@@ -1,0 +1,12 @@
+﻿Stage,Section,Element,Parameter,Name,Value,Unit,Comment
+1,Source,Source,Mode,SourceMode,0,,Gaussian kinetic energy
+1,Source,Source,Sigma x,SigmaX,0.000004,m,"Gaussian width, x"
+1,Source,Source,Sigma y,SigmaY,0.000004,m,"Gaussian width, y"
+1,Source,Source,Minimum energy,Emin,1,MeV,Minimum of energy distribution
+1,Source,Source,Maximum energy,Emax,25,MeV,Minimum of energy distribution
+1,Source,Source,Number of points,nPnts,1000,,Number of points to sample for integration of PDF
+1,Source,Source,Minimum cos theta,MinCTheta,0.998,,Maximum theta for flat cos theta
+1,Source,Drift,Length,Drift1Length,0.05,m,"Length of first, compensated, drift"
+1,Source,Aperture,Circular,Radius1,0.002,m,Inner bore of entry to nozzle
+1,Source,Drift,Length,Drift2Length,0.05,m,"Length of first, compensated, drift"
+1,Source,Aperture,Circular,Radius2,0.00287,m,Inner bore of exit from nozzle

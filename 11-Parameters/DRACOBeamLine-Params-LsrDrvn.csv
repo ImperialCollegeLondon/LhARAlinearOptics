@@ -1,0 +1,26 @@
+﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment,
+1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy,
+1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x",
+1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y",
+1,Source,Source,Parameterised TNSA,Emin,5,MeV,Minimum of energy distribution,
+1,Source,Source,Parameterised TNSA,Emax,70,MeV,Maximum of energy distribution,
+1,Source,Source,Parameterised TNSA,nPnts,10000,,Number of points to sample for integration of PDF,
+1,Source,Source,Parameterised TNSA,MinCTheta,0.970295726,,Maximum theta for flat cos theta,0.97030
+1,Capture,Drift,,Length,0.08,m,Length of drift from target to first solenoid,0.08000
+1,Capture,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,
+1,Capture,Solenoid,"Length, layers and turns",Length,0.12,m,Length of solenoid,0.20000
+1,Capture,Solenoid,"Length, layers and turns",Current,1.16E+04,A,,11607.64331
+1,Capture,Solenoid,"Length, layers and turns",Layers,4,,,
+1,Capture,Solenoid,"Length, layers and turns",Turns,28,,Turns per layer,
+1,Capture,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,0.20000
+1,Capture,Drift,,Length,0.545,m,,0.74500
+1,Capture,Aperture,Circular,Radius,0.0075,m,,
+1,Delivery,Drift,,Length,0.355,m,,1.10000
+1,Delivery,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,
+1,Delivery,Solenoid,"Length, layers and turns",Length,0.12,m,Length of solenoid,1.22000
+1,Delivery,Solenoid,"Length, layers and turns",Current,2.98E+03,A,,2981.92771
+1,Delivery,Solenoid,"Length, layers and turns",Layers,4,,,
+1,Delivery,Solenoid,"Length, layers and turns",Turns,28,,Turns per layer,
+1,Delivery,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,
+1,Delivery,Drift,,Length,0.915,m,,2.13500
+1,Delivery,Aperture,Circular,Radius,0.0035,m,Colimator,

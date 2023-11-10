@@ -1,0 +1,81 @@
+\section*{Introduction}
+This document summarises the steps needed to set-up and run
+LhARA\_Beamline linear optics simulation of the LhARA beamine.
+A summary of the tasks that LhARA\_Beamline software suite performs
+will be documented in due course.
+LhARA\_Beamline has been developed in python; python~3 is assumed.
+
+\section*{Getting the code}
+LhARA\_Beamline is maintained using the GitHub version-control system.
+The latest release can be downloaded from the {\color{red} \ldots
+should we moce to the LhARA repository ... its git, but, bespoke to
+CCAP/LhARA}.
+
+\section*{Dependencies and required packages}
+LhARA\_Beamline requires the following packages:
+\begin{itemize}
+  \item Python modules: \verb+scipy+, \verb+matplotlib+,
+    \verb+pandas+, and \verb+iminuit+; 
+  \item CERN programme library: \verb+pyroot+ (which may be installed
+    using the standard \verb+root+ installers, see the documentation
+    at \href{https://root.cern/install/}{\underline{\color{blue}https://root.cern/install/}}).
+\end{itemize}
+It may be convenient to run LhARA\_Beamline in a ``virtual environment''.
+To set this up, after updating your python installation to python~3.9.2,
+and installing root, execute the following commands:
+\begin{enumerate}
+  \item \verb+python3 -m venv --system-site-packages venv+
+    \begin{itemize}
+      \item This creates the director \verb+venv+ that contains files
+        related to the virtual environment.
+    \end{itemize}
+  \item \verb+source venv/bin/activate+
+  \item \verb+python -m pip install pandas scipy matplotlib iminuit+
+\end{enumerate}
+To exit from the virtual environment, execute the command
+\verb+deactivate+. \\
+\noindent
+The command \verb+source venv/bin/activate+ places you back
+into the virtual environment.
+
+\section*{Unpacking the code, directories, and running the tests}
+After downloading the package from GitHub, or cloning the repositiry,
+you will find a ``\verb+README.md+'' file which provides some orientation
+and instructions to run the code.
+In particular, a \verb+bash+ script ``\verb+startup.bash+'' is
+provided which:
+\begin{itemize}
+  \item Sets the ``\verb+LhARAOpticsPATH+'' environment variable
+    so that the files that hold constants etc. required by the code
+    can be located; and
+  \item Adds ``\verb+01-Code+'' (see below) to the PYTHONPATH.
+    The scripts in "02-Tests" (see below) may then be run with the
+    command "python 02-Tests/\textless\,filename\,\textgreater.py".
+\end{itemize}
+Below the top directory, the directory structure in which the code is
+presented is:
+\begin{description}
+  \item\verb+01-Code+: contains the python implementation as a
+    series of modules.
+    Each module contains a single class or a related set of methods.
+  \item\verb+02-Tests+: contains self-contained test scripts that
+    run the various methods and simulation packages defined in the
+    code directory.
+  \item\verb+11-Parameters+: contains the parameter set used in
+    \verb+02-Tests/RunSimulation.py+ to generate muon decays in
+    the production straight.
+\end{description}
+The instruction in the \verb+README.md+ file should be followed to set
+up and run the code.
+
+\section*{Running the code}
+The file in 02-Tests/RunSimulation.py - will run the code.
+
+\noindent The file {\bf RunSimulation.py} contains:
+\begin{itemize}
+  \item The definition of csv  input file to control the running of
+    the Simulation; and
+  \item The call to the Simulation class with; the number of events to
+    generate; the central energy to generate; and the
+    filenames.
+\end{itemize}
