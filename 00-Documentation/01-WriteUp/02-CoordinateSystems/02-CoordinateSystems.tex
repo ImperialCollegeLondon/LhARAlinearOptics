@@ -12,33 +12,30 @@ pointing in the downstream direction, i.e. away from the target.
 The $y$ axis points vertically upwards, and the $x$ axis completes a
 right-handed orthogonal coordinate system. 
 
-Phase-space coordinates as well as vector and scalar quantities
-referred to the laboratory coordinate system will be written in lower
-case.
 Unit vectors along the $x$, $y$ and $z$ axes are $\bm{i}$, $\bm{j}$
 and $\bm{k}$ respectively.
 The position of the reference particle, its momentum and energy are
 described as functions of the distance it has travelled from the origin
 of coordinates to its current position.
 The distance travelled is defined to be $s$, making the position,
-$\bm{r}_r$, momentum, $\bm{p}_p$, and energy, $\epsilon_r$, of the
+$\bm{r}_r$, momentum, $\bm{p}_r$, and energy, $E_r$, of the
 reference particle at position $s$:
 \begin{eqnarray}
-  \bm{r}_r & = &   \bm{r}(s)\, ;           \nonumber \\
-  \bm{p}_r & = &   \bm{p}(s)\, {\rm ; and} \nonumber \\
-\epsilon_r & = & \epsilon(s)\, .           \nonumber
+  \bm{r}_r & = & \bm{r}_r(s)\, ;           \nonumber \\
+  \bm{p}_r & = & \bm{p}_r(s)\, {\rm ; and}           \\
+       E_r & = &      E_r(s)\, .           \nonumber
 \end{eqnarray}
 The time, $t$, at which the reference particle is at $s$ is also a
 function of $s$:
 \begin{eqnarray}
-      t  & = & t(s) = \frac{p_r}{\epsilon_r c}\, ; \nonumber
+        t  & = & t(s) = \frac{p_r}{E_r c}\, ; 
 \end{eqnarray}
 where $p_r=\left|\bm{p}_r\right|$ and $c$ is the speed of light.
 
 \subsection{Reference particle local coordinate system}
 
 A coordinate system defined relative to the position of the reference
-particle, the ``reference particle local coordinaate'' (RPLC) system,
+particle, the ``reference particle local coordinate'' (RPLC) system,
 may be defined using the direction in which the particle is
 travelling. 
 The position of the particle defines the origin of the RPLC system,
@@ -62,20 +59,19 @@ see figure~\ref{fig:RPLC}.
   \label{fig:RPLC}
 \end{figure}
 
-Phase-space coordinates as well as vector and scalar quantities
-referred to the laboratory coordinate system will be written in
-capital letters.
 The tangent to the reference particle trajectory at $s$ defines the
-$Z$ axis with unit vector $\bm{K}$.
-The presence of local electric or magnetic fields may cause the
-reference particle's trajectory to curve.
+$z_{\rm RPLC}$ axis with unit vector $\bm{k}_{\rm RPLC}$.
+In the laboratory frame, the presence of local electric or magnetic
+fields may cause the reference particle's trajectory to change.
 In the neighbourhood of the particle, the curved trajectory may be
-described in terms of an arc of a cicle.
-The $X$ axis (with unit vector $\bm{I}$) is then taken to be in
-the direction pointing towards the centre of the circle.
-The third coordinate axis, $Y$, is defined to complete the
+described in terms of an arc of a circle.
+The $x_{\rm RPLC}$ axis (with unit vector $\bm{i}_{\rm RPLC}$) is then
+taken to be in the direction pointing towards the centre of the
+circle. 
+The third coordinate axis, $y_{\rm RPLC}$, is defined to complete the
 right-handed orthogonal coordinate system; the unit vector along the
-$Y$ axis being given by $\bm{J} = \bm{K} \times \bm{I}$.
+$y_{\rm RPLC}$ axis being given by
+$\bm{j}_{\rm RPLC} = \bm{k}_{\rm RPLC} \times \bm{i}_{\rm RPLC}$.
 
 The trajectory of the reference particle will be a straight line as it
 traverses a drift space or when the particle's energy is increased (or
@@ -83,7 +79,7 @@ decreased) through an electric field applied parallel to its direction
 of motion.
 In such cases the RPLC axes are taken to coincide with either the
 laboratory coordinate system or the RPLC system defined at the exit of
-the beam-line element that preceded the drift space or accelating
+the beam-line element that preceded the drift space or accelerating
 element.
 
 \subsection{Transforming to and from reference particle local
@@ -97,28 +93,28 @@ The position of a test particle in the RPLC frame ($\bm{R}_{t}$) is
 described with reference to the position of the reference particle.
 In the laboratory frame, the position of the test particle is:
 \begin{equation}
-  \bm{R}_{t}(s) = \bm{R}(s) + \bm{\delta r}(s) \,;
+  \bm{r}_{t}(s) = \bm{r}_r(s) + \bm{\delta r}(s) \,;
 \end{equation}
 where:
 \begin{equation}
-  \bm{\delta r}(s) = \underline{\underline{R}}(s) \bm{R}_t(s) \,;
+  \bm{\delta r}(s) = \underline{\underline{R}}(s) \bm{R}_t(s) \,{\rm ; and}
 \end{equation}
-where $\underline{\underline{R}}(s)$ is a rotation matrix that takes
+$\underline{\underline{R}}(s)$ is a rotation matrix that takes
 the RPLCs at $s$ to the laboratory frame coordinates.
 
-In the laboratory frame, the unit vectors $\bm{I}$, $\bm{J}$ and
-$\bm{K}$ may be written: 
+In the laboratory frame, the unit vectors $\bm{i}_{\rm RPLC}$,
+$\bm{j}_{\rm RPLC}$ and $\bm{k}_{\rm RPLC}$ are given by:
 \begin{eqnarray}
-  \bm{i}_r & = & \begin{pmatrix} i_{rx} \\ i_{ry} \\  i_{rz} \\ \end{pmatrix} \nonumber \\
-  \bm{j}_r & = & \begin{pmatrix} j_{rx} \\ j_{ry} \\  j_{rz} \\ \end{pmatrix} \nonumber \\
-  \bm{k}_r & = & \begin{pmatrix} k_{rx} \\ k_{ry} \\  k_{rz} \\ \end{pmatrix} \nonumber
+  \bm{i}_{\rm RPLC} & = & \begin{pmatrix} i_{rx} \\ i_{ry} \\  i_{rz} \\ \end{pmatrix} \,;           \nonumber \\
+  \bm{j}_{\rm RPLC} & = & \begin{pmatrix} j_{rx} \\ j_{ry} \\  j_{rz} \\ \end{pmatrix} \,{\rm ; and}           \\
+  \bm{k}_{\rm RPLC} & = & \begin{pmatrix} k_{rx} \\ k_{ry} \\  k_{rz} \\ \end{pmatrix} \,.           \nonumber
 \end{eqnarray}
 The rotation matrix, $\underline{\underline{R}}$, may now be written:
 \begin{equation}
   \underline{\underline{R}}(s) =
     \begin{bmatrix}
-      i_{rx} & j_{rx} & k_{rx} \\
-      i_{ry} & j_{ry} & k_{ry} \\
-      i_{rz} & j_{rz} & k_{rz} 
-    \end{bmatrix}
+      i_{{\rm RPLC}x} & j_{{\rm RPLC}x} & k_{{\rm RPLC}x} \\
+      i_{{\rm RPLC}y} & j_{{\rm RPLC}y} & k_{{\rm RPLC}y} \\
+      i_{{\rm RPLC}z} & j_{{\rm RPLC}z} & k_{{\rm RPLC}z}
+    \end{bmatrix} \,.
 \end{equation}
