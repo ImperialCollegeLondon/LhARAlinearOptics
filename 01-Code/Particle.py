@@ -5,7 +5,12 @@ Class Particle:
 ===============
 
   Instance of particle class is record of particle travelling through the
-  beamm line.
+  beam line.
+
+  Derived classes:
+  ----------------
+   ReferenceParticle: Reference particle derived class to record passage of
+                      reference particle through the lattice.
 
 
   Class attributes:
@@ -151,6 +156,9 @@ class Particle:
         return "Particle()"
 
     def __str__(self):
+        self.print()
+
+    def print(self):
         print(" Particle:")
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
@@ -530,7 +538,73 @@ class Particle:
 
         ParticleFILE.close()
 
-            
+
+class ReferenceParticle(Particle):
+    __instance = None
+    __RPDebug    = False
+
+#--------  "Built-in methods":
+    def __init__(self):
+        if ReferenceParticle.getinstance() is None:
+            if self.__RPDebug:
+                print(' ReferenceParticle(Particle).__init__: ', \
+                      'creating the ReferenceParticle object')
+            ReferenceParticle.setinstance(self)
+
+            #.. Particle class initialisation:
+            Particle.__init__(self)
+        
+            # Only constants; print values that will be used:
+            if self.__RPDebug:
+                print(self)
+                
+        else:
+            print(' ReferenceParticle(Particle).__init__: ',       \
+                  " attempt to create second reference particle.", \
+                  " Abort!")
+            raise secondReferenceParticle(" Second call not allowed.")
+
+        return
+
+    def __repr__(self):
+        return "ReferenceParticle()"
+
+    def __str__(self):
+        print(" ReferenceParticle:")
+        print(" ==================")
+        print("     ----> Debug:", self.getRPDebug())
+        print("     <---- Now particle dump:")
+        print(self.print())
+        return " <---- ReferenceParticle dump complete."
+
+    
+#--------  "Get methods" only; version, reference, and constants
+#.. Methods believed to be self documenting(!)
+
+    @classmethod
+    def getinstance(cls):
+        return cls.__instance
+        
+    def getRPDebug(self):
+        return self.__RPDebug
+
+
+#--------  "Get methods" only; version, reference, and constants
+    def setRPDebug(self, Debug):
+        if isinstance(Debug, bool):
+            self.__RPDebug = Debug
+        else:
+            raise badArgument()
+
+    @classmethod
+    def setinstance(cls, inst):
+        if isinstance(inst, ReferenceParticle):
+            cls.__instance = inst
+        else:
+            raise badArgument()
+
+        
+
 #--------  Exceptions:
 class badParticle(Exception):
     pass
@@ -545,5 +619,11 @@ class noNAME(Exception):
     pass
 
 class noFILE(Exception):
+    pass
+
+class badArgument(Exception):
+    pass
+
+class secondReferenceParticle(Exception):
     pass
 
