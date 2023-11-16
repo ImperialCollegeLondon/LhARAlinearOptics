@@ -558,8 +558,8 @@ Derived class ReferenceParticle(Particle):
 
    ReferencePartricle attributes:
 !!To be implemented
-         _sIn[]: ndarray : Path lenth at entrance to beamline element. 
-        _sOut[]: ndarray : Path lenth at exit from beamline element. 
+         _sIn[]: float   : Path lenth at entrance to beamline element. 
+        _sOut[]: float   : Path lenth at exit from beamline element. 
 !!To be implemented
         _RrIn[]: ndarray : In laboratory frame, four-vector position at
                            entrance to beamline element. 
@@ -727,6 +727,35 @@ class ReferenceParticle(Particle):
         self._PrOut     = []
         self._Rot2LabIn = []
         self._Rot2LabIn = []
+
+    def setsIn(self, sIn):
+        Success = False
+        if isinstance(sIn, float):
+            self._sIn.append(sIn)
+            Success = True
+        return Success
+
+    def setsOut(self, sOut):
+        Success = False
+        if isinstance(sOut, float):
+            self._sOut.append(sOut)
+            Success = True
+        return Success
+
+    def setRrIn(self, RrIn):
+        Success = False
+        if isinstance(RrIn, np.ndarray):
+            self._RrIn.append(RrIn)
+            Success = True
+        return Success
+
+    def setRrOut(self, RrOut):
+        Success = False
+        if isinstance(RrOut, np.ndarray):
+            self._RrOut.append(RrOut)
+            Success = True
+        return Success
+
         
 
 #--------  Processing methods:
@@ -738,6 +767,27 @@ class ReferenceParticle(Particle):
         #.. Loop over beam-line elements:
         for iBLE in BLE.BeamLineElement.getinstances():
             print("     ----> Take:", iBLE.getName())
+            if isinstance(iBLE, BLE.Source):
+                print(iBLE)
+                Success = self.setsIn(0.)
+                if not Success:
+                    raise fail2setReferenceParticle("sIn")
+                Success = self.setsOut(0.)
+                if not Success:
+                    raise fail2setReferenceParticle("sOut")
+
+                RrIn  = np.array([0., 0., 0.])
+                RrOut = np.array([0., 0., 0.])
+                Success = self.setRrIn(RrIn)
+                if not Success:
+                    raise fail2setReferenceParticle("RrIn")
+                Success = self.setRrOut(RrOut)
+                if not Success:
+                    raise fail2setReferenceParticle("RrOut")
+
+        if self.getRPDebug():
+            print("     ----> Dump refence particle:")
+            print(self)
 
 
 #--------  Exceptions:
@@ -762,3 +812,5 @@ class badArgument(Exception):
 class secondReferenceParticle(Exception):
     pass
 
+class fail2setReferenceParticle(Exception):
+    pass
