@@ -557,6 +557,10 @@ Derived class ReferenceParticle(Particle):
    Particle instance attributes.
 
    ReferencePartricle attributes:
+!!To be implemented
+         _sIn[]: ndarray : Path lenth at entrance to beamline element. 
+        _sOut[]: ndarray : Path lenth at exit from beamline element. 
+!!To be implemented
         _RrIn[]: ndarray : In laboratory frame, four-vector position at
                            entrance to beamline element. 
           _Pr[]: ndarray : In laboratory frame, four-vector momentum at
@@ -714,6 +718,17 @@ class ReferenceParticle(Particle):
         self._Rot2LabIn = []
         self._Rot2LabIn = []
         
+
+#--------  Processing methods:
+    def setReferenceParticle(self):
+        if self.getRPDebug():
+            print(" ReferenceParticle(Particle).setReferenceParticle", \
+                  "starts.")
+
+        #.. Loop over beam-line elements:
+        for iBLE in BLE.BeamLineElement.getinstances():
+            print("     ----> Take:", iBLE.getName())
+
 
 #--------  Exceptions:
 class badParticle(Exception):

@@ -8,8 +8,11 @@ Test script for "ReferenceParticle" derived class
 
 """
 
-import Particle as Prtcl
+import os
 import sys
+
+import LIONbeam as LNb
+import Particle as Prtcl
 
 ##! Start:
 print("========  ReferenceParticle: tests start  ========")
@@ -57,6 +60,23 @@ print()
 print("ReferenceParticleTest:", ReferenceParticleTest, \
       " check get instane method.")
 print(Prtcl.ReferenceParticle.getinstance())
+
+
+##! Load some geometry and then test reference particle load:
+ReferenceParticleTest += 1
+print()
+print("ReferenceParticleTest:", ReferenceParticleTest, \
+      " load geometry and then test reference particle load.")
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+LNbI  = LNb.LIONbeam(filename)
+print(LNbI)
+
+refPrtcl.setRPDebug(True)
+refPrtclSet = refPrtcl.setReferenceParticle()
+refPrtcl.setRPDebug(False)
+
 
 ##! Complete:
 print()
