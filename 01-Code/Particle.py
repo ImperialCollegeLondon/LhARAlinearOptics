@@ -190,10 +190,10 @@ class Particle:
         cls.instances = []
         
     def setAll2None(self):
-        self._Location = []
-        self._z        = []
-        self._s        = []
-        self._PhsSpc   = []
+        self._Location  = []
+        self._z         = []
+        self._s         = []
+        self._PhsSpc    = []
         
     def setLocation(self, Location):
         Success = False
@@ -539,6 +539,82 @@ class Particle:
         ParticleFILE.close()
 
 
+"""
+Derived class ReferenceParticle(Particle):
+==========================================
+
+  Provides reference particle.  Derived from Particle class.
+
+
+  Class attributes:
+  -----------------
+  __instance : Instances of ReferenceParticle class
+  __Debug    : Debug flag
+
+      
+  Instance attributes:
+  --------------------
+   Particle instance attributes.
+
+   ReferencePartricle attributes:
+        _RrIn[]: ndarray : In laboratory frame, four-vector position at
+                           entrance to beamline element. 
+          _Pr[]: ndarray : In laboratory frame, four-vector momentum at
+                           entrance to beamline element. 
+       _RrOut[]: ndarray : In laboratory frame, four-vector position at
+                           exit from beamline element. 
+       _PrOut[]: ndarray : In laboratory frame, four-vector momentum at
+                           exit from beamline element.
+   _Rot2LabIn[]: ndarray : Rotation matrix from RPLC to lab at entry to
+                           beamline element.
+  _Rot2LabOut[]: ndarray : Rotation matrix from RPLC to lab at exit from
+                           beamline element.
+
+   All instance attributes are initialised to Null
+
+
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+  Get methods:
+   getinstance: Class method, returns instance of ReferencePartcicle class.
+
+    getRPDebug: Get ReferenceParticle class debug flag.
+
+
+  Set methods:
+   setinstance: Class method, sets ReferencePartcicle instance.
+           Input: ReferenceParticle
+          Return: None
+       Exception: Raised if i/p not instance of ReferenceParticle
+
+    setRPDebug: Set ReferenceParticle class debug flag.
+           Input: bool, True/False
+          Return: None
+       Exception: Raised if i/p not bool.
+
+   setAll2RPNone: set all instance attributes to None or []
+
+  Processing method:
+
+
+  I/o methods:
+
+
+  Exceptions:
+     badArgument(Exception), secondReferenceParticle
+    
+
+Created on Mon 15Nov23: Version history:
+----------------------------------------
+ 1.0: 15Nov23: First implementation
+
+@author: kennethlong
+"""
 class ReferenceParticle(Particle):
     __instance = None
     __RPDebug    = False
@@ -550,6 +626,9 @@ class ReferenceParticle(Particle):
                 print(' ReferenceParticle(Particle).__init__: ', \
                       'creating the ReferenceParticle object')
             ReferenceParticle.setinstance(self)
+
+            #.. Set ReferenceParticle attributes to None:
+            self.setAllRP2None()
 
             #.. Particle class initialisation:
             Particle.__init__(self)
@@ -572,7 +651,13 @@ class ReferenceParticle(Particle):
     def __str__(self):
         print(" ReferenceParticle:")
         print(" ==================")
-        print("     ----> Debug:", self.getRPDebug())
+        print("     ----> Debug     :", self.getRPDebug())
+        print("     ----> RrIn      :", self.getRrIn())
+        print("     ----> PrIn      :", self.getPrIn())
+        print("     ----> RrOut     :", self.getRrOut())
+        print("     ----> PrOut     :", self.getPrOut())
+        print("     ----> Rot2LabIn :", self.getRot2LabIn())
+        print("     ----> Rot2LabOut:", self.getRot2LabOut())
         print("     <---- Now particle dump:")
         print(self.print())
         return " <---- ReferenceParticle dump complete."
@@ -588,6 +673,24 @@ class ReferenceParticle(Particle):
     def getRPDebug(self):
         return self.__RPDebug
 
+    def getRrIn(self):
+        return self._RrIn
+        
+    def getRrOut(self):
+        return self._RrOut
+        
+    def getPrIn(self):
+        return self._PrIn
+        
+    def getPrOut(self):
+        return self._PrOut
+    
+    def getRot2LabIn(self):
+        return self._PrIn
+        
+    def getRot2LabOut(self):
+        return self._PrOut
+        
 
 #--------  "Get methods" only; version, reference, and constants
     def setRPDebug(self, Debug):
@@ -603,6 +706,13 @@ class ReferenceParticle(Particle):
         else:
             raise badArgument()
 
+    def setAllRP2None(self):
+        self._RrIn      = []
+        self._PrIn      = []
+        self._RrOut     = []
+        self._PrOut     = []
+        self._Rot2LabIn = []
+        self._Rot2LabIn = []
         
 
 #--------  Exceptions:
