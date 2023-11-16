@@ -656,6 +656,8 @@ class ReferenceParticle(Particle):
         print(" ReferenceParticle:")
         print(" ==================")
         print("     ----> Debug     :", self.getRPDebug())
+        print("     ----> sIn       :", self.getsIn())
+        print("     ----> sOut      :", self.getsOut())
         print("     ----> RrIn      :", self.getRrIn())
         print("     ----> PrIn      :", self.getPrIn())
         print("     ----> RrOut     :", self.getRrOut())
@@ -677,6 +679,12 @@ class ReferenceParticle(Particle):
     def getRPDebug(self):
         return self.__RPDebug
 
+    def getsIn(self):
+        return self._sIn
+        
+    def getsOut(self):
+        return self._sOut
+        
     def getRrIn(self):
         return self._RrIn
         
@@ -711,6 +719,8 @@ class ReferenceParticle(Particle):
             raise badArgument()
 
     def setAllRP2None(self):
+        self._sIn       = []
+        self._sOut      = []
         self._RrIn      = []
         self._PrIn      = []
         self._RrOut     = []
