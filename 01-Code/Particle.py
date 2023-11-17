@@ -558,10 +558,8 @@ Derived class ReferenceParticle(Particle):
    Particle instance attributes.
 
    ReferencePartricle attributes:
-!!To be implemented
          _sIn[]: float   : Path lenth at entrance to beamline element. 
         _sOut[]: float   : Path lenth at exit from beamline element. 
-!!To be implemented
         _RrIn[]: ndarray : In laboratory frame, four-vector position at
                            entrance to beamline element. 
           _Pr[]: ndarray : In laboratory frame, four-vector momentum at
@@ -590,6 +588,8 @@ Derived class ReferenceParticle(Particle):
 
     getRPDebug: Get ReferenceParticle class debug flag.
 
+     getsIn, getsOut, getRrIn, getRrOut, getPrIn, getPrOut, getRot2LabIn,
+     getRot2LabOut all believed to be self documenting.
 
   Set methods:
    setinstance: Class method, sets ReferencePartcicle instance.
@@ -604,11 +604,36 @@ Derived class ReferenceParticle(Particle):
 
    setAll2RPNone: set all instance attributes to None or []
 
-  Processing method:
+          setsIn : i/p float              : Sets _sIn
+         setsOut : i/p float              : Sets _sOut
 
+         setRrIn : i/p 4 param, ndarray   : Sets _RrIn
+        setRrOut : i/p 4 param, ndarray   : Sets _RrOut
+
+         setPrIn : i/p 4 param, ndarray   : Sets _PrIn
+        setPrOut : i/p 4 param, ndarray   : Sets _PrOut
+
+    setRot2LabIn : i/p 3x3 param, ndarray : Sets _Rot2LabIn
+   setRot2LabOut : i/p 3x3 param, ndarray : Sets _Rot2LabOut
+
+  Processing method:
+         setReferenceParticle: No input, runs through beam line elements
+                               (instances of BeamLineElement class) to
+                               set parameters of reference particle at each
+                               element.
+
+ setReferenceParticleAtSource: I/p: iBLE : BeamLineElement instance
+                               Sets attributes for reference partice at
+                               source.
+
+ setReferenceParticleAtDrift: I/p: iBLE : BeamLineElement instance
+                               Sets attributes for reference partice for a
+                               drift space.  Also works for apertures,
+                               quads, and any element that has length but
+                               does not bend the beam, sich as a dipole.
 
   I/o methods:
-
+     None so far.
 
   Exceptions:
      badArgument(Exception), secondReferenceParticle
@@ -706,17 +731,17 @@ class ReferenceParticle(Particle):
         return self._Rot2LabOut
         
 
-#--------  "Get methods" only; version, reference, and constants
-    def setRPDebug(self, Debug):
-        if isinstance(Debug, bool):
-            self.__RPDebug = Debug
-        else:
-            raise badArgument()
-
+#--------  "Set methods";
     @classmethod
     def setinstance(cls, inst):
         if isinstance(inst, ReferenceParticle):
             cls.__instance = inst
+        else:
+            raise badArgument()
+
+    def setRPDebug(self, Debug):
+        if isinstance(Debug, bool):
+            self.__RPDebug = Debug
         else:
             raise badArgument()
 
