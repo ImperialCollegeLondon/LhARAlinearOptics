@@ -55,7 +55,7 @@ Class Particle:
 
 setPhaseSpace: np.ndarray(6,) : phase space 6 floats
 
-recortParticle: i/p: Location, s, z, PhaseSpace:
+recordParticle: i/p: Location, s, z, PhaseSpace:
                 calls, setLocation, setz, sets, setPhaseSpace in turn
                 to store all variables.
 
@@ -125,6 +125,7 @@ import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
 import struct            as strct
 import numpy             as np
+import math              as mth
 import os
 import io
 
@@ -656,14 +657,15 @@ class ReferenceParticle(Particle):
         print(" ReferenceParticle:")
         print(" ==================")
         print("     ----> Debug     :", self.getRPDebug())
+        print("     ----> Location  :", self.getLocation())
         print("     ----> sIn       :", self.getsIn())
         print("     ----> sOut      :", self.getsOut())
         print("     ----> RrIn      :", self.getRrIn())
         print("     ----> PrIn      :", self.getPrIn())
         print("     ----> RrOut     :", self.getRrOut())
         print("     ----> PrOut     :", self.getPrOut())
-        print("     ----> Rot2LabIn :", self.getRot2LabIn())
-        print("     ----> Rot2LabOut:", self.getRot2LabOut())
+        print("     ----> Rot2LabIn : \n", self.getRot2LabIn())
+        print("     ----> Rot2LabOut: \n", self.getRot2LabOut())
         print("     <---- Now particle dump:")
         print(self.print())
         return " <---- ReferenceParticle dump complete."
@@ -698,10 +700,10 @@ class ReferenceParticle(Particle):
         return self._PrOut
     
     def getRot2LabIn(self):
-        return self._PrIn
+        return self._Rot2LabIn
         
     def getRot2LabOut(self):
-        return self._PrOut
+        return self._Rot2LabOut
         
 
 #--------  "Get methods" only; version, reference, and constants
@@ -719,14 +721,14 @@ class ReferenceParticle(Particle):
             raise badArgument()
 
     def setAllRP2None(self):
-        self._sIn       = []
-        self._sOut      = []
-        self._RrIn      = []
-        self._PrIn      = []
-        self._RrOut     = []
-        self._PrOut     = []
-        self._Rot2LabIn = []
-        self._Rot2LabIn = []
+        self._sIn        = []
+        self._sOut       = []
+        self._RrIn       = []
+        self._PrIn       = []
+        self._RrOut      = []
+        self._PrOut      = []
+        self._Rot2LabIn  = []
+        self._Rot2LabOut = []
 
     def setsIn(self, sIn):
         Success = False
@@ -756,8 +758,35 @@ class ReferenceParticle(Particle):
             Success = True
         return Success
 
-        
+    def setPrIn(self, PrIn):
+        Success = False
+        if isinstance(PrIn, np.ndarray):
+            self._PrIn.append(PrIn)
+            Success = True
+        return Success
 
+    def setPrOut(self, PrOut):
+        Success = False
+        if isinstance(PrOut, np.ndarray):
+            self._PrOut.append(PrOut)
+            Success = True
+        return Success
+
+    def setRot2LabIn(self, Rot2LabIn):
+        Success = False
+        if isinstance(Rot2LabIn, np.ndarray):
+            self._Rot2LabIn.append(Rot2LabIn)
+            Success = True
+        return Success
+
+    def setRot2LabOut(self, Rot2LabOut):
+        Success = False
+        if isinstance(Rot2LabOut, np.ndarray):
+            self._Rot2LabOut.append(Rot2LabOut)
+            Success = True
+        return Success
+
+        
 #--------  Processing methods:
     def setReferenceParticle(self):
         if self.getRPDebug():
@@ -766,30 +795,150 @@ class ReferenceParticle(Particle):
 
         #.. Loop over beam-line elements:
         for iBLE in BLE.BeamLineElement.getinstances():
-            print("     ----> Take:", iBLE.getName())
             if isinstance(iBLE, BLE.Source):
-                print(iBLE)
-                Success = self.setsIn(0.)
+                Success = self.setReferenceParticleAtSource(iBLE)
                 if not Success:
-                    raise fail2setReferenceParticle("sIn")
-                Success = self.setsOut(0.)
+                    raise fail2setReferenceParticle( \
+                                   "setReferenceParticleAtSource")
+            elif isinstance(iBLE, BLE.Drift)             or \
+                 isinstance(iBLE, BLE.Aperture)          or \
+                 isinstance(iBLE, BLE.FocusQuadrupole)   or \
+                 isinstance(iBLE, BLE.DefocusQuadrupole)    :
+                Success = self.setReferenceParticleAtDrift(iBLE)
                 if not Success:
-                    raise fail2setReferenceParticle("sOut")
+                    raise fail2setReferenceParticle( \
+                                   "setReferenceParticleAtDrift")
+                
 
-                RrIn  = np.array([0., 0., 0.])
-                RrOut = np.array([0., 0., 0.])
-                Success = self.setRrIn(RrIn)
-                if not Success:
-                    raise fail2setReferenceParticle("RrIn")
-                Success = self.setRrOut(RrOut)
-                if not Success:
-                    raise fail2setReferenceParticle("RrOut")
+            Success = self.setLocation(iBLE.getName())
+            if not Success:
+                raise fail2setReferenceParticle("setLocation")
 
         if self.getRPDebug():
             print("     ----> Dump refence particle:")
             print(self)
 
+    def setReferenceParticleAtSource(self, iBLE=None):
+        Success = self.setsIn(0.)
+        if not Success:
+            raise fail2setReferenceParticle("sIn")
+        Success = self.setsOut(0.)
+        if not Success:
+            raise fail2setReferenceParticle("sOut")
 
+        RrIn  = np.array([0., 0., 0., 0.])
+        RrOut = np.array([0., 0., 0., 0.])
+        Success = self.setRrIn(RrIn)
+        if not Success:
+            raise fail2setReferenceParticle("RrIn")
+        Success = self.setRrOut(RrOut)
+        if not Success:
+            raise fail2setReferenceParticle("RrOut")
+
+        PrIn  = np.array([0., 0., 99., np.nan])
+        PrOut = np.array([0., 0., 99., np.nan])
+        Success = self.setPrIn(PrIn)
+        if not Success:
+            raise fail2setReferenceParticle("PrIn")
+        Success = self.setPrOut(PrOut)
+        if not Success:
+            raise fail2setReferenceParticle("PrOut")
+
+        Rot2LabIn  = np.array([                  \
+                               [1., 0., 0.],      \
+                               [0., 1., 0.],      \
+                               [0., 0., 1.]       \
+                                      ])
+        Rot2LabOut = np.array([                   \
+                               [1., 0., 0.],      \
+                               [0., 1., 0.],      \
+                               [0., 0., 1.]       \
+                              ])
+        Success = self.setRot2LabIn(Rot2LabIn)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabIn")
+        Success = self.setRot2LabOut(Rot2LabOut)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabOut")
+
+        #.. Now particle position/phase space:
+        Success = self.setz(self.getRrOut()[0][3])
+        if not Success:
+            raise fail2setReferenceParticle("setz")
+        Success = self.sets(self.getsOut()[0])
+        if not Success:
+            raise fail2setReferenceParticle("sets")
+        PhsSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        Success = self.setPhaseSpace(PhsSpc)
+        if not Success:
+            raise fail2setReferenceParticle("setPhaseSpace")
+
+        return Success
+
+    def setReferenceParticleAtDrift(self, iBLE=None):
+        nRcrds  = len(self.getsIn())
+        
+        Success = self.setsIn(self.getsOut()[nRcrds-1])
+        if not Success:
+            raise fail2setReferenceParticle("sIn")
+        Success = self.setsOut(self.getsOut()[nRcrds-1] + iBLE.getLength())
+        if not Success:
+            raise fail2setReferenceParticle("sOut")
+        
+        RrIn  = self.getRrOut()[nRcrds-1]
+        Mmtm  = mth.sqrt(                             \
+                    self.getPrOut()[nRcrds-1][0]**2 + \
+                    self.getPrOut()[nRcrds-1][1]**2 + \
+                    self.getPrOut()[nRcrds-1][2]**2   \
+                        )
+        cx    = self.getPrOut()[nRcrds-1][0] / Mmtm
+        cy    = self.getPrOut()[nRcrds-1][1] / Mmtm
+        cz    = self.getPrOut()[nRcrds-1][2] / Mmtm
+        RrOut = np.array([ \
+                           RrIn[0] + cx*iBLE.getLength(), \
+                           RrIn[1] + cy*iBLE.getLength(), \
+                           RrIn[2] + cz*iBLE.getLength(), \
+                           0.                             \
+                          ])
+        Success = self.setRrIn(RrIn)
+        if not Success:
+            raise fail2setReferenceParticle("RrIn")
+        Success = self.setRrOut(RrOut)
+        if not Success:
+            raise fail2setReferenceParticle("RrOut")
+
+        PrIn  = self.getPrOut()[nRcrds-1]
+        PrOut = PrIn
+        Success = self.setPrIn(PrIn)
+        if not Success:
+            raise fail2setReferenceParticle("PrIn")
+        Success = self.setPrOut(PrOut)
+        if not Success:
+            raise fail2setReferenceParticle("PrOut")
+
+        Rot2LabIn  = self.getRot2LabOut()[nRcrds-1]
+        Rot2LabOut = Rot2LabIn
+        Success = self.setRot2LabIn(Rot2LabIn)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabIn")
+        Success = self.setRot2LabOut(Rot2LabOut)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabOut")
+        
+        #.. Now particle position/phase space:
+        Success = self.setz(self.getRrOut()[nRcrds][2])
+        if not Success:
+            raise fail2setReferenceParticle("setz")
+        Success = self.sets(self.getsOut()[nRcrds])
+        if not Success:
+            raise fail2setReferenceParticle("sets")
+        PhsSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        Success = self.setPhaseSpace(PhsSpc)
+        if not Success:
+            raise fail2setReferenceParticle("setPhaseSpace")
+        
+        return Success
+    
 #--------  Exceptions:
 class badParticle(Exception):
     pass
