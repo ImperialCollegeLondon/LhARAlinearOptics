@@ -22,12 +22,12 @@ Class Particle:
   Instance attributes:
   --------------------
    All instance attributes are initialised to Null
-   _Location[] :   str   : Name of location where phase space recorded
-   _z[]        : float   : z coordinate at which phase space recorded
-   _s[]        : float   : s coordinate at which phase space recorded
-   _PhsSpc[]   : ndarray : 6D phase space: x, x', y, y', t, E (m, s, MeV)
+   _Location[] :   str   : Name of location where trace space recorded
+   _z[]        : float   : z coordinate at which trace space recorded
+   _s[]        : float   : s coordinate at which trace space recorded
+   _TrcSpc[]   : ndarray : 6D trace space: x, x', y, y', t, E (m, s, MeV)
 
-***   _SourcePhaseSpace: numpy array of 6-dimensional phase space
+***   _SourceTraceSpace: numpy array of 6-dimensional trace space
     
   Methods:
   --------
@@ -53,20 +53,20 @@ Class Particle:
 
          sets: float : Set s coordinate at which phase-space is stored.
 
-setPhaseSpace: np.ndarray(6,) : phase space 6 floats
+setTraceSpace: np.ndarray(6,) : trace space 6 floats
 
-recordParticle: i/p: Location, s, z, PhaseSpace:
-                calls, setLocation, setz, sets, setPhaseSpace in turn
+recordParticle: i/p: Location, s, z, TraceSpace:
+                calls, setLocation, setz, sets, setTraceSpace in turn
                 to store all variables.
 
-  setSourcePhaseSpace: set phase space after source
+  setSourceTraceSpace: set trace space after source
            Input: numpy.array(6,); 6D phase to store
           Return: Success: bool, True if stored OK.
 
 
   Get methods:
       getDebug, getParticleInstances, getLocation, getz, gets, 
-      getPhaseSpace
+      getTraceSpace
           -- thought to be self documenting!
 
   Processing method:
@@ -74,7 +74,7 @@ recordParticle: i/p: Location, s, z, PhaseSpace:
                      particles.
          No input; Returns bool flag, True means all good.
 
- plotPhaseSpaceProgression: create plots showing standard summary of
+ plotTraceSpaceProgression: create plots showing standard summary of
                             progression through beam line
          No input or return
 
@@ -142,6 +142,12 @@ class Particle:
             print(' Particle.__init__: ', \
                   'creating the Particle object')
 
+        #.. Must have reference particle as first in the instance list,
+        #   ... so ...
+        if not isinstance(ReferenceParticle.getinstance(),ReferenceParticle):
+            raise noReferenceParticle(" Reference particle, ", \
+                                      "not first in particle list.")
+
         Particle.instances.append(self)
 
         #.. Particle instance created with phase-space at each
@@ -158,6 +164,7 @@ class Particle:
 
     def __str__(self):
         self.print()
+        return " Partcle __str__ done."
 
     def print(self):
         print(" Particle:")
@@ -166,14 +173,14 @@ class Particle:
         print("     ----> Number of phase-space records:", \
               len(self.getLocation()))
         if len(self.getLocation()) > 0:
-            print("     ----> Record of phase space:")
+            print("     ----> Record of trace space:")
         for iLctn in range(len(self.getLocation())):
             print("         ---->", self.getLocation()[iLctn], ":")
             print("             ----> z, s", self.getz()[iLctn], \
                                              self.gets()[iLctn])
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("             ----> Phase space:", \
-                      self.getPhaseSpace()[iLctn])
+                print("             ----> trace space:", \
+                      self.getTraceSpace()[iLctn])
         return " <---- Particle parameter dump complete."
 
     
@@ -194,7 +201,7 @@ class Particle:
         self._Location  = []
         self._z         = []
         self._s         = []
-        self._PhsSpc    = []
+        self._TrcSpc    = []
         
     def setLocation(self, Location):
         Success = False
@@ -217,31 +224,31 @@ class Particle:
             Success = True
         return Success
 
-    def setPhaseSpace(self, PhaseSpace):
+    def setTraceSpace(self, TraceSpace):
         Success = False
-        if isinstance(PhaseSpace, np.ndarray):
-            self._PhsSpc.append(PhaseSpace)
+        if isinstance(TraceSpace, np.ndarray):
+            self._TrcSpc.append(TraceSpace)
             Success = True
         return Success
 
-    def recordParticle(self, Location, z, s, PhaseSpace):
+    def recordParticle(self, Location, z, s, TraceSpace):
         Success = self.setLocation(Location)
         if Success:
             Success = self.setz(z)
         if Success:
             Success = self.sets(s)
         if Success:
-            Success = self.setPhaseSpace(PhaseSpace)
+            Success = self.setTraceSpace(TraceSpace)
         return Success
 
-    def setSourcePhaseSpace(self, PhaseSpace):
+    def setSourceTraceSpace(self, TraceSpace):
         Success = self.setLocation("Source")
         if Success:
             Success = self.setz(0.)
         if Success:
             Success = self.sets(0.)
         if Success:
-            Success = self.setPhaseSpace(PhaseSpace)
+            Success = self.setTraceSpace(TraceSpace)
         return Success
 
     
@@ -265,8 +272,8 @@ class Particle:
     def gets(self):
         return self._s
     
-    def getPhaseSpace(self):
-        return self._PhsSpc
+    def getTraceSpace(self):
+        return self._TrcSpc
     
     
 #--------  Utilities:
@@ -278,12 +285,13 @@ class Particle:
             del iPrtcl
             
         cls.resetParticleInstances()
+        ReferenceParticle.resetinstance()
         DoneOK = True
 
         return DoneOK
     
     @classmethod
-    def plotPhaseSpaceProgression(cls):
+    def plotTraceSpaceProgression(cls):
 
         font = {'family': 'serif', \
                 'color':  'darkred', \
@@ -298,7 +306,7 @@ class Particle:
         ELoc  = []
         for iPrtcl in cls.getParticleInstances():
             iLoc = -1
-            for iPhsSpc in iPrtcl.getPhaseSpace():
+            for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
                 if iLoc > (len(xLoc)-1):
                     xLoc.append([])
@@ -307,11 +315,11 @@ class Particle:
                     ypLoc.append([])
                     ELoc.append([])
 
-                xLoc[iLoc].append(iPrtcl.getPhaseSpace()[iLoc][0])
-                xpLoc[iLoc].append(iPrtcl.getPhaseSpace()[iLoc][1])
-                yLoc[iLoc].append(iPrtcl.getPhaseSpace()[iLoc][2])
-                ypLoc[iLoc].append(iPrtcl.getPhaseSpace()[iLoc][3])
-                ELoc[iLoc].append(iPrtcl.getPhaseSpace()[iLoc][5])
+                xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
+                xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
+                yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
+                ypLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][3])
+                ELoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
 
         for iLoc in range(len(xLoc)):
             fig, axs = plt.subplots(nrows=2, ncols=2)
@@ -358,9 +366,9 @@ class Particle:
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500,precision=5,suppress=True):
-                print(self.getLocation()[iLoc], ": z, s, phase space:", \
+                print(self.getLocation()[iLoc], ": z, s, trace space:", \
                       self.getz()[iLoc], self.gets()[iLoc], \
-                      self.getPhaseSpace()[iLoc])
+                      self.getTraceSpace()[iLoc])
 
     
 #--------  I/o methods:
@@ -422,15 +430,15 @@ class Particle:
             record = strct.pack(">8d",                           \
                                 self.getz()[iLoc],               \
                                 self.gets()[iLoc],               \
-                                self.getPhaseSpace()[iLoc][0],   \
-                                self.getPhaseSpace()[iLoc][1],   \
-                                self.getPhaseSpace()[iLoc][2],   \
-                                self.getPhaseSpace()[iLoc][3],   \
-                                self.getPhaseSpace()[iLoc][4],   \
-                                self.getPhaseSpace()[iLoc][5])
+                                self.getTraceSpace()[iLoc][0],   \
+                                self.getTraceSpace()[iLoc][1],   \
+                                self.getTraceSpace()[iLoc][2],   \
+                                self.getTraceSpace()[iLoc][3],   \
+                                self.getTraceSpace()[iLoc][4],   \
+                                self.getTraceSpace()[iLoc][5])
             ParticleFILE.write(record)
             if self.getDebug():
-                print("         ----> z, s, phase space:", \
+                print("         ----> z, s, trace space:", \
                       strct.unpack(">8d",record))
         
         Cleaned = self.cleanParticles()
@@ -509,7 +517,7 @@ class Particle:
             record  = strct.unpack(">8d", brecord)
             z       = float(record[0])
             s       = float(record[1])
-            PhsSpc = np.array([                  \
+            TrcSpc = np.array([                  \
                                float(record[2]), \
                                float(record[3]), \
                                float(record[4]), \
@@ -517,9 +525,9 @@ class Particle:
                                float(record[6]), \
                                float(record[7])] )
             if cls.getDebug():
-                print("         ----> z, s, phase space:", z, s, PhsSpc)
+                print("         ----> z, s, trace space:", z, s, TrcSpc)
 
-            iPrtcl.recordParticle(Location, z, s, PhsSpc)
+            iPrtcl.recordParticle(Location, z, s, TrcSpc)
 
         if cls.getDebug():
             print("     <---- Particle instsance")
@@ -647,7 +655,7 @@ Created on Mon 15Nov23: Version history:
 """
 class ReferenceParticle(Particle):
     __instance = None
-    __RPDebug    = False
+    __RPDebug  = False
 
 #--------  "Built-in methods":
     def __init__(self):
@@ -691,9 +699,11 @@ class ReferenceParticle(Particle):
         print("     ----> PrOut     :", self.getPrOut())
         print("     ----> Rot2LabIn : \n", self.getRot2LabIn())
         print("     ----> Rot2LabOut: \n", self.getRot2LabOut())
-        print("     <---- Now particle dump:")
+        print("     <---- Reference particle dump complete.")
+        print("     Particle:")
+        print("     =========")
         print(self.print())
-        return " <---- ReferenceParticle dump complete."
+        return " <---- ReferenceParticle __str__ done."
 
     
 #--------  "Get methods" only; version, reference, and constants
@@ -732,6 +742,10 @@ class ReferenceParticle(Particle):
         
 
 #--------  "Set methods";
+    @classmethod
+    def resetinstance(cls):
+        cls.__instance = None
+
     @classmethod
     def setinstance(cls, inst):
         if isinstance(inst, ReferenceParticle):
@@ -886,17 +900,17 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("Rot2LabOut")
 
-        #.. Now particle position/phase space:
+        #.. Now particle position/trace space:
         Success = self.setz(self.getRrOut()[0][3])
         if not Success:
             raise fail2setReferenceParticle("setz")
         Success = self.sets(self.getsOut()[0])
         if not Success:
             raise fail2setReferenceParticle("sets")
-        PhsSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
-        Success = self.setPhaseSpace(PhsSpc)
+        TrcSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        Success = self.setTraceSpace(TrcSpc)
         if not Success:
-            raise fail2setReferenceParticle("setPhaseSpace")
+            raise fail2setReferenceParticle("setTraceSpace")
 
         return Success
 
@@ -950,21 +964,24 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("Rot2LabOut")
         
-        #.. Now particle position/phase space:
+        #.. Now particle position/trace space:
         Success = self.setz(self.getRrOut()[nRcrds][2])
         if not Success:
             raise fail2setReferenceParticle("setz")
         Success = self.sets(self.getsOut()[nRcrds])
         if not Success:
             raise fail2setReferenceParticle("sets")
-        PhsSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
-        Success = self.setPhaseSpace(PhsSpc)
+        TrcSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        Success = self.setTraceSpace(TrcSpc)
         if not Success:
-            raise fail2setReferenceParticle("setPhaseSpace")
+            raise fail2setReferenceParticle("setTraceSpace")
         
         return Success
     
 #--------  Exceptions:
+class noReferenceParticle(Exception):
+    pass
+
 class badParticle(Exception):
     pass
 
