@@ -26,6 +26,8 @@ Class Particle:
    _z[]        : float   : z coordinate at which trace space recorded
    _s[]        : float   : s coordinate at which trace space recorded
    _TrcSpc[]   : ndarray : 6D trace space: x, x', y, y', t, E (m, s, MeV)
+   _PhsSpc[]   : array   : RPLC 6D phase space: (x, y, z), (px, py, pz)
+   _LabPhsSpc[]: array   : Lab 6D phase space: (x, y, z), (px, py, pz)
 
 ***   _SourceTraceSpace: numpy array of 6-dimensional trace space
     
@@ -131,6 +133,12 @@ import io
 
 import BeamLineElement   as BLE
 
+#-------- Physical Constants Instances and Methods ----------------
+from PhysicalConstants import PhysicalConstants
+constants_instance = PhysicalConstants()
+protonMASS         = constants_instance.mp()
+
+
 class Particle:
     instances  = []
     __Debug    = False
@@ -202,6 +210,8 @@ class Particle:
         self._z         = []
         self._s         = []
         self._TrcSpc    = []
+        self._PhsSpc    = []
+        self._LabPhsSpc = []
         
     def setLocation(self, Location):
         Success = False
@@ -229,6 +239,20 @@ class Particle:
         if isinstance(TraceSpace, np.ndarray):
             self._TrcSpc.append(TraceSpace)
             Success = True
+        return Success
+
+    def setRPLCPhaseSpace(self, PhaseSpace):
+        Success = False
+        self._PhsSpc.append(PhaseSpace)
+        Success = True
+
+        return Success
+
+    def setLabPhaseSpace(self, PhaseSpace):
+        Success = False
+        self._LabPhsSpc.append(PhaseSpace)
+        Success = True
+
         return Success
 
     def recordParticle(self, Location, z, s, TraceSpace):
@@ -275,7 +299,39 @@ class Particle:
     def getTraceSpace(self):
         return self._TrcSpc
     
-    
+    def getPhaseSpace(self, nLoc=None):
+        if self.getDebug():
+            print(" Particle.getPhaseSpace for nLoc:", \
+                  nLoc, "start:")
+            
+        TrcSpc = self.getTraceSpace()[nLoc]
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> trace space:", TrcSpc)
+
+        rRPLC  = np.array([TrcSpc[0], TrcSpc[2], 0.])
+
+        Enrgy  = protonMASS + TrcSpc[5]
+        Mmtm   = mth.sqrt(Enrgy**2 - protonMASS**2)
+        zPrm   = mth.sqrt(1.-TrcSpc[1]**2-TrcSpc[3]**2)
+        pRPLC  = np.array([TrcSpc[1]*Mmtm, \
+                           TrcSpc[3]*Mmtm, \
+                           zPrm*Mmtm])
+                
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> position:", rRPLC)
+                print("     ----> Mmtm    :", pRPLC)
+
+        PhsSpc = [rRPLC, pRPLC]
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Return phase space:", PhsSpc)
+
+        return PhsSpc
+
+            
 #--------  Utilities:
     @classmethod
     def cleanParticles(cls):
@@ -370,7 +426,80 @@ class Particle:
                       self.getz()[iLoc], self.gets()[iLoc], \
                       self.getTraceSpace()[iLoc])
 
+
+#--------  I/o methods:
+#                     ----> Write instances:
+    @classmethod
+    def fillPhaseSpaceAll(cls):
+        Success = False
+        if cls.getDebug():
+            print(" Particle.fillPhaseSpaceAll, start:")
+            print("     ----> fill phase space for", \
+                  len(cls.getParticleInstances()), \
+                  "particle instances.")
+
+        nPrtcl = 0
+        for iPrtcl in cls.getParticleInstances():
+            nPrtcl += 1
+            if cls.getDebug():
+                print("     ----> Particle:", nPrtcl)
+            
+            if not isinstance(iPrtcl, ReferenceParticle):
+                if Particle.getDebug():
+                    print("         ----> Fill phase space for particle:", \
+                          nPrtcl)
+                    Success = iPrtcl.fillPhaseSpace()
+
+        if cls.getDebug():
+            print("     ----> Particle.fillPhaseSpaceAll:", \
+                  "fill phase space Success =", Success)
+            print(" <----  Particle.fillPhaseSpaceAll, compete.")
+            
+        return Success
     
+    def fillPhaseSpace(self):
+        Success = False
+        if self.getDebug():
+            print(" Particle.fillPhaseSpace, start:")
+            print("     ----> fill phase space for particle with", \
+                  len(self.getLocation()), "records.")
+
+        iRefPrtcl = ReferenceParticle.getinstance()
+
+        nLoc = 0
+        for iLoc in self.getLocation():
+            if self.getDebug():
+                print("         ----> Convert at location:", \
+                      iLoc)
+            PhsSpc  = self.getPhaseSpace(nLoc)
+            Success = self.setRPLCPhaseSpace(PhsSpc)
+
+            RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
+            drLab   = np.matmul(RotMtrx, PhsSpc[0])
+            pLab    = np.matmul(RotMtrx, PhsSpc[1])
+
+            rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
+
+            LabPhsSpc = [rLab, pLab]
+            Success   = self.setLabPhaseSpace(LabPhsSpc)
+
+            nLoc  += 1
+
+        if nLoc == len(self.getLocation()):
+            Success = True
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Particle.fillPhaseSpace: RPLC phase space:", \
+                      PhsSpc)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Particle.fillPhaseSpace:  Lab phase space:", \
+                      LabPhsSpc)
+            print(" <----  Particle.fillPhaseSpace, compete.", \
+                  "Success:", Success)
+
+        return Success
+
 #--------  I/o methods:
 #                     ----> Write instances:
     @classmethod
