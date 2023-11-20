@@ -15,7 +15,7 @@ Class DRACObeam:
   Class attributes:
   -----------------
     __Debug    : Debug flag
-    __SrcPhsSpc: 6D phase space at source (np.ndarray)
+    __SrcTrcSpc: 6D trace space at source (np.ndarray)
 __DRACObeamInst: Instance of DRACObeam class.  Set on creation of first
                  (and only) instance.
 
@@ -39,8 +39,8 @@ __DRACObeamInst: Instance of DRACObeam class.  Set on creation of first
   Set methods:
       setDebug  : Set debug flag
 
-    setSrcPhsSpc: Set phase space at source.
-             Input: np.array([6,]) containing 6D phase space vector.
+    setSrcTrcSpc: Set trace space at source.
+             Input: np.array([6,]) containing 6D trace space vector.
 
   Get methods:
      getinstance: Get instance of DRACO beam class
@@ -51,7 +51,7 @@ getDRACObeamParamPandas:
                   Get pandas instance specifying the beam line
       getElement: get list of instances of BeamLineElement objects that make
                   up the DRACO beam line
-    getSrcPhsSpc: get source phase space nd.array(6,)
+    getSrcTrcSpc: get source trace space nd.array(6,)
 
   Processing method:
       print()   : Dumps parameters
@@ -115,7 +115,7 @@ protonMASS         = constants_instance.mp()
 class DRACObeam(object):
     __DRACObeamInst     = None
     __Debug        = False
-    __SrcPhsSpc    = None
+    __SrcTrcSpc    = None
     __DRACObeamInst = None
 
 
@@ -180,6 +180,16 @@ class DRACObeam(object):
             print("        <---- Beam line done.")
 #    <---- Done beam line  --------  --------  --------  --------
 
+#    ----> Reference particle:  --------  --------  --------  --------
+        if cls.getDebug():
+            print("        ----> Reference particle: ")
+            
+        refPrtcl  = Prtcl.ReferenceParticle()
+
+        if cls.getDebug():
+            print("        <---- Reference particle done. ")
+#    <---- Done reference particle -----  --------  --------  --------
+
         return cls.getinstance()
 
     def __repr__(self):
@@ -212,22 +222,22 @@ class DRACObeam(object):
         cls.__Debug = Debug
         
     @classmethod
-    def setSrcPhsSpc(cls, SrcPhsSpc=np.array([])):
+    def setSrcTrcSpc(cls, SrcTrcSpc=np.array([])):
         if cls.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(" DRACObeam.setSrcPhsSpc: ", SrcPhsSpc)
+                print(" DRACObeam.setSrcTrcSpc: ", SrcTrcSpc)
         
-        if not isinstance(SrcPhsSpc, np.ndarray):
+        if not isinstance(SrcTrcSpc, np.ndarray):
             raise badPhaseSpaceVector( \
-                        " DRACObeam.setSrcPhsSpc:", SrcPhsSpc)
+                        " DRACObeam.setSrcTrcSpc:", SrcTrcSpc)
 
-        if len(SrcPhsSpc) == 0:
-            SrcPhsSpc = None
-        elif not SrcPhsSpc.size == 6:
+        if len(SrcTrcSpc) == 0:
+            SrcTrcSpc = None
+        elif not SrcTrcSpc.size == 6:
             raise badPhaseSpaceVector( \
-                        " DRACObeam.setSrcPhsSpc:", SrcPhsSpc)
+                        " DRACObeam.setSrcTrcSpc:", SrcTrcSpc)
 
-        cls.__SrcPhsSpc = SrcPhsSpc
+        cls.__SrcTrcSpc = SrcTrcSpc
         
 #--------  "Get methods"
 #.. Method believed to be self documenting(!)
@@ -252,8 +262,8 @@ class DRACObeam(object):
         return cls._Element
     
     @classmethod
-    def getSrcPhsSpc(cls):
-        return cls.__SrcPhsSpc
+    def getSrcTrcSpc(cls):
+        return cls.__SrcTrcSpc
     
         
 #--------  Processing methods:
@@ -478,30 +488,30 @@ class DRACObeam(object):
                 print("     ----> Created new Particle instance")
 
             #.. Generate particle:
-            if isinstance(cls.getSrcPhsSpc(), np.ndarray):
+            if isinstance(cls.getSrcTrcSpc(), np.ndarray):
                 if cls.getDebug():
                     print("     ----> Start using:", iEvt)
                 Name = "DRACO:0:Source:User"
-                SrcPhsSpc = cls.getSrcPhsSpc()
+                SrcTrcSpc = cls.getSrcTrcSpc()
             else:
                 if cls.getDebug():
                     print("     ----> Start by calling getSourcePhaseSpace")
                 Name = cls.getElement()[0].getName()
-                SrcPhsSpc = \
+                SrcTrcSpc = \
                     cls.getElement()[0].getParticleFromSource()
-            Success = PrtclInst.recordParticle(Name, 0., 0., SrcPhsSpc)
+            Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
             if cls.getDebug():
                 print("     ----> Event", iEvt)
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("         ----> Phase space at source     :", \
-                          SrcPhsSpc)
+                    print("         ----> trace space at source     :", \
+                          SrcTrcSpc)
 
-            Mmtm = np.sqrt(2.*protonMASS*SrcPhsSpc[5])
+            Mmtm = np.sqrt(2.*protonMASS*SrcTrcSpc[5])
             Brho = (1/(speed_of_light*1.E-9))*Mmtm/1000.
 
             #.. Track through beam line:
-            PhsSpc_i = SrcPhsSpc
-            PhsSpc   = SrcPhsSpc
+            TrcSpc_i = SrcTrcSpc
+            TrcSpc   = SrcTrcSpc
             HlfLngth = 0.
             if cls.getDebug():
                 print("     ----> Transport through beam line")
@@ -512,16 +522,16 @@ class DRACObeam(object):
                     print("         ---->", iBLE.getName())
                 HlfLngth = iBLE.getLength() / 2.
                 if isinstance(iBLE, BLE.Solenoid):
-                    PhsSpc     = iBLE.Transport(PhsSpc_i, \
+                    TrcSpc     = iBLE.Transport(TrcSpc_i, \
                                                 Brho)
                 else:
-                    PhsSpc     = iBLE.Transport(PhsSpc_i)
+                    TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
                                 linewidth=500,precision=7,suppress=True):
-                        print("             ----> Updated phase space   :", \
-                              PhsSpc)
-                if not isinstance(PhsSpc, np.ndarray):
+                        print("             ----> Updated trace space   :", \
+                              TrcSpc)
+                if not isinstance(TrcSpc, np.ndarray):
                     if cls.getDebug():
                         print("              ---->", \
                               " partice outside acceptance(1)")
@@ -531,8 +541,8 @@ class DRACObeam(object):
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
                                                        zEnd, \
-                                                       PhsSpc)
-                PhsSpc_i = PhsSpc
+                                                       TrcSpc)
+                TrcSpc_i = TrcSpc
 
             if cls.getDebug():
                 print("         ----> Reached end of beam line.")
@@ -540,7 +550,9 @@ class DRACObeam(object):
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 PrtclInst.writeParticle(ParticleFILE)
-            del PrtclInst
+                
+            Prtcl.Particle.cleanParticles()
+            #del PrtclInst
             
             if cls.getDebug():
                 print("     <---- Finished handling beam line.")

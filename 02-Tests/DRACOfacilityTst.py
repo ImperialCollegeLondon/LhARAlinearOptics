@@ -39,8 +39,10 @@ print()
 print("     ----> DRACOFacilityTest:", DRACOFacilityTest, \
       " create facility instance.")
 
+LNb.DRACObeam.setDebug(True)
 DRACObI  = LNb.DRACObeam(filename)
 print(DRACObI)
+LNb.DRACObeam.setDebug(False)
 
 print()
 print("     <---- DRACOFacilityTest:", DRACOFacilityTest, \
@@ -52,36 +54,43 @@ print()
 print("     ----> DRACOFacilityTest:", DRACOFacilityTest, \
       " check generation/tracking.")
 
-print("         ----> First using hard-coded phase space at source.")
+print("         ----> First using hard-coded trace space at source.")
 DRACObI.setDebug(True)
-DRACObI.setSrcPhsSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
+DRACObI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
 OK = DRACObI.trackDRACO(1)
 DRACObI.setDebug(False)
 
 print("         ----> Second using generated beam:")
-DRACObI.setSrcPhsSpc()
+DRACObI.setSrcTrcSpc()
 print(DRACObI)
 
-NEvt = 10
+NEvt = 10000
 OK = DRACObI.trackDRACO(NEvt)
 
+"""
+       ---> Had to scratch this bit because upgraded clean-up means it
+            wont work.
 print("     ----> Find one event that made it to end of beam line:")
 
 Prt    = False
 iPrtcl = 0
 
+print(" Here:", len(Prtcl.Particle.getParticleInstances()))
+
 while not Prt:
     OK = DRACObI.trackDRACO(1)
-    iPrtclInst = Prtcl.Particle.instances[len(Prtcl.Particle.instances)-1]
+    print(" HereHere:", len(Prtcl.Particle.getParticleInstances()))
+    iPrtclInst = Prtcl.Particle.instances[ \
+                            len(Prtcl.Particle.getParticleInstances())-1]
     if iPrtcl >= NEvt:
         print("         ----> No events made it to end of delivery section.")
         Prt = True
     if iPrtclInst.getz()[len(iPrtclInst.getLocation())-1] > 2.1:
         OK     = iPrtclInst.printProgression()
-        PhsSpc = iPrtclInst.getPhaseSpace()[0]
+        TrcSpc = iPrtclInst.getTraceSpace()[0]
         Prt    = True
 print("     <---- Done printing one event that made it to end of delivery:")
-
+"""
 
 ##! End:
 print()

@@ -51,10 +51,10 @@ while not EndOfFile:
 
 print("     ----> Track particle through LION:")
 LNbI.setDebug(True)
-LNbI.setSrcPhsSpc(iPrtcl.getPhaseSpace()[0])
+LNbI.setSrcTrcSpc(iPrtcl.getTraceSpace()[0])
 OK = LNbI.trackLION(1)
 LNbI.setDebug(False)
-iPrtcl1 = Prtcl.Particle.getParticleInstances()[1]
+iPrtcl1 = Prtcl.Particle.getParticleInstances()[0]
 
 """
   Loop over elements on the LION beam line.
@@ -79,14 +79,14 @@ for iBlE in BLE.BeamLineElement.getinstances():
 """
   Print coordinates of particle at interfaces.
    - Documentation in header of Particle.py
-   - Phase space is numpy array: x, x', y, y', t and E
+   - Trace space is numpy array: x, x', y, y', t and E
 """
 print(" plotTrajectory: print coordinates of particle at interfaces", \
       "along LION beam line.")
-for iLoc in range(len(iPrtcl1.getPhaseSpace())):
+for iLoc in range(len(iPrtcl1.getTraceSpace())):
     with np.printoptions(linewidth=500,precision=7,suppress=True):
         print("     ---->", iPrtcl1.getLocation()[iLoc], ":", \
-              iPrtcl1.getPhaseSpace()[iLoc]) 
+              iPrtcl1.getTraceSpace()[iLoc]) 
 
 print()
 print(" <---- Done.")

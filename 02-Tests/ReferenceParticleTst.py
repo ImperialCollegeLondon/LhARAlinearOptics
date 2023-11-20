@@ -63,6 +63,7 @@ print(Prtcl.ReferenceParticle.getinstance())
 
 
 ##! Load some geometry and then test reference particle load:
+Prtcl.ReferenceParticle.cleaninstance()
 ReferenceParticleTest += 1
 print()
 print("ReferenceParticleTest:", ReferenceParticleTest, \
@@ -72,10 +73,7 @@ filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 LNbI  = LNb.LIONbeam(filename)
 print(LNbI)
-
-refPrtcl.setRPDebug(True)
-refPrtclSet = refPrtcl.setReferenceParticle()
-refPrtcl.setRPDebug(False)
+print(Prtcl.ReferenceParticle.getinstance())
 
 
 ##! Complete:

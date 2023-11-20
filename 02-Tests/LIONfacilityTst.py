@@ -151,34 +151,37 @@ print()
 print("     ----> LIONFacilityTest:", LIONFacilityTest, \
       " check generation/tracking.")
 
-print("         ----> First using hard-coded phase space at source.")
+print("         ----> First using hard-coded trace space at source.")
 LNbI.setDebug(True)
-LNbI.setSrcPhsSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
+LNbI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
 OK = LNbI.trackLION(1)
 LNbI.setDebug(False)
 
 print("         ----> Second using generated beam:")
-LNbI.setSrcPhsSpc()
+LNbI.setSrcTrcSpc()
 print(LNbI)
 
 NEvt = 10
 OK = LNbI.trackLION(NEvt)
 
+
+""" Legacy; need to recheck tests from here:
 print("     ----> Print one event that made it to end of delivery:", \
-      LNbI.getSrcPhsSpc())
+      LNbI.getSrcTrcSpc())
 
 Prt    = False
 iPrtcl = 0
 
 while not Prt:
     OK = LNbI.trackLION(1)
+    print(" HereHere:", len(Prtcl.Particle.instances))
     iPrtclInst = Prtcl.Particle.instances[len(Prtcl.Particle.instances)-1]
     if iPrtcl >= NEvt:
         print("         ----> No events made it to end of delivery section.")
         Prt = True
     if iPrtclInst.getz()[len(iPrtclInst.getLocation())-1] > 1.88:
         OK     = iPrtclInst.printProgression()
-        PhsSpc = iPrtclInst.getPhaseSpace()[0]
+        TrcSpc = iPrtclInst.getTraceSpace()[0]
         Prt    = True
 print("     <---- Done printing one event that made it to end of delivery:")
 
@@ -193,7 +196,7 @@ print("         ----> Speed of light:", BLE.speed_of_light, " m/s")
 print()
 print("         ----> Test with particle that made it all the way through:")
 cprime = BLE.speed_of_light * 1.E-6
-Enrgy = PhsSpc[5]
+Enrgy = TrcSpc[5]
 print("             ----> Energy:", Enrgy, " MeV")
 Mmtm  = mth.sqrt(2.*938.27208816*Enrgy)
 Brho = Mmtm / (BLE.speed_of_light * 1.E-9) / 1000.
@@ -202,9 +205,9 @@ print("                   Brho:", Brho, " T m")
 Brho = Mmtm / cprime
 print("                   Brho:", Brho, " T m")
 print()
-x2 = calcX2(Brho, PhsSpc)
+x2 = calcX2(Brho, TrcSpc)
 print("             ----> x2:", x2)
-y2 = PhsSpc[2] + calcY2(Brho, PhsSpc)
+y2 = TrcSpc[2] + calcY2(Brho, TrcSpc)
 print("             ----> y2:", y2)
 print()
 
@@ -213,36 +216,36 @@ EnergyRange = np.arange(1., 20., 0.01)
 Energy  = []
 x2      = []
 x1prime = 1./60.
-PhsSpc  = np.array([0., x1prime, 0., x1prime, 0., 0.])
+TrcSpc  = np.array([0., x1prime, 0., x1prime, 0., 0.])
 for Enrgy in EnergyRange:
     Mmtm      = mth.sqrt(2.*938.27208816*Enrgy)
-    PhsSpc[5] = Enrgy
+    TrcSpc[5] = Enrgy
     Brho      = Mmtm / cprime
-    xx2       = calcX2(Brho, PhsSpc)
+    xx2       = calcX2(Brho, TrcSpc)
     Energy.append(Enrgy)
     x2.append(xx2[0])
 plt.plot(Energy, x2, 'r')
 Energy  = []
 x2      = []
 x1prime = 0.01/60.
-PhsSpc  = np.array([0., x1prime, 0., x1prime, 0., 0.])
+TrcSpc  = np.array([0., x1prime, 0., x1prime, 0., 0.])
 for Enrgy in EnergyRange:
     Mmtm      = mth.sqrt(2.*938.27208816*Enrgy)
     Brho      = Mmtm / cprime
-    PhsSpc[5] = Enrgy
-    xx2       = calcX2(Brho, PhsSpc)
+    TrcSpc[5] = Enrgy
+    xx2       = calcX2(Brho, TrcSpc)
     Energy.append(Enrgy)
     x2.append(xx2[0])
 plt.plot(Energy, x2, 'g')
 Energy  = []
 x2      = []
 x1prime = 10.0/60.
-PhsSpc  = np.array([0., x1prime, 0., x1prime, 0., 0.])
+TrcSpc  = np.array([0., x1prime, 0., x1prime, 0., 0.])
 for Enrgy in EnergyRange:
     Mmtm      = mth.sqrt(2.*938.27208816*Enrgy)
     Brho      = Mmtm / cprime
-    PhsSpc[5] = Enrgy
-    xx2       = calcX2(Brho, PhsSpc)
+    TrcSpc[5] = Enrgy
+    xx2       = calcX2(Brho, TrcSpc)
     Energy.append(Enrgy)
     x2.append(xx2[0])
 plt.plot(Energy, x2, 'b')
@@ -255,36 +258,36 @@ plt.close()
 Energy  = []
 y2      = []
 y1prime = 1./60.
-PhsSpc  = np.array([0., y1prime, 0., y1prime, 0., 0.])
+TrcSpc  = np.array([0., y1prime, 0., y1prime, 0., 0.])
 for Enrgy in EnergyRange:
     Mmtm      = mth.sqrt(2.*938.27208816*Enrgy)
     Brho      = Mmtm / cprime
-    PhsSpc[5] = Enrgy
-    yy2       = calcY2(Brho, PhsSpc)
+    TrcSpc[5] = Enrgy
+    yy2       = calcY2(Brho, TrcSpc)
     Energy.append(Enrgy)
     y2.append(yy2[0])
 plt.plot(Energy, y2, 'r')
 Energy  = []
 y2      = []
 y1prime = 0.01/60.
-PhsSpc  = np.array([0., y1prime, 0., y1prime, 0., 0.])
+TrcSpc  = np.array([0., y1prime, 0., y1prime, 0., 0.])
 for Enrgy in EnergyRange:
     Mmtm      = mth.sqrt(2.*938.27208816*Enrgy)
     Brho      = Mmtm / cprime
-    PhsSpc[5] = Enrgy
-    yy2       = calcY2(Brho, PhsSpc)
+    TrcSpc[5] = Enrgy
+    yy2       = calcY2(Brho, TrcSpc)
     Energy.append(Enrgy)
     y2.append(yy2[0])
 plt.plot(Energy, y2, 'g')
 Energy  = []
 y2      = []
 y1prime = 10.0/60.
-PhsSpc  = np.array([0., y1prime, 0., y1prime, 0., 0.])
+TrcSpc  = np.array([0., y1prime, 0., y1prime, 0., 0.])
 for Enrgy in EnergyRange:
     Mmtm      = mth.sqrt(2.*938.27208816*Enrgy)
     Brho      = Mmtm / cprime
-    PhsSpc[5] = Enrgy
-    yy2       = calcY2(Brho, PhsSpc)
+    TrcSpc[5] = Enrgy
+    yy2       = calcY2(Brho, TrcSpc)
     Energy.append(Enrgy)
     y2.append(yy2[0])
 plt.plot(Energy, y2, 'b')
@@ -306,9 +309,9 @@ for x1prime in x1primeRange:
         for Enrgy in EnergyRange:
             Mmtm   = mth.sqrt(2.*938.27208816*Enrgy)
             Brho   = Mmtm / cprime
-            PhsSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
-            xx2    = calcX2(Brho, PhsSpc)
-            yy2    = calcY2(Brho, PhsSpc)
+            TrcSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
+            xx2    = calcX2(Brho, TrcSpc)
+            yy2    = calcY2(Brho, TrcSpc)
             rr     = mth.sqrt(xx2[0]**2 + yy2[0]**2)
             Energy.append(Enrgy)
             r.append(rr)
@@ -335,9 +338,9 @@ for x1prime in x1primeRange:
         for Enrgy in EnergyRange:
             Mmtm   = mth.sqrt(2.*938.27208816*Enrgy)
             Brho   = Mmtm / cprime
-            PhsSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
-            xx2    = calcX2(Brho, PhsSpc)
-            yy2    = calcY2(Brho, PhsSpc)
+            TrcSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
+            xx2    = calcX2(Brho, TrcSpc)
+            yy2    = calcY2(Brho, TrcSpc)
             rr     = mth.sqrt(xx2[0]**2 + yy2[0]**2)
             Energy.append(Enrgy)
             r.append(rr)
@@ -362,9 +365,9 @@ for x1prime in x1primeRange:
         for Enrgy in EnergyRange:
             Mmtm   = mth.sqrt(2.*938.27208816*Enrgy)
             Brho   = Mmtm / cprime
-            PhsSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
-            xx2    = calcX2(Brho, PhsSpc)
-            yy2    = calcY2(Brho, PhsSpc)
+            TrcSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
+            xx2    = calcX2(Brho, TrcSpc)
+            yy2    = calcY2(Brho, TrcSpc)
             rr     = mth.sqrt(xx2[0]**2 + yy2[0]**2)
             Energy.append(Enrgy)
             r.append(rr)
@@ -389,9 +392,9 @@ for x1prime in x1primeRange:
         for Enrgy in EnergyRange:
             Mmtm   = mth.sqrt(2.*938.27208816*Enrgy)
             Brho   = Mmtm / cprime
-            PhsSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
-            xx2    = calcX2(Brho, PhsSpc)
-            yy2    = calcY2(Brho, PhsSpc)
+            TrcSpc = np.array([0., x1prime, 0., y1prime, 0., Enrgy])
+            xx2    = calcX2(Brho, TrcSpc)
+            yy2    = calcY2(Brho, TrcSpc)
             rr     = mth.sqrt(xx2[0]**2 + yy2[0]**2)
             Energy.append(Enrgy)
             r.append(rr)
@@ -403,6 +406,7 @@ plt.xlabel('E (MeV)')
 plt.ylabel('r (m)')
 plt.savefig('99-Scratch/Tst_plot11rd.pdf')
 plt.close()
+"""
 
 ##! End:
 print()

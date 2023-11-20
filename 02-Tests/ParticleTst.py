@@ -39,8 +39,6 @@ filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 LNbI  = LNb.LIONbeam(filename)
 print(LNbI)
-refPrtcl  = Prtcl.ReferenceParticle()
-refPrtclSet = refPrtcl.setReferenceParticle()
 
 ##! Test built-in methods:
 ParticleTest = 1
@@ -91,10 +89,11 @@ Prtcl.Particle.setDebug(False)
 ParticleTest += 1
 print()
 Prtcl.Particle.cleanParticles()
+Prtcl.ReferenceParticle.cleaninstance()
 refPrtcl  = Prtcl.ReferenceParticle()
 refPrtclSet = refPrtcl.setReferenceParticle()
 print("ParticleTest:", ParticleTest, " check extraction of phase space.")
-LNbI.setSrcPhsSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
+LNbI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
 OK = LNbI.trackLION(1)
 Prtcl.Particle.setDebug(True)
 print(" <---- Prtcl.Particle.fillPhaseSpaceAll():", \

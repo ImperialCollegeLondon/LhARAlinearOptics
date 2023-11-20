@@ -167,6 +167,20 @@ class LhARAFacility(object):
         cls.__LhSrcInst = LhSrc.LhARASource(SrcMode, SrcParam)
         print(cls.__LhSrcInst)
             
+#    ----> Reference particle:  --------  --------  --------  --------
+        if cls.getDebug():
+            print("        ----> Reference particle: ")
+            
+        refPrtcl  = Prtcl.ReferenceParticle()
+        refPrtclSet = refPrtcl.setReferenceParticle()
+
+        print("            ----> Reference particle set, success:", \
+              refPrtclSet)
+
+        if cls.getDebug():
+            print("        <---- Reference particle done. ")
+#    <---- Done reference particle -----  --------  --------  --------
+
         return cls.__instance
 
     def __repr__(self):
@@ -243,12 +257,12 @@ class LhARAFacility(object):
                       PrtclInst)
             
             #.. Generate initial particle:
-            SrcPhsSpc = \
+            SrcTrcSpc = \
                 cls.getLhARASourceInstance().getParticleFromSource()
-            Success = PrtclInst.setSourcePhaseSpace(SrcPhsSpc)
+            Success = PrtclInst.setSourceTraceSpace(SrcTrcSpc)
             if cls.__Debug:
                 print("     ----> Event", iEvt)
-                print("         ----> Phase space at source:", SrcPhsSpc)
+                print("         ----> trace space at source:", SrcTrcSpc)
                 print("         ----> Stored successfully:", Success)
 
         if prt == 1:

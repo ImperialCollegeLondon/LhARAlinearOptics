@@ -52,7 +52,7 @@ while not EndOfFile:
                 Scl  = Scl * 10
     iPrtcl  = Prtcl.Particle.getParticleInstances() \
               [len(Prtcl.Particle.getParticleInstances())-1]
-    nPhsSpc = len(iPrtcl.getPhaseSpace())
+    nPhsSpc = len(iPrtcl.getTraceSpace())
     
     if Debug and iEvt < 10:
         print(iPrtcl)
@@ -62,6 +62,6 @@ print("     <---- Event loop done, ", iEvt, "events read")
 ##! Plot progression:
 print("     ----> Plot progression:")
 
-Prtcl.Particle.plotPhaseSpaceProgression()
+Prtcl.Particle.plotTraceSpaceProgression()
 print(" <---- Done.")
 print("========  DRACO event reading: end  ========")

@@ -550,7 +550,9 @@ class LhARAbeam(object):
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 PrtclInst.writeParticle(ParticleFILE)
-            del PrtclInst
+                
+            Prtcl.Particle.cleanParticles()
+            #del PrtclInst
             
             if cls.getDebug():
                 print("     <---- Finished handling beam line.")

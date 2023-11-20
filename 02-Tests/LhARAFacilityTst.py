@@ -9,6 +9,7 @@ Test script for "LhARAFacility" class ... initialisation and get methods
 """
 
 import LhARAFacility as LF
+import Particle      as Prtcl
 import sys
 import os
 
@@ -26,6 +27,7 @@ print()
 print("LhARAFacilityTest:", LhARAFacilityTest, \
       " check if class is a singleton.")
 LhARAFclty  = LF.LhARAFacility(filename)
+Prtcl.ReferenceParticle.cleaninstance()
 LhARAFclty1 = LF.LhARAFacility(filename)
 print("    LhARAFclty singleton test:", id(LhARAFclty), id(LhARAFclty1), \
       id(LhARAFclty)-id(LhARAFclty1))
