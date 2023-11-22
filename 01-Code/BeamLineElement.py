@@ -21,7 +21,7 @@ Class BeamLineElement:
 
   Classes derived from BeamLineElement:
              Drift, Aperture, FocusQuadrupole, DeFocusQuadrupole,
-             Dipole, Octupole, Solenoid, RFCavity, Source
+             SectorDipole, Octupole, Solenoid, RFCavity, Source
 
 
   Class attributes:
@@ -970,70 +970,119 @@ class DefocusQuadrupole(BeamLineElement):
         return self._Strength
 
 
-#########################################################################
+"""
+Derived class SectorDipole:
+===========================
 
-class Dipole(BeamLineElement):
+  SectorDipole class derived from BeamLineElement to contain parameters
+  for a sector dipole
+
+
+  Class attributes:
+  -----------------
+    instances : List of instances of BeamLineElement class
+  __Debug     : Debug flag
+
+
+  Parent class instance attributes:
+  ---------------------------------
+  Calling arguments:
+   _Name : Name
+   _rCtr : numpy array; x, y, z position (in m) of centre of element.
+   _vCtr : numpy array; theta, phi of principal axis of element.
+  _drCtr : "error", displacement of centre from nominal position.
+  _dvCtr : "error", deviation in theta and phy from nominal axis.
+
+  _TrnsMtrx : Transfer matrix
+
+
+  Instance attributes to define quadrupole:
+  -----------------------------------------
+  _Angle  : Bending angle, degrees
+
+    
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+    SummaryStr: No arguments, returns one-line string summarising dipole
+                parameterrs.
+
+  Set methods:
+    setAngle: set length:
+          Input: _Angle (float): angle through which dipole bends reference
+                                 particle
+
+setTransferMatrix: Set transfer matrix; calculate using i/p brhop
+          Input: Brho (T m)
+         Return: np.array(6,6,) transfer matrix
+
+  Get methods:
+      getAngle
+
+  Utilities:
+
+"""
+class SectorDipole(BeamLineElement):
     instances = []
     __Debug = False
 
     def __init__(self, _Name=None, \
                  _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
-                 _Angle=None, _Length=None):
+                 _Angle=None):
         if self.__Debug:
-            print(' Dipole.__init__: ', 'creating the Dipole object: Angle=', _Angle, ', Length=', _Length)
+            print(' SectorDipole(BeamLineElement).__init__: ', \
+                  'creating SectorDipole object: Angle=', _Angle)
 
-        Dipole.instances.append(self)
+        SectorDipole.instances.append(self)
 
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
 
         if not isinstance(_Angle, float):
-            raise badBeamLineElement("Dipole: bad specification for bending angle (Angle)!")
-        if not isinstance(_Length, float):
-            raise badBeamLineElement("Dipole: bad specification for length!")
+            raise badBeamLineElement( \
+                "SectorDipole: bad specification for bending angle (Angle)!")
 
         self.setAngle(_Angle)
-        self.setLength(_Length)
         self.setTransferMatrix()
 
         if self.__Debug:
-            print("     ----> New Dipole instance: \n", self)
+            print("     ----> New SectorDipole instance: \n", self)
 
     def __repr__(self):
-        return "Dipole()"
+        return "SectorDipole()"
 
     def __str__(self):
-        print(" Dipole:")
+        print(" SectorDipole:")
         print(" -------")
-        print("     ----> Debug flag:", Dipole.getDebug())
+        print("     ----> Debug flag:", SectorDipole.getDebug())
         print("     ----> Bending Angle (Angle):", self.getAngle())
-        print("     ----> Length (m):", self.getLength())
         print("     ----> Transfer matrix: \n", self.getTransferMatrix())
         BeamLineElement.__str__(self)
-        return " <---- Dipole parameter dump complete."
+        return " <---- SectorDipole parameter dump complete."
 
-    # -------- "Set methods"
-    # Methods believed to be self-documenting(!)
-
+# -------- "Set methods"
+#..  Methods believed to be self-documenting(!)
     def setAngle(self, _Angle):
         if not isinstance(_Angle, float):
-            raise badParameter("BeamLineElement.Dipole.setAngle: bad bending angle (Angle):", _Angle)
+            raise badParameter(\
+                               "BeamLineElement.SectorDipole.setAngle:", \
+                               "bad bending angle (Angle):", _Angle)
         self._Angle = _Angle
 
-    def setLength(self, _Length):
-        if not isinstance(_Length, float):
-            raise badParameter("BeamLineElement.Dipole.setLength: bad length:", _Length)
-        self._Length = _Length
 
     def setTransferMatrix(self):
-        r = self._Length / self._Angle
+        r = 10.
         c = np.cos(self._Angle)
         s = np.sin(self._Angle)
 
         TrnsMtrx = np.array([
             (c, r * s, 0, 0, 0, r * (1 - c)),
             (-(1 / r) * s, c, 0, 0, 0, s),
-            (0, 0, 1, self._Length, 0, 0),
+            (0, 0, 1, 10., 0, 0),
             (0, 0, 0, 1, 0, 0),
             (s, r * (1 - c), 0, 0, 1, r * (self._Angle - s)),
             (0, 0, 0, 0, 0, 1)
@@ -1041,14 +1090,10 @@ class Dipole(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
-    # -------- "Get methods"
-    # Methods believed to be self-documenting(!)
-
+# -------- "Get methods"
+#..  Methods believed to be self-documenting(!)
     def getAngle(self):
         return self._Angle
-
-    def getLength(self):
-        return self._Length
 
 
 class Octupole(BeamLineElement):

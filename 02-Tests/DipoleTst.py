@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Test script for "Dipole" class
+Test script for "SectorDipole" class
 =============================
 
-  Dipole.py -- set "relative" path to code
+  SectorDipole.py -- set "relative" path to code
 
 """
 
@@ -13,18 +13,18 @@ import numpy as np
 import BeamLineElement as BLE
 
 ##! Start:
-print("========  Dipole: tests start  ========")
+print("========  SectorDipole: tests start  ========")
 
 ##! Test singleton class feature:
-DipoleTest = 1
+SectorDipoleTest = 1
 print()
-print("DipoleTest:", DipoleTest, \
+print("SectorDipoleTest:", SectorDipoleTest, \
       " check built-in methods.")
 
 #.. __init__
 print("    __init__:")
 try:
-    Dpl = BLE.Dipole()
+    Dpl = BLE.SectorDipole()
 except:
     print('      ----> Correctly trapped no argument exception.')
 rCtr = np.array([0.,0.,0.])
@@ -32,17 +32,17 @@ vCtr = np.array([0.,0.])
 drCtr = np.array([0.,0.,0.])
 dvCtr = np.array([0.,0.])
 try:
-    Dpl = BLE.Dipole("NoAngle", rCtr, vCtr, drCtr, dvCtr)
+    Dpl = BLE.SectorDipole("NoAngle", rCtr, vCtr, drCtr, dvCtr)
 except:
     print('      ----> Correctly trapped no dipole angle exception.')
 
 try:
-    Dpl = BLE.Dipole("NoAngle", rCtr, vCtr, drCtr, dvCtr, 0.3)
+    Dpl = BLE.SectorDipole("NoAngle", rCtr, vCtr, drCtr, dvCtr, 0.3)
 except:
     print('      ----> Correctly trapped no length exception.')
 
 #.. Create valid instance:
-Dpl = BLE.Dipole("ValidDipole", rCtr, vCtr, drCtr, dvCtr, 0.03, 0.03)
+Dpl = BLE.SectorDipole("ValidSectorDipole", rCtr, vCtr, drCtr, dvCtr, 0.03)
     
 #.. __repr__
 print("    __repr__:")
@@ -54,24 +54,24 @@ print(str(Dpl))
 print("    <---- __str__ done.")
 
 ##! Check get methods:
-DipoleTest = 3
+SectorDipoleTest = 3
 print()
-print("DipoleTest:", DipoleTest, " check get methods.")
+print("SectorDipoleTest:", SectorDipoleTest, " check get methods.")
 print("    ----> print() method; tests all get methods")
 print(Dpl)
 
 ##! Check set method:
-DipoleTest = 4
+SectorDipoleTest = 4
 print()
-print("DipoleTest:", DipoleTest, " check set method.")
-BLE.Dipole.setDebug(True)
+print("SectorDipoleTest:", SectorDipoleTest, " check set method.")
+BLE.SectorDipole.setDebug(True)
 print(Dpl)
-BLE.Dipole.setDebug(False)
+BLE.SectorDipole.setDebug(False)
 
 ##! Check set method:
-DipoleTest += 1
+SectorDipoleTest += 1
 print()
-print("DipoleTest:", DipoleTest, " test transport through dipole.")
+print("SectorDipoleTest:", SectorDipoleTest, " test transport through dipole.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
 Rprime = Dpl.Transport(R)
 print("     ----> Input phase-space vector:", R)
@@ -101,8 +101,8 @@ print("     ----> Magnitude of Diff:", Norm)
 if Norm > 1E-6:
     raise Exception(" !!!!----> FAILED: dipole transport result not as expected.")
 else:
-    print(" <---- Dipole transport test successful.")
+    print(" <---- SectorDipole transport test successful.")
 
 ##! Complete:
 print()
-print("========  Dipole: tests complete  ========")
+print("========  SectorDipole: tests complete  ========")

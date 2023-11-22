@@ -51,3 +51,30 @@ The trajectory of the particle is evaluated as a function of time,
 $t$ or $s$.
 
 \subsection{Trace space}
+
+Trace space is defined to simplify the calculation of the trajectory
+of particles through the accelerator lattice and is derived from the
+phase space expressed in the RPLC frame.
+Consider a particle with position
+$(x_{\rm RPLC}, y_{\rm RPLC}, z_{\rm RPLC})$ and momentum 
+$p_{\rm RPLC}$ with components
+$(p_{\rm x\,RPLC}, p_{\rm y\,RPLC}, p_{\rm z\,RPLC})$.
+Taking the momentum of the reference particle to be
+$p_{0 {\rm RPLC}}$, the trace-space coordinates are given by:
+\begin{equation}
+    \bm{\phi} = \begin{pmatrix}
+                  x_{\rm RPLC}       \\
+                  x\prime_{\rm RPLC} \\
+                  y_{\rm RPLC}       \\
+                  y\prime_{\rm RPLC} \\
+                  t                 \\
+                  \frac{\Delta p_{\rm RPLC}}{p_{\rm RPLC}}
+                \end{pmatrix} \, ;
+\end{equation}
+where:
+\begin{eqnarray}
+  x\prime_{\rm RPLC}  & = & \frac{\partial x}{\partial s} = \frac{p_{x\,{\rm RPLC}}}{p_{\rm RPLC}} \, ; \\
+  y\prime_{\rm RPLC}  & = & \frac{\partial y}{\partial s} = \frac{p_{y\,{\rm RPLC}}}{p_{\rm RPLC}} \, {\rm ; and}\\
+  \Delta p_{\rm RPLC} & = & p_{\rm RPLC} - p_{0 {\rm RPLC}} \; .
+\end{eqnarray}
+
