@@ -106,6 +106,7 @@ import math   as mth
 import random as rnd
 
 import PhysicalConstants as PhysCnst
+import Particle          as Prtcl
 
 #.. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -711,7 +712,9 @@ class FocusQuadrupole(BeamLineElement):
 
         self.setLength(_Length)
         self.setStrength(_Strength)
-        self.setTransferMatrix(1.)
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
 
         if self.getDebug():
             print("     ----> New FocusQuadrupole instance: \n", self)
@@ -725,7 +728,8 @@ class FocusQuadrupole(BeamLineElement):
         print("     ----> Debug flag:", FocusQuadrupole.getDebug())
         print("     ----> Length (m):", self.getLength())
         print("     ----> Strength:", self.getStrength())
-        print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> Transfer matrix: \n", self.getTransferMatrix())
         BeamLineElement.__str__(self)
         return " <---- FocusQuadrupole parameter dump complete."
 
@@ -752,8 +756,14 @@ class FocusQuadrupole(BeamLineElement):
                     " bad quadrupole strength:", _Strength)
         self._Strength = _Strength
 
-    def setTransferMatrix(self, _Brho):
-        k = self._Strength / _Brho
+    def setTransferMatrix(self, _p0=None):
+        if not isinstance(_p0, float):
+            raise badParameter(\
+                    "BeamLineElement.FocusQuadrupole.setTransferMatrix:", \
+                               "bad reference particle momentum:", _p0)
+
+        Brho = (1/(speed_of_light*1.E-9))*_p0/1000.
+        k = self._Strength / Brho
         l = self._Length
 
         b = np.sqrt(k)
@@ -770,9 +780,8 @@ class FocusQuadrupole(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
-    # -------- "Get methods"
-    # Methods believed to be self-documenting(!)
-
+# -------- "Get methods"
+# Methods believed to be self-documenting(!)
     def getLength(self):
         return self._Length
 
@@ -780,18 +789,16 @@ class FocusQuadrupole(BeamLineElement):
         return self._Strength
 
 # -------- Utilities:
-    def Transport(self, _R, _Brho):
+    def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
-        if not isinstance(_Brho, float):
-            raise badParameter( \
-                        " BeamLineElement.Transport: bad input vector:", \
-                                _Brho)
-        
-        self.setTransferMatrix(_Brho)
-
+        with np.printoptions(linewidth=500,precision=5,suppress=True): \
+             print(" Here: \n", self.getTransferMatrix())
+        with np.printoptions(linewidth=500,precision=5,suppress=True): \
+             print(_R)
+        print(self.getTransferMatrix().dot(_R))
         return self.getTransferMatrix().dot(_R)
     
 
@@ -932,8 +939,14 @@ class DefocusQuadrupole(BeamLineElement):
                 " bad quadrupole strength:", _Strength)
         self._Strength = _Strength
 
-    def setTransferMatrix(self, _Brho):
-        k = self._Strength / _Brho
+    def setTransferMatrix(self, _p0=None):
+        if not isinstance(_p0, float):
+            raise badParameter(\
+                    "BeamLineElement.DeocusQuadrupole.setTransferMatrix:", \
+                               "bad reference particle momentum:", _p0)
+
+        Brho = (1/(speed_of_light*1.E-9))*_p0/1000.
+        k = self._Strength / Brho
         l = self._Length
 
         b = np.sqrt(k)
@@ -1032,7 +1045,7 @@ class SectorDipole(BeamLineElement):
 
     def __init__(self, _Name=None, \
                  _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
-                 _Angle=None):
+                 _Angle=None, _B=None):
         if self.__Debug:
             print(' SectorDipole(BeamLineElement).__init__: ', \
                   'creating SectorDipole object: Angle=', _Angle)
@@ -1047,7 +1060,9 @@ class SectorDipole(BeamLineElement):
                 "SectorDipole: bad specification for bending angle (Angle)!")
 
         self.setAngle(_Angle)
-        self.setTransferMatrix()
+        self.setB(_B)
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
 
         if self.__Debug:
             print("     ----> New SectorDipole instance: \n", self)
@@ -1060,6 +1075,7 @@ class SectorDipole(BeamLineElement):
         print(" -------")
         print("     ----> Debug flag:", SectorDipole.getDebug())
         print("     ----> Bending Angle (Angle):", self.getAngle())
+        print("     ----> Magnetic field:", self.getB())
         print("     ----> Transfer matrix: \n", self.getTransferMatrix())
         BeamLineElement.__str__(self)
         return " <---- SectorDipole parameter dump complete."
@@ -1073,19 +1089,32 @@ class SectorDipole(BeamLineElement):
                                "bad bending angle (Angle):", _Angle)
         self._Angle = _Angle
 
+    def setB(self, _B):
+        if not isinstance(_B, float):
+            raise badParameter(\
+                               "BeamLineElement.SectorDipole.setB:", \
+                               "bad B:", _B)
+        self._B = _B
 
-    def setTransferMatrix(self):
-        r = 10.
-        c = np.cos(self._Angle)
-        s = np.sin(self._Angle)
+    def setTransferMatrix(self, _p0=None):
+        if not isinstance(_p0, float):
+            raise badParameter(\
+                    "BeamLineElement.SectorDipole.setTransferMatrix:", \
+                               "bad reference particle momentum:", _p0)
+        
+        Brho = (1/(speed_of_light*1.E-9))*_p0/1000.
+        r    = Brho / self.getB()
+        c    = np.cos(self.getAngle())
+        s    = np.sin(self.getAngle())
+        l    = r * self.getAngle()
 
         TrnsMtrx = np.array([
-            (c, r * s, 0, 0, 0, r * (1 - c)),
-            (-(1 / r) * s, c, 0, 0, 0, s),
-            (0, 0, 1, 10., 0, 0),
-            (0, 0, 0, 1, 0, 0),
-            (s, r * (1 - c), 0, 0, 1, r * (self._Angle - s)),
-            (0, 0, 0, 0, 0, 1)
+            [       c, r*s, 0., 0., 0., r*(1-c)],
+            [-(1/r)*s,   c, 0., 0., 0.,       s],
+            [      0.,  0., 1.,  l, 0.,      0.],
+            [      0.,  0., 0., 1., 0.,      0.],
+            [      0.,  0., 0., 0., 1.,      0.],
+            [      0.,  0., 0., 0., 0.,      1.]
         ])
 
         self._TrnsMtrx = TrnsMtrx
@@ -1094,6 +1123,9 @@ class SectorDipole(BeamLineElement):
 #..  Methods believed to be self-documenting(!)
     def getAngle(self):
         return self._Angle
+
+    def getB(self):
+        return self._B
 
 
 class Octupole(BeamLineElement):

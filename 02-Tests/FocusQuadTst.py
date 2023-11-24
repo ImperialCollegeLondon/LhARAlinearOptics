@@ -10,13 +10,33 @@ FocusQuadrupole.py -- set "relative" path to code
 
 import numpy as np
 import scipy as sp
+import os
 
 import BeamLineElement as BLE
+import LIONbeam        as LNb
+import Particle        as Prtcl
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+LNbI  = LNb.LIONbeam(filename)
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
 ##! Start:
 print("========  FocusQuadrupole: tests start  ========")
 
-##! Test singleton class feature:
+print("Reference particle:")
+xx    = iRefPrtcl.getPrIn()[0]
+xx[2] = 194.7585262
+iRefPrtcl._PrIn[0] = xx
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Three momentum (in, RPLC):", iRefPrtcl.getPrIn()[0][0:3])
+    print("                           Magnitude:", p0)
+
+
+##! Test built-in methods:
 FocusQuadrupoleTest = 1
 print()
 print("FocusQuadrupoleTest:", FocusQuadrupoleTest, \
@@ -70,12 +90,9 @@ print()
 print("FocusQuadrupoleTest:", FocusQuadrupoleTest, \
       " test transport through focusing quadrupole.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
-p      = 20.
-Brho   = 1./(sp.constants.c*1.E-9) * p / 1000.
-Rprime = FQuad.Transport(R, Brho)
+Rprime = FQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
-print("     ----> Mommentum (MeV), Brho:", p, Brho)
 print("     ----> Relevant portions of transfer matrix:")
 print("         ", FQuad.getTransferMatrix()[0,0], \
                    FQuad.getTransferMatrix()[0,1], \
@@ -95,8 +112,8 @@ print("         ", FQuad.getTransferMatrix()[3,0], \
                    FQuad.getTransferMatrix()[3,3])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ -0.374292812, 12.83562571, -7.330289223, \
-                        -283.5649557, 0.,  0. ])
+RprimeTest = np.array([ 0.169698254, -5.836075396, -0.58761661, \
+                        -6.271951923, 0.,  0. ])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)

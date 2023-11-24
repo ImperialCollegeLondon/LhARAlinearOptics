@@ -7,15 +7,34 @@ Test script for "SectorDipole" class
   SectorDipole.py -- set "relative" path to code
 
 """
-
+import os
 import numpy as np
 
 import BeamLineElement as BLE
+import LIONbeam        as LNb
+import Particle        as Prtcl
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+LNbI  = LNb.LIONbeam(filename)
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
 ##! Start:
 print("========  SectorDipole: tests start  ========")
 
-##! Test singleton class feature:
+print("Reference particle:")
+xx    = iRefPrtcl.getPrIn()[0]
+xx[2] = 194.7585262
+iRefPrtcl._PrIn[0] = xx
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Three momentum (in, RPLC):", iRefPrtcl.getPrIn()[0][0:3])
+    print("                           Magnitude:", p0)
+
+
+##! Test built-in emthods:
 SectorDipoleTest = 1
 print()
 print("SectorDipoleTest:", SectorDipoleTest, \
@@ -34,15 +53,18 @@ dvCtr = np.array([0.,0.])
 try:
     Dpl = BLE.SectorDipole("NoAngle", rCtr, vCtr, drCtr, dvCtr)
 except:
-    print('      ----> Correctly trapped no dipole angle exception.')
+    print('      ----> Correctly trapped no angle exception.')
 
 try:
-    Dpl = BLE.SectorDipole("NoAngle", rCtr, vCtr, drCtr, dvCtr, 0.3)
+    Dpl = BLE.SectorDipole("NoField", rCtr, vCtr, drCtr, dvCtr, 0.3)
 except:
-    print('      ----> Correctly trapped no length exception.')
+    print('      ----> Correctly trapped no field exception.')
 
 #.. Create valid instance:
-Dpl = BLE.SectorDipole("ValidSectorDipole", rCtr, vCtr, drCtr, dvCtr, 0.03)
+Ang = 45./180.*np.pi
+B   = 0.5
+Dpl = BLE.SectorDipole("ValidSectorDipole", rCtr, vCtr, drCtr, dvCtr, \
+                       Ang, B)
     
 #.. __repr__
 print("    __repr__:")
@@ -72,28 +94,10 @@ BLE.SectorDipole.setDebug(False)
 SectorDipoleTest += 1
 print()
 print("SectorDipoleTest:", SectorDipoleTest, " test transport through dipole.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.05])
 Rprime = Dpl.Transport(R)
-print("     ----> Input phase-space vector:", R)
-print("     ----> Relevant portions of transfer matrix:")
-print("         ", Dpl.getTransferMatrix()[0,0], \
-                   Dpl.getTransferMatrix()[0,1], \
-                   Dpl.getTransferMatrix()[0,2], \
-                   Dpl.getTransferMatrix()[0,3])
-print("         ", Dpl.getTransferMatrix()[1,0], \
-                   Dpl.getTransferMatrix()[1,1], \
-                   Dpl.getTransferMatrix()[1,2], \
-                   Dpl.getTransferMatrix()[1,3])
-print("         ", Dpl.getTransferMatrix()[2,0], \
-                   Dpl.getTransferMatrix()[2,1], \
-                   Dpl.getTransferMatrix()[2,2], \
-                   Dpl.getTransferMatrix()[2,3])
-print("         ", Dpl.getTransferMatrix()[3,0], \
-                   Dpl.getTransferMatrix()[3,1], \
-                   Dpl.getTransferMatrix()[3,2], \
-                   Dpl.getTransferMatrix()[3,3])
 print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ 0.50500125,  0.0999925,  -0.3000075,  -0.19999875,   0.,    0.  ])
+RprimeTest = np.array([0.464454646, -0.166046948, -0.504091844, -0.2, 0, 0.05])
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
 print("     ----> Difference Rprime - RprimeTest:", Diff)

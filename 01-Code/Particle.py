@@ -726,7 +726,7 @@ Derived class ReferenceParticle(Particle):
   Class attributes:
   -----------------
   __instance : Instances of ReferenceParticle class
-  __Debug    : Debug flag
+<  __Debug    : Debug flag
 
       
   Instance attributes:
@@ -898,10 +898,18 @@ class ReferenceParticle(Particle):
         
     def getPrIn(self):
         return self._PrIn
+
+    def getMomentumIn(self, iLoc):
+        return mth.sqrt(np.dot(self.getPrIn()[iLoc][:3], \
+                               self.getPrIn()[iLoc][:3]))
         
     def getPrOut(self):
         return self._PrOut
     
+    def getMomentumOut(self, iLoc):
+        return mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
+                               self.getPrOut()[iLoc][:3]))
+        
     def getRot2LabIn(self):
         return self._Rot2LabIn
         

@@ -168,6 +168,23 @@ class LIONbeam(object):
             print("        <---- Source done.")
 #    <---- Done source  --------  --------  --------  --------
 
+#    ----> Create reference particle:  --------  --------  --------  --------
+#..  Set Name and reference-particle momentum only at this stage:
+        cls.setDebug(True)
+        if cls.getDebug():
+            print("        ----> Create reference particle instance: ")
+            
+        refPrtcl  = Prtcl.ReferenceParticle()
+        p0 = np.array([0., 0., 194.7585262, 1000.])
+        refPrtcl.setPrIn(p0)
+
+        if cls.getDebug():
+            print("            ----> Reference particle 4-momentum:", \
+                  p0)
+            print("        <---- Reference particle created. ")
+        cls.setDebug(False)
+#    <---- Done source  --------  --------  --------  --------
+
 #    ----> Beam line:  --------  --------  --------  --------
         if cls.getDebug():
             print("         ----> Beam line: ")
@@ -182,13 +199,11 @@ class LIONbeam(object):
         if cls.getDebug():
             print("        ----> Reference particle: ")
             
-        refPrtcl  = Prtcl.ReferenceParticle()
         refPrtclSet = refPrtcl.setReferenceParticle()
 
-        print("            ----> Reference particle set, success:", \
-              refPrtclSet)
-
         if cls.getDebug():
+            print("            ----> Reference particle set, success:", \
+                  refPrtclSet)
             print("        <---- Reference particle done. ")
 #    <---- Done reference particle -----  --------  --------  --------
 
