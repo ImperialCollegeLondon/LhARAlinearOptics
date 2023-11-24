@@ -10,13 +10,34 @@ DefocusQuadrupole.py -- set "relative" path to code
 
 import numpy as np
 import scipy as sp
+import os
 
 import BeamLineElement as BLE
+import LIONbeam        as LNb
+import Particle        as Prtcl
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+LNbI  = LNb.LIONbeam(filename)
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
 ##! Start:
 print("========  DefocusQuadrupole: tests start  ========")
 
-##! Test singleton class feature:
+print("Reference particle:")
+xx    = iRefPrtcl.getPrIn()[0]
+xx[2] = 194.7585262
+iRefPrtcl._PrIn[0] = xx
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3])
+    print("                           Magnitude:", p0)
+
+
+##! Test built-in methods:
 DefocusQuadrupoleTest = 1
 print()
 print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, \
@@ -71,12 +92,9 @@ print()
 print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, \
       " test transport through defocusing quadrupole.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
-p      = 20.
-Brho   = 1./(sp.constants.c*1.E-9) * p / 1000.
-Rprime = DfQuad.Transport(R, Brho)
+Rprime = DfQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
-print("     ----> Mommentum (MeV), Brho:", p, Brho)
 print("     ----> Relevant portions of transfer matrix:")
 print("         ", DfQuad.getTransferMatrix()[0,0], \
                    DfQuad.getTransferMatrix()[0,1], \
@@ -96,8 +114,8 @@ print("         ", DfQuad.getTransferMatrix()[3,0], \
                    DfQuad.getTransferMatrix()[3,3])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([12.07250603, 467.003352, 0.226987248, \
-                       -7.597055753,  0.,  0.])
+RprimeTest = np.array([0.949563524, 10.01608306, -0.112493763,
+                       3.456264689, 0.,  0.])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)
@@ -111,6 +129,7 @@ if Norm > 1E-6:
 else:
     print(" <---- Defocusing quadrupole transport test successful.")
 
+    
 ##! Complete:
 print()
 print("========  DefocusQuadrupole: tests complete  ========")

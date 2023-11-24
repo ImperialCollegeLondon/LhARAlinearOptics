@@ -552,7 +552,7 @@ class LIONbeam(object):
                 HlfLngth = iBLE.getLength() / 2.
                 if isinstance(iBLE, BLE.FocusQuadrupole) or \
                    isinstance(iBLE, BLE.DefocusQuadrupole):
-                    TrcSpc     = iBLE.Transport(TrcSpc_i, Brho)
+                    TrcSpc     = iBLE.Transport(TrcSpc_i)
                 else:
                     TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():

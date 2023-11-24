@@ -32,7 +32,8 @@ xx[2] = 194.7585262
 iRefPrtcl._PrIn[0] = xx
 p0        = iRefPrtcl.getMomentumIn(0)
 with np.printoptions(linewidth=500,precision=7,suppress=True):
-    print("     ----> Three momentum (in, RPLC):", iRefPrtcl.getPrIn()[0][0:3])
+    print("     ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3])
     print("                           Magnitude:", p0)
 
 
@@ -58,7 +59,8 @@ except:
     print('      ----> Correctly trapped no quadrupole strength exception.')
 
 #.. Create valid instance:
-FQuad = BLE.FocusQuadrupole("ValidQuad", rCtr, vCtr, drCtr, dvCtr, 0.1, 100.)
+FQuad = BLE.FocusQuadrupole("ValidQuad", rCtr, vCtr, drCtr, dvCtr, \
+                            0.1, 100.)
     
 #.. __repr__
 print("    __repr__:")

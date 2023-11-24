@@ -740,13 +740,13 @@ class FocusQuadrupole(BeamLineElement):
         return Str
 
     
-    # -------- "Set methods"
-    # Methods believed to be self-documenting(!)
-
+# -------- "Set methods"
+# Methods believed to be self-documenting(!)
     def setLength(self, _Length):
         if not isinstance(_Length, float):
-            raise badParameter("BeamLineElement.FocusQuadrupole.setLength:", \
-                               " bad length:", _Length)
+            raise badParameter( \
+                            "BeamLineElement.FocusQuadrupole.setLength:", \
+                            " bad length:", _Length)
         self._Length = _Length
 
     def setStrength(self, _Strength):
@@ -762,7 +762,7 @@ class FocusQuadrupole(BeamLineElement):
                     "BeamLineElement.FocusQuadrupole.setTransferMatrix:", \
                                "bad reference particle momentum:", _p0)
 
-        Brho = (1/(speed_of_light*1.E-9))*_p0/1000.
+        Brho = (1./(speed_of_light*1.E-9))*_p0/1000.
         k = self._Strength / Brho
         l = self._Length
 
@@ -794,11 +794,6 @@ class FocusQuadrupole(BeamLineElement):
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
-        with np.printoptions(linewidth=500,precision=5,suppress=True): \
-             print(" Here: \n", self.getTransferMatrix())
-        with np.printoptions(linewidth=500,precision=5,suppress=True): \
-             print(_R)
-        print(self.getTransferMatrix().dot(_R))
         return self.getTransferMatrix().dot(_R)
     
 
@@ -897,7 +892,9 @@ class DefocusQuadrupole(BeamLineElement):
 
         self.setLength(_Length)
         self.setStrength(_Strength)
-        self.setTransferMatrix(1.)
+        
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
 
         if self.__Debug:
             print("     ----> New DefocusQuadrupole instance: \n", self)
@@ -911,7 +908,8 @@ class DefocusQuadrupole(BeamLineElement):
         print("     ----> Debug flag:", DefocusQuadrupole.getDebug())
         print("     ----> Length (m):", self.getLength())
         print("     ----> Strength:", self.getStrength())
-        print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> Transfer matrix: \n", self.getTransferMatrix())
         BeamLineElement.__str__(self)
         return " <---- DefocusQuadrupole parameter dump complete."
 
@@ -922,9 +920,8 @@ class DefocusQuadrupole(BeamLineElement):
         return Str
 
     
-    # -------- "Set methods"
-    # Methods believed to be self-documenting(!)
-
+# -------- "Set methods"
+# Methods believed to be self-documenting(!)
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
@@ -952,36 +949,32 @@ class DefocusQuadrupole(BeamLineElement):
         b = np.sqrt(k)
         a = l * b
 
-        TrnsMtrx = np.array([                                              \
-            [  np.cosh(a), np.sinh(a)/b,           0.,           0., 0., 0.],\
-            [b*np.sinh(a),   np.cosh(a),           0.,           0., 0., 0.],\
-            [          0.,           0.,    np.cos(a),  np.sin(a)/b, 0., 0.],\
-            [          0.,           0., -b*np.sin(a),    np.cos(a), 0., 0.],\
+        TrnsMtrx = np.array([                                               \
+            [  np.cosh(a), np.sinh(a)/b,           0.,          0., 0., 0.],\
+            [b*np.sinh(a),   np.cosh(a),           0.,          0., 0., 0.],\
+            [          0.,           0.,    np.cos(a), np.sin(a)/b, 0., 0.],\
+            [          0.,           0., -b*np.sin(a),   np.cos(a), 0., 0.],\
             [0., 0., 0., 0., 1., 0.],\
             [0., 0., 0., 0., 0., 1.] \
         ])
 
         self._TrnsMtrx = TrnsMtrx
 
-    def Transport(self, _R, _Brho):
-        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
-            raise badParameter( \
-                        " BeamLineElement.Transport: bad input vector:", \
-                                _R)
-        
-        self.setTransferMatrix(_Brho)
-
-        return self.getTransferMatrix().dot(_R)
-
     # -------- "Get methods"
     # Methods believed to be self-documenting(!)
-
     def getLength(self):
         return self._Length
 
     def getStrength(self):
         return self._Strength
 
+# -------- Utilities:
+    def Transport(self, _R):
+        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
+            raise badParameter( \
+                        " BeamLineElement.Transport: bad input vector:", \
+                                _R)
+        return self.getTransferMatrix().dot(_R)
 
 """
 Derived class SectorDipole:
