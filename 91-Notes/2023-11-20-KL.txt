@@ -1,0 +1,100 @@
+--------  --------  --------  --------  --------  --------  --------  20Nov23
+---- In Frankfurt:
+ - Fix Read:
+   - Realise can (should?) regenerate reference particle, so, just write
+     particles. works!
+   - Now need to rerun tests, so:
+
+ReReRun tests:
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK -- but; upgraded clean up at the end of
+                                the generation meant that code to find one
+				event that made it to the end falled.  Fix
+				later.
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - Fails as before.
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - LIONfacilityTst.py      - OK - comments as for DRACO
+ - LhARAFacilityTst.py     - OK 
+ - LhARASourceTst.py       - OK
+ - OctupoleTst.py          - Fails as before.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - ReferenceParticleTst.py - OK
+ - RFCavityTst.py          - Fails as before.
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestWrite.py            - OK
+ - TestRead.py             - OK
+
+Run scripts:
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - plotTrajectory.py       - OK, but plotting reference particle, so boring.
+
+
+---- In RAL car, on flight:
+Implemented referene particle, now rerun all tests etc.:
+
+Run tests:
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK after phase -> trace space
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - Fails as before.
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - LIONfacilityTst.py      - OK after phase -> trace space
+ - LhARAFacilityTst.py     - OK
+ - LhARASourceTst.py       - OK
+ - OctupoleTst.py          - Fails as before.
+ - ParticleTst.py          - OK after phase -> trace space
+                             Had also to add Success flag to
+			     setReferenceParticle.  So, loop back to tests.
+			     OK as documented above.
+ - PhysicalConstantsTst.py - OK
+ - ReferenceParticleTst.py - OK -- had to fix cleaning!
+ - RFCavityTst.py          - Fails as before.
+ - RunSimulationTst.py     - OK after phase -> trace space
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - Fails; does not handle reference particle.
+ - TestWrite.py            - Made to run, but, does not handle reference
+                             particle.
+Loop back!  ReRun tests:
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - Fails as before.
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK (had to clean reference particle to allow
+                                 singleton test)
+ - LhARASourceTst.py       - OK
+ - OctupoleTst.py          - Fails as before.
+ - ParticleTst.py          - OK (had to clean reference particle to allow
+                                 singleton test)
+ - PhysicalConstantsTst.py - OK
+ - ReferenceParticleTst.py - OK
+ - RFCavityTst.py          - Fails as before.
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - Fails; does not handle reference particle.
+ - TestWrite.py            - Made to run, but, does not handle reference
+                             particle.
+
+Run scripts:         <------  Not yet!  Need to fix read/write first.
+ - ReadDRACOsimu.py        - 
+ - ReadLIONsimu.py         - 
+ - RunDRACOsimulation.py   - 
+ - RunLIONsimulation.py    - 
+ - plotTrajectory.py       - 
+--------  --------  --------  --------  --------  --------  --------  --------

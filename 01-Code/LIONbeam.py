@@ -97,6 +97,7 @@ Created on Mon 12Jun23: Version history:
 
 import os
 import io
+import math   as mth
 import numpy  as np
 import pandas as pnds
 
@@ -104,10 +105,11 @@ import Particle        as Prtcl
 import BeamLineElement as BLE
 
 #-------- Physical Constants Instances and Methods ----------------
-
 from PhysicalConstants import PhysicalConstants
 
 constants_instance = PhysicalConstants()
+
+protonMASS         = constants_instance.mp()
 speed_of_light     = constants_instance.SoL()
 
 class LIONbeam(object):
@@ -158,6 +160,16 @@ class LIONbeam(object):
         if cls.getDebug():
             print("     ----> Build facility:")
 
+#    ----> Facility:  --------  --------  --------  --------
+        if cls.getDebug():
+            print("         ----> Facility: ")
+
+        cls.addFacility()
+        
+        if cls.getDebug():
+            print("        <---- Facility done.")
+#    <---- Done source  --------  --------  --------  --------
+
 #    ----> Source:  --------  --------  --------  --------
         if cls.getDebug():
             print("         ----> Source: ")
@@ -170,17 +182,20 @@ class LIONbeam(object):
 
 #    ----> Create reference particle:  --------  --------  --------  --------
 #..  Set Name and reference-particle momentum only at this stage:
-        cls.setDebug(True)
         if cls.getDebug():
             print("        ----> Create reference particle instance: ")
             
         refPrtcl  = Prtcl.ReferenceParticle()
-        p0 = np.array([0., 0., 194.7585262, 1000.])
-        refPrtcl.setPrIn(p0)
-
+        p0        = cls.getElement()[0].getp0()
+        Ref4mmtm  = np.array([0., 0., p0,
+                       mth.sqrt(p0**2 + protonMASS**2)])
+        Success = refPrtcl.setPrIn(Ref4mmtm)
+        if not Success:
+            raise fail2createfacility()
+        
         if cls.getDebug():
             print("            ----> Reference particle 4-momentum:", \
-                  p0)
+                  p0, Success)
             print("        <---- Reference particle created. ")
         cls.setDebug(False)
 #    <---- Done source  --------  --------  --------  --------
@@ -289,6 +304,37 @@ class LIONbeam(object):
         return ParamsPandas
         
     @classmethod
+    def addFacility(cls):
+        if cls.getDebug():
+            print("         LIONbeam.addFacility starts:")
+            
+        #.. Get "sub" pandas data frame with Facility parameters only:
+        pndsFacility = cls.getLIONbeamParamPandas()[ \
+                       cls.getLIONbeamParamPandas()["Section"] == "Facility" \
+                                                  ]
+
+        #.. Parse the dataframe to get Facility parameters:
+        Name, K0 = cls.parseFacility(pndsFacility)
+
+        #.. Create the Facility beam line element:
+        rCtr  = np.array([0., 0., 0.])
+        vCtr  = np.array([0., 0., 0.])
+        drCtr = np.array([0., 0., 0.])
+        dvCtr = np.array([0., 0., 0.])
+        print(protonMASS)
+        print(K0)
+        p0    = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
+
+        FacilityBLE = BLE.Facility(Name, rCtr, vCtr, drCtr, dvCtr, \
+                                   p0)
+        if cls.getDebug():
+            print("             <----", Name, \
+                  "beam line element created.")
+
+
+        cls._Element.append(FacilityBLE)
+
+    @classmethod
     def addSource(cls):
         if cls.getDebug():
             print("         LIONbeam.addSource starts:")
@@ -318,6 +364,35 @@ class LIONbeam(object):
         cls._Element.append(SourceBLE)
 
     @classmethod
+    def parseFacility(cls, pndsSource):
+        cls.setDebug(True)
+        if cls.getDebug():
+            print("         LIONbeam.addFacility starts:")
+            
+        #.. Get "sub" pandas data frame with facility parameters only:
+        pndsFacility = cls.getLIONbeamParamPandas()[ \
+                       cls.getLIONbeamParamPandas()["Section"] == "Facility" \
+                                                  ]
+        print(pndsFacility)
+        
+        Name  = None
+        p0    = None
+        if cls.getDebug():
+            print("             ----> LIONbeam.parseFacility starts:")
+
+        Name = str( \
+            pndsFacility[pndsFacility["Parameter"]=="Name"].loc[0]["Value"] \
+                   )
+        K0   = float( \
+        pndsFacility[pndsFacility["Parameter"]=="Kinetic energy"].iloc[0]["Value"] \
+                   )
+        
+        if cls.getDebug():
+            print("                 ----> Name, p0:", Name, K0)
+
+        return Name, K0
+
+    @classmethod
     def parseSource(cls, pndsSource):
         SrcMode  = None
         SrcParam = None
@@ -325,32 +400,32 @@ class LIONbeam(object):
             print("             ----> LIONbeam.parseSource starts:")
 
         SrcMode = int( \
-           pndsSource[pndsSource["Parameter"]=="SourceMode"].loc[0]["Value"] \
+           pndsSource[pndsSource["Parameter"]=="SourceMode"].iloc[0]["Value"] \
                        )
         if cls.getDebug():
             print("                 ----> Mode:", SrcMode)
             
         if SrcMode == 0:               #.. Laser driven:
-            Emin  = \
-             pndsSource[pndsSource["Parameter"]=="Emin"].iloc[0]["Value"]
-            Emax = \
-             pndsSource[pndsSource["Parameter"]=="Emax"].iloc[0]["Value"]
+            Emin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Emin"].iloc[0]["Value"])
+            Emax = float( \
+             pndsSource[pndsSource["Parameter"]=="Emax"].iloc[0]["Value"])
             nPnts = \
              int(pndsSource[pndsSource["Parameter"]=="nPnts"].iloc[0]["Value"])
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"])
         elif SrcMode == 1:               #.. Gaussian:
-            MeanE  = \
-             pndsSource[pndsSource["Parameter"]=="MeanEnergy"].iloc[0]["Value"]
-            SigmaE = \
-             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"].iloc[0]["Value"]
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+            MeanE  = float( \
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"].iloc[0]["Value"])
+            SigmaE = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaEnergy"].iloc[0]["Value"])
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"])
 
-        SigmaX  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaX"].iloc[0]["Value"]
-        SigmaY  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaY"].iloc[0]["Value"]
+        SigmaX  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaX"].iloc[0]["Value"])
+        SigmaY  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaY"].iloc[0]["Value"])
 
         if cls.getDebug():
             print("                     ----> SigmaX, SigmaY:", SigmaX, SigmaY)
@@ -397,7 +472,7 @@ class LIONbeam(object):
             if iLine.Element == "Drift":
                 nDrift   += 1
                 Name      = Name + str(nDrift)
-                Length    = iLine.Value
+                Length    = float(iLine.Value)
                 rCtr      = np.array([0.,0.,s+Length/2.])
                 vCtr      = np.array([0.,0.])
                 drCtr     = np.array([0.,0.,0.])
@@ -413,14 +488,14 @@ class LIONbeam(object):
                 drCtr = np.array([0.,0.,0.])
                 dvCtr = np.array([0.,0.])
                 if iLine.Type == "Circular":
-                    Param = [0, iLine.Value]
+                    Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
                     if NewElement:
-                        Param      = [1, iLine.Value]
+                        Param      = [1, float(iLine.Value)]
                         NewElement = False
                         continue
                     else:
-                        Param.append(iLine.Value)
+                        Param.append(float(iLine.Value))
                         NewElement = True
                 nAperture += 1
                 Name       = Name + iLine.Type + ":" + str(nAperture)
@@ -431,9 +506,9 @@ class LIONbeam(object):
                 s += 0.
             elif iLine.Element == "Fquad":
                 if iLine.Parameter == "Length":
-                    FqL = iLine.Value
+                    FqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    FqS = iLine.Value
+                    FqS = float(iLine.Value)
                 if NewElement:
                     NewElement = False
                     continue
@@ -452,9 +527,9 @@ class LIONbeam(object):
                 s += FqL
             elif iLine.Element == "Dquad":
                 if iLine.Parameter == "Length":
-                    DqL = iLine.Value
+                    DqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    DqS = iLine.Value
+                    DqS = float(iLine.Value)
                 if NewElement:
                     NewElement = False
                     continue
@@ -525,18 +600,15 @@ class LIONbeam(object):
             else:
                 if cls.getDebug():
                     print("     ----> Start by calling getSourceTraceSpace")
-                Name = cls.getElement()[0].getName()
+                Name = cls.getElement()[1].getName()
                 SrcTrcSpc = \
-                    cls.getElement()[0].getParticleFromSource()
+                    cls.getElement()[1].getParticleFromSource()
             Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
             if cls.getDebug():
                 print("     ----> Event", iEvt)
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
                     print("         ----> trace space at source     :", \
                           SrcTrcSpc)
-
-            Mmtm = np.sqrt(2.*938.27208816*SrcTrcSpc[5])
-            Brho = (1/(speed_of_light*1.E-9))*Mmtm/1000.
 
             #.. Track through beam line:
             TrcSpc_i = SrcTrcSpc
@@ -545,7 +617,8 @@ class LIONbeam(object):
             if cls.getDebug():
                 print("     ----> Transport through beam line")
             for iBLE in BLE.BeamLineElement.getinstances():
-                if isinstance(iBLE, BLE.Source):
+                if isinstance(iBLE, BLE.Source) or \
+                   isinstance(iBLE, BLE.Facility):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
@@ -596,5 +669,8 @@ class badParameter(Exception):
     pass
                 
 class badTraceSpaceVector(Exception):
+    pass
+                
+class fail2createfacility(Exception):
     pass
                 

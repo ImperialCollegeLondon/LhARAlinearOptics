@@ -290,6 +290,113 @@ class BeamLineElement:
 
 #--------  Derived classes  --------  --------  --------  --------  --------
 """
+Derived class Facility:
+=======================
+
+  Facility class derived from BeamLineElement to contain paramters for a
+  Facility space.  __init__ sets parameters of Facility.  Methods to
+  apply transfer matix.
+
+
+  Class attributes:
+  -----------------
+    instance : List of instances of Facility(BeamLineElement) class
+  __Debug    : Debug flag
+
+
+  Parent class attributes:
+  ------------------------
+   _rCtr : numpy array; x, y, z position (in m) of centre of element.
+   _vCtr : numpy array; theta, phi of principal axis of element.
+  _drCtr : "error", displacement of centre from nominal position.
+  _dvCtr : "error", deviation in theta and phy from nominal axis.
+  _TrnsMtrx : Transfer matrix.
+
+
+  Instance attributes to define Facility:
+  ------------------------------------
+  _Name : str   : Name of facility
+  _p0   : float : Reference particle momentum
+    
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+  Set methods:
+        setName  : 
+          setp0  : 
+
+  Get methods:
+     getName, getp0
+
+"""
+class Facility(BeamLineElement):
+    instance  = []
+    __Debug   = False
+
+    
+#--------  "Built-in methods":
+    def __init__(self, _Name=None, \
+                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _p0=None):
+        if self.__Debug:
+            print(' Facility.__init__: ', \
+                  'creating the Facility object: Name=', _Name, \
+                  'p0=', _p0)
+
+        Facility.instance = self
+
+        #.. BeamLineElement class initialisation:
+        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+
+        if not isinstance(_p0, float):
+            raise badBeamLineElement( \
+                  " Facility: bad specification for length of Facility!"
+                                      )
+        self.setp0(_p0)
+                
+        if self.__Debug:
+            print("     ----> New Facility instance: \n", \
+                  self)
+            
+    def __repr__(self):
+        return "Facility()"
+
+    def __str__(self):
+        print(" Facility:")
+        print(" ------")
+        print("     ----> Debug flag:", Facility.getDebug())
+        print("     ----> Name      :", self.getName())
+        print("     ----> p0 (MeV/c):", self.getp0())
+        BeamLineElement.__str__(self)
+        return " <---- Facility parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "Facility         : " + BeamLineElement.SummaryStr(self) + \
+            "; Name = " + self.getName() + "; p0 = " + str(self.getp0())
+        return Str
+
+
+#--------  "Set methods"
+#.. Methods believed to be self documenting(!)
+    def setp0(self, _p0=None):
+        if not isinstance(_p0, float):
+            raise badParameter( \
+                     " BeamLineElement.Facility.setLength: bad p0",
+                                _p0)
+        self._p0 = _p0
+
+        
+#--------  "get methods"
+#.. Methods believed to be self documenting(!)
+    def getp0(self):
+        return self._p0
+    
+        
+"""
 Derived class Drift:
 ====================
 
@@ -794,6 +901,13 @@ class FocusQuadrupole(BeamLineElement):
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
+
+        self.setTransferMatrix(mmtm)
+        
         return self.getTransferMatrix().dot(_R)
     
 
@@ -974,6 +1088,13 @@ class DefocusQuadrupole(BeamLineElement):
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
+        
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
+
+        self.setTransferMatrix(mmtm)
+
         return self.getTransferMatrix().dot(_R)
 
 """
@@ -1660,6 +1781,7 @@ class Source(BeamLineElement):
             raise badSourceSpecification( \
                         " BeamLineElement(Source).__init__:", \
                         " bad source paramters. Exit", \
+                        _Name
                                                             )
 
         self.setMode(_Mode)
@@ -1805,6 +1927,12 @@ class Source(BeamLineElement):
                           i, cls.ParamList[_Mode][i], _Param[i])
                 if isinstance(_Param[i], cls.ParamList[_Mode][i]):
                     iMtch += 1
+                else:
+                    if cls.getDebug():
+                        print("             ----> No match for", \
+                              "i, ParamList, _Param:", \
+                              i, cls.ParamList[_Mode][i], _Param[i])
+                    
             if cls.getDebug():
                 print("     ----> iMtch:", iMtch)
         else:
@@ -1928,7 +2056,13 @@ class Source(BeamLineElement):
         sTheta = mth.sqrt(1.-cTheta**2)
         xPrime = sTheta * mth.cos(Phi)
         yPrime = sTheta * mth.sin(Phi)
-        TrcSpc = np.array([x, xPrime, y, yPrime, 0., K])
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        p0        = iRefPrtcl.getMomentumIn(0)
+        mmtm      = mth.sqrt( (protonMASS+K)**2 - protonMASS**2)
+        dp        = mmtm - p0
+        
+        TrcSpc = np.array([x, xPrime, y, yPrime, 0., dp/p0])
         return TrcSpc
 
     
