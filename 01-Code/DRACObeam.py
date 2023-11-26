@@ -97,6 +97,7 @@ Created on Mon 12Jun23: Version history:
 
 import os
 import io
+import math   as mth
 import numpy  as np
 import pandas as pnds
 
@@ -198,7 +199,7 @@ class DRACObeam(object):
 
         if cls.getDebug():
             print("            ----> Reference particle set, success:", \
-                  refPrtclSet)
+                  refPrtcl)
             print("        <---- Reference particle done. ")
 #    <---- Done reference particle -----  --------  --------  --------
 
@@ -284,6 +285,36 @@ class DRACObeam(object):
         return ParamsPandas
         
     @classmethod
+    def addFacility(cls):
+        if cls.getDebug():
+            print("         DRACObeam.addFacility starts:")
+            
+        #.. Get "sub" pandas data frame with Facility parameters only:
+        pndsFacility = cls.getDRACObeamParamPandas()[ \
+                       cls.getDRACObeamParamPandas()["Section"] == "Facility" \
+                                                  ]
+
+        #.. Parse the dataframe to get Facility parameters:
+        Name, K0 = cls.parseFacility(pndsFacility)
+
+        #.. Create the Facility beam line element:
+        rCtr  = np.array([0., 0., 0.])
+        vCtr  = np.array([0., 0., 0.])
+        drCtr = np.array([0., 0., 0.])
+        dvCtr = np.array([0., 0., 0.])
+
+        p0    = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
+
+        FacilityBLE = BLE.Facility(Name, rCtr, vCtr, drCtr, dvCtr, \
+                                   p0)
+        if cls.getDebug():
+            print("             <----", Name, \
+                  "beam line element created.")
+
+
+        cls._Element.append(FacilityBLE)
+
+    @classmethod
     def addSource(cls):
         if cls.getDebug():
             print("         DRACObeam.addSource starts:")
@@ -313,6 +344,36 @@ class DRACObeam(object):
         cls._Element.append(SourceBLE)
 
     @classmethod
+    def parseFacility(cls, pndsSource):
+        cls.setDebug(True)
+        if cls.getDebug():
+            print("         DRACObeam.addFacility starts:")
+            
+        #.. Get "sub" pandas data frame with facility parameters only:
+        pndsFacility = cls.getDRACObeamParamPandas()[ \
+                       cls.getDRACObeamParamPandas()["Section"] == "Facility" \
+                                                  ]
+        print(pndsFacility)
+        
+        Name  = None
+        p0    = None
+        if cls.getDebug():
+            print("             ----> DRACObeam.parseFacility starts:")
+
+        Name = str( \
+            pndsFacility[pndsFacility["Parameter"]=="Name"].loc[0]["Value"] \
+                   )
+        K0   = float( \
+                      pndsFacility[pndsFacility["Parameter"]== \
+                     "Kinetic energy"].iloc[0]["Value"] \
+                   )
+        
+        if cls.getDebug():
+            print("                 ----> Name, K0:", Name, K0)
+
+        return Name, K0
+
+    @classmethod
     def parseSource(cls, pndsSource):
         SrcMode  = None
         SrcParam = None
@@ -320,32 +381,32 @@ class DRACObeam(object):
             print("             ----> DRACObeam.parseSource starts:")
 
         SrcMode = int( \
-           pndsSource[pndsSource["Parameter"]=="SourceMode"].loc[0]["Value"] \
+           pndsSource[pndsSource["Parameter"]=="SourceMode"].iloc[0]["Value"] \
                        )
         if cls.getDebug():
             print("                 ----> Mode:", SrcMode)
             
         if SrcMode == 0:               #.. Laser driven:
-            Emin  = \
-             pndsSource[pndsSource["Parameter"]=="Emin"].iloc[0]["Value"]
-            Emax = \
-             pndsSource[pndsSource["Parameter"]=="Emax"].iloc[0]["Value"]
+            Emin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Emin"].iloc[0]["Value"])
+            Emax = float( \
+             pndsSource[pndsSource["Parameter"]=="Emax"].iloc[0]["Value"])
             nPnts = \
              int(pndsSource[pndsSource["Parameter"]=="nPnts"].iloc[0]["Value"])
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"])
         elif SrcMode == 1:               #.. Gaussian:
-            MeanE  = \
-             pndsSource[pndsSource["Parameter"]=="MeanEnergy"].iloc[0]["Value"]
-            SigmaE = \
-             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"].iloc[0]["Value"]
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+            MeanE  = float( \
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"].iloc[0]["Value"])
+            SigmaE = float( \
+             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"].iloc[0]["Value"])
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"])
 
-        SigmaX  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaX"].iloc[0]["Value"]
-        SigmaY  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaY"].iloc[0]["Value"]
+        SigmaX  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaX"].iloc[0]["Value"])
+        SigmaY  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaY"].iloc[0]["Value"])
 
         if cls.getDebug():
             print("                     ----> SigmaX, SigmaY:", SigmaX, SigmaY)
@@ -391,7 +452,7 @@ class DRACObeam(object):
             if iLine.Element == "Drift":
                 nDrift   += 1
                 Name     += str(nDrift)
-                Length    = iLine.Value
+                Length    = float(iLine.Value)
                 rCtr      = np.array([0.,0.,s+Length/2.])
                 vCtr      = np.array([0.,0.])
                 drCtr     = np.array([0.,0.,0.])
@@ -407,14 +468,14 @@ class DRACObeam(object):
                 drCtr = np.array([0.,0.,0.])
                 dvCtr = np.array([0.,0.])
                 if iLine.Type == "Circular":
-                    Param = [0, iLine.Value]
+                    Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
                     if NewElement:
-                        Param      = [1, iLine.Value]
+                        Param      = [1, float(iLine.Value)]
                         NewElement = False
                         continue
                     else:
-                        Param.append(iLine.Value)
+                        Param.append(float(iLine.Value))
                         NewElement = True
                 nAperture += 1
                 Name      += iLine.Type + ":" + str(nAperture)
@@ -429,13 +490,13 @@ class DRACObeam(object):
                         nLnsSlnd = 4
                         iLnSlnd  = 1
                 if iLine.Parameter == "Length":
-                    SlndL = iLine.Value
+                    SlndL = float(iLine.Value)
                 elif iLine.Parameter == "Current":
-                    SlndI= iLine.Value
+                    SlndI = float(iLine.Value)
                 elif iLine.Parameter == "Layers":
-                    SlndLy = iLine.Value
+                    SlndLy = float(iLine.Value)
                 elif iLine.Parameter == "Turns":
-                    SlndT = iLine.Value
+                    SlndT = float(iLine.Value)
                 if iLnSlnd < nLnsSlnd:
                     iLnSlnd += 1
                     NewElement = False

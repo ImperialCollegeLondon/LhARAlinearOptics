@@ -321,8 +321,7 @@ class LIONbeam(object):
         vCtr  = np.array([0., 0., 0.])
         drCtr = np.array([0., 0., 0.])
         dvCtr = np.array([0., 0., 0.])
-        print(protonMASS)
-        print(K0)
+
         p0    = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
 
         FacilityBLE = BLE.Facility(Name, rCtr, vCtr, drCtr, dvCtr, \
@@ -384,11 +383,12 @@ class LIONbeam(object):
             pndsFacility[pndsFacility["Parameter"]=="Name"].loc[0]["Value"] \
                    )
         K0   = float( \
-        pndsFacility[pndsFacility["Parameter"]=="Kinetic energy"].iloc[0]["Value"] \
+                      pndsFacility[pndsFacility["Parameter"]== \
+                     "Kinetic energy"].iloc[0]["Value"] \
                    )
         
         if cls.getDebug():
-            print("                 ----> Name, p0:", Name, K0)
+            print("                 ----> Name, K0:", Name, K0)
 
         return Name, K0
 
