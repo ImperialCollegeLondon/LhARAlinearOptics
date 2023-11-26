@@ -389,6 +389,7 @@ class Particle:
             fig, axs = plt.subplots(ncols=2, nrows=2, figsize=(6., 6.), \
                                     layout="constrained")
             # add an artist, in this case a nice label in the middle...
+            """
             for row in range(2):
                 for col in range(2):
                     axs[row, col].annotate( \
@@ -396,6 +397,7 @@ class Particle:
                             transform=axs[row, col].transAxes, \
                             ha='center', va='center', fontsize=18, \
                             color='darkgrey')
+            """
             Ttl = BLE.BeamLineElement.getinstances()[iLoc].getName()
             fig.suptitle(Ttl, fontdict=font)
 
@@ -406,7 +408,7 @@ class Particle:
             
             #axs[0, 1].set_title('Energy')
             axs[0, 1].hist(ELoc[iLoc], 100)
-            axs[0, 1].set_xlabel('Energy (MeV)')
+            axs[0, 1].set_xlabel('dp/p')
             axs[0, 1].set_ylabel('Number')
             
             #axs[1, 0].set_title('x, xprime')

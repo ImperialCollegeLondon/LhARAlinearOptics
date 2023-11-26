@@ -198,7 +198,7 @@ class LIONbeam(object):
                   p0, Success)
             print("        <---- Reference particle created. ")
         cls.setDebug(False)
-#    <---- Done source  --------  --------  --------  --------
+#    <---- Done reference particle  --------  --------  --------  --------
 
 #    ----> Beam line:  --------  --------  --------  --------
         if cls.getDebug():

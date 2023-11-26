@@ -181,6 +181,26 @@ class DRACObeam(object):
             print("        <---- Source done.")
 #    <---- Done source  --------  --------  --------  --------
 
+#    ----> Create reference particle:  --------  --------  --------  --------
+#..  Set Name and reference-particle momentum only at this stage:
+        if cls.getDebug():
+            print("        ----> Create reference particle instance: ")
+            
+        refPrtcl  = Prtcl.ReferenceParticle()
+        p0        = cls.getElement()[0].getp0()
+        Ref4mmtm  = np.array([0., 0., p0,
+                       mth.sqrt(p0**2 + protonMASS**2)])
+        Success = refPrtcl.setPrIn(Ref4mmtm)
+        if not Success:
+            raise fail2createfacility()
+        
+        if cls.getDebug():
+            print("            ----> Reference particle 4-momentum:", \
+                  p0, Success)
+            print("        <---- Reference particle created. ")
+        cls.setDebug(False)
+#    <---- Done reference particle  --------  --------  --------  --------
+
 #    ----> Beam line:  --------  --------  --------  --------
         if cls.getDebug():
             print("         ----> Beam line: ")
@@ -194,8 +214,8 @@ class DRACObeam(object):
 #    ----> Reference particle:  --------  --------  --------  --------
         if cls.getDebug():
             print("        ----> Reference particle: ")
-            
-        refPrtcl  = Prtcl.ReferenceParticle()
+
+        refPrtclSet = refPrtcl.setReferenceParticle()
 
         if cls.getDebug():
             print("            ----> Reference particle set, success:", \
@@ -571,16 +591,13 @@ class DRACObeam(object):
                     print("     ----> Start by calling getSourcePhaseSpace")
                 Name = cls.getElement()[0].getName()
                 SrcTrcSpc = \
-                    cls.getElement()[0].getParticleFromSource()
+                    cls.getElement()[1].getParticleFromSource()
             Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
             if cls.getDebug():
                 print("     ----> Event", iEvt)
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
                     print("         ----> trace space at source     :", \
                           SrcTrcSpc)
-
-            Mmtm = np.sqrt(2.*protonMASS*SrcTrcSpc[5])
-            Brho = (1/(speed_of_light*1.E-9))*Mmtm/1000.
 
             #.. Track through beam line:
             TrcSpc_i = SrcTrcSpc
@@ -589,14 +606,14 @@ class DRACObeam(object):
             if cls.getDebug():
                 print("     ----> Transport through beam line")
             for iBLE in BLE.BeamLineElement.getinstances():
-                if isinstance(iBLE, BLE.Source):
+                if isinstance(iBLE, BLE.Source) or \
+                   isinstance(iBLE, BLE.Facility):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
                 HlfLngth = iBLE.getLength() / 2.
                 if isinstance(iBLE, BLE.Solenoid):
-                    TrcSpc     = iBLE.Transport(TrcSpc_i, \
-                                                Brho)
+                    TrcSpc     = iBLE.Transport(TrcSpc_i)
                 else:
                     TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():

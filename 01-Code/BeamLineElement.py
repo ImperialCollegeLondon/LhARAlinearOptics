@@ -800,6 +800,7 @@ class FocusQuadrupole(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
                  _Length=None, _Strength=None):
+        
         if self.getDebug():
             print(' FocusQuadrupole.__init__: ', \
                   'creating the FocusQuadrupole object: Length=', \
@@ -887,6 +888,7 @@ class FocusQuadrupole(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
+        
 # -------- "Get methods"
 # Methods believed to be self-documenting(!)
     def getLength(self):
@@ -895,6 +897,7 @@ class FocusQuadrupole(BeamLineElement):
     def getStrength(self):
         return self._Strength
 
+    
 # -------- Utilities:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
@@ -1403,7 +1406,9 @@ class Solenoid(BeamLineElement):
 
         self.setLength(_Length)
         self.setStrength(_Strength)
-        self.setTransferMatrix(1.)
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
 
         if self.getDebug():
             print("     ----> New Solenoid instance: \n", self)
@@ -1427,6 +1432,8 @@ class Solenoid(BeamLineElement):
             "; Length = " + str(self.getLength()) + \
             "; Strength = " + str(self.getStrength())
         return Str
+
+    
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
@@ -1445,15 +1452,15 @@ class Solenoid(BeamLineElement):
                                " bad strength value:", _Strength)
         self._Strength = _Strength
 
-    def setTransferMatrix(self, _Brho=None):
-        if _Brho == None:
+    def setTransferMatrix(self, _p0=None):
+        if _p0 == None:
             raise badBeamLineElement( \
             " Solenoid(BeamLineElement).setTransferMatrix:", \
-            " no default Brho!"
-                                      )
+                               "bad reference particle momentum:", _p0)
+
+        Brho = (1./(speed_of_light*1.E-9))*_p0/1000.
         l  = self.getLength()
-        
-        k     = self.getStrength() / (2.*_Brho)
+        k     = self.getStrength() / (2.*Brho)
         
         ckl  = mth.cos(k*l)
         skl  = mth.sin(k*l)
@@ -1470,13 +1477,9 @@ class Solenoid(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
+        
 # -------- Get methods:
 #..   Methods believed to be self-documenting(!)
-
-    @classmethod
-    def getDebug(cls):
-        return cls.__Debug
-    
     def getLength(self):
         return self._Length
 
@@ -1485,22 +1488,21 @@ class Solenoid(BeamLineElement):
     
 
 # -------- Utilities:
-    def Transport(self, _R, _Brho):
+    def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
-        if not isinstance(_Brho, float):
-            raise badParameter( \
-                                " Solenoid(BeamLineElement).Transport:", \
-                                " bad input Brho:", \
-                                _Brho)
         
-        self.setTransferMatrix(_Brho)
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
+
+        self.setTransferMatrix(mmtm)
 
         return self.getTransferMatrix().dot(_R)
 
-
+# -------- New, undebugged classes ...
 class RFCavity(BeamLineElement):
     instances = []
     __Debug = False
