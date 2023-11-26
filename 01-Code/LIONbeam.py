@@ -168,7 +168,7 @@ class LIONbeam(object):
         
         if cls.getDebug():
             print("        <---- Facility done.")
-#    <---- Done source  --------  --------  --------  --------
+#    <---- Done facility  --------  --------  --------  --------
 
 #    ----> Source:  --------  --------  --------  --------
         if cls.getDebug():

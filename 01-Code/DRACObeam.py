@@ -160,6 +160,16 @@ class DRACObeam(object):
         if cls.getDebug():
             print("     ----> Build facility:")
 
+#    ----> Facility:  --------  --------  --------  --------
+        if cls.getDebug():
+            print("         ----> Facility: ")
+
+        cls.addFacility()
+        
+        if cls.getDebug():
+            print("        <---- Facility done.")
+#    <---- Done facility  --------  --------  --------  --------
+
 #    ----> Source:  --------  --------  --------  --------
         if cls.getDebug():
             print("         ----> Source: ")
@@ -187,6 +197,8 @@ class DRACObeam(object):
         refPrtcl  = Prtcl.ReferenceParticle()
 
         if cls.getDebug():
+            print("            ----> Reference particle set, success:", \
+                  refPrtclSet)
             print("        <---- Reference particle done. ")
 #    <---- Done reference particle -----  --------  --------  --------
 
