@@ -8,15 +8,36 @@ Solenoid.py -- set "relative" path to code
 
 """
 
+import os
 import numpy as np
-import scipy as sp
 
 import BeamLineElement as BLE
+import LIONbeam        as LNb
+import Particle        as Prtcl
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+LNbI  = LNb.LIONbeam(filename)
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
 
 ##! Start:
 print("========  Solenoid: tests start  ========")
 
-##! Test singleton class feature:
+print("Reference particle:")
+xx    = iRefPrtcl.getPrIn()[0]
+xx[2] = 194.7585262
+iRefPrtcl._PrIn[0] = xx
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3])
+    print("                           Magnitude:", p0)
+
+
+##! Test built in methods:
 SolenoidTest = 1
 print()
 print("SolenoidTest:", SolenoidTest, \
@@ -68,29 +89,10 @@ BLE.Solenoid.setDebug(False)
 SolenoidTest += 1
 print()
 print("SolenoidTest:", SolenoidTest, " test transport through solenoid.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
-p      = 194.7585
-Brho   = 1./(sp.constants.c*1.E-9) * p / 1000.
-Rprime = Sol.Transport(R, Brho)
-print("     ----> Input phase-space vector:", R)
-print("     ----> Relevant portions of transfer matrix:")
-print("         ", Sol.getTransferMatrix()[0,0], \
-                   Sol.getTransferMatrix()[0,1], \
-                   Sol.getTransferMatrix()[0,2], \
-                   Sol.getTransferMatrix()[0,3])
-print("         ", Sol.getTransferMatrix()[1,0], \
-                   Sol.getTransferMatrix()[1,1], \
-                   Sol.getTransferMatrix()[1,2], \
-                   Sol.getTransferMatrix()[1,3])
-print("         ", Sol.getTransferMatrix()[2,0], \
-                   Sol.getTransferMatrix()[2,1], \
-                   Sol.getTransferMatrix()[2,2], \
-                   Sol.getTransferMatrix()[2,3])
-print("         ", Sol.getTransferMatrix()[3,0], \
-                   Sol.getTransferMatrix()[3,1], \
-                   Sol.getTransferMatrix()[3,2], \
-                   Sol.getTransferMatrix()[3,3])
-print("     ----> Transported phase-space vector:", Rprime)
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.00])
+Rprime = Sol.Transport(R)
+print("     ----> Input trace-space vector:", R)
+print("     ----> Transported trace-space vector:", Rprime)
 RprimeTest = np.array([0.228273338, -0.166572584, -0.54739631, 0.092788839, \
                        0., 0. ])
 Diff       = np.subtract(Rprime, RprimeTest)
@@ -99,7 +101,8 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
     print("     ----> Difference Rprime - RprimeTest:", Diff)
 print("     ----> Magnitude of Diff:", Norm)
 if Norm > 1E-6:
-    raise Exception(" !!!!----> FAILED: solenoid transport result not as expected.")
+    raise Exception(" !!!!----> FAILED:", \
+                    "solenoid transport result not as expected.")
 else:
     print(" <---- Solenoid transport test successful.")
 

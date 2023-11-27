@@ -162,7 +162,6 @@ LNbI.setSrcTrcSpc()
 print(LNbI)
 
 NEvt = 10
-LNbI.setDebug(True)
 OK = LNbI.trackLION(NEvt)
 
 
