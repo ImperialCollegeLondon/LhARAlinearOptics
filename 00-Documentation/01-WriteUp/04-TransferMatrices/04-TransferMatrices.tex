@@ -12,12 +12,41 @@ Description of beam transport often carried out by:
     terms of the trace space at the start of the element,
     $\bm{\phi}_i$:
     \begin{equation}
-      \bm{\phi}_f = \underline{\underline{T}} ~ \bm{\phi}_i \,.
+      \bm{\phi}_f = \underline{\underline{T}} ~ \bm{\phi}_i \,
+      {\rm ; and}
     \end{equation}
+  \item The distance along the reference particle trajectory is
+    increased by $\delta s$, where:
+    \begin{equation}
+      s_{\rm end} = s_{\rm start} + \delta s \, ;
+    \end{equation}
+    and $s_{\rm start}$ and $s_{\rm end}$ are the length of the
+    reference particle trajectory at the start and end of the 
+    beam-line element respectively.
 \end{itemize}
 Many excellent descriptions of derivation of transfer matrices,
 $\underline{\underline{T}}$, so only quote results here.
 
 \subsection{Drift}
 
-
+A ``drift'' space refers to a region in which the beam propagates in
+the absence of any electromagnetic fields.
+In a drift, particles propogate in straight lines, therefore:
+\begin{equation}
+  \underline{\underline{T}}_{\rm~drift} =
+        \begin{pmatrix}
+          1 & l & 0 & 0 &              0 & 0 \\
+          0 & 1 & 0 & 0 &              0 & 0 \\
+          0 & 0 & 1 & l &              0 & 0 \\
+          0 & 0 & 0 & 1 &              0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & f_{\rm drift}(s) \\
+          0 & 0 & 0 & 0 &              0 & 1
+        \end{pmatrix} \, ; 
+\end{equation}
+where $l$ is the length of the drift and $f_{\rm drift}(s)$ indicates
+that the time taken to cross the drift is yet to be included in the
+transfer matrix.
+The increment in the reference particle trajectory is:
+\begin{equation}
+  \delta s = l \, .
+\end{equation}
