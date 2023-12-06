@@ -113,6 +113,12 @@ constants_instance = PhysCnst.PhysicalConstants()
 speed_of_light     = constants_instance.SoL()
 protonMASS         = constants_instance.mp()
 
+alpha              = 0.0072973525693
+electricCHARGE     = mth.sqrt(4.*mth.pi*alpha)
+epsilon0           = 1.
+Joule2MeV          = 6241509074000.
+m2InvMeV           = 5067730717679.4
+
 class BeamLineElement:
 
 #-------- Class attributes  --------  --------
@@ -1485,6 +1491,215 @@ class Solenoid(BeamLineElement):
 
     def getStrength(self):
         return self._Strength
+    
+
+# -------- Utilities:
+    def Transport(self, _R):
+        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
+            raise badParameter( \
+                        " BeamLineElement.Transport: bad input vector:", \
+                                _R)
+        
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
+
+        self.setTransferMatrix(mmtm)
+
+        return self.getTransferMatrix().dot(_R)
+
+"""
+Derived class GaborLens:
+========================
+
+  GaborLens class derived from BeamLineElement to contain paramters
+  for a Gabor lens.
+
+
+  Class attributes:
+  -----------------
+    instances : List of instances of BeamLineElement class
+  __Debug     : Debug flag
+
+
+  Derived instance attributes:
+  ----------------------------
+  Calling arguments:
+   _rCtr : numpy array; x, y, z position (in m) of centre of element.
+   _vCtr : numpy array; theta, phi of principal axis of element.
+  _drCtr : "error", displacement of centre from nominal position.
+  _dvCtr : "error", deviation in theta and phy from nominal axis.
+
+
+  _TrnsMtrx : Transfer matrix (6x6).  Set to Null in __init__, initialised
+              (to Null) in BeamLineElement.__init__, filled in derived
+              classes.
+                
+
+  Instance attributes to define quadrupole:
+  -----------------------------------------
+  _Length  : Length of quad, m
+  _Strength: Strength of solenoid (B0) in T
+
+    
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+    SummaryStr: No arguments, returns one-line string summarising quad
+                parameterrs.
+
+  Set methods:
+           setLength: set length:
+                  Input: _Length (float)   : length of lens (m)
+  setElectronDensity: set primary field strength
+                  Input: _ne (float): electron density (m^{-3))
+
+setTransferMatrix: Set transfer matrix; calculate using i/p kinetic
+                   energy for test particle and reference particle
+          Input: Brho (T m)
+         Return: np.array(6,6,) transfer matrix
+         Return: np.array(6,6,) transfer matrix
+
+  Get methods:
+      getLength, getElectronDensity
+
+  Utilities:
+    Transport: transport through solenoid.  Sets transfer matrix (using
+               call to setTransferMatrix) given Brho
+            Input:
+                  R: 6D numpy array containing phase space at entry of
+                      solenoid
+               Brho: Brho (T m)
+             Rprime: 6D phase space (numpy array) at exit of aperture
+                     if the particle passes through the solenoid.
+
+"""
+class GaborLens(BeamLineElement):
+    instances = []
+    __Debug = False
+
+    def __init__(self, _Name=None, \
+                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _Length=None, _ne=None):
+
+        if self.getDebug():
+            print(" GaborLens.__init__:", \
+                  " creating the GaborLens object: Length=", _Length, " m,"\
+                  " electron density=", _Strength, " /m^3")
+
+        GaborLens.instances.append(self)
+
+        # BeamLineElement class initialization:
+        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+
+        if not isinstance(_Length, float):
+            raise badBeamLineElement( \
+                            "GaborLens: bad specification for length!")
+        if not isinstance(_ne, float):
+            raise badBeamLineElement( \
+                            "GaborLens: bad specification for strength!")
+
+        self.setLength(_Length)
+        self.setElectronDensity(_ne)
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
+
+        if self.getDebug():
+            print("     ----> New GaborLens instance: \n", self)
+
+    def __repr__(self):
+        return "GaborLens()"
+
+    def __str__(self):
+        print(" GaborLens:")
+        print(" ---------")
+        print("     ----> Debug flag:", GaborLens.getDebug())
+        print("     ----> Length (m):", self.getLength())
+        print("     ----> n_e (/m^3):", self.getElectronDensity())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        BeamLineElement.__str__(self)
+        return " <---- GaborLens parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "GaborLens         : " + BeamLineElement.SummaryStr(self) + \
+            "; Length = " + str(self.getLength()) + \
+            "; Electron density = " + str(self.getElectronDensity())
+        return Str
+
+    
+# -------- "Set methods"
+# Methods believed to be self-documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
+    def setLength(self, _Length):
+        if not isinstance(_Length, float):
+            raise badParameter( \
+                "BeamLineElement.GaborLens.setLength: bad length:", _Length)
+        self._Length = _Length
+
+    def setElectronDensity(self, _ElectronDensity):
+        if not isinstance(_ElectronDensity, float):
+            raise badParameter( \
+                        "BeamLineElement.GaborLens.setElectronDensity:" \
+                               " bad strength value:", _ElectronDensity)
+        self._ElectronDensity = _ElectronDensity
+
+    def setTransferMatrix(self, p0=None):
+        if p0 == None:
+            raise badBeamLineElement( \
+            " GaborLens(BeamLineElement).setTransferMatrix:", \
+                               "bad reference particle momentum:", _p0)
+
+        E0     = mth.sqrt(protonMASS**2 + p0**2)
+        gamma0 = E0/protonMASS
+        l      = self.getLength()
+        ne     = self.getElectronDensity()
+
+        print(" GaborLens.setTransferMatrix: l, ne:", l, ne)
+        print("     ----> p0, E0:", p0, E0)
+        print("         ----> gamma0:", gamma0)
+
+        print("     ----> alpha, electricCHARGE, epsilon0:", \
+              alpha, electricCHARGE, epsilon0)
+        print("     ----> Joule2MeV:", Joule2MeV)
+        print("     ----> m2InvMeV:", m2InvMeV)
+
+        k      = (electricCHARGE**2 * protonMASS * gamma0) / \
+                 (2.*epsilon0 * p0**2) * \
+                 ne /m2InvMeV
+        w      = mth.sqrt(k)
+        print("     ----> k, w:", k, w)
+        
+        cwl  = mth.cos(w*l)
+        swl  = mth.sin(w*l)
+
+        TrnsMtrx = np.array([                                      \
+            [    cwl, swl/w,     0.,    0., 0., 0.], \
+            [ -w*swl,   cwl,     0.,    0., 0., 0.], \
+            [     0.,    0.,    cwl, swl/w, 0., 0.], \
+            [     0.,    0., -w*swl,   cwl, 0., 0.], \
+            [0., 0., 0., 0., 1., 0.],                              \
+            [0., 0., 0., 0., 0., 1.]                               \
+                             ])
+
+        self._TrnsMtrx = TrnsMtrx
+
+        
+# -------- Get methods:
+#..   Methods believed to be self-documenting(!)
+    def getLength(self):
+        return self._Length
+
+    def getElectronDensity(self):
+        return self._ElectronDensity
     
 
 # -------- Utilities:
