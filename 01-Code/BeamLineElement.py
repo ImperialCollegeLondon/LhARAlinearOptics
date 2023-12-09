@@ -1580,30 +1580,48 @@ setTransferMatrix: Set transfer matrix; calculate using i/p kinetic
 """
 class GaborLens(BeamLineElement):
     instances = []
-    __Debug = False
+    __Debug = True
 
     def __init__(self, _Name=None, \
                  _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
-                 _Length=None, _ne=None):
+                 _Bz=None, _VA=None, _RA=None, _Rp=None, _Length=None):
 
         if self.getDebug():
             print(" GaborLens.__init__:", \
-                  " creating the GaborLens object: Length=", _Length, " m,"\
-                  " electron density=", _Strength, " /m^3")
+                  " creating the GaborLens object:")
+            print("     ---->     Bz:",     _Bz, " T")
+            print("     ---->     VA:",     _VA, " V")
+            print("     ---->     RA:",     _RA, " m")
+            print("     ---->     RP:",     _Rp, " m")
+            print("     ----> Length:", _Length, " m")
 
         GaborLens.instances.append(self)
 
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
 
+        if not isinstance(_Bz, float):
+            raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
+        if not isinstance(_VA, float):
+            raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
+        if not isinstance(_RA, float):
+            raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
+        if not isinstance(_Rp, float):
+            raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
         if not isinstance(_Length, float):
             raise badBeamLineElement( \
                             "GaborLens: bad specification for length!")
-        if not isinstance(_ne, float):
-            raise badBeamLineElement( \
-                            "GaborLens: bad specification for strength!")
 
+        self.setBz(_Length)
+        self.setVA(_Length)
+        self.setRA(_Length)
+        self.setRp(_Length)
         self.setLength(_Length)
+        _ne = 1.
         self.setElectronDensity(_ne)
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
@@ -1639,6 +1657,30 @@ class GaborLens(BeamLineElement):
     def setDebug(cls, Debug):
         cls.__Debug = Debug
         
+    def setBz(self, _Bz):
+        if not isinstance(_Bz, float):
+            raise badParameter( \
+                "BeamLineElement.GaborLens.setBz: bad length:", _Bz)
+        self._Bz = _Bz
+
+    def setVA(self, _VA):
+        if not isinstance(_VA, float):
+            raise badParameter( \
+                "BeamLineElement.GaborLens.setVA: bad length:", _VA)
+        self._VA = _VA
+
+    def setRA(self, _RA):
+        if not isinstance(_RA, float):
+            raise badParameter( \
+                "BeamLineElement.GaborLens.setRA: bad length:", _RA)
+        self._RA = _RA
+
+    def setRp(self, _Rp):
+        if not isinstance(_Rp, float):
+            raise badParameter( \
+                "BeamLineElement.GaborLens.setRp: bad length:", _Rp)
+        self._Rp = _Rp
+
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
@@ -1695,6 +1737,22 @@ class GaborLens(BeamLineElement):
         
 # -------- Get methods:
 #..   Methods believed to be self-documenting(!)
+    @classmethod
+    def getDebug(self):
+        return self.__Debug
+    
+    def getBz(self):
+        return self._Bz
+
+    def getVA(self):
+        return self._VA
+
+    def getRA(self):
+        return self._RA
+
+    def getRp(self):
+        return self._Rp
+
     def getLength(self):
         return self._Length
 

@@ -46,7 +46,7 @@ print("GaborLensTest:", GaborLensTest, \
 #.. __init__
 print("    __init__:")
 try:
-    Sol = BLE.GaborLens()
+    GbL = BLE.GaborLens()
 except:
     print('      ----> Correctly trapped no argument exception.')
 rCtr = np.array([0.,0.,0.])
@@ -54,20 +54,23 @@ vCtr = np.array([0.,0.])
 drCtr = np.array([0.,0.,0.])
 dvCtr = np.array([0.,0.])
 try:
-    Sol = BLE.GaborLens("GaborLens1", rCtr, vCtr, drCtr, dvCtr)
+    GbL = BLE.GaborLens("GaborLens1", rCtr, vCtr, drCtr, dvCtr)
 except:
-    print('      ----> Correctly trapped no solenoid length exception.')
+    print('      ----> Correctly trapped no solenoid GbL args exception.')
 
 #.. Create valid instance:
-Sol = BLE.GaborLens("GaborLens2", rCtr, vCtr, drCtr, dvCtr, 0.5, 1.E15)
+BLE.GaborLens.setDebug(True)
+GbL = BLE.GaborLens("GaborLens2", rCtr, vCtr, drCtr, dvCtr, \
+                    0.2, 65.E3, 0.06, 0.05, 0.5)
+BLE.GaborLens.setDebug(False)
     
 #.. __repr__
 print("    __repr__:")
-print("      ---->", repr(Sol))
+print("      ---->", repr(GbL))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-print(str(Sol))
+print(str(GbL))
 print("    <---- __str__ done.")
 
 ##! Check get methods:
@@ -75,14 +78,14 @@ GaborLensTest = 3
 print()
 print("GaborLensTest:", GaborLensTest, " check get methods.")
 print("    ----> print() method; tests all get methods")
-print(Sol)
+print(GbL)
 
 ##! Check set method:
 GaborLensTest = 4
 print()
 print("GaborLensTest:", GaborLensTest, " check set method.")
 BLE.GaborLens.setDebug(True)
-print(Sol)
+print(GbL)
 BLE.GaborLens.setDebug(False)
 
 ##! Check set method:
@@ -90,7 +93,7 @@ GaborLensTest += 1
 print()
 print("GaborLensTest:", GaborLensTest, " test transport through solenoid.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.00])
-Rprime = Sol.Transport(R)
+Rprime = GbL.Transport(R)
 print("     ----> Input trace-space vector:", R)
 print("     ----> Transported trace-space vector:", Rprime)
 RprimeTest = np.array([0.535307163, 0.040555484, -0.390519525, -0.16035225, \
