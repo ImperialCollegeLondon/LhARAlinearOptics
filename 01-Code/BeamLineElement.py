@@ -1600,6 +1600,8 @@ class GaborLens(BeamLineElement):
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
 
+        OK = self.setAll2None()
+
         if not isinstance(_Bz, float):
             raise badBeamLineElement( \
                             "GaborLens: bad specification for Bz!")
@@ -1621,8 +1623,7 @@ class GaborLens(BeamLineElement):
         self.setRA(_Length)
         self.setRp(_Length)
         self.setLength(_Length)
-        _ne = 1.
-        self.setElectronDensity(_ne)
+        self.setElectronDensity()
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
@@ -1656,6 +1657,13 @@ class GaborLens(BeamLineElement):
     @classmethod
     def setDebug(cls, Debug):
         cls.__Debug = Debug
+
+    def setAll2None(self):
+        self._Bz    = None
+        self._VA    = None
+        self._RA    = None
+        self._Rp    = None
+        self._Lengh = None
         
     def setBz(self, _Bz):
         if not isinstance(_Bz, float):
@@ -1687,13 +1695,22 @@ class GaborLens(BeamLineElement):
                 "BeamLineElement.GaborLens.setLength: bad length:", _Length)
         self._Length = _Length
 
-    def setElectronDensity(self, _ElectronDensity):
-        if not isinstance(_ElectronDensity, float):
+    def setElectronDensity(self):
+        if self.getBz() == None or              \
+           self.getVA() == None or              \
+           self.getRA() == None or              \
+           self.getRp() == None:
             raise badParameter( \
                         "BeamLineElement.GaborLens.setElectronDensity:" \
-                               " bad strength value:", _ElectronDensity)
-        self._ElectronDensity = _ElectronDensity
+                               " no parameters!")
 
+        ne_trans = epsilon0 * self.getBz() / (2. * electronMASS)
+        ne_longi = 4. * epsilon0 * self.getVA() / \
+            (electronCHARGE * self.getRp()**2 * ( \
+                        1. + 2.*mth.log(self.getRA()/self.getRp()) \
+                                                 ))
+        self._ElectronDensity = 1.
+        
     def setTransferMatrix(self, p0=None):
         if p0 == None:
             raise badBeamLineElement( \
