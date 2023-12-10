@@ -119,6 +119,11 @@ epsilon0           = 1.
 Joule2MeV          = 6241509074000.
 m2InvMeV           = 5067730717679.4
 
+epsilon0SI       = 8.8541878128E-12
+electronCHARGESI = 1.602176634E-19
+electronMASSSI   = 9.1093837015E-31
+
+
 class BeamLineElement:
 
 #-------- Class attributes  --------  --------
@@ -1618,10 +1623,10 @@ class GaborLens(BeamLineElement):
             raise badBeamLineElement( \
                             "GaborLens: bad specification for length!")
 
-        self.setBz(_Length)
-        self.setVA(_Length)
-        self.setRA(_Length)
-        self.setRp(_Length)
+        self.setBz(_Bz)
+        self.setVA(_VA)
+        self.setRA(_RA)
+        self.setRp(_Rp)
         self.setLength(_Length)
         self.setElectronDensity()
 
@@ -1704,13 +1709,21 @@ class GaborLens(BeamLineElement):
                         "BeamLineElement.GaborLens.setElectronDensity:" \
                                " no parameters!")
 
-        ne_trans = epsilon0 * self.getBz() / (2. * electronMASS)
-        ne_longi = 4. * epsilon0 * self.getVA() / \
-            (electronCHARGE * self.getRp()**2 * ( \
-                        1. + 2.*mth.log(self.getRA()/self.getRp()) \
-                                                 ))
-        self._ElectronDensity = 1.
+        ne_trans = (epsilon0SI * self.getBz()**2) / (2. * electronMASSSI)
+        ne_longi = 4. * epsilon0SI * self.getVA() / \
+            (electronCHARGESI * self.getRp()**2 * \
+                        (1. + 2.*mth.log(self.getRA()/self.getRp())) \
+                                                 )
+        if self.getDebug():
+            print(" GaborLens(BeamLineElement).setElectronDensity:")
+            print("     ----> ne_trans:", ne_trans)
+            print("     ----> ne_longi:", ne_longi)
+
+        self._ElectronDensity = min(ne_trans, ne_longi)
         
+        if self.getDebug():
+            print(" <---- Electron density:", self.getElectronDensity())
+            
     def setTransferMatrix(self, p0=None):
         if p0 == None:
             raise badBeamLineElement( \

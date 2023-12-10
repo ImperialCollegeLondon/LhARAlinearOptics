@@ -96,7 +96,7 @@ R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.00])
 Rprime = GbL.Transport(R)
 print("     ----> Input trace-space vector:", R)
 print("     ----> Transported trace-space vector:", Rprime)
-RprimeTest = np.array([0.535307163, 0.040555484, -0.390519525, -0.16035225, \
+RprimeTest = np.array([00.489048232, -0.142924944, -0.360654729, -0.03773338, \
                        0., 0. ])
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
