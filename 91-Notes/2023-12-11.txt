@@ -1,0 +1,46 @@
+--------  --------  --------  --------  --------  --------  --------  11Dec23
+Weekend update:
+---------------
+Have implemented the Gabor lens, finished up, over the w/e. So, do tsts:
+
+Run tests:
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - LhARASourceTst.py       - OK
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK (had to fix some legacy issues in test script)
+ - SourceTst.py            - OK (had to put ref. particle init)
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Run scripts:
+ - ReadDRACOsimu.py        - OK
+ - ReadLIONsimu.py         - OK
+ - RunDRACOsimulation.py   - OK
+ - RunLIONsimulation.py    - OK
+ - plotTrajectory.py       - OK
+
+Legacy!
+ - Twin-track approach:
+   - Documentation              -- 
+ - LhARA:
+   - Do this with generalised lattice.
+
+To do:
+ - Fix energy plots in LhARASourceTst
+ - Fix energy and position plots in SourceTst
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
