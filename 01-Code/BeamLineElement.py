@@ -2378,3 +2378,5 @@ class badBeamLineElement(Exception):
 class badParameter(Exception):
     pass
 
+class badSourceSpecification(Exception):
+    pass

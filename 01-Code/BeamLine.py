@@ -100,6 +100,7 @@ Created on Mon 02Oct23: Version history:
 
 import os
 import io
+import math   as mth
 import numpy  as np
 import pandas as pnds
 
@@ -107,10 +108,11 @@ import Particle        as Prtcl
 import BeamLineElement as BLE
 
 #-------- Physical Constants Instances and Methods ----------------
-
 from PhysicalConstants import PhysicalConstants
 
 constants_instance = PhysicalConstants()
+
+protonMASS         = constants_instance.mp()
 speed_of_light     = constants_instance.SoL()
 
 class BeamLine(object):
@@ -168,7 +170,7 @@ class BeamLine(object):
         cls.addFacility()
         
         if cls.getDebug():
-            print("        <---- Facility done.")
+            print("         <---- Facility done.")
 #    <---- Done facility  --------  --------  --------  --------
 
 #    ----> Source:  --------  --------  --------  --------
@@ -183,7 +185,7 @@ class BeamLine(object):
 
 #    ----> Beam line:  --------  --------  --------  --------
         if cls.getDebug():
-            print("         ----> Beam line: ")
+            print("        ----> Beam line: ")
 
         cls.addBeamline()
         
@@ -275,15 +277,10 @@ class BeamLine(object):
     @classmethod
     def addFacility(cls):
         if cls.getDebug():
-            print("         BeamLine.addFacility starts:")
-
-        #.. Get "sub" pandas data frame with Facility parameters only:
-        pndsFacility = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] == "Facility" \
-                                                  ]
+            print("             ----> BeamLine.addFacility starts:")
 
         #.. Parse the dataframe to get Facility parameters:
-        Name, K0 = cls.parseFacility(pndsFacility)
+        Name, K0 = cls.parseFacility()
 
         #.. Create the Facility beam line element:
         rCtr  = np.array([0., 0., 0.])
@@ -295,118 +292,110 @@ class BeamLine(object):
 
         FacilityBLE = BLE.Facility(Name, rCtr, vCtr, drCtr, dvCtr, \
                                    p0)
+        cls._Element.append(FacilityBLE)
+
         if cls.getDebug():
             print("             <----", Name, \
-                  "beam line element created.")
-
-
-        cls._Element.append(FacilityBLE)
+                  "facility initialise.")
 
     @classmethod
     def addSource(cls):
         if cls.getDebug():
-            print("         BeamLine.addSource starts:")
+            print("             BeamLine.addSource starts:")
             
-        #.. Get "sub" pandas data frame with source parameters only:
-        pndsSource = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] == "Source" \
-                                                  ]
-
         #.. Parse the dataframe to get source parameters:
-        SrcMode, SrcParam = cls.parseSource(pndsSource)
+        Name, SrcMode, SrcParam = cls.parseSource()
 
         #.. Create the source beam line element:
         rCtr = np.array([0.,0.,0.])
         vCtr = np.array([0.,0.])
         drCtr = np.array([0.,0.,0.])
         dvCtr = np.array([0.,0.])
-        Name = "LhARA:" + str(pndsSource.iloc[0]["Stage"]) + ":"  \
-                       + pndsSource.iloc[0]["Section"]    + ":" \
-                       + pndsSource.iloc[0]["Element"]
         SourceBLE = BLE.Source(Name, rCtr, vCtr, drCtr, dvCtr, \
                                SrcMode, SrcParam)
         if cls.getDebug():
-            print("             <----", Name, \
+            print("                 <----", Name, \
                   "beam line element created.")
 
         cls._Element.append(SourceBLE)
 
     @classmethod
-    def parseFacility(cls, pndsSource):
-        cls.setDebug(True)
-        if cls.getDebug():
-            print("         BeamLine.addFacility starts:")
-            
-        #.. Get "sub" pandas data frame with facility parameters only:
-        pndsFacility = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] == "Facility" \
-                                                  ]
-        print(pndsFacility)
-        
+    def parseFacility(cls):
         Name  = None
         p0    = None
         if cls.getDebug():
-            print("             ----> BeamLine.parseFacility starts:")
-
-        Name = str( \
-            pndsFacility[pndsFacility["Parameter"]=="Name"].loc[0]["Value"] \
-                   )
-        K0   = float( \
-                      pndsFacility[ \
-                        (pndsFacility["Parameter"]=="Reference particle") & \
-                        (pndsFacility["Name"]=="Kinetic energy") ]. \
+            print("                 ----> BeamLine.parseFacility starts:")
+            
+        #.. Get "sub" pandas data frame with facility parameters only:
+        pndsFacility = cls.getBeamLineParamPandas()[ \
+                  (cls.getBeamLineParamPandas()["Section"] == "Facility") & \
+                  (cls.getBeamLineParamPandas()["Element"] == "Global") \
+                                                  ]
+        Name = str(pndsFacility[ \
+                        (pndsFacility["Type"]=="Name") & \
+                        (pndsFacility["Parameter"]=="Name") ]. \
+                            iloc[0]["Value"] \
+                    )
+        K0   = float(pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Kinetic energy") ]. \
                             iloc[0]["Value"] \
                     )
         
         if cls.getDebug():
-            print("                 ----> Name, K0:", Name, K0)
+            print("                 <---- Name, K0:", Name, K0)
 
         return Name, K0
 
     @classmethod
-    def parseSource(cls, pndsSource):
+    def parseSource(cls):
         SrcMode  = None
         SrcParam = None
         if cls.getDebug():
-            print("             ----> BeamLine.parseSource starts:")
+            print("                 ----> BeamLine.parseSource starts:")
 
+        #.. Get "sub" pandas data frame with source parameters only:
+        pndsSource = cls.getBeamLineParamPandas()[ \
+                     cls.getBeamLineParamPandas()["Section"] == "Source" \
+                                                  ]
         SrcMode = int( \
-           pndsSource[pndsSource["Name"]=="SourceMode"].loc[0]["Value"] \
+           pndsSource[pndsSource["Parameter"]=="SourceMode"]["Value"].iloc[0] \
                        )
         if cls.getDebug():
-            print("                 ----> Mode:", SrcMode)
+            print("                     ----> Mode:", SrcMode)
             
         if SrcMode == 0:               #.. Laser driven:
-            Emin  = \
-             pndsSource[pndsSource["Parameter"]=="Emin"].iloc[0]["Value"]
-            Emax = \
-             pndsSource[pndsSource["Parameter"]=="Emax"].iloc[0]["Value"]
+            Emin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
+            Emax = float( \
+             pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             nPnts = \
-             int(pndsSource[pndsSource["Parameter"]=="nPnts"].iloc[0]["Value"])
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+             int(pndsSource[pndsSource["Parameter"]=="nPnts"]["Value"].iloc[0])
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
         elif SrcMode == 1:               #.. Gaussian:
-            MeanE  = \
-             pndsSource[pndsSource["Parameter"]=="MeanEnergy"].iloc[0]["Value"]
-            SigmaE = \
-             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"].iloc[0]["Value"]
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+            MeanE  = float( \
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
+            SigmaE = float( \
+             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"]["Value"].iloc[0])
+            MinCTheta = float(\
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
 
-        SigmaX  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaX"].iloc[0]["Value"]
-        SigmaY  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaY"].iloc[0]["Value"]
+        SigmaX  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
+        SigmaY  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
 
         if cls.getDebug():
-            print("                     ----> SigmaX, SigmaY:", SigmaX, SigmaY)
+            print("                         ----> SigmaX, SigmaY:", \
+                  SigmaX, SigmaY)
             if SrcMode == 0:
-                print("                     ----> Emin, Emax, nPnts:", \
+                print("                         ----> Emin, Emax, nPnts:", \
                       Emin, Emax, nPnts)
             elif SrcMode == 1:
-                print("                     ----> Mean and sigma:", \
+                print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
-            print("                     ----> Min cos(Theta):", MinCTheta)
+            print("                         ----> Min cos(Theta):", MinCTheta)
             
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
@@ -414,12 +403,22 @@ class BeamLine(object):
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
 
-        return SrcMode, SrcParam
+        
+        Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
+                       + str(pndsSource["Stage"].iloc[0]) + ":" \
+                       + pndsSource["Section"].iloc[0]    + ":" \
+                       + pndsSource["Element"].iloc[0]
+
+        if cls.getDebug():
+            print("                 <---- Name, SrcMode, SrcParam:", \
+                  Name, SrcMode, SrcParam)
+        
+        return Name, SrcMode, SrcParam
 
     @classmethod
     def addBeamline(cls):
         if cls.getDebug():
-            print("         BeamLine.addBeamline starts:")
+            print("            BeamLine.addBeamline starts:")
             
         #.. Get "sub" pandas data frame with beamline parameters only:
         pndsBeamline = cls.getBeamLineParamPandas()[ \
