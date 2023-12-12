@@ -422,13 +422,18 @@ class BeamLine(object):
             
         #.. Get "sub" pandas data frame with beamline parameters only:
         pndsBeamline = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] != "Source" \
+                    (cls.getBeamLineParamPandas()["Section"] != "Source") & \
+                    (cls.getBeamLineParamPandas()["Section"] != "Facility") \
                                                   ]
+
+        print(pndsBeamline)
+        
         Section    = ""
         NewElement = True
         s         = 0.
         for iLine in pndsBeamline.itertuples():
-            Name = "LhARA:" + str(iLine.Stage) + ":"  \
+            Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
+                           + str(iLine.Stage) + ":"  \
                            + iLine.Section    + ":" \
                            + iLine.Element    + ":"
 
@@ -442,7 +447,7 @@ class BeamLine(object):
             if iLine.Element == "Drift":
                 nDrift   += 1
                 Name      = Name + str(nDrift)
-                Length    = iLine.Value
+                Length    = float(iLine.Value)
                 rCtr      = np.array([0.,0.,s+Length/2.])
                 vCtr      = np.array([0.,0.])
                 drCtr     = np.array([0.,0.,0.])
@@ -458,14 +463,14 @@ class BeamLine(object):
                 drCtr = np.array([0.,0.,0.])
                 dvCtr = np.array([0.,0.])
                 if iLine.Type == "Circular":
-                    Param = [0, iLine.Value]
+                    Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
                     if NewElement:
-                        Param      = [1, iLine.Value]
+                        Param      = [1, float(iLine.Value)]
                         NewElement = False
                         continue
                     else:
-                        Param.append(iLine.Value)
+                        Param.append(float(iLine.Value))
                         NewElement = True
                 nAperture += 1
                 Name       = Name + iLine.Type + ":" + str(nAperture)
@@ -476,9 +481,9 @@ class BeamLine(object):
                 s += 0.
             elif iLine.Element == "Fquad":
                 if iLine.Parameter == "Length":
-                    FqL = iLine.Value
+                    FqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    FqS = iLine.Value
+                    FqS = float(iLine.Value)
                 if NewElement:
                     NewElement = False
                     continue
@@ -497,9 +502,9 @@ class BeamLine(object):
                 s += FqL
             elif iLine.Element == "Dquad":
                 if iLine.Parameter == "Length":
-                    DqL = iLine.Value
+                    DqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    DqS = iLine.Value
+                    DqS = float(iLine.Value)
                 if NewElement:
                     NewElement = False
                     continue
@@ -565,14 +570,15 @@ class BeamLine(object):
             if isinstance(cls.getSrcPhsSpc(), np.ndarray):
                 if cls.getDebug():
                     print("     ----> Start using:", iEvt)
-                Name = "LhARA:0:Source:User"
+                Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
+                       + "Source:User"
                 SrcPhsSpc = cls.getSrcPhsSpc()
             else:
                 if cls.getDebug():
                     print("     ----> Start by calling getSourcePhaseSpace")
-                Name = cls.getElement()[0].getName()
+                Name = cls.getElement()[1].getName()
                 SrcPhsSpc = \
-                    cls.getElement()[0].getParticleFromSource()
+                    cls.getElement()[1].getParticleFromSource()
             Success = PrtclInst.recordParticle(Name, 0., 0., SrcPhsSpc)
             if cls.getDebug():
                 print("     ----> Event", iEvt)
