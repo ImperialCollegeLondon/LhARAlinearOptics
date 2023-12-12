@@ -345,7 +345,7 @@ Derived class Facility:
 
 """
 class Facility(BeamLineElement):
-    instance  = []
+    instance  = None
     __Debug   = False
 
     
@@ -353,25 +353,36 @@ class Facility(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
                  _p0=None):
-        if self.__Debug:
-            print(' Facility.__init__: ', \
-                  'creating the Facility object: Name=', _Name, \
-                  'p0=', _p0)
 
-        Facility.instance = self
+        if Facility.instance == None:
+            Facility.instance = self
+            
+            if self.__Debug:
+                print(' Facility.__init__: ', \
+                      'creating the Facility object: Name=', _Name, \
+                      'p0=', _p0)
 
-        #.. BeamLineElement class initialisation:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+            Facility.instance = self
 
-        if not isinstance(_p0, float):
-            raise badBeamLineElement( \
-                  " Facility: bad specification for length of Facility!"
-                                      )
-        self.setp0(_p0)
+            #.. BeamLineElement class initialisation:
+            BeamLineElement.__init__(self, \
+                                     _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+
+            if not isinstance(_p0, float):
+                raise badBeamLineElement( \
+                        " Facility: bad specification for length of Facility!"
+                                         )
+            self.setp0(_p0)
                 
-        if self.__Debug:
-            print("     ----> New Facility instance: \n", \
-                  self)
+            if self.__Debug:
+                print("     ----> New Facility instance: \n", \
+                      self)
+        else:
+            print(' Facility(BeamLineElement).__init__: ',       \
+                  " attempt to create facility.", \
+                  " Abort!")
+            raise secondFacility(" Second call not allowed.")
+                
             
     def __repr__(self):
         return "Facility()"
@@ -2379,4 +2390,7 @@ class badParameter(Exception):
     pass
 
 class badSourceSpecification(Exception):
+    pass
+
+class secondFacility(Exception):
     pass

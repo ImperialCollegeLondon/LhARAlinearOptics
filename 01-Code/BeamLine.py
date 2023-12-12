@@ -124,74 +124,79 @@ class BeamLine(object):
 
 #--------  "Built-in methods":
     def __new__(cls, _BeamLineSpecificationCVSfile=None):
-        if cls.getinstance() is None:
+        if cls.getinstance() == None:
             if cls.getDebug():
                 print(' BeamLine.__new__: ', \
                       'creating the BeamLine object')
             cls.__BeamLineInst = super(BeamLine, cls).__new__(cls)
 
-        #.. Only constants; print values that will be used:
-        if cls.getDebug():
-            print("     ----> Debug flag: ", cls.getDebug())
+            #.. Only constants; print values that will be used:
+            if cls.getDebug():
+                print("     ----> Debug flag: ", cls.getDebug())
 
-        #.. Check and load parameter file
-        if _BeamLineSpecificationCVSfile == None:
-            raise Exception( \
-                    " BeamLine.__new__: no parameter file given.")
+                #.. Check and load parameter file
+            if _BeamLineSpecificationCVSfile == None:
+                raise Exception( \
+                            " BeamLine.__new__: no parameter file given.")
         
-        if not os.path.exists(_BeamLineSpecificationCVSfile):
-            raise Exception( \
+            if not os.path.exists(_BeamLineSpecificationCVSfile):
+                raise Exception( \
                     " BeamLine.__new__: parameter file does not exist.")
         
-        cls._BeamLineSpecificationCVSfile = \
+            cls._BeamLineSpecificationCVSfile = \
                                _BeamLineSpecificationCVSfile
-        cls._BeamLineParamPandas = BeamLine.csv2pandas( \
+            cls._BeamLineParamPandas = BeamLine.csv2pandas( \
                                _BeamLineSpecificationCVSfile)
-        if not isinstance(cls._BeamLineParamPandas, pnds.DataFrame):
-            raise Exception( \
+            if not isinstance(cls._BeamLineParamPandas, pnds.DataFrame):
+                raise Exception( \
                     " BeamLine.__new__: pandas data frame invalid.")
 
-        cls._Element = []
+            cls._Element = []
                                                                       
-        if cls.getDebug():
-            print("     ----> Parameter file: ", \
-                  cls.getBeamLineSpecificationCVSfile())
-            print("     ----> Dump of pandas paramter list: \n", \
-                  cls.getBeamLineParamPandas())
+            if cls.getDebug():
+                print("     ----> Parameter file: ", \
+                      cls.getBeamLineSpecificationCVSfile())
+                print("     ----> Dump of pandas paramter list: \n", \
+                      cls.getBeamLineParamPandas())
 
 #.. Build facility:
-        if cls.getDebug():
-            print("     ----> Build facility:")
+            if cls.getDebug():
+                print("     ----> Build facility:")
 
 #    ----> Facility:  --------  --------  --------  --------
-        if cls.getDebug():
-            print("         ----> Facility: ")
+            if cls.getDebug():
+                print("         ----> Facility: ")
 
-        cls.addFacility()
+            cls.addFacility()
         
-        if cls.getDebug():
-            print("         <---- Facility done.")
+            if cls.getDebug():
+                print("         <---- Facility done.")
 #    <---- Done facility  --------  --------  --------  --------
 
 #    ----> Source:  --------  --------  --------  --------
-        if cls.getDebug():
-            print("         ----> Source: ")
+            if cls.getDebug():
+                print("         ----> Source: ")
 
-        cls.addSource()
+            cls.addSource()
         
-        if cls.getDebug():
-            print("        <---- Source done.")
+            if cls.getDebug():
+                print("        <---- Source done.")
 #    <---- Done source  --------  --------  --------  --------
 
 #    ----> Beam line:  --------  --------  --------  --------
-        if cls.getDebug():
-            print("        ----> Beam line: ")
+            if cls.getDebug():
+                print("        ----> Beam line: ")
 
-        cls.addBeamline()
+            cls.addBeamline()
         
-        if cls.getDebug():
-            print("        <---- Beam line done.")
+            if cls.getDebug():
+                print("        <---- Beam line done.")
 #    <---- Done beam line  --------  --------  --------  --------
+
+        else:
+            if cls.getDebug():
+                print(' BeamLine.__new__: ', \
+                      'existing BeamLine object will be used')
 
         return cls.getinstance()
 
@@ -426,8 +431,6 @@ class BeamLine(object):
                     (cls.getBeamLineParamPandas()["Section"] != "Facility") \
                                                   ]
 
-        print(pndsBeamline)
-        
         Section    = ""
         NewElement = True
         s         = 0.
