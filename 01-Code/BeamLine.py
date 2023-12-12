@@ -173,6 +173,25 @@ class BeamLine(object):
                 print("         <---- Facility done.")
 #    <---- Done facility  --------  --------  --------  --------
 
+#    ----> Create reference particle:  --------  --------  --------  --------
+#..  Set Name and reference-particle momentum only at this stage:
+            if cls.getDebug():
+                print("        ----> Create reference particle instance: ")
+            
+            refPrtcl  = Prtcl.ReferenceParticle()
+            p0        = cls.getElement()[0].getp0()
+            Ref4mmtm  = np.array([0., 0., p0,
+                                  mth.sqrt(p0**2 + protonMASS**2)])
+            Success = refPrtcl.setPrIn(Ref4mmtm)
+            if not Success:
+                raise fail2createfacility()
+        
+            if cls.getDebug():
+                print("            ----> Reference particle 4-momentum:", \
+                      p0, Success)
+                print("        <---- Reference particle created. ")
+#    <---- Done reference particle  --------  --------  --------  --------
+
 #    ----> Source:  --------  --------  --------  --------
             if cls.getDebug():
                 print("         ----> Source: ")
@@ -192,6 +211,18 @@ class BeamLine(object):
             if cls.getDebug():
                 print("        <---- Beam line done.")
 #    <---- Done beam line  --------  --------  --------  --------
+
+#    ----> Reference particle:  --------  --------  --------  --------
+            if cls.getDebug():
+                print("        ----> Reference particle: ")
+            
+            refPrtclSet = refPrtcl.setReferenceParticle()
+
+            if cls.getDebug():
+                print("            ----> Reference particle set, success:", \
+                      refPrtclSet)
+                print("        <---- Reference particle done. ")
+#    <---- Done reference particle -----  --------  --------  --------
 
         else:
             if cls.getDebug():

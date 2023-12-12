@@ -1,3 +1,49 @@
+--------  --------  --------  --------  --------  --------  --------  12Dec23
+Created "BeamLine" class/module; general beamline set up ... not yet tested
+for processing.  Need to check tests and scripts before moving on.
+
+Run tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK - Had to fix Tst to call BeamLine and change
+                                  specification csv file.
+ - LhARASourceTst.py       - Fails; pension off.  Let it age for no.
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - RunSimulationTst.py     - Fails in tracking, too bad for now.  This bit is
+                             not updated.
+ - SimulationTst.py        - OK after fix to parameter filename
+ - SolenoidTst.py          - OK 
+ - SourceTst.py            - OK 
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Run scripts:
+ - ReadDRACOsimu.py        - OK
+ - ReadLIONsimu.py         - OK
+ - RunDRACOsimulation.py   - OK
+ - RunLIONsimulation.py    - OK
+ - plotTrajectory.py       - OK
+
+Legacy!
+ - Twin-track approach:
+   - Documentation              -- 
+ - LhARA:
+   - Do this with generalised lattice.
+
+To do:
+ - Fix energy plots in LhARASourceTst
+ - Fix energy and position plots in SourceTst
+
 --------  --------  --------  --------  --------  --------  --------  11Dec23
 Weekend update:
 ---------------
@@ -31,16 +77,5 @@ Run scripts:
  - RunDRACOsimulation.py   - OK
  - RunLIONsimulation.py    - OK
  - plotTrajectory.py       - OK
-
-Legacy!
- - Twin-track approach:
-   - Documentation              -- 
- - LhARA:
-   - Do this with generalised lattice.
-
-To do:
- - Fix energy plots in LhARASourceTst
- - Fix energy and position plots in SourceTst
-
 
 --------  --------  --------  --------  --------  --------  --------  --------

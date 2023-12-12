@@ -4,14 +4,14 @@
 Class Simulation
 ================
 
-  CEO class for linear optics simulation of LhARA beam lines.
+  CEO class for linear optics simulation of beam lines.
 
   Class attributes:
   -----------------
   __instance : Set on creation of first (and only) instance.
   __Debug    : Debug flag
 __RandomSeed : Seed for random number, set to time at load of class.  
-__LhARAFacility : Address of instance of LhARA facility instance.
+__Facility : Address of instance of a facility
 
   Packages loaded:
   ----------------
@@ -45,7 +45,7 @@ __LhARAFacility : Address of instance of LhARA facility instance.
       getRandomSeed: Returns random seed
            setDebug: Set debug flag
            getDebug: Get debug flag
-   getLhARAFacility: Get __LhARAFacility
+   getFacility: Get __Facility
             getNEvt: Get NEvt
   
   Simulation methods:
@@ -70,7 +70,7 @@ import random as __Rnd
 import numpy as np
 import sys
 
-import LhARAFacility
+import BeamLine as BL
 
 #--------  Module methods
 def getRandom():
@@ -102,7 +102,6 @@ class Simulation(object):
     __Debug     = False
     __instance  = None
 
-    __LhARAFacility = None
 
 #--------  "Built-in methods":
     def __new__(cls, NEvt=5, filename=None, rootfilename=None):
@@ -117,8 +116,8 @@ class Simulation(object):
             cls._ParamFileName = filename
             cls._RootFileName  = rootfilename
 
-            # Create LhARAFacility instance:
-            cls.__LhARAFclty = LhARAFacility.LhARAFacility(filename)
+            # Create Facility instance:
+            cls._Facility = BL.BeamLine(filename)
 
             # Summarise initialisation
             cls.print(cls)
@@ -150,8 +149,8 @@ class Simulation(object):
     def setDebug(cls, _Debug=False):
         cls.__Debug = _Debug
 
-    def getLhARAFacility(cls):
-        return cls.__LhARAFclty
+    def getFacility(cls):
+        return cls._Facility
 
     def getNEvt(self):
         return self._NEvt
@@ -174,8 +173,8 @@ class Simulation(object):
 
         runNumber =  26                   # set run number
         
-        #.. Transport particles through LhARA:
+        #.. Transport particles through facility:
         
-        nEvt = self.getLhARAFacility().trackLhARA(self.getNEvt())
+        nEvt = self.getFacility().trackLhARA(self.getNEvt())
 
         
