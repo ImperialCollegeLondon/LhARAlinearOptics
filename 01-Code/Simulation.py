@@ -175,6 +175,6 @@ class Simulation(object):
         
         #.. Transport particles through facility:
         
-        nEvt = self.getFacility().trackLhARA(self.getNEvt())
+        nEvt = self.getFacility().trackBeam(self.getNEvt())
 
         

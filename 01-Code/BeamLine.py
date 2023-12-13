@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 To do:
- - Add documentation for methods from trackLhARA
+ - Add documentation for methods from trackBeam
  LhARAcument all class attributes
 
 Class BeamLine:
@@ -15,7 +15,7 @@ Class BeamLine:
   Class attributes:
   -----------------
    __Debug    : Debug flag
-   __SrcPhsSpc: 6D phase space at source (np.ndarray)
+   __SrcTrcSpc: 6D trace space at source (np.ndarray)
 __BeamLineInst: Instance of BeamLine class.  Set on creation of first
                 (and only) instance.
 
@@ -39,8 +39,8 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
   Set methods:
       setDebug  : Set debug flag
 
-    setSrcPhsSpc: Set phase space at source.
-             Input: np.array([6,]) containing 6D phase space vector.
+    setSrcTrcSpc: Set trace space at source.
+             Input: np.array([6,]) containing 6D trace space vector.
 
   Get methods:
      getinstance: Get instance of LhARA beam class
@@ -51,7 +51,7 @@ getBeamLineParamPandas:
                   Get pandas instance specifying the beam line
       getElement: get list of instances of BeamLineElement objects that make
                   up the LhARA beam line
-    getSrcPhsSpc: get source phase space nd.array(6,)
+    getSrcTrcSpc: get source trace space nd.array(6,)
 
   Processing method:
       print()   : Dumps parameters
@@ -86,7 +86,7 @@ getBeamLineParamPandas:
                 Input: None
                Return: True/False: consistent/not consistent
 
-          trackLhARA: Tracks through the LhARA beam line.
+          trackBeam: Tracks through the LhARA beam line.
 
 Created on Mon 02Oct23: Version history:
 ----------------------------------------
@@ -118,7 +118,7 @@ speed_of_light     = constants_instance.SoL()
 class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
-    __SrcPhsSpc    = None
+    __SrcTrcSpc    = None
     __BeamLineInst = None
 
 
@@ -174,21 +174,13 @@ class BeamLine(object):
 #    <---- Done facility  --------  --------  --------  --------
 
 #    ----> Create reference particle:  --------  --------  --------  --------
-#..  Set Name and reference-particle momentum only at this stage:
+#..  Instance only at this stage:
             if cls.getDebug():
                 print("        ----> Create reference particle instance: ")
             
             refPrtcl  = Prtcl.ReferenceParticle()
-            p0        = cls.getElement()[0].getp0()
-            Ref4mmtm  = np.array([0., 0., p0,
-                                  mth.sqrt(p0**2 + protonMASS**2)])
-            Success = refPrtcl.setPrIn(Ref4mmtm)
-            if not Success:
-                raise fail2createfacility()
-        
+            
             if cls.getDebug():
-                print("            ----> Reference particle 4-momentum:", \
-                      p0, Success)
                 print("        <---- Reference particle created. ")
 #    <---- Done reference particle  --------  --------  --------  --------
 
@@ -216,11 +208,10 @@ class BeamLine(object):
             if cls.getDebug():
                 print("        ----> Reference particle: ")
             
-            refPrtclSet = refPrtcl.setReferenceParticle()
+            #refPrtclSet = refPrtcl.setReferenceParticle()
 
             if cls.getDebug():
-                print("            ----> Reference particle set, success:", \
-                      refPrtclSet)
+                print("            ----> Reference particle set, success:")
                 print("        <---- Reference particle done. ")
 #    <---- Done reference particle -----  --------  --------  --------
 
@@ -235,8 +226,8 @@ class BeamLine(object):
         return "BeamLine()"
 
     def __str__(self):
-        print(" LhARA beam line set up as follows:")
-        print(" =================================")
+        print(" Beam line set up as follows:")
+        print(" ============================")
         print("     ----> Debug flag:", BeamLine.getDebug())
         print("     ----> Source and beam line:")
         for iBLE in BLE.BeamLineElement.getinstances():
@@ -261,22 +252,22 @@ class BeamLine(object):
         cls.__Debug = Debug
         
     @classmethod
-    def setSrcPhsSpc(cls, SrcPhsSpc=np.array([])):
+    def setSrcTrcSpc(cls, SrcTrcSpc=np.array([])):
         if cls.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(" BeamLine.setSrcPhsSpc: ", SrcPhsSpc)
+                print(" BeamLine.setSrcTrcSpc: ", SrcTrcSpc)
         
-        if not isinstance(SrcPhsSpc, np.ndarray):
-            raise badPhaseSpaceVector( \
-                        " BeamLine.setSrcPhsSpc:", SrcPhsSpc)
+        if not isinstance(SrcTrcSpc, np.ndarray):
+            raise badTraceSpaceVector( \
+                        " BeamLine.setSrcTrcSpc:", SrcTrcSpc)
 
-        if len(SrcPhsSpc) == 0:
-            SrcPhsSpc = None
-        elif not SrcPhsSpc.size == 6:
-            raise badPhaseSpaceVector( \
-                        " BeamLine.setSrcPhsSpc:", SrcPhsSpc)
+        if len(SrcTrcSpc) == 0:
+            SrcTrcSpc = None
+        elif not SrcTrcSpc.size == 6:
+            raise badTraceSpaceVector( \
+                        " BeamLine.setSrcTrcSpc:", SrcTrcSpc)
 
-        cls.__SrcPhsSpc = SrcPhsSpc
+        cls.__SrcTrcSpc = SrcTrcSpc
         
 #--------  "Get methods"
 #.. Method believed to be self documenting(!)
@@ -301,8 +292,8 @@ class BeamLine(object):
         return cls._Element
     
     @classmethod
-    def getSrcPhsSpc(cls):
-        return cls.__SrcPhsSpc
+    def getSrcTrcSpc(cls):
+        return cls.__SrcTrcSpc
     
         
 #--------  Processing methods:
@@ -349,11 +340,19 @@ class BeamLine(object):
         dvCtr = np.array([0.,0.])
         SourceBLE = BLE.Source(Name, rCtr, vCtr, drCtr, dvCtr, \
                                SrcMode, SrcParam)
-        if cls.getDebug():
-            print("                 <----", Name, \
-                  "beam line element created.")
 
         cls._Element.append(SourceBLE)
+
+        refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+        refPrtclSet = refPrtcl.setReferenceParticleAtSource()
+
+        if cls.getDebug():
+            print("                 ---->", Name, \
+                  "beam line element created.")
+            print("                     ----> reference particle:")
+            print("                         Position:", refPrtcl.getRrIn()[0])
+            print("                         Momentum:", refPrtcl.getPrIn()[0])
+            print("                 <---- Done.")
 
     @classmethod
     def parseFacility(cls):
@@ -488,9 +487,12 @@ class BeamLine(object):
                 dvCtr     = np.array([0.,0.])
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.Drift(Name, \
-                             rCtr, vCtr, drCtr, dvCtr, Length))
+                iBLE = BLE.Drift(Name, \
+                             rCtr, vCtr, drCtr, dvCtr, Length)
+                cls._Element.append(iBLE)
                 s += Length
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
                 rCtr  = np.array([0.,0.,s])
                 vCtr  = np.array([0.,0.])
@@ -510,9 +512,12 @@ class BeamLine(object):
                 Name       = Name + iLine.Type + ":" + str(nAperture)
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.Aperture(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, Param) )
+                iBLE = BLE.Aperture(Name, \
+                                    rCtr, vCtr, drCtr, dvCtr, Param)
+                cls._Element.append(iBLE)
                 s += 0.
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Fquad":
                 if iLine.Parameter == "Length":
                     FqL = float(iLine.Value)
@@ -531,9 +536,12 @@ class BeamLine(object):
                 Name       = Name + str(nFquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.FocusQuadrupole(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, FqL, FqS) )
+                iBLE = BLE.FocusQuadrupole(Name, \
+                                    rCtr, vCtr, drCtr, dvCtr, FqL, FqS)
+                cls._Element.append(iBLE)
                 s += FqL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dquad":
                 if iLine.Parameter == "Length":
                     DqL = float(iLine.Value)
@@ -552,9 +560,23 @@ class BeamLine(object):
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.DefocusQuadrupole(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, DqL, DqS) )
+                iBLE = BLE.DefocusQuadrupole(Name, \
+                                    rCtr, vCtr, drCtr, dvCtr, DqL, DqS)
+                cls._Element.append(iBLE)
                 s += DqL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+                
+            if cls.getDebug():
+                print("                 ---->", Name, \
+                      "beam line element created.")
+                print("                     ----> reference particle:")
+                print("                         Position:", \
+                      refPrtcl.getRrIn()[0])
+                print("                         Momentum:", \
+                      refPrtcl.getPrIn()[0])
+                print("                 <---- Done.")
+                
         
     def checkConsistency(self):
         ConsChk = False
@@ -579,11 +601,13 @@ class BeamLine(object):
         return True
 
     @classmethod
-    def trackLhARA(cls, NEvts=0, ParticleFILE=None):
+    def trackBeam(cls, NEvts=0, ParticleFILE=None):
         if cls.getDebug() or NEvts > 1:
-            print(" trackLhARA for", NEvts, " events.")
+            print(" trackBeam for", NEvts, " events.")
         Scl  = 1
         iCnt = 1
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
         for iEvt in range(1, NEvts+1):
             if (iEvt % Scl) == 0:
@@ -593,6 +617,7 @@ class BeamLine(object):
                 if iCnt == 10:
                     iCnt = 1
                     Scl  = Scl * 10
+
                 
             #.. Create particle instance to store progression through
             #   beam line
@@ -601,51 +626,50 @@ class BeamLine(object):
                 print("     ----> Created new Particle instance")
 
             #.. Generate particle:
-            if isinstance(cls.getSrcPhsSpc(), np.ndarray):
+            if isinstance(cls.getSrcTrcSpc(), np.ndarray):
                 if cls.getDebug():
                     print("     ----> Start using:", iEvt)
                 Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                        + "Source:User"
-                SrcPhsSpc = cls.getSrcPhsSpc()
+                SrcTrcSpc = cls.getSrcTrcSpc()
             else:
                 if cls.getDebug():
-                    print("     ----> Start by calling getSourcePhaseSpace")
+                    print("     ----> Start by calling getSourceTraceSpace")
                 Name = cls.getElement()[1].getName()
-                SrcPhsSpc = \
+                SrcTrcSpc = \
                     cls.getElement()[1].getParticleFromSource()
-            Success = PrtclInst.recordParticle(Name, 0., 0., SrcPhsSpc)
+            Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
             if cls.getDebug():
                 print("     ----> Event", iEvt)
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("         ----> Phase space at source     :", \
-                          SrcPhsSpc)
-
-            Mmtm = np.sqrt(2.*938.27208816*SrcPhsSpc[5])
-            Brho = (1/(speed_of_light*1.E-9))*Mmtm/1000.
+                    print("         ----> trace space at source     :", \
+                          SrcTrcSpc)
 
             #.. Track through beam line:
-            PhsSpc_i = SrcPhsSpc
-            PhsSpc   = SrcPhsSpc
+            TrcSpc_i = SrcTrcSpc
+            TrcSpc   = SrcTrcSpc
             HlfLngth = 0.
             if cls.getDebug():
                 print("     ----> Transport through beam line")
+            iLoc = -1
             for iBLE in BLE.BeamLineElement.getinstances():
-                if isinstance(iBLE, BLE.Source):
+                iLoc += 1
+                if isinstance(iBLE, BLE.Source) or \
+                   isinstance(iBLE, BLE.Facility):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
                 HlfLngth = iBLE.getLength() / 2.
                 if isinstance(iBLE, BLE.FocusQuadrupole) or \
                    isinstance(iBLE, BLE.DefocusQuadrupole):
-                    PhsSpc     = iBLE.Transport(PhsSpc_i, Brho)
-                else:
-                    PhsSpc     = iBLE.Transport(PhsSpc_i)
+                    p0     = iRefPrtcl.getMomentumIn(iLoc)
+                TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
                                 linewidth=500,precision=7,suppress=True):
-                        print("             ----> Updated phase space   :", \
-                              PhsSpc)
-                if not isinstance(PhsSpc, np.ndarray):
+                        print("             ----> Updated trace space   :", \
+                              TrcSpc)
+                if not isinstance(TrcSpc, np.ndarray):
                     if cls.getDebug():
                         print("              ---->", \
                               " partice outside acceptance(1)")
@@ -655,8 +679,8 @@ class BeamLine(object):
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
                                                        zEnd, \
-                                                       PhsSpc)
-                PhsSpc_i = PhsSpc
+                                                       TrcSpc)
+                TrcSpc_i = TrcSpc
 
             if cls.getDebug():
                 print("         ----> Reached end of beam line.")
@@ -680,6 +704,6 @@ class BeamLine(object):
 class badParameter(Exception):
     pass
                 
-class badPhaseSpaceVector(Exception):
+class badTraceSpaceVector(Exception):
     pass
                 
