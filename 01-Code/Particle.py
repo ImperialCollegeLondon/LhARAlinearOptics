@@ -1014,15 +1014,16 @@ class ReferenceParticle(Particle):
 #--------  Processing methods:
     def setReferenceParticle(self):
         Success = False
-        self.setRPDebug(True)
         if self.getRPDebug():
             print(" ReferenceParticle(Particle).setReferenceParticle", \
                   "starts.")
 
         #.. Loop over beam-line elements:
         for iBLE in BLE.BeamLineElement.getinstances():
+            if isinstance(iBLE, BLE.Facility):
+                continue
             if isinstance(iBLE, BLE.Source):
-                Success = self.setReferenceParticleAtSource(iBLE)
+                Success = self.setReferenceParticleAtSource()
                 if not Success:
                     raise fail2setReferenceParticle( \
                                    "setReferenceParticleAtSource")
@@ -1044,7 +1045,6 @@ class ReferenceParticle(Particle):
             print("     ----> Dump refence particle:")
             print(self)
 
-        self.setRPDebug(False)
         return Success
 
     def setReferenceParticleAtSource(self):

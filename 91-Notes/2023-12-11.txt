@@ -1,10 +1,44 @@
 --------  --------  --------  --------  --------  --------  --------  13Dec23
 Done:
  - Fixed RunSimulation -- just had to skip `"Facility" in trackBeam.
+ - Fix LION to use BeamLine;
 
 Next:
- - Fix LION to use BeamLine;
+ - Tidy, can I pension off LIONbeam and LhARAbeam ... yes, but need to
+   fix scripts.
  
+Run tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - Fails as not yet translated to BeamLine.
+ - DefocusQuadTst.py       - OK -- after fix to BeamLine
+ - DipoleTst.py            - OK -- after fix to BeamLine
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK -- after fix to BeamLine
+ - GaborLensTst.py         - OK -- after fix to BeamLine
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK -- Fixed BeamLine calls.  Also, fill of
+                                   phase space test at end no longer works
+				   because instances of particle are deleted
+				   at the end of trackBeam.
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK 
+ - SourceTst.py            - OK 
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Run scripts:
+ - ReadDRACOsimu.py        - Fail
+ - ReadLIONsimu.py         - Fail
+ - RunDRACOsimulation.py   - Fail
+ - RunLIONsimulation.py    - Fail
+ - plotTrajectory.py       - Fail
+
 --------  --------  --------  --------  --------  --------  --------  12Dec23
 Created "BeamLine" class/module; general beamline set up ... not yet tested
 for processing.  Need to check tests and scripts before moving on.
