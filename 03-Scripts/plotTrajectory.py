@@ -7,7 +7,7 @@ import os
 
 import Particle as Prtcl
 import BeamLineElement as BLE
-import LIONbeam as LNb
+import BeamLine as BL
 
 """
   Initialise by setting up the LION beamline, make LION beam line
@@ -18,9 +18,9 @@ print("plotTrajectory: initialising with HOMEPATH:", HOMEPATH)
 filename     = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 print("     ----> Parameters will be read from:", filename)
-LNbI  = LNb.LIONbeam(filename)
-print(LNbI)
-print("     <---- LION beam line initialised.")
+BLI  = BL.BeamLine(filename)
+print(BLI)
+print("     <---- Beam line initialised.")
 
 """
   Open data file.
@@ -42,23 +42,22 @@ iPrtcl    = None
 while not EndOfFile:
     EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     iEvt      += 1
-    iPrtcl    = Prtcl.Particle.getParticleInstances()[0]
-    if iPrtcl.getz()[len(iPrtcl.getz())-1] > 1.88:
+    iPrtcl    = Prtcl.Particle.getParticleInstances()[1]
+    if iPrtcl.getz()[len(iPrtcl.getz())-1] > 1.9:
         print("     ----> iEvt:", iEvt, " made it all the way.")
         break
     else:
         cleaned = Prtcl.Particle.cleanParticles()
 
 print("     ----> Track particle through LION:")
-LNbI.setDebug(True)
-LNbI.setSrcTrcSpc(iPrtcl.getTraceSpace()[0])
-OK = LNbI.trackLION(1)
-LNbI.setDebug(False)
-iPrtcl1 = Prtcl.Particle.getParticleInstances()[0]
-
+BLI.setDebug(True)
+BLI.setSrcTrcSpc(iPrtcl.getTraceSpace()[0])
+OK = BLI.trackBeam(1)
+BLI.setDebug(False)
+iPrtcl1 = Prtcl.Particle.getParticleInstances()[1]
 """
   Loop over elements on the LION beam line.
-  - Documentation in header of LIONbeam.py and BeamLineElement.py.
+  - Documentation in header of BeamLine.py and BeamLineElement.py.
   - Each beam-line element has a position and orientation three vector
     that specifies the position and orientation of the element.  The
     parameters that define the element depend on the element in question and
@@ -67,12 +66,14 @@ iPrtcl1 = Prtcl.Particle.getParticleInstances()[0]
 print(" plotTrajectory: loop over elements in LION beam line.")
 
 iSrcElmnt = 0
-iBlE      = BLE.BeamLineElement.getinstances()[0]
+iBlE      = BLE.BeamLineElement.getinstances()[1]
 iSrcElmnt += 1
 print("     ----> Source element  :", iSrcElmnt, "; type:", type(iBlE))
 
 iElmnt = 0
-for iBlE in BLE.BeamLineElement.getinstances():
+for iBLE in BLE.BeamLineElement.getinstances():
+    if isinstance(iBLE, BLE.Facility):
+        continue
     iElmnt += 1
     print("     ----> Beam line element :", iElmnt, "; type:", type(iBlE))
 

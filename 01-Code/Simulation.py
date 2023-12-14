@@ -71,6 +71,7 @@ import numpy as np
 import sys
 
 import BeamLine as BL
+import Particle as Prtcl
 
 #--------  Module methods
 def getRandom():
@@ -104,7 +105,8 @@ class Simulation(object):
 
 
 #--------  "Built-in methods":
-    def __new__(cls, NEvt=5, filename=None, rootfilename=None):
+    def __new__(cls, NEvt=5, filename=None, 
+                _dataFileDir=None, _dataFileName=None):
         if cls.__instance is None:
             print('Simulation.__new__: creating the Simulation object')
             print('-------------------')
@@ -114,7 +116,8 @@ class Simulation(object):
 
             cls._NEvt          = NEvt
             cls._ParamFileName = filename
-            cls._RootFileName  = rootfilename
+            cls._dataFileDir   = _dataFileDir
+            cls._dataFileName  = _dataFileName
 
             # Create Facility instance:
             cls._Facility = BL.BeamLine(filename)
@@ -149,8 +152,17 @@ class Simulation(object):
     def setDebug(cls, _Debug=False):
         cls.__Debug = _Debug
 
+    @classmethod
     def getFacility(cls):
         return cls._Facility
+
+    @classmethod
+    def getdataFileDir(cls):
+        return cls._dataFileDir
+
+    @classmethod
+    def getdataFileName(cls):
+        return cls._dataFileName
 
     def getNEvt(self):
         return self._NEvt
@@ -162,7 +174,8 @@ class Simulation(object):
         print("      State of random generator:", self.__Rnd.getstate()[0])
         print("   Number of events to generate:", self._NEvt)
         print("   Beam line specification file:", self._ParamFileName)
-        print("       root filename for output:", self._RootFileName)
+        print(" data file directory for output:", self._dataFileDir)
+        print("       data filename for output:", self._dataFileName)
 
         
 #--------  Simulation run methods
@@ -173,8 +186,15 @@ class Simulation(object):
 
         runNumber =  26                   # set run number
         
+        #.. Open file to store events:
+        ParticleFILE = Prtcl.Particle.createParticleFile( \
+                                       self.getdataFileDir(), \
+                                       self.getdataFileName() )
+
         #.. Transport particles through facility:
         
-        nEvt = self.getFacility().trackBeam(self.getNEvt())
+        nEvt = self.getFacility().trackBeam(self.getNEvt(), ParticleFILE)
 
+        #.. Flush and close particle file:
+        Prtcl.Particle.flushNcloseParticleFile(ParticleFILE)
         

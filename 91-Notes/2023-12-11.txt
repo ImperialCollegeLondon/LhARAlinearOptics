@@ -1,3 +1,43 @@
+--------  --------  --------  --------  --------  --------  --------  14Dec23
+Back at DRACO test;
+
+Done:
+ - Fixed DRACOfacilityTst.py just by moving to BeamLine.
+ - Fixed RunDRACOsimulation and ReadDRACOsimulation.
+ - Fixed RunLIONsimulation and ReadLIONsimulation.
+ - Fixed plotTrajectory
+
+Run tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - ReferenceParticleTst.py - OK -- after LNb->BL fix
+ - RunSimulationTst.py     - Fails ... no particle file given!
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK 
+ - SourceTst.py            - OK 
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Run scripts:
+ - ReadDRACOsimu.py        - OK
+ - ReadLIONsimu.py         - OK
+ - RunDRACOsimulation.py   - OK
+ - RunLIONsimulation.py    - OK
+ - plotTrajectory.py       - OK
+
+
 --------  --------  --------  --------  --------  --------  --------  13Dec23
 Done:
  - Fixed RunSimulation -- just had to skip `"Facility" in trackBeam.

@@ -6,7 +6,7 @@ import struct
 import math as mth
 
 import Particle as Prtcl
-import LIONbeam as LNb
+import BeamLine as BL
 
 HOMEPATH    = os.getenv('HOMEPATH')
 print("     ----> Initialising with HOMEPATH:", HOMEPATH)
@@ -19,7 +19,7 @@ print("     ----> Create LION instance:")
 filename     = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 print("         ----> Parameters will be read from:", filename)
-DRACObI  = LNb.LIONbeam(filename)
+DRACObI  = BL.BeamLine(filename)
 if Debug:
     print(DRACObI)
 

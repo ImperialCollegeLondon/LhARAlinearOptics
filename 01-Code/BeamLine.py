@@ -27,7 +27,7 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
             _BeamLineParamPandas : Pandas data frame instance containing
                                    parameters.
     _Element[] : BeamLineElement : List of beam line elements making up the
-                                   LhARA beam line.
+                                   beam line.
     
   Methods:
   --------
@@ -43,14 +43,14 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
              Input: np.array([6,]) containing 6D trace space vector.
 
   Get methods:
-     getinstance: Get instance of LhARA beam class
+     getinstance: Get instance of beam class
       getDebug  : get debug flag
 getBeamLineSpecificationCVSfile:
                   Get the path to the csv file specifying the beam line
 getBeamLineParamPandas:
                   Get pandas instance specifying the beam line
       getElement: get list of instances of BeamLineElement objects that make
-                  up the LhARA beam line
+                  up the beam line
     getSrcTrcSpc: get source trace space nd.array(6,)
 
   Processing method:
@@ -58,7 +58,7 @@ getBeamLineParamPandas:
   
   I/o methods:
  getBeamLineParams: Creates pandas instance with values stored in
-                    LhARA parameters stored in cvs file
+                    parameters stored in cvs file
               Input: fileneam: path to pandas file
              Return: Pandas instance
 
@@ -86,12 +86,12 @@ getBeamLineParamPandas:
                 Input: None
                Return: True/False: consistent/not consistent
 
-          trackBeam: Tracks through the LhARA beam line.
+          trackBeam: Tracks through the beam line.
 
 Created on Mon 02Oct23: Version history:
 ----------------------------------------
  2.0: 11Dec23: Refactor to make code generate beamline based on input
-               specificaiton file and not tie it to LhARA or another
+               specificaiton file and not tie it to or another
                hard-coded facility.
  1.0: 02Oct23: First implementation
 
@@ -232,9 +232,9 @@ class BeamLine(object):
         print("     ----> Source and beam line:")
         for iBLE in BLE.BeamLineElement.getinstances():
             print("               ", iBLE.SummaryStr())            
-        print("     ----> LhARA beam line is self consistent = ", \
+        print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
-        return " <---- LhARA beam line parameter dump complete."
+        return " <---- Beam line parameter dump complete."
                 
     
 #--------  I/o methods:
@@ -688,9 +688,8 @@ class BeamLine(object):
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 PrtclInst.writeParticle(ParticleFILE)
-                
-            Prtcl.Particle.cleanParticles()
-            #del PrtclInst
+                Prtcl.Particle.cleanParticles()
+                #del PrtclInst
             
             if cls.getDebug():
                 print("     <---- Finished handling beam line.")

@@ -9,7 +9,7 @@ Test script for "Simulation" class ... simulation processing tasks
 """
 
 import os
-import LIONSimu as Simu
+import Simulation as Simu
 
 ##! Start:
 print("========  Simulation: start  ========")
@@ -28,7 +28,6 @@ print(" ----> Run simulation test:")
 print()
 Smltn.setDebug(True)
 Smltn.RunSim()
-print(Smltn.getNEvt())
 print()
 print(" <---- Simulation test done.")
 

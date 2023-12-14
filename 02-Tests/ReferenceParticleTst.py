@@ -11,7 +11,7 @@ Test script for "ReferenceParticle" derived class
 import os
 import sys
 
-import LIONbeam as LNb
+import BeamLine as BL
 import Particle as Prtcl
 
 ##! Start:
@@ -71,8 +71,8 @@ print("ReferenceParticleTest:", ReferenceParticleTest, \
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-LNbI  = LNb.LIONbeam(filename)
-print(LNbI)
+BLI  = BL.BeamLine(filename)
+print(BLI)
 print(Prtcl.ReferenceParticle.getinstance())
 
 
