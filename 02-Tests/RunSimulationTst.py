@@ -18,9 +18,8 @@ LhARAOpticsPATH = os.getenv('LhARAOpticsPATH')
 print("LhARAOpticsPATH", LhARAOpticsPATH)
 filename  = os.path.join(LhARAOpticsPATH, \
                          '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
-rootfilename = os.path.join(LhARAOpticsPATH, \
-                            '99-Scratch/LhARAOptics-RunSimulationTst.root')
-Smltn = Simu.Simulation(100000, filename, rootfilename)
+
+Smltn = Simu.Simulation(100000, filename)
 print()
 print(" <---- Simulation initialised.")
 

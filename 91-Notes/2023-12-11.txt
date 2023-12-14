@@ -6,6 +6,9 @@ Done:
  - Fixed RunDRACOsimulation and ReadDRACOsimulation.
  - Fixed RunLIONsimulation and ReadLIONsimulation.
  - Fixed plotTrajectory
+ - Fixed RunSimulationTst
+
+So,check:
 
 Run tests:
  - BeamLineTst.py          - OK

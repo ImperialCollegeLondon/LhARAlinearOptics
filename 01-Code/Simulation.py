@@ -187,14 +187,20 @@ class Simulation(object):
         runNumber =  26                   # set run number
         
         #.. Open file to store events:
-        ParticleFILE = Prtcl.Particle.createParticleFile( \
-                                       self.getdataFileDir(), \
-                                       self.getdataFileName() )
+        print(" Here:", self.getdataFileDir())
+        print("      ", self.getdataFileName())
+        ParticleFILE = None
+        if self.getdataFileDir()  != None and \
+           self.getdataFileName() != None:
+            ParticleFILE = Prtcl.Particle.createParticleFile( \
+                                            self.getdataFileDir(), \
+                                            self.getdataFileName() )
 
         #.. Transport particles through facility:
         
         nEvt = self.getFacility().trackBeam(self.getNEvt(), ParticleFILE)
 
         #.. Flush and close particle file:
-        Prtcl.Particle.flushNcloseParticleFile(ParticleFILE)
+        if ParticleFILE != None:
+            Prtcl.Particle.flushNcloseParticleFile(ParticleFILE)
         
