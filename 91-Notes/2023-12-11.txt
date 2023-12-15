@@ -1,3 +1,41 @@
+--------  --------  --------  --------  --------  --------  --------  15Dec23
+Good.  Next steps:
+ - Move hardwired constants into PhysicalConstants
+ - Update comment blocks in code
+ - Complete documentation
+ 
+Think I completed the overhaul yesterday, so, now rerun tests:
+
+Run tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK 
+ - SourceTst.py            - OK 
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Run scripts:
+ - ReadDRACOsimu.py        - OK
+ - ReadLIONsimu.py         - OK
+ - RunDRACOsimulation.py   - OK
+ - RunLIONsimulation.py    - OK
+ - plotTrajectory.py       - OK
+
 --------  --------  --------  --------  --------  --------  --------  14Dec23
 Back at DRACO test;
 
