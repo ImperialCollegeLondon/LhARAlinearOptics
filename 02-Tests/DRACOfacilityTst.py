@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 
 import Simulation      as Sml
-import DRACObeam        as LNb
+import BeamLine        as BL
 import BeamLineElement as BLE
 import Particle        as Prtcl
 
@@ -39,10 +39,10 @@ print()
 print("     ----> DRACOFacilityTest:", DRACOFacilityTest, \
       " create facility instance.")
 
-LNb.DRACObeam.setDebug(True)
-DRACObI  = LNb.DRACObeam(filename)
+BL.BeamLine.setDebug(True)
+DRACObI  = BL.BeamLine(filename)
 print(DRACObI)
-LNb.DRACObeam.setDebug(False)
+BL.BeamLine.setDebug(False)
 
 print()
 print("     <---- DRACOFacilityTest:", DRACOFacilityTest, \
@@ -57,7 +57,7 @@ print("     ----> DRACOFacilityTest:", DRACOFacilityTest, \
 print("         ----> First using hard-coded trace space at source.")
 DRACObI.setDebug(True)
 DRACObI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
-OK = DRACObI.trackDRACO(1)
+OK = DRACObI.trackBeam(1)
 DRACObI.setDebug(False)
 
 print("         ----> Second using generated beam:")
@@ -65,7 +65,7 @@ DRACObI.setSrcTrcSpc()
 print(DRACObI)
 
 NEvt = 10000
-OK = DRACObI.trackDRACO(NEvt)
+OK = DRACObI.trackBeam(NEvt)
 
 """
        ---> Had to scratch this bit because upgraded clean-up means it

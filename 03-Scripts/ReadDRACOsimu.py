@@ -6,7 +6,7 @@ import struct
 import math as mth
 
 import Particle  as Prtcl
-import DRACObeam as LNb
+import BeamLine as BL
 
 ##! Start:
 print("========  DRACO event reading: start  ========")
@@ -17,7 +17,7 @@ Debug = False
 
 writePATH = HOMEPATH + "/99-Scratch"
 ParticleFILE = Prtcl.Particle.openParticleFile(writePATH, \
-                                               "DRACOsimu.dat")
+                                               "DRACOSimulation.dat")
 EndOfFile = False
 iEvt = 0
 iCnt = 0
@@ -30,7 +30,7 @@ print("     ----> Create DRACO instance:")
 filename     = os.path.join(HOMEPATH, \
                         '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
 print("         ----> Parameters will be read from:", filename)
-DRACObI  = LNb.DRACObeam(filename)
+DRACObI  = BL.BeamLine(filename)
 if Debug:
     print(DRACObI)
 

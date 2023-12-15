@@ -9,7 +9,7 @@ Test script for "Simulation" class ... simulation processing tasks
 """
 
 import os
-import DRACOsimu as Simu
+import Simulation as Simu
 
 ##! Start:
 print("========  Simulation: start  ========")
@@ -19,9 +19,9 @@ print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
                          '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(2000000, filename, datafiledir, 'DRACOsimu.dat')
+Smltn = Simu.Simulation(2000000, filename, datafiledir, 'DRACOSimulation.dat')
 print()
-print(Simu.Simulation.getDRACObeam())
+print(Simu.Simulation.getFacility())
 print()
 print(" <---- Simulation initialised.")
 
@@ -30,7 +30,6 @@ print(" ----> Run simulation test:")
 print()
 Smltn.setDebug(True)
 Smltn.RunSim()
-print(Smltn.getNEvt())
 print()
 print(" <---- Simulation test done.")
 

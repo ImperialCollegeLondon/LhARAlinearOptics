@@ -25,9 +25,7 @@ BeamLineTest = 1
 print()
 print("BeamLineTest:", BeamLineTest, \
       " check if class is a singleton.")
-OK    = BL.BeamLine.setDebug(True)
 BmLn  = BL.BeamLine(filename)
-Prtcl.ReferenceParticle.cleaninstance()
 BmLn1 = BL.BeamLine(filename)
 print("    BmLn singleton test:", id(BmLn), id(BmLn1), \
       id(BmLn)-id(BmLn1))

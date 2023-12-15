@@ -149,6 +149,7 @@ import math              as mth
 import os
 import io
 
+import BeamLine          as BL
 import BeamLineElement   as BLE
 
 #-------- Physical Constants Instances and Methods ----------------
@@ -336,7 +337,7 @@ class Particle:
         return self._PhsSpc
     
     def getLabPhaseSpace(self):
-        return self._LabPhsSpc    
+        return self._LabPhsSpc
 
             
 #--------  Utilities:
@@ -1019,8 +1020,10 @@ class ReferenceParticle(Particle):
 
         #.. Loop over beam-line elements:
         for iBLE in BLE.BeamLineElement.getinstances():
+            if isinstance(iBLE, BLE.Facility):
+                continue
             if isinstance(iBLE, BLE.Source):
-                Success = self.setReferenceParticleAtSource(iBLE)
+                Success = self.setReferenceParticleAtSource()
                 if not Success:
                     raise fail2setReferenceParticle( \
                                    "setReferenceParticleAtSource")
@@ -1044,7 +1047,7 @@ class ReferenceParticle(Particle):
 
         return Success
 
-    def setReferenceParticleAtSource(self, iBLE=None):
+    def setReferenceParticleAtSource(self):
         Success = self.setsIn(0.)
         if not Success:
             raise fail2setReferenceParticle("sIn")
@@ -1061,8 +1064,12 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        PrIn  = np.array([0., 0., 99., np.nan])
-        PrOut = np.array([0., 0., 99., np.nan])
+        p0       = BL.BeamLine.getElement()[0].getp0()
+        Ref4mmtm = np.array([0., 0., p0,
+                             mth.sqrt(p0**2 + protonMASS**2)])
+        
+        PrIn  = Ref4mmtm
+        PrOut = Ref4mmtm
         Success = self.setPrIn(PrIn)
         if not Success:
             raise fail2setReferenceParticle("PrIn")

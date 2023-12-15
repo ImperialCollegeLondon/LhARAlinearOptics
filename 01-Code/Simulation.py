@@ -4,14 +4,14 @@
 Class Simulation
 ================
 
-  CEO class for linear optics simulation of LhARA beam lines.
+  CEO class for linear optics simulation of beam lines.
 
   Class attributes:
   -----------------
   __instance : Set on creation of first (and only) instance.
   __Debug    : Debug flag
 __RandomSeed : Seed for random number, set to time at load of class.  
-__LhARAFacility : Address of instance of LhARA facility instance.
+__Facility : Address of instance of a facility
 
   Packages loaded:
   ----------------
@@ -45,7 +45,7 @@ __LhARAFacility : Address of instance of LhARA facility instance.
       getRandomSeed: Returns random seed
            setDebug: Set debug flag
            getDebug: Get debug flag
-   getLhARAFacility: Get __LhARAFacility
+   getFacility: Get __Facility
             getNEvt: Get NEvt
   
   Simulation methods:
@@ -70,7 +70,8 @@ import random as __Rnd
 import numpy as np
 import sys
 
-import LhARAFacility
+import BeamLine as BL
+import Particle as Prtcl
 
 #--------  Module methods
 def getRandom():
@@ -102,10 +103,10 @@ class Simulation(object):
     __Debug     = False
     __instance  = None
 
-    __LhARAFacility = None
 
 #--------  "Built-in methods":
-    def __new__(cls, NEvt=5, filename=None, rootfilename=None):
+    def __new__(cls, NEvt=5, filename=None, 
+                _dataFileDir=None, _dataFileName=None):
         if cls.__instance is None:
             print('Simulation.__new__: creating the Simulation object')
             print('-------------------')
@@ -115,10 +116,11 @@ class Simulation(object):
 
             cls._NEvt          = NEvt
             cls._ParamFileName = filename
-            cls._RootFileName  = rootfilename
+            cls._dataFileDir   = _dataFileDir
+            cls._dataFileName  = _dataFileName
 
-            # Create LhARAFacility instance:
-            cls.__LhARAFclty = LhARAFacility.LhARAFacility(filename)
+            # Create Facility instance:
+            cls._Facility = BL.BeamLine(filename)
 
             # Summarise initialisation
             cls.print(cls)
@@ -150,8 +152,17 @@ class Simulation(object):
     def setDebug(cls, _Debug=False):
         cls.__Debug = _Debug
 
-    def getLhARAFacility(cls):
-        return cls.__LhARAFclty
+    @classmethod
+    def getFacility(cls):
+        return cls._Facility
+
+    @classmethod
+    def getdataFileDir(cls):
+        return cls._dataFileDir
+
+    @classmethod
+    def getdataFileName(cls):
+        return cls._dataFileName
 
     def getNEvt(self):
         return self._NEvt
@@ -163,7 +174,8 @@ class Simulation(object):
         print("      State of random generator:", self.__Rnd.getstate()[0])
         print("   Number of events to generate:", self._NEvt)
         print("   Beam line specification file:", self._ParamFileName)
-        print("       root filename for output:", self._RootFileName)
+        print(" data file directory for output:", self._dataFileDir)
+        print("       data filename for output:", self._dataFileName)
 
         
 #--------  Simulation run methods
@@ -174,8 +186,21 @@ class Simulation(object):
 
         runNumber =  26                   # set run number
         
-        #.. Transport particles through LhARA:
-        
-        nEvt = self.getLhARAFacility().trackLhARA(self.getNEvt())
+        #.. Open file to store events:
+        print(" Here:", self.getdataFileDir())
+        print("      ", self.getdataFileName())
+        ParticleFILE = None
+        if self.getdataFileDir()  != None and \
+           self.getdataFileName() != None:
+            ParticleFILE = Prtcl.Particle.createParticleFile( \
+                                            self.getdataFileDir(), \
+                                            self.getdataFileName() )
 
+        #.. Transport particles through facility:
+        
+        nEvt = self.getFacility().trackBeam(self.getNEvt(), ParticleFILE)
+
+        #.. Flush and close particle file:
+        if ParticleFILE != None:
+            Prtcl.Particle.flushNcloseParticleFile(ParticleFILE)
         

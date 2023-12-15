@@ -14,13 +14,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import BeamLineElement as BLE
-import LIONbeam        as LNb
+import BeamLine        as BL
 import Particle        as Prtcl
 
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-LNbI  = LNb.LIONbeam(filename)
+BLI  = BL.BeamLine(filename)
 
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 

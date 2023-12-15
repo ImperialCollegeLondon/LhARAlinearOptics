@@ -6,7 +6,7 @@ import struct
 import math as mth
 
 import Particle as Prtcl
-import LIONbeam as LNb
+import BeamLine as BL
 
 
 
@@ -15,7 +15,7 @@ ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "TestFile.dat")
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-LNbI  = LNb.LIONbeam(filename)
+BLI  = BL.BeamLine(filename)
 
 EndOfFile = False
 iEvt = 0

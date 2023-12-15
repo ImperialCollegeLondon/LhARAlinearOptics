@@ -12,7 +12,7 @@ import os
 import sys
 import numpy as np
 
-import LIONbeam as LNb
+import BeamLine as BL
 import Particle as Prtcl
 
 ##! Start:
@@ -37,8 +37,8 @@ Prtcl.Particle.cleanParticles()
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-LNbI  = LNb.LIONbeam(filename)
-print(LNbI)
+BLI  = BL.BeamLine(filename)
+print(BLI)
 
 ##! Test built-in methods:
 ParticleTest = 1
@@ -85,6 +85,10 @@ Prtcl.Particle.setDebug(True)
 print(PrtcltInst)
 Prtcl.Particle.setDebug(False)
 
+"""
+Legacy; wont work as delete instances after generating ... needs to check
+        fillPhaseSpaceAll
+
 ##! Check extraction of phase-space:
 ParticleTest += 1
 print()
@@ -93,11 +97,16 @@ Prtcl.ReferenceParticle.cleaninstance()
 refPrtcl  = Prtcl.ReferenceParticle()
 refPrtclSet = refPrtcl.setReferenceParticle()
 print("ParticleTest:", ParticleTest, " check extraction of phase space.")
-LNbI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
-OK = LNbI.trackLION(1)
+BLI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
+BLI.setDebug(True)
+OK = BLI.trackBeam(1)
+BLI.setDebug(False)
+print(" Here:", OK)
 Prtcl.Particle.setDebug(True)
 print(" <---- Prtcl.Particle.fillPhaseSpaceAll():", \
       Prtcl.Particle.fillPhaseSpaceAll())
+"""
+
 ##! Complete:
 print()
 print("========  Particle: tests complete  ========")

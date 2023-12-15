@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 To do:
- - Add documentation for methods from trackLhARA
+ - Add documentation for methods from trackBeam
  LhARAcument all class attributes
 
 Class BeamLine:
@@ -15,7 +15,7 @@ Class BeamLine:
   Class attributes:
   -----------------
    __Debug    : Debug flag
-   __SrcPhsSpc: 6D phase space at source (np.ndarray)
+   __SrcTrcSpc: 6D trace space at source (np.ndarray)
 __BeamLineInst: Instance of BeamLine class.  Set on creation of first
                 (and only) instance.
 
@@ -27,7 +27,7 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
             _BeamLineParamPandas : Pandas data frame instance containing
                                    parameters.
     _Element[] : BeamLineElement : List of beam line elements making up the
-                                   LhARA beam line.
+                                   beam line.
     
   Methods:
   --------
@@ -39,26 +39,26 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
   Set methods:
       setDebug  : Set debug flag
 
-    setSrcPhsSpc: Set phase space at source.
-             Input: np.array([6,]) containing 6D phase space vector.
+    setSrcTrcSpc: Set trace space at source.
+             Input: np.array([6,]) containing 6D trace space vector.
 
   Get methods:
-     getinstance: Get instance of LhARA beam class
+     getinstance: Get instance of beam class
       getDebug  : get debug flag
 getBeamLineSpecificationCVSfile:
                   Get the path to the csv file specifying the beam line
 getBeamLineParamPandas:
                   Get pandas instance specifying the beam line
       getElement: get list of instances of BeamLineElement objects that make
-                  up the LhARA beam line
-    getSrcPhsSpc: get source phase space nd.array(6,)
+                  up the beam line
+    getSrcTrcSpc: get source trace space nd.array(6,)
 
   Processing method:
       print()   : Dumps parameters
   
   I/o methods:
  getBeamLineParams: Creates pandas instance with values stored in
-                    LhARA parameters stored in cvs file
+                    parameters stored in cvs file
               Input: fileneam: path to pandas file
              Return: Pandas instance
 
@@ -86,12 +86,12 @@ getBeamLineParamPandas:
                 Input: None
                Return: True/False: consistent/not consistent
 
-          trackLhARA: Tracks through the LhARA beam line.
+          trackBeam: Tracks through the beam line.
 
 Created on Mon 02Oct23: Version history:
 ----------------------------------------
  2.0: 11Dec23: Refactor to make code generate beamline based on input
-               specificaiton file and not tie it to LhARA or another
+               specificaiton file and not tie it to or another
                hard-coded facility.
  1.0: 02Oct23: First implementation
 
@@ -100,6 +100,7 @@ Created on Mon 02Oct23: Version history:
 
 import os
 import io
+import math   as mth
 import numpy  as np
 import pandas as pnds
 
@@ -107,89 +108,117 @@ import Particle        as Prtcl
 import BeamLineElement as BLE
 
 #-------- Physical Constants Instances and Methods ----------------
-
 from PhysicalConstants import PhysicalConstants
 
 constants_instance = PhysicalConstants()
+
+protonMASS         = constants_instance.mp()
 speed_of_light     = constants_instance.SoL()
 
 class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
-    __SrcPhsSpc    = None
+    __SrcTrcSpc    = None
     __BeamLineInst = None
 
 
 #--------  "Built-in methods":
     def __new__(cls, _BeamLineSpecificationCVSfile=None):
-        if cls.getinstance() is None:
+        if cls.getinstance() == None:
             if cls.getDebug():
                 print(' BeamLine.__new__: ', \
                       'creating the BeamLine object')
             cls.__BeamLineInst = super(BeamLine, cls).__new__(cls)
 
-        #.. Only constants; print values that will be used:
-        if cls.getDebug():
-            print("     ----> Debug flag: ", cls.getDebug())
+            #.. Only constants; print values that will be used:
+            if cls.getDebug():
+                print("     ----> Debug flag: ", cls.getDebug())
 
-        #.. Check and load parameter file
-        if _BeamLineSpecificationCVSfile == None:
-            raise Exception( \
-                    " BeamLine.__new__: no parameter file given.")
+                #.. Check and load parameter file
+            if _BeamLineSpecificationCVSfile == None:
+                raise Exception( \
+                            " BeamLine.__new__: no parameter file given.")
         
-        if not os.path.exists(_BeamLineSpecificationCVSfile):
-            raise Exception( \
+            if not os.path.exists(_BeamLineSpecificationCVSfile):
+                raise Exception( \
                     " BeamLine.__new__: parameter file does not exist.")
         
-        cls._BeamLineSpecificationCVSfile = \
+            cls._BeamLineSpecificationCVSfile = \
                                _BeamLineSpecificationCVSfile
-        cls._BeamLineParamPandas = BeamLine.csv2pandas( \
+            cls._BeamLineParamPandas = BeamLine.csv2pandas( \
                                _BeamLineSpecificationCVSfile)
-        if not isinstance(cls._BeamLineParamPandas, pnds.DataFrame):
-            raise Exception( \
+            if not isinstance(cls._BeamLineParamPandas, pnds.DataFrame):
+                raise Exception( \
                     " BeamLine.__new__: pandas data frame invalid.")
 
-        cls._Element = []
+            cls._Element = []
                                                                       
-        if cls.getDebug():
-            print("     ----> Parameter file: ", \
-                  cls.getBeamLineSpecificationCVSfile())
-            print("     ----> Dump of pandas paramter list: \n", \
-                  cls.getBeamLineParamPandas())
+            if cls.getDebug():
+                print("     ----> Parameter file: ", \
+                      cls.getBeamLineSpecificationCVSfile())
+                print("     ----> Dump of pandas paramter list: \n", \
+                      cls.getBeamLineParamPandas())
 
 #.. Build facility:
-        if cls.getDebug():
-            print("     ----> Build facility:")
+            if cls.getDebug():
+                print("     ----> Build facility:")
 
 #    ----> Facility:  --------  --------  --------  --------
-        if cls.getDebug():
-            print("         ----> Facility: ")
+            if cls.getDebug():
+                print("         ----> Facility: ")
 
-        cls.addFacility()
+            cls.addFacility()
         
-        if cls.getDebug():
-            print("        <---- Facility done.")
+            if cls.getDebug():
+                print("         <---- Facility done.")
 #    <---- Done facility  --------  --------  --------  --------
 
-#    ----> Source:  --------  --------  --------  --------
-        if cls.getDebug():
-            print("         ----> Source: ")
+#    ----> Create reference particle:  --------  --------  --------  --------
+#..  Instance only at this stage:
+            if cls.getDebug():
+                print("        ----> Create reference particle instance: ")
+            
+            refPrtcl  = Prtcl.ReferenceParticle()
+            
+            if cls.getDebug():
+                print("        <---- Reference particle created. ")
+#    <---- Done reference particle  --------  --------  --------  --------
 
-        cls.addSource()
+#    ----> Source:  --------  --------  --------  --------
+            if cls.getDebug():
+                print("         ----> Source: ")
+
+            cls.addSource()
         
-        if cls.getDebug():
-            print("        <---- Source done.")
+            if cls.getDebug():
+                print("        <---- Source done.")
 #    <---- Done source  --------  --------  --------  --------
 
 #    ----> Beam line:  --------  --------  --------  --------
-        if cls.getDebug():
-            print("         ----> Beam line: ")
+            if cls.getDebug():
+                print("        ----> Beam line: ")
 
-        cls.addBeamline()
+            cls.addBeamline()
         
-        if cls.getDebug():
-            print("        <---- Beam line done.")
+            if cls.getDebug():
+                print("        <---- Beam line done.")
 #    <---- Done beam line  --------  --------  --------  --------
+
+#    ----> Reference particle:  --------  --------  --------  --------
+            if cls.getDebug():
+                print("        ----> Reference particle: ")
+            
+            #refPrtclSet = refPrtcl.setReferenceParticle()
+
+            if cls.getDebug():
+                print("            ----> Reference particle set, success:")
+                print("        <---- Reference particle done. ")
+#    <---- Done reference particle -----  --------  --------  --------
+
+        else:
+            if cls.getDebug():
+                print(' BeamLine.__new__: ', \
+                      'existing BeamLine object will be used')
 
         return cls.getinstance()
 
@@ -197,15 +226,15 @@ class BeamLine(object):
         return "BeamLine()"
 
     def __str__(self):
-        print(" LhARA beam line set up as follows:")
-        print(" =================================")
+        print(" Beam line set up as follows:")
+        print(" ============================")
         print("     ----> Debug flag:", BeamLine.getDebug())
         print("     ----> Source and beam line:")
         for iBLE in BLE.BeamLineElement.getinstances():
             print("               ", iBLE.SummaryStr())            
-        print("     ----> LhARA beam line is self consistent = ", \
+        print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
-        return " <---- LhARA beam line parameter dump complete."
+        return " <---- Beam line parameter dump complete."
                 
     
 #--------  I/o methods:
@@ -223,22 +252,22 @@ class BeamLine(object):
         cls.__Debug = Debug
         
     @classmethod
-    def setSrcPhsSpc(cls, SrcPhsSpc=np.array([])):
+    def setSrcTrcSpc(cls, SrcTrcSpc=np.array([])):
         if cls.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(" BeamLine.setSrcPhsSpc: ", SrcPhsSpc)
+                print(" BeamLine.setSrcTrcSpc: ", SrcTrcSpc)
         
-        if not isinstance(SrcPhsSpc, np.ndarray):
-            raise badPhaseSpaceVector( \
-                        " BeamLine.setSrcPhsSpc:", SrcPhsSpc)
+        if not isinstance(SrcTrcSpc, np.ndarray):
+            raise badTraceSpaceVector( \
+                        " BeamLine.setSrcTrcSpc:", SrcTrcSpc)
 
-        if len(SrcPhsSpc) == 0:
-            SrcPhsSpc = None
-        elif not SrcPhsSpc.size == 6:
-            raise badPhaseSpaceVector( \
-                        " BeamLine.setSrcPhsSpc:", SrcPhsSpc)
+        if len(SrcTrcSpc) == 0:
+            SrcTrcSpc = None
+        elif not SrcTrcSpc.size == 6:
+            raise badTraceSpaceVector( \
+                        " BeamLine.setSrcTrcSpc:", SrcTrcSpc)
 
-        cls.__SrcPhsSpc = SrcPhsSpc
+        cls.__SrcTrcSpc = SrcTrcSpc
         
 #--------  "Get methods"
 #.. Method believed to be self documenting(!)
@@ -263,8 +292,8 @@ class BeamLine(object):
         return cls._Element
     
     @classmethod
-    def getSrcPhsSpc(cls):
-        return cls.__SrcPhsSpc
+    def getSrcTrcSpc(cls):
+        return cls.__SrcTrcSpc
     
         
 #--------  Processing methods:
@@ -275,15 +304,10 @@ class BeamLine(object):
     @classmethod
     def addFacility(cls):
         if cls.getDebug():
-            print("         BeamLine.addFacility starts:")
-
-        #.. Get "sub" pandas data frame with Facility parameters only:
-        pndsFacility = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] == "Facility" \
-                                                  ]
+            print("             ----> BeamLine.addFacility starts:")
 
         #.. Parse the dataframe to get Facility parameters:
-        Name, K0 = cls.parseFacility(pndsFacility)
+        Name, K0 = cls.parseFacility()
 
         #.. Create the Facility beam line element:
         rCtr  = np.array([0., 0., 0.])
@@ -295,118 +319,118 @@ class BeamLine(object):
 
         FacilityBLE = BLE.Facility(Name, rCtr, vCtr, drCtr, dvCtr, \
                                    p0)
+        cls._Element.append(FacilityBLE)
+
         if cls.getDebug():
             print("             <----", Name, \
-                  "beam line element created.")
-
-
-        cls._Element.append(FacilityBLE)
+                  "facility initialise.")
 
     @classmethod
     def addSource(cls):
         if cls.getDebug():
-            print("         BeamLine.addSource starts:")
+            print("             BeamLine.addSource starts:")
             
-        #.. Get "sub" pandas data frame with source parameters only:
-        pndsSource = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] == "Source" \
-                                                  ]
-
         #.. Parse the dataframe to get source parameters:
-        SrcMode, SrcParam = cls.parseSource(pndsSource)
+        Name, SrcMode, SrcParam = cls.parseSource()
 
         #.. Create the source beam line element:
         rCtr = np.array([0.,0.,0.])
         vCtr = np.array([0.,0.])
         drCtr = np.array([0.,0.,0.])
         dvCtr = np.array([0.,0.])
-        Name = "LhARA:" + str(pndsSource.iloc[0]["Stage"]) + ":"  \
-                       + pndsSource.iloc[0]["Section"]    + ":" \
-                       + pndsSource.iloc[0]["Element"]
         SourceBLE = BLE.Source(Name, rCtr, vCtr, drCtr, dvCtr, \
                                SrcMode, SrcParam)
-        if cls.getDebug():
-            print("             <----", Name, \
-                  "beam line element created.")
 
         cls._Element.append(SourceBLE)
 
-    @classmethod
-    def parseFacility(cls, pndsSource):
-        cls.setDebug(True)
+        refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+        refPrtclSet = refPrtcl.setReferenceParticleAtSource()
+
         if cls.getDebug():
-            print("         BeamLine.addFacility starts:")
-            
-        #.. Get "sub" pandas data frame with facility parameters only:
-        pndsFacility = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] == "Facility" \
-                                                  ]
-        print(pndsFacility)
-        
+            print("                 ---->", Name, \
+                  "beam line element created.")
+            print("                     ----> reference particle:")
+            print("                         Position:", refPrtcl.getRrIn()[0])
+            print("                         Momentum:", refPrtcl.getPrIn()[0])
+            print("                 <---- Done.")
+
+    @classmethod
+    def parseFacility(cls):
         Name  = None
         p0    = None
         if cls.getDebug():
-            print("             ----> BeamLine.parseFacility starts:")
-
-        Name = str( \
-            pndsFacility[pndsFacility["Parameter"]=="Name"].loc[0]["Value"] \
-                   )
-        K0   = float( \
-                      pndsFacility[ \
-                        (pndsFacility["Parameter"]=="Reference particle") & \
-                        (pndsFacility["Name"]=="Kinetic energy") ]. \
+            print("                 ----> BeamLine.parseFacility starts:")
+            
+        #.. Get "sub" pandas data frame with facility parameters only:
+        pndsFacility = cls.getBeamLineParamPandas()[ \
+                  (cls.getBeamLineParamPandas()["Section"] == "Facility") & \
+                  (cls.getBeamLineParamPandas()["Element"] == "Global") \
+                                                  ]
+        Name = str(pndsFacility[ \
+                        (pndsFacility["Type"]=="Name") & \
+                        (pndsFacility["Parameter"]=="Name") ]. \
+                            iloc[0]["Value"] \
+                    )
+        K0   = float(pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Kinetic energy") ]. \
                             iloc[0]["Value"] \
                     )
         
         if cls.getDebug():
-            print("                 ----> Name, K0:", Name, K0)
+            print("                 <---- Name, K0:", Name, K0)
 
         return Name, K0
 
     @classmethod
-    def parseSource(cls, pndsSource):
+    def parseSource(cls):
         SrcMode  = None
         SrcParam = None
         if cls.getDebug():
-            print("             ----> BeamLine.parseSource starts:")
+            print("                 ----> BeamLine.parseSource starts:")
 
+        #.. Get "sub" pandas data frame with source parameters only:
+        pndsSource = cls.getBeamLineParamPandas()[ \
+                     cls.getBeamLineParamPandas()["Section"] == "Source" \
+                                                  ]
         SrcMode = int( \
-           pndsSource[pndsSource["Name"]=="SourceMode"].loc[0]["Value"] \
+           pndsSource[pndsSource["Parameter"]=="SourceMode"]["Value"].iloc[0] \
                        )
         if cls.getDebug():
-            print("                 ----> Mode:", SrcMode)
+            print("                     ----> Mode:", SrcMode)
             
         if SrcMode == 0:               #.. Laser driven:
-            Emin  = \
-             pndsSource[pndsSource["Parameter"]=="Emin"].iloc[0]["Value"]
-            Emax = \
-             pndsSource[pndsSource["Parameter"]=="Emax"].iloc[0]["Value"]
+            Emin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
+            Emax = float( \
+             pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             nPnts = \
-             int(pndsSource[pndsSource["Parameter"]=="nPnts"].iloc[0]["Value"])
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+             int(pndsSource[pndsSource["Parameter"]=="nPnts"]["Value"].iloc[0])
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
         elif SrcMode == 1:               #.. Gaussian:
-            MeanE  = \
-             pndsSource[pndsSource["Parameter"]=="MeanEnergy"].iloc[0]["Value"]
-            SigmaE = \
-             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"].iloc[0]["Value"]
-            MinCTheta = \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"].iloc[0]["Value"]
+            MeanE  = float( \
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
+            SigmaE = float( \
+             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"]["Value"].iloc[0])
+            MinCTheta = float(\
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
 
-        SigmaX  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaX"].iloc[0]["Value"]
-        SigmaY  = \
-            pndsSource[pndsSource["Parameter"]=="SigmaY"].iloc[0]["Value"]
+        SigmaX  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
+        SigmaY  = float( \
+            pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
 
         if cls.getDebug():
-            print("                     ----> SigmaX, SigmaY:", SigmaX, SigmaY)
+            print("                         ----> SigmaX, SigmaY:", \
+                  SigmaX, SigmaY)
             if SrcMode == 0:
-                print("                     ----> Emin, Emax, nPnts:", \
+                print("                         ----> Emin, Emax, nPnts:", \
                       Emin, Emax, nPnts)
             elif SrcMode == 1:
-                print("                     ----> Mean and sigma:", \
+                print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
-            print("                     ----> Min cos(Theta):", MinCTheta)
+            print("                         ----> Min cos(Theta):", MinCTheta)
             
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
@@ -414,22 +438,35 @@ class BeamLine(object):
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
 
-        return SrcMode, SrcParam
+        
+        Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
+                       + str(pndsSource["Stage"].iloc[0]) + ":" \
+                       + pndsSource["Section"].iloc[0]    + ":" \
+                       + pndsSource["Element"].iloc[0]
+
+        if cls.getDebug():
+            print("                 <---- Name, SrcMode, SrcParam:", \
+                  Name, SrcMode, SrcParam)
+        
+        return Name, SrcMode, SrcParam
 
     @classmethod
     def addBeamline(cls):
         if cls.getDebug():
-            print("         BeamLine.addBeamline starts:")
+            print("            BeamLine.addBeamline starts:")
             
         #.. Get "sub" pandas data frame with beamline parameters only:
         pndsBeamline = cls.getBeamLineParamPandas()[ \
-                       cls.getBeamLineParamPandas()["Section"] != "Source" \
+                    (cls.getBeamLineParamPandas()["Section"] != "Source") & \
+                    (cls.getBeamLineParamPandas()["Section"] != "Facility") \
                                                   ]
+
         Section    = ""
         NewElement = True
         s         = 0.
         for iLine in pndsBeamline.itertuples():
-            Name = "LhARA:" + str(iLine.Stage) + ":"  \
+            Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
+                           + str(iLine.Stage) + ":"  \
                            + iLine.Section    + ":" \
                            + iLine.Element    + ":"
 
@@ -443,43 +480,49 @@ class BeamLine(object):
             if iLine.Element == "Drift":
                 nDrift   += 1
                 Name      = Name + str(nDrift)
-                Length    = iLine.Value
+                Length    = float(iLine.Value)
                 rCtr      = np.array([0.,0.,s+Length/2.])
                 vCtr      = np.array([0.,0.])
                 drCtr     = np.array([0.,0.,0.])
                 dvCtr     = np.array([0.,0.])
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.Drift(Name, \
-                             rCtr, vCtr, drCtr, dvCtr, Length))
+                iBLE = BLE.Drift(Name, \
+                             rCtr, vCtr, drCtr, dvCtr, Length)
+                cls._Element.append(iBLE)
                 s += Length
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
                 rCtr  = np.array([0.,0.,s])
                 vCtr  = np.array([0.,0.])
                 drCtr = np.array([0.,0.,0.])
                 dvCtr = np.array([0.,0.])
                 if iLine.Type == "Circular":
-                    Param = [0, iLine.Value]
+                    Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
                     if NewElement:
-                        Param      = [1, iLine.Value]
+                        Param      = [1, float(iLine.Value)]
                         NewElement = False
                         continue
                     else:
-                        Param.append(iLine.Value)
+                        Param.append(float(iLine.Value))
                         NewElement = True
                 nAperture += 1
                 Name       = Name + iLine.Type + ":" + str(nAperture)
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.Aperture(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, Param) )
+                iBLE = BLE.Aperture(Name, \
+                                    rCtr, vCtr, drCtr, dvCtr, Param)
+                cls._Element.append(iBLE)
                 s += 0.
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Fquad":
                 if iLine.Parameter == "Length":
-                    FqL = iLine.Value
+                    FqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    FqS = iLine.Value
+                    FqS = float(iLine.Value)
                 if NewElement:
                     NewElement = False
                     continue
@@ -493,14 +536,17 @@ class BeamLine(object):
                 Name       = Name + str(nFquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.FocusQuadrupole(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, FqL, FqS) )
+                iBLE = BLE.FocusQuadrupole(Name, \
+                                    rCtr, vCtr, drCtr, dvCtr, FqL, FqS)
+                cls._Element.append(iBLE)
                 s += FqL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dquad":
                 if iLine.Parameter == "Length":
-                    DqL = iLine.Value
+                    DqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    DqS = iLine.Value
+                    DqS = float(iLine.Value)
                 if NewElement:
                     NewElement = False
                     continue
@@ -514,9 +560,23 @@ class BeamLine(object):
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(BLE.DefocusQuadrupole(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, DqL, DqS) )
+                iBLE = BLE.DefocusQuadrupole(Name, \
+                                    rCtr, vCtr, drCtr, dvCtr, DqL, DqS)
+                cls._Element.append(iBLE)
                 s += DqL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+                
+            if cls.getDebug():
+                print("                 ---->", Name, \
+                      "beam line element created.")
+                print("                     ----> reference particle:")
+                print("                         Position:", \
+                      refPrtcl.getRrIn()[0])
+                print("                         Momentum:", \
+                      refPrtcl.getPrIn()[0])
+                print("                 <---- Done.")
+                
         
     def checkConsistency(self):
         ConsChk = False
@@ -541,11 +601,13 @@ class BeamLine(object):
         return True
 
     @classmethod
-    def trackLhARA(cls, NEvts=0, ParticleFILE=None):
+    def trackBeam(cls, NEvts=0, ParticleFILE=None):
         if cls.getDebug() or NEvts > 1:
-            print(" trackLhARA for", NEvts, " events.")
+            print(" trackBeam for", NEvts, " events.")
         Scl  = 1
         iCnt = 1
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
         for iEvt in range(1, NEvts+1):
             if (iEvt % Scl) == 0:
@@ -555,6 +617,7 @@ class BeamLine(object):
                 if iCnt == 10:
                     iCnt = 1
                     Scl  = Scl * 10
+
                 
             #.. Create particle instance to store progression through
             #   beam line
@@ -563,50 +626,50 @@ class BeamLine(object):
                 print("     ----> Created new Particle instance")
 
             #.. Generate particle:
-            if isinstance(cls.getSrcPhsSpc(), np.ndarray):
+            if isinstance(cls.getSrcTrcSpc(), np.ndarray):
                 if cls.getDebug():
                     print("     ----> Start using:", iEvt)
-                Name = "LhARA:0:Source:User"
-                SrcPhsSpc = cls.getSrcPhsSpc()
+                Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
+                       + "Source:User"
+                SrcTrcSpc = cls.getSrcTrcSpc()
             else:
                 if cls.getDebug():
-                    print("     ----> Start by calling getSourcePhaseSpace")
-                Name = cls.getElement()[0].getName()
-                SrcPhsSpc = \
-                    cls.getElement()[0].getParticleFromSource()
-            Success = PrtclInst.recordParticle(Name, 0., 0., SrcPhsSpc)
+                    print("     ----> Start by calling getSourceTraceSpace")
+                Name = cls.getElement()[1].getName()
+                SrcTrcSpc = \
+                    cls.getElement()[1].getParticleFromSource()
+            Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
             if cls.getDebug():
                 print("     ----> Event", iEvt)
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("         ----> Phase space at source     :", \
-                          SrcPhsSpc)
-
-            Mmtm = np.sqrt(2.*938.27208816*SrcPhsSpc[5])
-            Brho = (1/(speed_of_light*1.E-9))*Mmtm/1000.
+                    print("         ----> trace space at source     :", \
+                          SrcTrcSpc)
 
             #.. Track through beam line:
-            PhsSpc_i = SrcPhsSpc
-            PhsSpc   = SrcPhsSpc
+            TrcSpc_i = SrcTrcSpc
+            TrcSpc   = SrcTrcSpc
             HlfLngth = 0.
             if cls.getDebug():
                 print("     ----> Transport through beam line")
+            iLoc = -1
             for iBLE in BLE.BeamLineElement.getinstances():
-                if isinstance(iBLE, BLE.Source):
+                iLoc += 1
+                if isinstance(iBLE, BLE.Source) or \
+                   isinstance(iBLE, BLE.Facility):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
                 HlfLngth = iBLE.getLength() / 2.
                 if isinstance(iBLE, BLE.FocusQuadrupole) or \
                    isinstance(iBLE, BLE.DefocusQuadrupole):
-                    PhsSpc     = iBLE.Transport(PhsSpc_i, Brho)
-                else:
-                    PhsSpc     = iBLE.Transport(PhsSpc_i)
+                    p0     = iRefPrtcl.getMomentumIn(iLoc)
+                TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
                                 linewidth=500,precision=7,suppress=True):
-                        print("             ----> Updated phase space   :", \
-                              PhsSpc)
-                if not isinstance(PhsSpc, np.ndarray):
+                        print("             ----> Updated trace space   :", \
+                              TrcSpc)
+                if not isinstance(TrcSpc, np.ndarray):
                     if cls.getDebug():
                         print("              ---->", \
                               " partice outside acceptance(1)")
@@ -616,8 +679,8 @@ class BeamLine(object):
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
                                                        zEnd, \
-                                                       PhsSpc)
-                PhsSpc_i = PhsSpc
+                                                       TrcSpc)
+                TrcSpc_i = TrcSpc
 
             if cls.getDebug():
                 print("         ----> Reached end of beam line.")
@@ -625,9 +688,8 @@ class BeamLine(object):
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 PrtclInst.writeParticle(ParticleFILE)
-                
-            Prtcl.Particle.cleanParticles()
-            #del PrtclInst
+                Prtcl.Particle.cleanParticles()
+                #del PrtclInst
             
             if cls.getDebug():
                 print("     <---- Finished handling beam line.")
@@ -641,6 +703,6 @@ class BeamLine(object):
 class badParameter(Exception):
     pass
                 
-class badPhaseSpaceVector(Exception):
+class badTraceSpaceVector(Exception):
     pass
                 

@@ -116,7 +116,7 @@ import matplotlib.pyplot as plt
 
 
 import Simulation      as Sml
-import LIONbeam        as LNb
+import BeamLine        as BL
 import BeamLineElement as BLE
 import Particle        as Prtcl
 
@@ -138,8 +138,8 @@ print()
 print("     ----> LIONFacilityTest:", LIONFacilityTest, \
       " create facility instance.")
 
-LNbI  = LNb.LIONbeam(filename)
-print(LNbI)
+BLI  = BL.BeamLine(filename)
+print(BLI)
 
 print()
 print("     <---- LIONFacilityTest:", LIONFacilityTest, \
@@ -152,28 +152,27 @@ print("     ----> LIONFacilityTest:", LIONFacilityTest, \
       " check generation/tracking.")
 
 print("         ----> First using hard-coded trace space at source.")
-LNbI.setDebug(True)
-LNbI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
-OK = LNbI.trackLION(1)
-LNbI.setDebug(False)
+BLI.setDebug(True)
+BLI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
+OK = BLI.trackBeam(1)
+BLI.setDebug(False)
 
 print("         ----> Second using generated beam:")
-LNbI.setSrcTrcSpc()
-print(LNbI)
+BLI.setSrcTrcSpc()
 
 NEvt = 10
-OK = LNbI.trackLION(NEvt)
+OK = BLI.trackBeam(NEvt)
 
 
 """ Legacy; need to recheck tests from here:
 print("     ----> Print one event that made it to end of delivery:", \
-      LNbI.getSrcTrcSpc())
+      BLI.getSrcTrcSpc())
 
 Prt    = False
 iPrtcl = 0
 
 while not Prt:
-    OK = LNbI.trackLION(1)
+    OK = BLI.trackLION(1)
     print(" HereHere:", len(Prtcl.Particle.instances))
     iPrtclInst = Prtcl.Particle.instances[len(Prtcl.Particle.instances)-1]
     if iPrtcl >= NEvt:
