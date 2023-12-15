@@ -13,9 +13,6 @@ import Particle as Prtcl
 import BeamLine as BL
 
 '''
-VERY IMPORTANT:
-    Phase Space is now Trace Space after Ken's adjustements. Need to revise whole code. (Download new version first)
-
 Things to revise:
     
     Arbitrary parameters for centering structures in plt_apt (5E-3, 6E-3)
@@ -148,13 +145,7 @@ class BeamlinePlotter(object):
                                 
                                 EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
         
-                                iPrtcl = Prtcl.Particle.getParticleInstances()[1] #used to be 0
-                                
-                                #or iPrtcl in Prtcl.getParticleInstances():
-                                
-                                #print(iPrtcl.getTraceSpace()) #AQUI FALLA ALGO
-                                
-                                
+                                iPrtcl = Prtcl.Particle.getParticleInstances()[1] #used to be 0 in the previous PhaseSpace implementation
                     
                                 if iPrtcl.getz()[-1] > maxz: #the ones that get to the end of beamline
                     
