@@ -19,9 +19,9 @@ print("     ----> Create LION instance:")
 filename     = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 print("         ----> Parameters will be read from:", filename)
-DRACObI  = BL.BeamLine(filename)
+LIONbI  = BL.BeamLine(filename)
 if Debug:
-    print(DRACObI)
+    print(LIONbI)
 
 print("     <---- Initialisation done.")
 
