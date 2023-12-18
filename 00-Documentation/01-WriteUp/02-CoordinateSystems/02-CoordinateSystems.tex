@@ -7,8 +7,8 @@
 The origin of the LhARA coordinate system, the ``laboratory coordinate
 system'' or ``laboratory reference frame'', is at the position of the
 laser focus at the position of the laser-target interaction.
-The $z$ axis is horizontal and points along the nominal capture axis,
-pointing in the downstream direction, i.e. away from the target.
+The $z$ axis is horizontal and parallel to the nominal capture axis,
+pointing in the downstream direction.
 The $y$ axis points vertically upwards, and the $x$ axis completes a
 right-handed orthogonal coordinate system. 
 
@@ -18,19 +18,19 @@ The position of the reference particle, its momentum and energy are
 described as functions of the distance it has travelled from the origin
 of coordinates to its current position.
 The distance travelled is defined to be $s$, making the position,
-$\bm{r}_r$, momentum, $\bm{p}_r$, and energy, $E_r$, of the
+$\bm{r}_0$, momentum, $\bm{p}_0$, and energy, $E_0$, of the
 reference particle at position $s$:
 \begin{eqnarray}
-  \bm{r}_r & = & \bm{r}_r(s)\, ;           \nonumber \\
-  \bm{p}_r & = & \bm{p}_r(s)\, {\rm ; and}           \\
-       E_r & = &      E_r(s)\, .           \nonumber
+  \bm{r}_0 & = & \bm{r}_0(s)\, ;           \nonumber \\
+  \bm{p}_0 & = & \bm{p}_0(s)\, {\rm ; and}           \\
+       E_0 & = &      E_0(s)\, .           \nonumber
 \end{eqnarray}
-The time, $t_r$, at which the reference particle is at $s$ is also a
+The time, $t$, at which the reference particle is at $s$ is also a
 function of $s$:
 \begin{eqnarray}
-        t_r  & = & t(s) = \frac{c}{s} \frac{p_r}{E_r}\, ; 
+        t  & = & t(s) = \frac{c}{s} \frac{c p_0}{E_0}\, ; 
 \end{eqnarray}
-where $p_r=\left|\bm{p}_r\right|$ and $c$ is the speed of light.
+where $p_0=\left|\bm{p}_0\right|$ and $c$ is the speed of light.
 
 \subsection{Reference particle local coordinate system}
 
@@ -54,7 +54,7 @@ see figure~\ref{fig:RPLC}.
     reference particle.
     The directions of unit vectors along each of three righthanded,
     orthogonal coordinate axes are shown as black arrows labelled
-    $\bm{i}_r$, $\bm{j}_r$, and $\bm{j}_r$. 
+    $\bm{i}_0$, $\bm{j}_0$, and $\bm{j}_0$. 
   }
   \label{fig:RPLC}
 \end{figure}
@@ -85,19 +85,20 @@ element.
 \subsection{Transforming to and from reference particle local
             coordinates to laboratory coordinates}
             
-In RPLC, the trajectory of the reference particle, $\bm{R}_r$, is:
+In the RPLC system, the trajectory of the reference particle,
+$\bm{R}_0$, is:
 \begin{equation}
-  \bm{R}_r(s) = \bm{0}\,.
+  \bm{R}_0(s) = \bm{0}\,.
 \end{equation}
-The position of a test particle in the RPLC frame ($\bm{R}_{t}$) is
+The position of a test particle in the RPLC frame, $\bm{R}$, is
 described with reference to the position of the reference particle.
 In the laboratory frame, the position of the test particle is:
 \begin{equation}
-  \bm{r}_{t}(s) = \bm{r}_r(s) + \bm{\delta r}(s) \,;
+  \bm{r}(s) = \bm{r}_0(s) + \bm{\delta r}(s) \,;
 \end{equation}
 where:
 \begin{equation}
-  \bm{\delta r}(s) = \underline{\underline{R}}(s) \bm{R}_t(s) \,{\rm ; and}
+  \bm{\delta r}(s) = \underline{\underline{R}}(s) \bm{R}(s) \,{\rm ; and}
 \end{equation}
 $\underline{\underline{R}}(s)$ is a rotation matrix that takes
 the RPLCs at $s$ to the laboratory frame coordinates.

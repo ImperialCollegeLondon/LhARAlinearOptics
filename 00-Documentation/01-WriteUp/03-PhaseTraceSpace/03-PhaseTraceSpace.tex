@@ -59,23 +59,31 @@ Consider a particle with position
 $(x_{\rm\,RPLC}, y_{\rm\,RPLC}, z_{\rm\,RPLC})$ and momentum 
 $p_{\rm\,RPLC}$ with components
 $(p_{\rm x\,RPLC}, p_{\rm y\,RPLC}, p_{\rm z\,RPLC})$.
-Taking the momentum of the reference particle to be
-$p_{0 {\rm\,RPLC}}$, the trace-space coordinates are given by:
+Taking the momentum of the reference particle in the laboratory frame
+to be $p_0$, the trace-space coordinates are given by:
 \begin{equation}
     \bm{\phi} = \begin{pmatrix}
                   x_{\rm\,RPLC}       \\
                   x\prime_{\rm\,RPLC} \\
                   y_{\rm\,RPLC}       \\
                   y\prime_{\rm\,RPLC} \\
-                  t                 \\
-                  \frac{\Delta p_{\rm\,RPLC}}{p_{\rm\,RPLC}}
+                  z_{\rm\,RPLC}       \\
+                  \delta_{\rm\,RPLC}
                 \end{pmatrix} \, ;
 \end{equation}
 where:
 \begin{eqnarray}
   x\prime_{\rm\,RPLC}  & = & \frac{\partial x}{\partial s} = \frac{p_{x\,{\rm\,RPLC}}}{p_{\rm\,RPLC}} \, ; \\
   y\prime_{\rm\,RPLC}  & = & \frac{\partial y}{\partial s} = \frac{p_{y\,{\rm\,RPLC}}}{p_{\rm\,RPLC}} \, ; \\
-  \Delta p_{\rm\,RPLC} & = & p_{\rm\,RPLC} - p_{0 {\rm\,RPLC}} \, {\rm ; and}
+  z_{\rm\,RPLC}        & = & \frac{s}{\beta_0} - ct = \frac{\Delta s}{\beta_0}                    \, ; \\
+  \delta_{\rm\,RPLC}   & = & \frac{E}{c p_0} - \frac{1}{\beta_0} = \frac{\Delta E}{cp_0}          \, {\rm ; and}
 \end{eqnarray}
-$p_{0 {\rm\,RPLC}}$ is the momentum of the reference particle.
+$\beta_0 = \frac{v_0}{c}$, where the magnitude of the velocity of the
+reference particle in the laboratory frame is $v_0$.
+$\Delta s$ and $\Delta E$ are the differences between the reference
+particle position, $s_0$, and its energy, $E_0$, and the position and
+energy of the test particle, $s$ and $E$ respectively.  
+$\Delta s$ and $\Delta E$ are given by $\Delta s = s - s_0$ and
+$\Delta E = E - E_0$.
+
 
