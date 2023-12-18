@@ -325,7 +325,138 @@ n, bins, patches = plt.hist(SrcE, \
 plt.xlabel('Kinetic energy')
 plt.ylabel('Entries')
 plt.title('LsrDrvnSrc: Kinetic energy at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot110.pdf')
+plt.savefig('99-Scratch/SourceTst_plot20.pdf')
+plt.close()
+
+
+##! Next: check flat energy distribution:
+SourceTest += 1
+print()
+print("SourceTest:", SourceTest, \
+      " test flat source distribution ", \
+      "check.")
+Src2 = BLE.Source("Source2", rCtr, vCtr, drCtr, dvCtr, \
+                  2, [0.000004, 0.000004, 0.998, 1., 25.])
+
+print(Src2)
+print(" Test generation:")
+print("     ----> First particle: KE, cosThetaPhi:", \
+      Src2.getParticle())
+
+PrtclX   = np.array([])
+PrtclY   = np.array([])
+PrtclKE  = np.array([])
+PrtclcT  = np.array([])
+PrtclPhi = np.array([])
+
+SrcX     = np.array([])
+SrcY     = np.array([])
+SrcXp    = np.array([])
+SrcYp    = np.array([])
+SrcE     = np.array([])
+
+print("     ----> Generate many particles:")
+for i in range(100000):
+    X, Y, KE, cTheta, Phi = Src2.getParticle()
+    PrtclX   = np.append(PrtclX , X)
+    PrtclY   = np.append(PrtclY , Y)
+    PrtclKE  = np.append(PrtclKE , KE)
+    PrtclcT  = np.append(PrtclcT , cTheta)
+    PrtclPhi = np.append(PrtclPhi, Phi)
+
+    TrcSpcFrmSrc = Src2.getParticleFromSource()
+    SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
+    SrcY         = np.append(SrcY,  TrcSpcFrmSrc[2])
+    SrcXp        = np.append(SrcXp, TrcSpcFrmSrc[1])
+    SrcYp        = np.append(SrcYp, TrcSpcFrmSrc[3])
+    SrcE         = np.append(SrcE,  TrcSpcFrmSrc[5])
+    
+n, bins, patches = plt.hist(PrtclX, \
+                            bins=50, color='y', range=(-0.00002,0.00002), \
+                            log=False)
+plt.xlabel('X (m)')
+plt.ylabel('Entries')
+plt.title('FlatSrc: X position distribution')
+plt.savefig('99-Scratch/SourceTst_plot21.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(PrtclY, \
+                            bins=50, color='y', range=(-0.00002,0.00002), \
+                            log=False)
+plt.xlabel('Y (m)')
+plt.ylabel('Entries')
+plt.title('FlatSrc: Y position distribution')
+plt.savefig('99-Scratch/SourceTst_plot22.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(PrtclKE, \
+                            bins=50, color='y', range=(1.,25.), log=False)
+plt.xlabel('Kinetic energy (MeV)')
+plt.ylabel('Entries')
+plt.title('FlatSrc: Energy distribution')
+plt.savefig('99-Scratch/SourceTst_plot23.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(PrtclcT, \
+                            bins=50, color='y', range=(0.998,1.), log=False)
+plt.xlabel('cos(theta)')
+plt.ylabel('Entries')
+plt.title('FlatSrc: (cos) polar angle distribution')
+plt.savefig('99-Scratch/SourceTst_plot24.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(PrtclPhi, \
+                            bins=50, color='y', range=(0.,2*mth.pi), \
+                            log=False)
+plt.xlabel('Phi')
+plt.ylabel('Entries')
+plt.title('FlatSrc: Azimuthal; angle distribution')
+plt.savefig('99-Scratch/SourceTst_plot25.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(SrcX, \
+                            bins=50, color='y', range=(-0.006,0.006), \
+                            log=False)
+plt.xlabel('X')
+plt.ylabel('Entries')
+plt.title('FlatSrc: X position at exit from source')
+plt.savefig('99-Scratch/SourceTst_plot26.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(SrcY, \
+                            bins=50, color='y', range=(-0.006,0.006), \
+                            log=False)
+plt.xlabel('Y')
+plt.ylabel('Entries')
+plt.title('FlatSrc: Y position at exit from source')
+plt.savefig('99-Scratch/SourceTst_plot27.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(SrcXp, \
+                            bins=50, color='y', range=(-0.05,0.05), \
+                            log=False)
+plt.xlabel('X-prime')
+plt.ylabel('Entries')
+plt.title('FlatSrc: X-prime position at exit from source')
+plt.savefig('99-Scratch/SourceTst_plot28.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(SrcYp, \
+                            bins=50, color='y', range=(-0.05,0.05), \
+                            log=False)
+plt.xlabel('Y-prime')
+plt.ylabel('Entries')
+plt.title('FlatSrc: Y-prime position at exit from source')
+plt.savefig('99-Scratch/SourceTst_plot29.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(SrcE, \
+                            bins=50, color='y', range=(1., 25.), \
+                            log=False)
+plt.xlabel('Kinetic energy')
+plt.ylabel('Entries')
+plt.title('FlatSrc: Kinetic energy at exit from source')
+plt.savefig('99-Scratch/SourceTst_plot30.pdf')
 plt.close()
 
 

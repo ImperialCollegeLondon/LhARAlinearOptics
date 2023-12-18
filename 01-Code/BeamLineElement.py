@@ -138,7 +138,7 @@ class BeamLineElement:
         if self.__Debug:
             print(' BeamLineElement.__init__: ', \
                   'creating the BeamLineElement object')
-            print("     ---->               Name:", _rName)
+            print("     ---->               Name:", _Name)
             print("     ---->           Position:", _rCtr)
             print("     ---->        Orientation:", _vCtr)
             print("     ---->    Position offset:", _drCtr)
@@ -2058,12 +2058,13 @@ class Source(BeamLineElement):
     instances  = []
     __Debug    = False
 
-    ModeList   = [0, 1]
-    ModeText   = ["Parameterised laser driven", "Gaussian"]
+    ModeList   = [0, 1, 2]
+    ModeText   = ["Parameterised laser driven", "Gaussian", "Flat"]
     ParamList  = [ [float, float, float, float, float, int], \
+                   [float, float, float, float, float],      \
                    [float, float, float, float, float] ]
 
-    LsrDrvnG_E = None
+    Lsrdrvng_E = None
     LsrDrvnIni = False
     
     def __init__(self, _Name=None, \
@@ -2320,6 +2321,12 @@ class Source(BeamLineElement):
             cosTheta, Phi = self.getFlatThetaPhi()
             KE            = rnd.gauss(self.getParameters()[3], \
                                       self.getParameters()[4])
+        elif self._Mode == 2:
+            X             = rnd.gauss(0., self.getParameters()[0])
+            Y             = rnd.gauss(0., self.getParameters()[1])
+            cosTheta, Phi = self.getFlatThetaPhi()
+            KE            = rnd.uniform(self.getParameters()[3], \
+                                        self.getParameters()[4])
 
         if self.__Debug:
             print("     ----> X, Y, KE, cosTheta, Phi:", \
@@ -2393,4 +2400,7 @@ class badSourceSpecification(Exception):
     pass
 
 class secondFacility(Exception):
+    pass
+
+class badParameters(Exception):
     pass

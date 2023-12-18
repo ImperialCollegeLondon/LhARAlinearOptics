@@ -415,6 +415,13 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="SigmaEnergy"]["Value"].iloc[0])
             MinCTheta = float(\
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+        elif SrcMode == 2:               #.. Gaussian:
+            Emin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
+            Emax = float( \
+             pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
 
         SigmaX  = float( \
             pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
@@ -430,15 +437,19 @@ class BeamLine(object):
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
-            print("                         ----> Min cos(Theta):", MinCTheta)
-            
+            elif SrcMode == 2:
+                print("                         ----> MinE and MaxE:", \
+                      MinE, MaxE)
+
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
 
-        
+        elif SrcMode == 2:
+            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax]
+
         Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                        + str(pndsSource["Stage"].iloc[0]) + ":" \
                        + pndsSource["Section"].iloc[0]    + ":" \
