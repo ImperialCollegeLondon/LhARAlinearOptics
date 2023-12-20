@@ -729,7 +729,7 @@ Derived class ReferenceParticle(Particle):
   Class attributes:
   -----------------
   __instance : Instances of ReferenceParticle class
-<  __Debug    : Debug flag
+    : Debug flag
 
       
   Instance attributes:

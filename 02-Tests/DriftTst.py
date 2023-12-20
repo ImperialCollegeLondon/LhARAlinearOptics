@@ -8,12 +8,27 @@ Test script for "Drift" class
 
 """
 
+import os
 import numpy as np
 
 import BeamLineElement as BLE
+import BeamLine        as BL
+import Particle        as Prtcl
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+BLI  = BL.BeamLine(filename)
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
 ##! Start:
 print("========  Drift: tests start  ========")
+
+print(" Reference particle:")
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Four momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0])
 
 ##! Test singleton class feature:
 DriftTest = 1
@@ -37,7 +52,9 @@ except:
     print('      ----> Correctly trapped no drift length exception.')
 
 #.. Create valid instance:
+BLE.Drift.setDebug(True)
 Drft = BLE.Drift("ValidDrift", rCtr, vCtr, drCtr, dvCtr, 1.5)
+BLE.Drift.setDebug(False)
     
 #.. __repr__
 print("    __repr__:")

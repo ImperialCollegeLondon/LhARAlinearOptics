@@ -524,16 +524,35 @@ class Drift(BeamLineElement):
             raise badParameter( \
                     " BeamLineElement.Drift.setTransferMatrix: bad length:",
                                _Length)
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
+                                    iRefPrtcl.getPrIn()[0][:3]))
+        E0        = iRefPrtcl.getPrIn()[0][3]
+        b02       = (p0/E0)**2
+        g02       = 1./(1.-b02)
+        if self.getDebug():
+            print(" Drift(BeamLineElement).setTransferMatrix:")
+            print("     ----> Reference particle 4-mmtm:", \
+                  iRefPrtcl.getPrIn()[0])
+            print("         ----> p0, E0:", p0, E0)
+            print("     <---- b02, g02:", b02, g02)
+
         TrnsMtrx = np.array( [ \
-                              [1., _Length, 0.,      0., 0., 0.], \
-                              [0.,      1., 0.,      0., 0., 0.], \
-                              [0.,      0., 1., _Length, 0., 0.], \
-                              [0.,      0., 0.,      1., 0., 0.], \
-                              [0.,      0., 0.,      0., 1., 0.], \
-                              [0.,      0., 0.,      0., 0., 1.]  \
+                              [1., _Length, 0.,      0., 0., 0.        ], \
+                              [0.,      1., 0.,      0., 0., 0.        ], \
+                              [0.,      0., 1., _Length, 0., 0.        ], \
+                              [0.,      0., 0.,      1., 0., 0.        ], \
+                              [0.,      0., 0.,      0., 1., 1./b02/g02], \
+                              [0.,      0., 0.,      0., 0., 1.        ]  \
                              ] )
         self._TrnsMtrx = TrnsMtrx
 
+        if self.getDebug():
+            print(" <---- Done.")
         
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)
@@ -691,6 +710,7 @@ class Aperture(BeamLineElement):
             self._Params = np.append(self._Params, _Param[2])
 
     def setTransferMatrix(self):
+        
         TrnsMtrx = np.array( [ \
                               [1., 0., 0., 0., 0., 0.], \
                               [0., 1., 0., 0., 0., 0.], \
@@ -2403,4 +2423,7 @@ class secondFacility(Exception):
     pass
 
 class badParameters(Exception):
+    pass
+
+class ReferenceParticleNotSpecified(Exception):
     pass
