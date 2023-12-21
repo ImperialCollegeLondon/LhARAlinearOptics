@@ -231,8 +231,16 @@ class BeamLine(object):
         print(" ============================")
         print("     ----> Debug flag:", BeamLine.getDebug())
         print("     ----> Source and beam line:")
+        Section = ""
         for iBLE in BLE.BeamLineElement.getinstances():
-            print("               ", iBLE.SummaryStr())            
+            NameStrs = iBLE.getName().split(":")
+            if len(NameStrs) == 1:
+                Section = NameStrs[0]
+                print("        ---->", NameStrs[0])
+            elif NameStrs[2] != Section:
+                Section = NameStrs[2]
+                print("        ---->", NameStrs[2])
+            print("            ---->", iBLE.SummaryStr())            
         print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
         return " <---- Beam line parameter dump complete."
