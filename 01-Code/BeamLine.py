@@ -114,6 +114,7 @@ constants_instance = PhysicalConstants()
 
 protonMASS         = constants_instance.mp()
 speed_of_light     = constants_instance.SoL()
+mu0                = constants_instance.mu0()
 
 class BeamLine(object):
     __BeamLineInst = None
@@ -475,6 +476,13 @@ class BeamLine(object):
         Section    = ""
         NewElement = True
         s         = 0.
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
+                                    iRefPrtcl.getPrIn()[0][:3]))
+        
         for iLine in pndsBeamline.itertuples():
             Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                            + str(iLine.Stage) + ":"  \
@@ -487,6 +495,7 @@ class BeamLine(object):
                 nAperture = 0
                 nFquad    = 0
                 nDquad    = 0
+                nSlnd     = 0
 
             if iLine.Element == "Drift":
                 nDrift   += 1
@@ -577,6 +586,58 @@ class BeamLine(object):
                 s += DqL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+            elif iLine.Element == "Solenoid":
+                if NewElement:
+                    if iLine.Type == "Length, layers and turns":
+                        nLnsSlnd = 4
+                        iLnSlnd  = 1
+                    elif iLine.Type == "Length, strength":
+                        nLnsSlnd = 2
+                        iLnSlnd  = 1
+                    else:
+                        raise badParameter(" BeamLine.addbeam: Solenoid", \
+                                           " Type=", iLine.Type, \
+                                           " invalid.")
+                if iLine.Parameter == "Length":
+                    SlndL = float(iLine.Value)
+                elif iLine.Parameter == "Current":
+                    SlndI = float(iLine.Value)
+                elif iLine.Parameter == "Layers":
+                    SlndLy = float(iLine.Value)
+                elif iLine.Parameter == "Turns":
+                    SlndT = float(iLine.Value)
+                elif iLine.Parameter == "Strength":
+                    Slndks = float(iLine.Value)
+                if iLnSlnd < nLnsSlnd:
+                    iLnSlnd += 1
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                rCtr   = np.array([0.,0.,s+SlndL/2.])
+                vCtr   = np.array([0.,0.])
+                drCtr  = np.array([0.,0.,0.])
+                dvCtr  = np.array([0.,0.])
+                nSlnd += 1
+                Name  += str(nSlnd)
+                if iLine.Type == "Length, layers and turns":
+                    nTrns  = float(SlndLy) * float(SlndT)
+                    B0     = mu0*nTrns*SlndI/SlndL
+                elif iLine.Type == "Length, strength":
+                    Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+                    B0 = Slndks * Brho
+                else:
+                    raise badParameter(" BeamLine.addbeam: Solenoid", \
+                                       " Type=", iLine.Type, \
+                                       " invalid.")
+                nSlnd += 1
+                if cls.getDebug():
+                    print("             ----> Add", Name)
+                cls._Element.append(BLE.Solenoid(Name, \
+                                     rCtr, vCtr, drCtr, dvCtr, SlndL, B0) )
+                s += SlndL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
                 
             if cls.getDebug():
                 print("                 ---->", Name, \
@@ -600,6 +661,8 @@ class BeamLine(object):
             elif isinstance(iBLE, BLE.FocusQuadrupole):
                 s += iBLE.getLength()
             elif isinstance(iBLE, BLE.DefocusQuadrupole):
+                s += iBLE.getLength()
+            elif isinstance(iBLE, BLE.Solenoid):
                 s += iBLE.getLength()
 
         iBLElast = BLE.BeamLineElement.getinstances() \

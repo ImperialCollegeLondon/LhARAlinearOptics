@@ -5,10 +5,18 @@
 1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
 1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y"
 1,Source,Source,Parameterised TNSA,Emin,1,MeV,Minimum of energy distribution
-1,Source,Source,Parameterised TNSA,Emax,25,MeV,Minimum of energy distribution
+1,Source,Source,Parameterised TNSA,Emax,25,MeV,b
 1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF
 1,Source,Source,Parameterised TNSA,MinCTheta,0.998,,Maximum theta for flat cos theta
 1,Interface,Drift,,Length,0.05,m,"Length of first, compensated, drift"
 1,Interface,Aperture,Circular,Radius,0.002,m,Inner bore of entry to nozzle
 1,Interface,Drift,,Length,0.05,m,"Length of first, compensated, drift"
 1,Interface,Aperture,Circular,Radius,0.00287,m,Inner bore of exit from nozzle
+1,Capture,Drift,,Length,0.15,m,Drift to solenoid
+1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
+1,Capture,Solenoid,"Length, strength",Strength,2.491694909,rad/m,ks
+1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
+1,Capture,Drift,,Length,0.15,m,Drift to next solenoid
+1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
+1,Capture,Solenoid,"Length, strength",Strength,1.018747261,rad/m,ks
+1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
