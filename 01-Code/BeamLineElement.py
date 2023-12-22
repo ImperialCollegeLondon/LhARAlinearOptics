@@ -2396,16 +2396,41 @@ class Source(BeamLineElement):
         return E
 
     def getTraceSpace(self, x, y, K, cTheta, Phi):
+        #self.setDebug(True)
+        #self.setDebug(False)
+        if self.getDebug():
+            print(" Source(BeamLineElement).getTraceSpace: start.")
+            print("     ----> x, y, K, cTheta, Phi:", \
+                  x, y, K, cTheta, Phi)
+            
         sTheta = mth.sqrt(1.-cTheta**2)
         xPrime = sTheta * mth.cos(Phi)
         yPrime = sTheta * mth.sin(Phi)
+        
+        if self.getDebug():
+            print("     ----> sTheta, xPrime, yPrime:", 
+                  sTheta, xPrime, yPrime)
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         p0        = iRefPrtcl.getMomentumIn(0)
-        mmtm      = mth.sqrt( (protonMASS+K)**2 - protonMASS**2)
-        dp        = mmtm - p0
+        E0        = mth.sqrt( protonMASS**2 + p0**2)
+        b0        = p0/E0
+
+        if self.getDebug():
+            print("     ----> p0, E0, b0:", p0, E0, b0)
+
+        E         = protonMASS+K
+        delta     = (E - E0) / b0
         
-        TrcSpc = np.array([x, xPrime, y, yPrime, 0., dp/p0])
+        if self.getDebug():
+            print("     ----> E, delta:", E, delta)
+
+        TrcSpc = np.array([x, xPrime, y, yPrime, 0., delta])
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Trace space:", TrcSpc)
+
         return TrcSpc
 
     

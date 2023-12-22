@@ -25,7 +25,8 @@ Class Particle:
    _Location[] :   str   : Name of location where trace space recorded
    _z[]        : float   : z coordinate at which trace space recorded
    _s[]        : float   : s coordinate at which trace space recorded
-   _TrcSpc[]   : ndarray : 6D trace space: x, x', y, y', t, E (m, s, MeV)
+   _TrcSpc[]   : ndarray : 6D trace space: x, x', y, y', z, delta, all
+                           in reference particle local coordinates
    _PhsSpc[]   : array   : RPLC 6D phase space: [(x, y, z), (px, py, pz)]
                            List ot two ndarrays.
    _LabPhsSpc[]: array   : Lab 6D phase space: [(x, y, z), (px, py, pz)]
@@ -362,17 +363,23 @@ class Particle:
                 'weight': 'normal', \
                 'size': 16, \
                 }
-        
-        xLoc  = []
-        xpLoc = []
-        yLoc  = []
-        ypLoc = []
-        ELoc  = []
+
+        nLoc   = []
+        xLoc   = []
+        xpLoc  = []
+        yLoc   = []
+        ypLoc  = []
+        ELoc   = []
+        nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
+            nPrtcl += 1
+            if isinstance(iPrtcl, ReferenceParticle):
+                continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
                 if iLoc > (len(xLoc)-1):
+                    nLoc.append(iPrtcl.getLocation()[iLoc])
                     xLoc.append([])
                     xpLoc.append([])
                     yLoc.append([])
@@ -399,7 +406,7 @@ class Particle:
                             ha='center', va='center', fontsize=18, \
                             color='darkgrey')
             """
-            Ttl = BLE.BeamLineElement.getinstances()[iLoc].getName()
+            Ttl = nLoc[iLoc]
             fig.suptitle(Ttl, fontdict=font)
 
             #axs[0, 0].set_title('x,y')
@@ -409,7 +416,7 @@ class Particle:
             
             #axs[0, 1].set_title('Energy')
             axs[0, 1].hist(ELoc[iLoc], 100)
-            axs[0, 1].set_xlabel('dp/p')
+            axs[0, 1].set_xlabel('delta')
             axs[0, 1].set_ylabel('Number')
             
             #axs[1, 0].set_title('x, xprime')

@@ -1,3 +1,14 @@
+--------  --------  --------  --------  --------  --------  --------  22Dec23
+Back to LhARA:
+ - Took Will's madx file and impplemented b/l elements from source to end
+   of linear trannsport.
+ - Created Run and Read in Scripts for LhARA.
+
+ * Now need to loop back to make the trace-space vector the one that is now
+   in the documentation.
+
+ - Now done.  And, names on plots for plot progression tidied.
+   
 --------  --------  --------  --------  --------  --------  --------  20Dec23
 More updates:
  - Fix description of transfer matrix for drift in w/u;

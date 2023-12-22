@@ -26,7 +26,9 @@
 1,Energy selection,Solenoid,"Length, strength",Strength,1.448564633,rad/m,
 1,Energy selection,Drift,,Length,0.15,m,Drift out of solenoid
 1,Energy selection,Drift,,Length,1.771,m,Drift to energy-selection collimator
-1,Energy selection,Drift,,Length,0.01,m,Space for energy-selection collimator
+1,Energy selection,Drift,,Length,0.005,m,Space for energy-selection collimator
+1,Energy selection,Aperture,Circular,Radius,0.0025,m,Collimator
+1,Energy selection,Drift,,Length,0.005,m,Space for energy-selection collimator
 1,Energy selection,Drift,,Length,0.06461,m,
 1,Energy selection,Drift,,Length,0.13539,m,
 1,Energy selection,Drift,,Length,0.01,m,Space for energy-selection collimator?
