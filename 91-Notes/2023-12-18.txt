@@ -8,6 +8,44 @@ Back to LhARA:
    in the documentation.
 
  - Now done.  And, names on plots for plot progression tidied.
+
+ - Now also made transition Ctr->Strt, seems to work.  Run tests etc:
+
+Tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK 
+ - SourceTst.py            - OK 
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Run scripts:
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK -- Runs OK, but, not sure I understand plots.
+ - RunLIONsimulation.py    - OK -- Runtime warning in first event ... sqrt(k)
+ - ReadLIONsimu.py         - Fails! only 4 plots, bad distributions.
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotTrajectory.py       - OK
+
+Hmmpf!  Need to fix LION, and probably DRACO!
+ - Issues with setTransfer and 6D matrices, back to basics, fix tests and
+   work through from beginning.
    
 --------  --------  --------  --------  --------  --------  --------  20Dec23
 More updates:

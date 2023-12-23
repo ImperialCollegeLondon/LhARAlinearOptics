@@ -42,18 +42,18 @@ try:
     Drft = BLE.Drift()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0.,0.,0.])
-vCtr = np.array([0.,0.])
-drCtr = np.array([0.,0.,0.])
-dvCtr = np.array([0.,0.])
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([0.,0.])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([0.,0.])
 try:
-    Drft = BLE.Drift("NoDriftLength", rCtr, vCtr, drCtr, dvCtr)
+    Drft = BLE.Drift("NoDriftLength", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no drift length exception.')
 
 #.. Create valid instance:
 BLE.Drift.setDebug(True)
-Drft = BLE.Drift("ValidDrift", rCtr, vCtr, drCtr, dvCtr, 1.5)
+Drft = BLE.Drift("ValidDrift", rStrt, vStrt, drStrt, dvStrt, 1.5)
 BLE.Drift.setDebug(False)
     
 #.. __repr__

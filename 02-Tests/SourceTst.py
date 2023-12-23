@@ -40,12 +40,12 @@ try:
     Src = BLE.Source()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0.,0.,0.])
-vCtr = np.array([0.,0.])
-drCtr = np.array([0.,0.,0.])
-dvCtr = np.array([0.,0.])
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([0.,0.])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([0.,0.])
 try:
-    Src = BLE.Source(rCtr, vCtr, drCtr, dvCtr)
+    Src = BLE.Source(rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no Source paramters exception.')
 
@@ -53,7 +53,7 @@ except:
 Mode  = 0
 Param = [0.000004, 0.000004, 0.998,    \
           1., 25., 1000]
-Src = BLE.Source("Source0", rCtr, vCtr, drCtr, dvCtr, Mode, Param)
+Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
 print("    __repr__:")
@@ -74,7 +74,7 @@ print("BeamLineElement(Source)Test:", SourceTest, \
       " test gaussian source distribution.")
 BLE.Source.setDebug(False)
 BLE.Source.cleanInstances()
-Src = BLE.Source("Source1", rCtr, vCtr, drCtr, dvCtr, \
+Src = BLE.Source("Source1", rStrt, vStrt, drStrt, dvStrt, \
                  1, [0.000004, 0.000004, 0.998, 20., 0.3])
 x, y, K, cTheta, Phi = Src.getParticle()
 print("     ----> First particle: x, y, KE, cosTheta, Phi:", \
@@ -207,7 +207,7 @@ print()
 print("SourceTest:", SourceTest, \
       " test parameterised laser-driven source distribution ", \
       "check.")
-Src1 = BLE.Source("Source2", rCtr, vCtr, drCtr, dvCtr, \
+Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
                   0, [0.000004, 0.000004, 0.998, 1., 25., 1000])
 print(Src1)
 print(" Test generation:")
@@ -339,7 +339,7 @@ print()
 print("SourceTest:", SourceTest, \
       " test flat source distribution ", \
       "check.")
-Src2 = BLE.Source("Source2", rCtr, vCtr, drCtr, dvCtr, \
+Src2 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
                   2, [0.000004, 0.000004, 0.998, 1., 25.])
 
 print(Src2)

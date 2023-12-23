@@ -49,17 +49,17 @@ try:
     FQuad = BLE.FocusQuadrupole()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0., 0., 0.])
-vCtr = np.array([0., 0.])
-drCtr = np.array([0., 0., 0.])
-dvCtr = np.array([0., 0.])
+rStrt = np.array([0., 0., 0.])
+vStrt = np.array([0., 0.])
+drStrt = np.array([0., 0., 0.])
+dvStrt = np.array([0., 0.])
 try:
-    FQuad = BLE.FocusQuadrupole("NoStrength", rCtr, vCtr, drCtr, dvCtr)
+    FQuad = BLE.FocusQuadrupole("NoStrength", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no quadrupole strength exception.')
 
 #.. Create valid instance:
-FQuad = BLE.FocusQuadrupole("ValidQuad", rCtr, vCtr, drCtr, dvCtr, \
+FQuad = BLE.FocusQuadrupole("ValidQuad", rStrt, vStrt, drStrt, dvStrt, \
                             0.1, 100.)
     
 #.. __repr__

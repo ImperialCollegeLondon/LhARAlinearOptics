@@ -49,18 +49,18 @@ try:
     DfQuad = BLE.DefocusQuadrupole()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0., 0., 0.])
-vCtr = np.array([0., 0.])
-drCtr = np.array([0., 0., 0.])
-dvCtr = np.array([0., 0.])
+rStrt = np.array([0., 0., 0.])
+vStrt = np.array([0., 0.])
+drStrt = np.array([0., 0., 0.])
+dvStrt = np.array([0., 0.])
 try:
-    DfQuad = BLE.DefocusQuadrupole("NoStrength", rCtr, vCtr, drCtr, dvCtr)
+    DfQuad = BLE.DefocusQuadrupole("NoStrength", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no quadrupole strength exception.')
 
 #.. Create valid instance:
 DfQuad = BLE.DefocusQuadrupole("ValidDquad", \
-                               rCtr, vCtr, drCtr, dvCtr, 0.1, 100.)
+                               rStrt, vStrt, drStrt, dvStrt, 0.1, 100.)
     
 #.. __repr__
 print("    __repr__:")

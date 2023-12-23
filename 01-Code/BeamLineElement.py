@@ -6,7 +6,7 @@ To do:
  - Still to do:
    - KL: Add length to aperture: i.e. there can be a length to the plate
          or other collimator structure.
-   - KL: Add rotation to Shift2Local and Shift2Global.  Need to update dvCtr
+   - KL: Add rotation to Shift2Local and Shift2Global.  Need to update dvStrt
          to Euler angles, I think.
          Also, as coded, these methods are not correct, they do not account
          for position of element in global coordinates.
@@ -36,10 +36,10 @@ constants_instance: Instance of PhysicalConstants class
   --------------------
   Calling arguments:
    _Name : string; name of element, should be identifiable, e.g., Drift1
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position (rad).
-  _dvCtr : "error", deviation in theta and phy from nominal axis (rad).
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position (rad).
+  _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
 
   Instance attributes assigned in BeamLineElement parent class:
   _TrnsfMtrx: Transfer matrix (6x6).  Set to Null in __init__, initialised
@@ -57,25 +57,25 @@ constants_instance: Instance of PhysicalConstants class
       SummaryStr: returns summary string, presently just position of
                   element.
             Input: None
-           Return: str="Pos: [x, y, z] = " + str(self.getrCtr())
+           Return: str="Pos: [x, y, z] = " + str(self.getrStrt())
 
   Set methods:
       setDebug  : Set debug flag
     setAll2None : Set all attributes to Null
        setName  : Set name of element
-       setrCtr  : Set centre of element, x, y, z (m)
-       setvCtr  : Set orientation of element, theta, phi (rad)
-      setdrCtr  : Set offset of centre of element, x, y, z (m)
-      setdvCtr  : Set offset orientation of element, theta, phi (rad)
+       setrStrt  : Set start of element, x, y, z (m)
+       setvStrt  : Set orientation of element, theta, phi (rad)
+      setdrStrt  : Set offset of start of element, x, y, z (m)
+      setdvStrt  : Set offset orientation of element, theta, phi (rad)
 
   Get methods:
       getDebug  : get debug flag
   getinstances  : get list of instances
        getName  : Get name of element
-       getrCtr  : Get centre of element, x, y, z (m)
-       getvCtr  : Get orientation of element, theta, phi (rad)
-      getdrCtr  : Get offset from nominal centre of element, x, y, z (m)
-      getdvCtr  : Get offset of orientation of element, theta, phi (rad)
+       getrStrt  : Get start of element, x, y, z (m)
+       getvStrt  : Get orientation of element, theta, phi (rad)
+      getdrStrt  : Get offset from nominal start of element, x, y, z (m)
+      getdvStrt  : Get offset of orientation of element, theta, phi (rad)
  getTransferMatrix : Get transfer matrix.
 
   Processing method:
@@ -134,34 +134,34 @@ class BeamLineElement:
 
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None):
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
         if self.__Debug:
             print(' BeamLineElement.__init__: ', \
                   'creating the BeamLineElement object')
             print("     ---->               Name:", _Name)
-            print("     ---->           Position:", _rCtr)
-            print("     ---->        Orientation:", _vCtr)
-            print("     ---->    Position offset:", _drCtr)
-            print("     ----> Orientation offset:", _dvCtr)
+            print("     ---->           Position:", _rStrt)
+            print("     ---->        Orientation:", _vStrt)
+            print("     ---->    Position offset:", _drStrt)
+            print("     ----> Orientation offset:", _dvStrt)
 
         BeamLineElement.instances.append(self)
 
         self.setAll2None()
         
         if  not isinstance( _Name, str)        or \
-            not isinstance( _rCtr, np.ndarray) or \
-            not isinstance( _vCtr, np.ndarray) or \
-            not isinstance(_drCtr, np.ndarray) or \
-            not isinstance(_dvCtr, np.ndarray):
+            not isinstance( _rStrt, np.ndarray) or \
+            not isinstance( _vStrt, np.ndarray) or \
+            not isinstance(_drStrt, np.ndarray) or \
+            not isinstance(_dvStrt, np.ndarray):
             raise badBeamLineElement( \
                   " BeamLineElement: no default beamline element!"
                                       )
 
         self.setName(_Name)
-        self.setrCtr(_rCtr)
-        self.setvCtr(_vCtr)
-        self.setdrCtr(_drCtr)
-        self.setdvCtr(_dvCtr)
+        self.setrStrt(_rStrt)
+        self.setvStrt(_vStrt)
+        self.setdrStrt(_drStrt)
+        self.setdvStrt(_dvStrt)
         
         if self.__Debug:
             print("     ----> New BeamLineElement instance: \n", \
@@ -175,14 +175,14 @@ class BeamLineElement:
         print(" ----------------")
         print("     ---->         Debug flag:", BeamLineElement.getDebug())
         print("     ---->               Name:", self.getName())
-        print("     ---->           Position:", self.getrCtr())
-        print("     ---->        Orientation:", self.getvCtr())
-        print("     ---->    Position offset:", self.getdrCtr())
-        print("     ----> Orientation offset:", self.getdvCtr())
+        print("     ---->           Position:", self.getrStrt())
+        print("     ---->        Orientation:", self.getvStrt())
+        print("     ---->    Position offset:", self.getdrStrt())
+        print("     ----> Orientation offset:", self.getdvStrt())
         return " <---- BeamLineElement parameter dump complete."
 
     def SummaryStr(self):
-        Str = "Pos: [x, y, z] = " + str(self.getrCtr())
+        Str = "Pos: [x, y, z] = " + str(self.getrStrt())
         return Str
 
     
@@ -197,43 +197,43 @@ class BeamLineElement:
 
     def setAll2None(self):
         self._Name      = None
-        self._rCtr      = None
-        self._vCtr      = None
-        self._drCtr     = None
-        self._dvCtr     = None
+        self._rStrt      = None
+        self._vStrt      = None
+        self._drStrt     = None
+        self._dvStrt     = None
         self._TrnsfMtrx = None
         
     def setName(self, _Name):
         if not isinstance(_Name, str):
-            raise badParameter(" BeamLineElement.setrCtr: bad name:", \
+            raise badParameter(" BeamLineElement.setrStrt: bad name:", \
                                _Name)
         self._Name = _Name
         
-    def setrCtr(self, _rCtr):
-        if not isinstance(_rCtr, np.ndarray):
-            raise badParameter(" BeamLineElement.setrCtr: bad centre:", \
-                               _rCtr)
-        self._rCtr = _rCtr
+    def setrStrt(self, _rStrt):
+        if not isinstance(_rStrt, np.ndarray):
+            raise badParameter(" BeamLineElement.setrStrt: bad start:", \
+                               _rStrt)
+        self._rStrt = _rStrt
         
-    def setvCtr(self, _vCtr):
-        if not isinstance(_vCtr, np.ndarray):
-            raise badParameter(" BeamLineElement.setvCtr: bad orienttion:", \
-                               _vCtr)
-        self._vCtr = _vCtr
+    def setvStrt(self, _vStrt):
+        if not isinstance(_vStrt, np.ndarray):
+            raise badParameter(" BeamLineElement.setvStrt: bad orienttion:", \
+                               _vStrt)
+        self._vStrt = _vStrt
         
-    def setdrCtr(self, _drCtr):
-        if not isinstance(_drCtr, np.ndarray):
-            raise badParameter(" BeamLineElement.setdrCtr:", \
-                               " bad centre offset:", \
-                               _drCtr)
-        self._drCtr = _drCtr
+    def setdrStrt(self, _drStrt):
+        if not isinstance(_drStrt, np.ndarray):
+            raise badParameter(" BeamLineElement.setdrStrt:", \
+                               " bad start offset:", \
+                               _drStrt)
+        self._drStrt = _drStrt
         
-    def setdvCtr(self, _dvCtr):
-        if not isinstance(_dvCtr, np.ndarray):
-            raise badParameter(" BeamLineElement.setdvCtr:", \
+    def setdvStrt(self, _dvStrt):
+        if not isinstance(_dvStrt, np.ndarray):
+            raise badParameter(" BeamLineElement.setdvStrt:", \
                                " bad orienttion offset:", \
-                               _dvCtr)
-        self._dvCtr = _dvCtr
+                               _dvStrt)
+        self._dvStrt = _dvStrt
         
 
 #--------  "Get methods" only; version, reference, and constants
@@ -250,17 +250,17 @@ class BeamLineElement:
     def getName(self):
         return self._Name
 
-    def getrCtr(self):
-        return self._rCtr
+    def getrStrt(self):
+        return self._rStrt
 
-    def getvCtr(self):
-        return self._vCtr
+    def getvStrt(self):
+        return self._vStrt
 
-    def getdrCtr(self):
-        return self._drCtr
+    def getdrStrt(self):
+        return self._drStrt
 
-    def getdvCtr(self):
-        return self._dvCtr
+    def getdvStrt(self):
+        return self._dvStrt
 
     def getTransferMatrix(self):
         return self._TrnsMtrx
@@ -281,8 +281,8 @@ class BeamLineElement:
                                 _R)
 
         _Rprime    = _R
-        _Rprime[0] -= self._drCtr[0]
-        _Rprime[2] -= self._drCtr[1]
+        _Rprime[0] -= self._drStrt[0]
+        _Rprime[2] -= self._drStrt[1]
 
         return _Rprime
 
@@ -293,8 +293,8 @@ class BeamLineElement:
                                 _R)
         
         _Rprime    = _R
-        _Rprime[0] += self._drCtr[0]
-        _Rprime[2] += self._drCtr[1]
+        _Rprime[0] += self._drStrt[0]
+        _Rprime[2] += self._drStrt[1]
         
         return _Rprime
 
@@ -317,10 +317,10 @@ Derived class Facility:
 
   Parent class attributes:
   ------------------------
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
   _TrnsMtrx : Transfer matrix.
 
 
@@ -351,7 +351,7 @@ class Facility(BeamLineElement):
     
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _p0=None):
 
         if Facility.instance == None:
@@ -366,7 +366,7 @@ class Facility(BeamLineElement):
 
             #.. BeamLineElement class initialisation:
             BeamLineElement.__init__(self, \
-                                     _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+                                     _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
             if not isinstance(_p0, float):
                 raise badBeamLineElement( \
@@ -435,10 +435,10 @@ Derived class Drift:
 
   Parent class attributes:
   ------------------------
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
   _TrnsMtrx : Transfer matrix.
 
 
@@ -470,7 +470,7 @@ class Drift(BeamLineElement):
     
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None):
         if self.__Debug:
             print(' Drift.__init__: ', \
@@ -479,14 +479,15 @@ class Drift(BeamLineElement):
         Drift.instances.append(self)
 
         #.. BeamLineElement class initialisation:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement( \
                   " Drift: bad specification for length of drift!"
                                       )
         self.setLength(_Length)
-        self.setTransferMatrix(_Length)
+        
+        self.setTransferMatrix()
                 
         if self.__Debug:
             print("     ----> New drift instance: \n", \
@@ -519,12 +520,7 @@ class Drift(BeamLineElement):
                                _Length)
         self._Length = _Length
 
-    def setTransferMatrix(self, _Length):
-        if not isinstance(_Length, float):
-            raise badParameter( \
-                    " BeamLineElement.Drift.setTransferMatrix: bad length:",
-                               _Length)
-
+    def setTransferMatrix(self):
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
@@ -541,16 +537,23 @@ class Drift(BeamLineElement):
             print("         ----> p0, E0:", p0, E0)
             print("     <---- b02, g02:", b02, g02)
 
-        TrnsMtrx = np.array( [ \
-                              [1., _Length, 0.,      0., 0., 0.        ], \
-                              [0.,      1., 0.,      0., 0., 0.        ], \
-                              [0.,      0., 1., _Length, 0., 0.        ], \
-                              [0.,      0., 0.,      1., 0., 0.        ], \
-                              [0.,      0., 0.,      0., 1., 1./b02/g02], \
-                              [0.,      0., 0.,      0., 0., 1.        ]  \
-                             ] )
-        self._TrnsMtrx = TrnsMtrx
+        l = self.getLength()
 
+        TrnsMtrx = np.array( [ \
+                              [1.,  l, 0., 0., 0.,        0.], \
+                              [0., 1., 0., 0., 0.,        0.], \
+                              [0., 0., 1.,  l, 0.,        0.], \
+                              [0., 0., 0., 1., 0.,        0.], \
+                              [0., 0., 0., 0., 1., l/b02/g02], \
+                              [0., 0., 0., 0., 0.,        1.]  \
+                             ] )
+
+        if self.getDebug():
+            print("     ----> Drift transfer matrix:")
+            print(TrnsMtrx)
+
+        self._TrnsMtrx = TrnsMtrx
+        
         if self.getDebug():
             print(" <---- Done.")
         
@@ -580,10 +583,10 @@ Derived class Aperture:
   ---------------------------------
   Calling arguments:
    _Name : Name
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
   _Param : Array, Type, then paramters for aperture.
 
   _TrnsMtrx : Transfer matrix.
@@ -632,7 +635,7 @@ class Aperture(BeamLineElement):
 
 #--------  "Built-in methods":    
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Param=[]):
         if self.getDebug():
             print(' Aperture.__init__: ', \
@@ -642,13 +645,14 @@ class Aperture(BeamLineElement):
         Aperture.instances.append(self)
         
         #.. BeamLineElement class initialisation:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if len(_Param) < 2:
             raise badBeamLineElement( \
                   " Aperture: bad specification for aperture!"
                                       )
         self.setApertureParameters(_Param)
+        
         self.setTransferMatrix()
                 
         if self.setDebug():
@@ -784,10 +788,10 @@ Derived class FocusQuadrupole:
   ---------------------------------
   Calling arguments:
    _Name : Name
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
 
 
   _TrnsMtrx : Transfer matrix:
@@ -840,7 +844,7 @@ class FocusQuadrupole(BeamLineElement):
     __Debug = False
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None, _Strength=None):
         
         if self.getDebug():
@@ -851,7 +855,7 @@ class FocusQuadrupole(BeamLineElement):
         FocusQuadrupole.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement("FocusQuadrupole: bad specification", \
@@ -863,8 +867,7 @@ class FocusQuadrupole(BeamLineElement):
         self.setLength(_Length)
         self.setStrength(_Strength)
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
+        self.setTransferMatrix()
 
         if self.getDebug():
             print("     ----> New FocusQuadrupole instance: \n", self)
@@ -906,16 +909,36 @@ class FocusQuadrupole(BeamLineElement):
                     " bad quadrupole strength:", _Strength)
         self._Strength = _Strength
 
-    def setTransferMatrix(self, _p0=None):
-        if not isinstance(_p0, float):
-            raise badParameter(\
-                    "BeamLineElement.FocusQuadrupole.setTransferMatrix:", \
-                               "bad reference particle momentum:", _p0)
+    def setTransferMatrix(self):
 
-        Brho = (1./(speed_of_light*1.E-9))*_p0/1000.
-        k = self._Strength / Brho
-        l = self._Length
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
 
+        iLoc = len(BeamLineElement.getinstances()) - 2
+
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc-1][:3], \
+                                    iRefPrtcl.getPrIn()[iLoc-1][:3]))
+        E0        = iRefPrtcl.getPrOut()[0][3]
+        b02       = (p0/E0)**2
+        g02       = 1./(1.-b02)
+        
+        if self.getDebug():
+            print(" Drift(BeamLineElement).setTransferMatrix:")
+            print("     ----> Reference particle 4-mmtm:", \
+                  iRefPrtcl.getPrIn()[0])
+            print("         ----> p0, E0:", p0, E0)
+            print("     <---- b02, g02:", b02, g02)
+
+        Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+        k = self.getStrength() / Brho
+        l = self.getLength()
+
+        if k < 0.:
+            x=1.
+            y=0.
+            z=x/y
+            
         b = np.sqrt(k)
         a = l * b
 
@@ -924,9 +947,9 @@ class FocusQuadrupole(BeamLineElement):
             [-b*np.sin(a),   np.cos(a), 0., 0.,                   0., 0.],\
             [          0.,          0., np.cosh(a), np.sinh(a)/b, 0., 0.],\
             [          0.,          0., b*np.sinh(a), np.cosh(a), 0., 0.],\
-            [0., 0., 0., 0., 1., 0.],\
-            [0., 0., 0., 0., 0., 1.]\
-        ])
+            [          0.,          0.,           0., 0.,  1., l/b02/g02],\
+            [          0.,          0.,           0., 0.,  0.,        1.]\
+                            ])
 
         self._TrnsMtrx = TrnsMtrx
 
@@ -941,18 +964,12 @@ class FocusQuadrupole(BeamLineElement):
 
     
 # -------- Utilities:
-    def Transport(self, _R):
+    def Transport1(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        
-        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
-
-        self.setTransferMatrix(mmtm)
-        
         return self.getTransferMatrix().dot(_R)
     
 
@@ -974,10 +991,10 @@ Derived class DefocusQuadrupole:
   ---------------------------------
   Calling arguments:
    _Name : Name
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
 
   _TrnsMtrx : Transfer matrix:
          Input: Brho: float ... B*rho (=3.3356E-3) * p (MeV)
@@ -1029,7 +1046,7 @@ class DefocusQuadrupole(BeamLineElement):
     __Debug = False
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None, _Strength=None):
         if self.__Debug:
             print(' DefocusQuadrupole.__init__: ', \
@@ -1039,7 +1056,7 @@ class DefocusQuadrupole(BeamLineElement):
         DefocusQuadrupole.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement("DefocusQuadrupole:",\
@@ -1051,9 +1068,8 @@ class DefocusQuadrupole(BeamLineElement):
 
         self.setLength(_Length)
         self.setStrength(_Strength)
-        
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
+
+        self.setTransferMatrix()
 
         if self.__Debug:
             print("     ----> New DefocusQuadrupole instance: \n", self)
@@ -1096,15 +1112,35 @@ class DefocusQuadrupole(BeamLineElement):
         self._Strength = _Strength
 
     def setTransferMatrix(self, _p0=None):
-        if not isinstance(_p0, float):
-            raise badParameter(\
-                    "BeamLineElement.DeocusQuadrupole.setTransferMatrix:", \
-                               "bad reference particle momentum:", _p0)
 
-        Brho = (1/(speed_of_light*1.E-9))*_p0/1000.
-        k = self._Strength / Brho
-        l = self._Length
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
 
+        iLoc = len(BeamLineElement.getinstances()) - 2
+
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc-1][:3], \
+                                    iRefPrtcl.getPrIn()[iLoc-1][:3]))
+        E0        = iRefPrtcl.getPrOut()[0][3]
+        b02       = (p0/E0)**2
+        g02       = 1./(1.-b02)
+        
+        if self.getDebug():
+            print(" Drift(BeamLineElement).setTransferMatrix:")
+            print("     ----> Reference particle 4-mmtm:", \
+                  iRefPrtcl.getPrIn()[0])
+            print("         ----> p0, E0:", p0, E0)
+            print("     <---- b02, g02:", b02, g02)
+
+        Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+        k = self.getStrength() / Brho
+        l = self.getLength()
+
+        if k < 0.:
+            x=1.
+            y=0.
+            z=x/y
+            
         b = np.sqrt(k)
         a = l * b
 
@@ -1119,8 +1155,9 @@ class DefocusQuadrupole(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
-    # -------- "Get methods"
-    # Methods believed to be self-documenting(!)
+        
+# -------- "Get methods"
+# Methods believed to be self-documenting(!)
     def getLength(self):
         return self._Length
 
@@ -1128,18 +1165,12 @@ class DefocusQuadrupole(BeamLineElement):
         return self._Strength
 
 # -------- Utilities:
-    def Transport(self, _R):
+    def Transport1(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        
-        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
-
-        self.setTransferMatrix(mmtm)
-
         return self.getTransferMatrix().dot(_R)
 
 """
@@ -1160,10 +1191,10 @@ Derived class SectorDipole:
   ---------------------------------
   Calling arguments:
    _Name : Name
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
 
   _TrnsMtrx : Transfer matrix
 
@@ -1203,7 +1234,7 @@ class SectorDipole(BeamLineElement):
     __Debug = False
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Angle=None, _B=None):
         if self.__Debug:
             print(' SectorDipole(BeamLineElement).__init__: ', \
@@ -1212,7 +1243,7 @@ class SectorDipole(BeamLineElement):
         SectorDipole.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Angle, float):
             raise badBeamLineElement( \
@@ -1220,8 +1251,8 @@ class SectorDipole(BeamLineElement):
 
         self.setAngle(_Angle)
         self.setB(_B)
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
+
+        self.setTransferMatrix()
 
         if self.__Debug:
             print("     ----> New SectorDipole instance: \n", self)
@@ -1292,7 +1323,7 @@ class Octupole(BeamLineElement):
     __Debug = False
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None):
         if self.__Debug:
             print(' Octupole.__init__: ', 'creating the Octupole object: Length=', _Length)
@@ -1300,12 +1331,13 @@ class Octupole(BeamLineElement):
         Octupole.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement("Octupole: bad specification for length!")
 
         self.setLength(_Length)
+
         self.setTransferMatrix()
 
         if self.__Debug:
@@ -1368,10 +1400,10 @@ Derived class Solenoid:
   Derived instance attributes:
   ----------------------------
   Calling arguments:
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
 
 
   _TrnsMtrx : Transfer matrix (6x6).  Set to Null in __init__, initialised
@@ -1426,7 +1458,7 @@ class Solenoid(BeamLineElement):
     __Debug = False
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None, _Strength=None):
 
         if self.getDebug():
@@ -1437,7 +1469,7 @@ class Solenoid(BeamLineElement):
         Solenoid.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement( \
@@ -1449,8 +1481,7 @@ class Solenoid(BeamLineElement):
         self.setLength(_Length)
         self.setStrength(_Strength)
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
+        self.setTransferMatrix()
 
         if self.getDebug():
             print("     ----> New Solenoid instance: \n", self)
@@ -1530,18 +1561,12 @@ class Solenoid(BeamLineElement):
     
 
 # -------- Utilities:
-    def Transport(self, _R):
+    def Transport1(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        
-        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
-
-        self.setTransferMatrix(mmtm)
-
         return self.getTransferMatrix().dot(_R)
 
 """
@@ -1561,10 +1586,10 @@ Derived class GaborLens:
   Derived instance attributes:
   ----------------------------
   Calling arguments:
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
 
 
   _TrnsMtrx : Transfer matrix (6x6).  Set to Null in __init__, initialised
@@ -1619,7 +1644,7 @@ class GaborLens(BeamLineElement):
     __Debug = True
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Bz=None, _VA=None, _RA=None, _Rp=None, _Length=None):
 
         if self.getDebug():
@@ -1634,7 +1659,7 @@ class GaborLens(BeamLineElement):
         GaborLens.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         OK = self.setAll2None()
 
@@ -1661,8 +1686,7 @@ class GaborLens(BeamLineElement):
         self.setLength(_Length)
         self.setElectronDensity()
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        self.setTransferMatrix(iRefPrtcl.getMomentumIn(0))
+        self.setTransferMatrix()
 
         if self.getDebug():
             print("     ----> New GaborLens instance: \n", self)
@@ -1822,18 +1846,12 @@ class GaborLens(BeamLineElement):
     
 
 # -------- Utilities:
-    def Transport(self, _R):
+    def Transport1(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        
-        mmtm = iRefPrtcl.getMomentumIn(0) + iRefPrtcl.getMomentumIn(0)*_R[5]
-
-        self.setTransferMatrix(mmtm)
-
         return self.getTransferMatrix().dot(_R)
 
 # -------- New, undebugged classes ...
@@ -1842,7 +1860,7 @@ class RFCavity(BeamLineElement):
     __Debug = False
 
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _AngFreq=None, _Voltage=None, _RFKick=None, _Time=None):
         if self.__Debug:
             print(' RFCavity.__init__: ', 'creating the RFCavity object: Time=', _Time)
@@ -1850,7 +1868,7 @@ class RFCavity(BeamLineElement):
         RFCavity.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_AngFreq, float) or not isinstance(_Voltage, float) or not isinstance(_RFKick, float) or not isinstance(_Time, float):
             raise badBeamLineElement("RFCavity: bad specification for AngFreq, Voltage, RFKick, or Time!")
@@ -1859,6 +1877,7 @@ class RFCavity(BeamLineElement):
         self.setVoltage(_Voltage)
         self.setRFKick(_RFKick)
         self.setTime(_Time)
+        
         self.setTransferMatrix()
 
         if self.__Debug:
@@ -1942,7 +1961,7 @@ class RFCavity(BeamLineElement):
 #--------  Utilities:
     def Transport(self, _R):
         if self.__Debug:
-            print(" Aperture.Transport: Type, params:", \
+            print(" RF.Transport: Type, params:", \
                   self._Type, self._Params)
             
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
@@ -1984,10 +2003,10 @@ Derived class Source:
   Parent class instance attributes:
   ---------------------------------
    _Name : Name
-   _rCtr : numpy array; x, y, z position (in m) of centre of element.
-   _vCtr : numpy array; theta, phi of principal axis of element.
-  _drCtr : "error", displacement of centre from nominal position.
-  _dvCtr : "error", deviation in theta and phy from nominal axis.
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
 
 
   Instance attributes to define source:
@@ -2088,7 +2107,7 @@ class Source(BeamLineElement):
     LsrDrvnIni = False
     
     def __init__(self, _Name=None, \
-                 _rCtr=None, _vCtr=None, _drCtr=None, _dvCtr=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Mode=None, _Param=[]):
         if self.__Debug:
             print(' Source.__init__: ', \
@@ -2100,7 +2119,7 @@ class Source(BeamLineElement):
         self.setAll2None()
         
         #.. BeamLineElement class initialisation:
-        BeamLineElement.__init__(self, _Name, _rCtr, _vCtr, _drCtr, _dvCtr)
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         #.. Check valid mode and parameters:
         if _Mode==None or _Param==None:
@@ -2396,8 +2415,6 @@ class Source(BeamLineElement):
         return E
 
     def getTraceSpace(self, x, y, K, cTheta, Phi):
-        #self.setDebug(True)
-        #self.setDebug(False)
         if self.getDebug():
             print(" Source(BeamLineElement).getTraceSpace: start.")
             print("     ----> x, y, K, cTheta, Phi:", \

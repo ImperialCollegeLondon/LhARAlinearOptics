@@ -27,7 +27,6 @@ print(" <---- Simulation initialised.")
 ##! Start:
 print(" ----> Run simulation test:")
 print()
-Smltn.setDebug(True)
 Smltn.RunSim()
 print()
 print(" <---- Simulation test done.")

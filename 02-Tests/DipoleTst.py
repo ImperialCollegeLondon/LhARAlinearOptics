@@ -49,24 +49,24 @@ try:
     Dpl = BLE.SectorDipole()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0.,0.,0.])
-vCtr = np.array([0.,0.])
-drCtr = np.array([0.,0.,0.])
-dvCtr = np.array([0.,0.])
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([0.,0.])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([0.,0.])
 try:
-    Dpl = BLE.SectorDipole("NoAngle", rCtr, vCtr, drCtr, dvCtr)
+    Dpl = BLE.SectorDipole("NoAngle", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no angle exception.')
 
 try:
-    Dpl = BLE.SectorDipole("NoField", rCtr, vCtr, drCtr, dvCtr, 0.3)
+    Dpl = BLE.SectorDipole("NoField", rStrt, vStrt, drStrt, dvStrt, 0.3)
 except:
     print('      ----> Correctly trapped no field exception.')
 
 #.. Create valid instance:
 Ang = 45./180.*np.pi
 B   = 0.5
-Dpl = BLE.SectorDipole("ValidSectorDipole", rCtr, vCtr, drCtr, dvCtr, \
+Dpl = BLE.SectorDipole("ValidSectorDipole", rStrt, vStrt, drStrt, dvStrt, \
                        Ang, B)
     
 #.. __repr__

@@ -49,18 +49,18 @@ try:
     GbL = BLE.GaborLens()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0.,0.,0.])
-vCtr = np.array([0.,0.])
-drCtr = np.array([0.,0.,0.])
-dvCtr = np.array([0.,0.])
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([0.,0.])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([0.,0.])
 try:
-    GbL = BLE.GaborLens("GaborLens1", rCtr, vCtr, drCtr, dvCtr)
+    GbL = BLE.GaborLens("GaborLens1", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no solenoid GbL args exception.')
 
 #.. Create valid instance:
 BLE.GaborLens.setDebug(True)
-GbL = BLE.GaborLens("GaborLens2", rCtr, vCtr, drCtr, dvCtr, \
+GbL = BLE.GaborLens("GaborLens2", rStrt, vStrt, drStrt, dvStrt, \
                     0.2, 65.E3, 0.06, 0.05, 0.5)
 BLE.GaborLens.setDebug(False)
     
