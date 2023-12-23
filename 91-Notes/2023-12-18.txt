@@ -45,7 +45,8 @@ Run scripts:
 
 Hmmpf!  Need to fix LION, and probably DRACO!
  - Issues with setTransfer and 6D matrices, back to basics, fix tests and
-   work through from beginning.
+   work through from beginning.  Mods were to make the reference particle
+   be used properly once on set up of each BLE.
    
 --------  --------  --------  --------  --------  --------  --------  20Dec23
 More updates:
