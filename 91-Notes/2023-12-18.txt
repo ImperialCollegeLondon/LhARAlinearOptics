@@ -1,3 +1,33 @@
+--------  --------  --------  --------  --------  --------  --------  23Dec23
+First: make 4D phase space work as it wa before.
+
+Work through all test to re-establish baseline:
+ - BeamLineTst.py          - OK after fix to solenoid initialisation.
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK 
+ - SourceTst.py            - OK 
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Problems started when running LION from scripts.  Turned out to be a bug in
+setTraceSpace in source handling.  Better now, LION with flat distributon seems
+OK.  Checking DRACO.
+
 --------  --------  --------  --------  --------  --------  --------  22Dec23
 Back to LhARA:
  - Took Will's madx file and impplemented b/l elements from source to end

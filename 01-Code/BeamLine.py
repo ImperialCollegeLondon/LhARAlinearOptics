@@ -164,16 +164,6 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> Build facility:")
 
-#    ----> Facility:  --------  --------  --------  --------
-            if cls.getDebug():
-                print("         ----> Facility: ")
-
-            cls.addFacility()
-        
-            if cls.getDebug():
-                print("         <---- Facility done.")
-#    <---- Done facility  --------  --------  --------  --------
-
 #    ----> Create reference particle:  --------  --------  --------  --------
 #..  Instance only at this stage:
             if cls.getDebug():
@@ -184,6 +174,16 @@ class BeamLine(object):
             if cls.getDebug():
                 print("        <---- Reference particle created. ")
 #    <---- Done reference particle  --------  --------  --------  --------
+
+#    ----> Facility:  --------  --------  --------  --------
+            if cls.getDebug():
+                print("         ----> Facility: ")
+
+            cls.addFacility()
+        
+            if cls.getDebug():
+                print("         <---- Facility done.")
+#    <---- Done facility  --------  --------  --------  --------
 
 #    ----> Source:  --------  --------  --------  --------
             if cls.getDebug():
@@ -304,6 +304,16 @@ class BeamLine(object):
     def getSrcTrcSpc(cls):
         return cls.__SrcTrcSpc
     
+    @classmethod
+    def addBeamLineElement(self, iBLE=False):
+        self.setDebug(True)
+        if self.getDebug():
+            print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
+        if not isinstance(iBLE, BeamLineElement):
+            raise badBeamLineElement()
+        self._Element.append(FacilityBLE)
+        self.setDebug(False)
+        
         
 #--------  Processing methods:
     def csv2pandas(_filename):
@@ -324,7 +334,7 @@ class BeamLine(object):
         drStrt = np.array([0., 0., 0.])
         dvStrt = np.array([0., 0., 0.])
 
-        p0    = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
+        p0     = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
 
         FacilityBLE = BLE.Facility(Name, rStrt, vStrt, drStrt, dvStrt, \
                                    p0)
@@ -341,6 +351,8 @@ class BeamLine(object):
             
         #.. Parse the dataframe to get source parameters:
         Name, SrcMode, SrcParam = cls.parseSource()
+        if Name == None and SrcMode == None and SrcMode == None:
+            return
 
         #.. Create the source beam line element:
         rStrt = np.array([0.,0.,0.])
@@ -402,6 +414,11 @@ class BeamLine(object):
         pndsSource = cls.getBeamLineParamPandas()[ \
                      cls.getBeamLineParamPandas()["Section"] == "Source" \
                                                   ]
+
+        if pndsSource.empty:
+            print(" Beamline.parseSource: empty source, return.")
+            return None, None, None
+            
         SrcMode = int( \
            pndsSource[pndsSource["Parameter"]=="SourceMode"]["Value"].iloc[0] \
                        )
@@ -481,6 +498,10 @@ class BeamLine(object):
                     (cls.getBeamLineParamPandas()["Section"] != "Facility") \
                                                   ]
 
+        if pndsBeamline.empty:
+            print(" BeamLine.addBeamline: empty beam line, return.")
+            return
+            
         Section    = ""
         NewElement = True
         s         = 0.

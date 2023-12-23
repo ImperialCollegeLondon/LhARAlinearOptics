@@ -850,7 +850,7 @@ class ReferenceParticle(Particle):
             Particle.__init__(self)
         
             # Only constants; print values that will be used:
-            if self.__RPDebug:
+            if self.getRPDebug():
                 print(self)
                 
         else:
@@ -1055,6 +1055,13 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtSource(self):
+        nRcrds  = len(self.getsIn())
+        
+        Success = self.setLocation(BLE.BeamLineElement.getinstances()\
+                                   [nRcrds+1].getName())
+        if not Success:
+            raise fail2setReferenceParticle("Name")
+
         Success = self.setsIn(0.)
         if not Success:
             raise fail2setReferenceParticle("sIn")
@@ -1118,6 +1125,11 @@ class ReferenceParticle(Particle):
     def setReferenceParticleAtDrift(self, iBLE=None):
         nRcrds  = len(self.getsIn())
         
+        Success = self.setLocation(BLE.BeamLineElement.getinstances()\
+                                   [nRcrds+1].getName())
+        if not Success:
+            raise fail2setReferenceParticle("Name")
+
         Success = self.setsIn(self.getsOut()[nRcrds-1])
         if not Success:
             raise fail2setReferenceParticle("sIn")
