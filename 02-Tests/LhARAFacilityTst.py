@@ -16,7 +16,7 @@ import os
 LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
 print(LhARAOpticsPATH)
 filename     = os.path.join(LhARAOpticsPATH, \
-                        '11-Parameters/LhARABeamLine-Params-Gauss.csv')
+                        '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
 
 ##! Start:
 print("========  LhARAFacility: tests start  ========")
