@@ -661,11 +661,10 @@ class BeamLine(object):
                     raise badParameter(" BeamLine.addbeam: Solenoid", \
                                        " Type=", iLine.Type, \
                                        " invalid.")
-                nSlnd += 1
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 cls._Element.append(BLE.Solenoid(Name, \
-                                     rStrt, vStrt, drStrt, dvStrt, SlndL, B0) )
+                                rStrt, vStrt, drStrt, dvStrt, SlndL, B0) )
                 s += SlndL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
@@ -682,6 +681,7 @@ class BeamLine(object):
                     DplL = float(iLine.Value)
                 elif iLine.Parameter == "Angle":
                     DplA = float(iLine.Value)
+                    DplA = DplA * mth.pi / 180.
                 if iLnDpl < nLnsDpl:
                     iLnDpl += 1
                     NewElement = False
@@ -692,9 +692,18 @@ class BeamLine(object):
                 vStrt   = np.array([0.,0.])
                 drStrt  = np.array([0.,0.,0.])
                 dvStrt  = np.array([0.,0.])
-                nDpl += 1
-                Name  += str(nDpl)
+                nDpl   += 1
+                Name   += str(nDpl)
                 print(Name, DplL, DplA)
+                print(Name, DplL, DplA)
+                rho     = DplL/DplA
+                B       = (1/(speed_of_light*1.E-9))*p0/rho/1000.
+                print(rho, B)
+                BLE.SectorDipole.setDebug(True)
+                cls._Element.append(BLE.SectorDipole(Name, \
+                                rStrt, vStrt, drStrt, dvStrt, DplA, DplL))
+                BLE.SectorDipole.setDebug(False)
+
                 x=1.
                 y=0.
                 z=x/y
