@@ -489,6 +489,7 @@ class BeamLine(object):
 
     @classmethod
     def addBeamline(cls):
+        cls.setDebug(True)
         if cls.getDebug():
             print("            BeamLine.addBeamline starts:")
             
@@ -525,6 +526,7 @@ class BeamLine(object):
                 nFquad    = 0
                 nDquad    = 0
                 nSlnd     = 0
+                nDpl      = 0
 
             if iLine.Element == "Drift":
                 nDrift   += 1
@@ -667,6 +669,35 @@ class BeamLine(object):
                 s += SlndL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+            elif iLine.Element == "Dipole":
+                if NewElement:
+                    if iLine.Type == "Sector (Length, angle)":
+                        nLnsDpl = 2
+                        iLnDpl  = 1
+                    else:
+                        raise badParameter(" BeamLine.addbeam: Dipole", \
+                                           " Type=", iLine.Type, \
+                                           " invalid.")
+                if iLine.Parameter == "Length":
+                    DplL = float(iLine.Value)
+                elif iLine.Parameter == "Angle":
+                    DplA = float(iLine.Value)
+                if iLnDpl < nLnsDpl:
+                    iLnDpl += 1
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                rStrt   = np.array([0.,0.,s])
+                vStrt   = np.array([0.,0.])
+                drStrt  = np.array([0.,0.,0.])
+                dvStrt  = np.array([0.,0.])
+                nDpl += 1
+                Name  += str(nDpl)
+                print(Name, DplL, DplA)
+                x=1.
+                y=0.
+                z=x/y
                 
             if cls.getDebug():
                 print("                 ---->", Name, \
@@ -677,7 +708,7 @@ class BeamLine(object):
                 print("                         Momentum:", \
                       refPrtcl.getPrIn()[0])
                 print("                 <---- Done.")
-                
+        cls.setDebug(False)
         
     def checkConsistency(self):
         ConsChk = False
