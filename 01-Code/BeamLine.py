@@ -574,6 +574,10 @@ class BeamLine(object):
                     FqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
                     FqS = float(iLine.Value)
+                elif iLine.Parameter == "kq":
+                    kq   = float(iLine.Value)
+                    Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+                    FqS  = kq * Brho
                 if NewElement:
                     NewElement = False
                     continue
@@ -598,6 +602,10 @@ class BeamLine(object):
                     DqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
                     DqS = float(iLine.Value)
+                elif iLine.Parameter == "kq":
+                    kq   = float(iLine.Value)
+                    Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+                    DqS  = kq * Brho
                 if NewElement:
                     NewElement = False
                     continue
@@ -694,20 +702,11 @@ class BeamLine(object):
                 dvStrt  = np.array([0.,0.])
                 nDpl   += 1
                 Name   += str(nDpl)
-                print(Name, DplL, DplA)
-                print(Name, DplL, DplA)
                 rho     = DplL/DplA
                 B       = (1/(speed_of_light*1.E-9))*p0/rho/1000.
-                print(rho, B)
-                BLE.SectorDipole.setDebug(True)
                 cls._Element.append(BLE.SectorDipole(Name, \
-                                rStrt, vStrt, drStrt, dvStrt, DplA, DplL))
-                BLE.SectorDipole.setDebug(False)
+                                rStrt, vStrt, drStrt, dvStrt, DplA, B))
 
-                x=1.
-                y=0.
-                z=x/y
-                
             if cls.getDebug():
                 print("                 ---->", Name, \
                       "beam line element created.")

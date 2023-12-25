@@ -42,7 +42,7 @@ constants_instance: Instance of PhysicalConstants class
   _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
 
   Instance attributes assigned in BeamLineElement parent class:
-  _TrnsfMtrx: Transfer matrix (6x6).  Set to Null in __init__, initialised
+  _TrnsMtrx: Transfer matrix (6x6).  Set to Null in __init__, initialised
               (to Null) in BeamLineElement.__init__, filled in derived
               classes.
 
@@ -208,7 +208,7 @@ class BeamLineElement:
         self._vStrt      = None
         self._drStrt     = None
         self._dvStrt     = None
-        self._TrnsfMtrx = None
+        self._TrnsMtrx = None
         
     def setName(self, _Name):
         if not isinstance(_Name, str):
@@ -1258,9 +1258,10 @@ class SectorDipole(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Angle=None, _B=None):
-        if self.__Debug:
-            print(' SectorDipole(BeamLineElement).__init__: ', \
-                  'creating SectorDipole object: Angle=', _Angle)
+        if self.getDebug():
+            print(' SectorDipole(BeamLineElement).__init__: ')
+            print('     ----> Angle=', _Angle)
+            print('     ----> Angle=', _B)
 
         SectorDipole.instances.append(self)
 
@@ -1274,9 +1275,7 @@ class SectorDipole(BeamLineElement):
         self.setAngle(_Angle)
         self.setB(_B)
 
-        self.setTransferMatrix()
-
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> New SectorDipole instance: \n", self)
 
     def __repr__(self):
@@ -1291,6 +1290,13 @@ class SectorDipole(BeamLineElement):
         print("     ----> Transfer matrix: \n", self.getTransferMatrix())
         BeamLineElement.__str__(self)
         return " <---- SectorDipole parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "Sector dipole    : " + BeamLineElement.SummaryStr(self) + \
+            "; Angle = " + str(self.getAngle()) + \
+            "; B = " + str(self.getB())
+        return Str
+
 
 # -------- "Set methods"
 #..  Methods believed to be self-documenting(!)
@@ -1308,12 +1314,12 @@ class SectorDipole(BeamLineElement):
                                "bad B:", _B)
         self._B = _B
 
-    def setTransferMatrix(self):
+    def setTransferMatrix(self, _R):
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
-        iPrev = len(BeamLineElement.getinstances()) - 2
+        iPrev = len(iRefPrtcl.getPrOut()) - 1
 
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
                                     iRefPrtcl.getPrOut()[iPrev][:3]))
@@ -1322,17 +1328,26 @@ class SectorDipole(BeamLineElement):
         g02       = 1./(1.-b02)
         
         if self.getDebug():
-            print(" Drift(BeamLineElement).setTransferMatrix:")
+            print(" Dipole(BeamLineElement).setTransferMatrix:")
             print("     ----> Reference particle 4-mmtm:", \
                   iRefPrtcl.getPrIn()[0])
             print("         ----> p0, E0:", p0, E0)
             print("     <---- b02, g02:", b02, g02)
         
-        Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+        E    = E0 + p0*_R[5]
+        p    = mth.sqrt(E**2 - protonMASS**2)
+        
+        if self.getDebug():
+            print("     ----> Particle energy and mmtm:", E, p)
+
+        Brho = (1/(speed_of_light*1.E-9))*p/1000.
         r    = Brho / self.getB()
         c    = np.cos(self.getAngle())
         s    = np.sin(self.getAngle())
         l    = r * self.getAngle()
+
+        if self.getDebug():
+            print("     ----> r, c, s, l:", r, c, s, l)
 
         TrnsMtrx = np.array([
             [       c, r*s, 0., 0., 0., r*(1-c)],
@@ -1345,8 +1360,17 @@ class SectorDipole(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
+    @classmethod
+    def setDebug(cls, Debug):
+        print(" HereHere:")
+        cls.__Debug = Debug
+
 # -------- "Get methods"
 #..  Methods believed to be self-documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
     def getAngle(self):
         return self._Angle
 
