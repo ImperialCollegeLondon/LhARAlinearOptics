@@ -4,7 +4,7 @@
 1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy
 1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
 1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y"
-1,Source,Source,Parameterised TNSA,Emin,1,MeV,Minimum of energy distribution
+1,Source,Source,Parameterised TNSA,Emin,10,MeV,Minimum of energy distribution
 1,Source,Source,Parameterised TNSA,Emax,25,MeV,b
 1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF
 1,Source,Source,Parameterised TNSA,MinCTheta,0.998,,Maximum theta for flat cos theta

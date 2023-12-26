@@ -17,7 +17,8 @@ print()
 HOMEPATH = os.getenv('HOMEPATH')
 print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
-                         '11-Parameters/LhARABeamLine-Params-Gauss.csv')
+#                         '11-Parameters/LhARABeamLine-Params-Gauss.csv')
+                         '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
 Smltn = Simu.Simulation(2000000, filename, datafiledir, 'LhARAsimu.dat')
 print()
@@ -34,4 +35,3 @@ print(" <---- Simulation test done.")
 ##! Complete:
 print()
 print("========  Simulation: complete  ========")
-
