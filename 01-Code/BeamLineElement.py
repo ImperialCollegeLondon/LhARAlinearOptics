@@ -272,20 +272,32 @@ class BeamLineElement:
     def getTransferMatrix(self):
         return self._TrnsMtrx
     
-    
+    def OutsideBeamPipe(self, _R):
+        Outside = False
+        Rad = np.sqrt(_R[0]**2 + _R[2]**2)
+        #print(" BeamLineElelent:: R:", _R)
+        if Rad >= 0.02:
+            Outside = True
+        return Outside
+
 #--------  Utilities:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
+
+        if self.OutsideBeamPipe(_R):
+            _Rprime = None
+        else:
+            if isinstance(self, DefocusQuadrupole) or \
+               isinstance(self, FocusQuadrupole)   or \
+               isinstance(self, Solenoid)          or \
+               isinstance(self, SectorDipole):
+                self.setTransferMatrix(_R)
+            _Rprime = self.getTransferMatrix().dot(_R)
         
-        if isinstance(self, DefocusQuadrupole) or \
-           isinstance(self, FocusQuadrupole)   or \
-           isinstance(self, Solenoid):
-            self.setTransferMatrix(_R)
-        
-        return self.getTransferMatrix().dot(_R)
+        return _Rprime
 
     def Shift2Local(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
@@ -1362,7 +1374,6 @@ class SectorDipole(BeamLineElement):
 
     @classmethod
     def setDebug(cls, Debug):
-        print(" HereHere:")
         cls.__Debug = Debug
 
 # -------- "Get methods"
@@ -1616,7 +1627,7 @@ class Solenoid(BeamLineElement):
 
         Brho = (1./(speed_of_light*1.E-9))*p/1000.
         l  = self.getLength()
-        k     = self.getStrength() / (2.*Brho)
+        k  = self.getStrength() / (2.*Brho)
         
         ckl  = mth.cos(k*l)
         skl  = mth.sin(k*l)
@@ -1632,8 +1643,8 @@ class Solenoid(BeamLineElement):
             [  -k*sckl,    ckl**2, -k*skl**2,       sckl, 0., 0.], \
             [    -sckl, -skl**2/k,    ckl**2,     sckl/k, 0., 0.], \
             [ k*skl**2,     -sckl,   -k*sckl,     ckl**2, 0., 0.], \
-            [0., 0., 0., 0., 1., 0.],                              \
-            [0., 0., 0., 0., 0., 1.]                               \
+            [       0.,        0.,        0.,  0.,  1., l/b02/g02],\
+            [       0.,        0.,        0.,  0.,  0.,        1.] \
                              ])
 
         if self.getDebug():
