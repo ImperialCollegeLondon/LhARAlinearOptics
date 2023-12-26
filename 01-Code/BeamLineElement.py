@@ -1628,10 +1628,10 @@ class Solenoid(BeamLineElement):
             print("     ----> Brho, k, l:", Brho, k, l)
 
         TrnsMtrx = np.array([                                      \
-            [   ckl**2,    sckl/k,      sckl, (skl**2)/k, 0., 0.], \
-            [  -k*sckl,    ckl**2, -k*skl**2,       sckl, 0., 0.], \
-            [    -sckl, -skl**2/k,    ckl**2,     sckl/k, 0., 0.], \
-            [ k*skl**2,     -sckl,   -k*sckl,     ckl**2, 0., 0.], \
+            [   ckl**2, sckl/(2.*k),      sckl, (skl**2)/k, 0., 0.], \
+            [  -k*sckl,      ckl**2, -k*skl**2,       sckl, 0., 0.], \
+            [    -sckl,   -skl**2/k,    ckl**2,     sckl/k, 0., 0.], \
+            [ k*skl**2,       -sckl,   -k*sckl,     ckl**2, 0., 0.], \
             [0., 0., 0., 0., 1., 0.],                              \
             [0., 0., 0., 0., 0., 1.]                               \
                              ])

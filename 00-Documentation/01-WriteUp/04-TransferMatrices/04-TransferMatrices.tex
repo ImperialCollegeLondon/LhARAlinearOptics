@@ -111,3 +111,43 @@ the $yz$ plane (a ``defocusing quadrupole'') may be written:
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
+
+\subsection{Solenoid}
+
+The passahge of a beam particle through a solenoid is determined by
+the magnetic field strength, $\bm{B}$, within the solenoid and the
+length of the solenoid, $l$, measured along its axis.
+As the particle enters the solenoid, the fringe fields impart momentum
+transverse to the axis of the magnet.
+This results in the particle executing a helical trajectory, the axis
+of the helix being parallel to the solenoid axis.
+The sense of the rotation depends on the particle charge and the
+polarity of the field.
+The helical motion means that the evolution of the particle motion in
+the $xz$ plane is coupled with the evolution of the particle motion in
+the $yz$ plane.
+
+In the ``hard-edge'' approximation, the magnetic field inside the
+magnet is given by $\bm{B} = (0, 0, B_0)$, where the solenoid axis
+lies along the $z_{\rm RPLC}$ axis.
+The solenoid field strength parameter is then given by:
+\begin{equation}
+  k_s = \left[ \frac{B_0 c}{2p} \times 10^{-6} \right]^2\,;
+\end{equation}
+where $B_0$ is measured in T, $p$ in MeV/c and $c$ in m/s.
+
+The transfer matrix for passage of a positive particle through a
+solenoid with field pointing in the positive $z_{\rm RPLC}$ direction
+may may be written: 
+\begin{equation}
+  \underline{\underline{T}}_{\rm~Sol} =
+    \begin{pmatrix}
+                             \cos^2(\sqrt{k_s} l) &   \frac{1}{2\sqrt{k_s}} \sin(\sqrt{k_s} l) &         \frac{1}{2} \sin(2\sqrt{k_s} l) & \frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l) & 0 & 0 \\
+          -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l) &                     \cos^2(\sqrt{k_s} l) &           -\sqrt{k_s}\sin^2(\sqrt{k_s} l) &         \frac{1}{2} \sin(2\sqrt{k_s} l) & 0 & 0 \\
+                 -\frac{1}{2} \sin(2\sqrt{k_s} l) & -\frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l) &                    \cos^2(\sqrt{k_s} l) & \frac{1}{2\sqrt{k_s}} \sin(2\sqrt{k_s} l) & 0 & 0 \\
+                    \sqrt{k_s} \sin^2(\sqrt{k_s} l) &         -\frac{1}{2} \sin(2\sqrt{k_s} l) & -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l) &                    \cos^2(\sqrt{k_s} l) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          0 & 0 & 0 & 0 & 0 &                             1
+        \end{pmatrix} \, .
+\end{equation}
+
