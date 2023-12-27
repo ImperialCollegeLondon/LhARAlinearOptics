@@ -1301,7 +1301,7 @@ class SectorDipole(BeamLineElement):
         print("     ----> Magnetic field:", self.getB())
         print("     ----> Transfer matrix: \n", self.getTransferMatrix())
         BeamLineElement.__str__(self)
-        return " <---- SectorDipole parameter dump complete."
+        return " <---- SectorDipole parameter dump com/plete."
 
     def SummaryStr(self):
         Str  = "Sector dipole    : " + BeamLineElement.SummaryStr(self) + \
@@ -1336,7 +1336,8 @@ class SectorDipole(BeamLineElement):
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
                                     iRefPrtcl.getPrOut()[iPrev][:3]))
         E0        = iRefPrtcl.getPrOut()[iPrev][3]
-        b02       = (p0/E0)**2
+        b0        = p0/E0
+        b02       = b0**2
         g02       = 1./(1.-b02)
         
         if self.getDebug():
@@ -1362,12 +1363,12 @@ class SectorDipole(BeamLineElement):
             print("     ----> r, c, s, l:", r, c, s, l)
 
         TrnsMtrx = np.array([
-            [       c, r*s, 0., 0., 0., r*(1-c)],
-            [-(1/r)*s,   c, 0., 0., 0.,       s],
-            [      0.,  0., 1.,  l, 0.,      0.],
-            [      0.,  0., 0., 1., 0.,      0.],
-            [      0.,  0., 0., 0., 1.,      0.],
-            [      0.,  0., 0., 0., 0.,      1.]
+            [     c,            r*s, 0., 0., 0.,                r*(1-c)/b0],
+            [     s,              c, 0., 0., 0.,                      s/b0],
+            [    0.,             0., 1.,  l, 0.,                        0.],
+            [    0.,             0., 0., 1., 0.,                        0.],
+            [ -s/b0, -(r/b0)*(1.-c), 0., 0., 1., l/b02/g02 - (l-r*s)/b0**2],
+            [    0.,             0., 0., 0., 0.,                        1.]
         ])
 
         self._TrnsMtrx = TrnsMtrx
