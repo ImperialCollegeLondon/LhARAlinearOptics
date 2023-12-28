@@ -122,6 +122,7 @@ m2InvMeV           = 5067730717679.4
 epsilon0SI       = 8.8541878128E-12
 electronCHARGESI = 1.602176634E-19
 electronMASSSI   = 9.1093837015E-31
+protonMASSSI     = 1.67262192369E-27
 
 
 class BeamLineElement:
@@ -288,12 +289,20 @@ class BeamLineElement:
                                 _R)
 
         if self.OutsideBeamPipe(_R):
-            _Rprime = None
+            #_Rprime = None
+            if isinstance(self, DefocusQuadrupole) or \
+               isinstance(self, FocusQuadrupole)   or \
+               isinstance(self, Solenoid)          or \
+               isinstance(self, SectorDipole)      or \
+               isinstance(self, GaborLens):
+                self.setTransferMatrix(_R)
+            _Rprime = self.getTransferMatrix().dot(_R)
         else:
             if isinstance(self, DefocusQuadrupole) or \
                isinstance(self, FocusQuadrupole)   or \
                isinstance(self, Solenoid)          or \
-               isinstance(self, SectorDipole):
+               isinstance(self, SectorDipole)      or \
+               isinstance(self, GaborLens):
                 self.setTransferMatrix(_R)
             _Rprime = self.getTransferMatrix().dot(_R)
         
@@ -1736,52 +1745,62 @@ setTransferMatrix: Set transfer matrix; calculate using i/p kinetic
 """
 class GaborLens(BeamLineElement):
     instances = []
-    __Debug = True
+    __Debug = False
 
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
-                 _Bz=None, _VA=None, _RA=None, _Rp=None, _Length=None):
+                 _Bz=None, _VA=None, _RA=None, _Rp=None, _Length=None, \
+                 _Strength=None):
 
         if self.getDebug():
             print(" GaborLens.__init__:", \
                   " creating the GaborLens object:")
-            print("     ---->     Bz:",     _Bz, " T")
-            print("     ---->     VA:",     _VA, " V")
-            print("     ---->     RA:",     _RA, " m")
-            print("     ---->     RP:",     _Rp, " m")
-            print("     ----> Length:", _Length, " m")
+            print("     ---->       Bz:",      _Bz, " T")
+            print("     ---->       VA:",       _VA, " V")
+            print("     ---->       RA:",       _RA, " m")
+            print("     ---->       RP:",       _Rp, " m")
+            print("     ---->   Length:",   _Length, " m")
+            print("     ----> Strength:", _Strength, " m^{-2}")
 
         GaborLens.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+        BeamLineElement.__init__(self, \
+                                 _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         OK = self.setAll2None()
-
-        if not isinstance(_Bz, float):
-            raise badBeamLineElement( \
-                            "GaborLens: bad specification for Bz!")
-        if not isinstance(_VA, float):
-            raise badBeamLineElement( \
-                            "GaborLens: bad specification for Bz!")
-        if not isinstance(_RA, float):
-            raise badBeamLineElement( \
-                            "GaborLens: bad specification for Bz!")
-        if not isinstance(_Rp, float):
-            raise badBeamLineElement( \
-                            "GaborLens: bad specification for Bz!")
+        
         if not isinstance(_Length, float):
             raise badBeamLineElement( \
                             "GaborLens: bad specification for length!")
-
-        self.setBz(_Bz)
-        self.setVA(_VA)
-        self.setRA(_RA)
-        self.setRp(_Rp)
         self.setLength(_Length)
-        self.setElectronDensity()
 
-        self.setTransferMatrix()
+        if _Strength == None:
+            if not isinstance(_Bz, float):
+                raise badBeamLineElement( \
+                                "GaborLens: bad specification for Bz!")
+            if not isinstance(_VA, float):
+                raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
+            if not isinstance(_RA, float):
+                raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
+            if not isinstance(_Rp, float):
+                raise badBeamLineElement( \
+                            "GaborLens: bad specification for Bz!")
+
+            self.setBz(_Bz)
+            self.setVA(_VA)
+            self.setRA(_RA)
+            self.setRp(_Rp)
+            
+        else:
+            if not isinstance(_Strength, float):
+                raise badBeamLineElement( \
+                            "GaborLens: bad specification for Strength!")
+            self.setStrength(_Strength)
+            
+        self.setElectronDensity()
 
         if self.getDebug():
             print("     ----> New GaborLens instance: \n", self)
@@ -1801,7 +1820,7 @@ class GaborLens(BeamLineElement):
         return " <---- GaborLens parameter dump complete."
 
     def SummaryStr(self):
-        Str  = "GaborLens         : " + BeamLineElement.SummaryStr(self) + \
+        Str  = "GaborLens        : " + BeamLineElement.SummaryStr(self) + \
             "; Length = " + str(self.getLength()) + \
             "; Electron density = " + str(self.getElectronDensity())
         return Str
@@ -1814,11 +1833,13 @@ class GaborLens(BeamLineElement):
         cls.__Debug = Debug
 
     def setAll2None(self):
-        self._Bz    = None
-        self._VA    = None
-        self._RA    = None
-        self._Rp    = None
-        self._Lengh = None
+        self._Bz       = None
+        self._VA       = None
+        self._RA       = None
+        self._Rp       = None
+        self._Length   = None
+        self._Strength = None
+        self._TrnsMtrx = None
         
     def setBz(self, _Bz):
         if not isinstance(_Bz, float):
@@ -1850,19 +1871,46 @@ class GaborLens(BeamLineElement):
                 "BeamLineElement.GaborLens.setLength: bad length:", _Length)
         self._Length = _Length
 
-    def setElectronDensity(self):
-        if self.getBz() == None or              \
-           self.getVA() == None or              \
-           self.getRA() == None or              \
-           self.getRp() == None:
+    def setStrength(self, _Strength):
+        if not isinstance(_Strength, float):
             raise badParameter( \
-                        "BeamLineElement.GaborLens.setElectronDensity:" \
-                               " no parameters!")
+                "BeamLineElement.GaborLens.setLength: bad strength:", \
+                                _Strength)
+        self._Strength = _Strength
 
-        ne_trans = (epsilon0SI * self.getBz()**2) / (2. * electronMASSSI)
-        ne_longi = 4. * epsilon0SI * self.getVA() / \
-            (electronCHARGESI * self.getRp()**2 * \
-                        (1. + 2.*mth.log(self.getRA()/self.getRp())) \
+    def setElectronDensity(self):
+        if isinstance(self.getStrength(), float):
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+                raise ReferenceParticleNotSpecified()
+
+            iPrev = len(iRefPrtcl.getPrOut()) - 1
+            p0    = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
+                                    iRefPrtcl.getPrOut()[iPrev][:3]))
+            E0    = iRefPrtcl.getPrOut()[iPrev][3]
+            b02   = (p0/E0)**2
+            g02   = 1./(1.-b02)
+            g0    = mth.sqrt(g02)
+            
+            Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+            B0 = self.getStrength() * 2.*Brho
+            ne = epsilon0SI * B0**2 / (2.*protonMASSSI*g0)
+
+            ne_trans = ne
+            ne_longi = ne
+        else:
+            if self.getBz() == None or              \
+               self.getVA() == None or              \
+               self.getRA() == None or              \
+               self.getRp() == None:
+                raise badParameter( \
+                        "BeamLineElement.GaborLens.setElectronDensity:" \
+                        " no parameters!")
+            
+            ne_trans = (epsilon0SI * self.getBz()**2) / (2. * electronMASSSI)
+            ne_longi = 4. * epsilon0SI * self.getVA() / \
+                (electronCHARGESI * self.getRp()**2 * \
+                 (1. + 2.*mth.log(self.getRA()/self.getRp())) \
                                                  )
         if self.getDebug():
             print(" GaborLens(BeamLineElement).setElectronDensity:")
@@ -1874,23 +1922,37 @@ class GaborLens(BeamLineElement):
         if self.getDebug():
             print(" <---- Electron density:", self.getElectronDensity())
             
-    def setTransferMatrix(self):
+    def setTransferMatrix(self, _R):
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
-        p0 = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
-                             iRefPrtcl.getPrIn()[0][:3]))
-        E0 = iRefPrtcl.getPrIn()[0][3]
-        b0 = p0/E0
-        g0 = mth.sqrt(1./(1.-b0**2))
+        iPrev = len(iRefPrtcl.getPrOut()) - 1
 
+        p0  = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
+                              iRefPrtcl.getPrOut()[iPrev][:3]))
+        E0  = iRefPrtcl.getPrOut()[iPrev][3]
+        b02 = (p0/E0)**2
+        g02 = 1./(1.-b02)
+        g0  = mth.sqrt(g02)
+        
         if self.getDebug():
-            print(" Solenoid(BeamLineElement).setTransferMatrix:")
+            print(" GaborLens(BeamLineElement).setTransferMatrix:")
             print("     ----> Reference particle 4-mmtm:", \
                   iRefPrtcl.getPrIn()[0])
+            b0 = mth.sqrt(b02)
             print("         ----> p0, E0:", p0, E0)
             print("     <---- b0, g0:", b0, g0)
+            
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Trace space:", _R)
+
+        E    = E0 + p0*_R[5]
+        p    = mth.sqrt(E**2 - protonMASS**2)
+        
+        if self.getDebug():
+            print("     ----> Particle energy and mmtm:", E, p)
 
         l      = self.getLength()
         ne     = self.getElectronDensity()
@@ -1902,22 +1964,27 @@ class GaborLens(BeamLineElement):
             print("     ----> m2InvMeV:", m2InvMeV)
 
         k      = (electricCHARGE**2 * protonMASS * g0) / \
-                 (2.*epsilon0 * p0**2) * \
+                 (2.*epsilon0 * p**2) * \
                  ne /m2InvMeV
         w      = mth.sqrt(k)
-        print("     ----> k, w:", k, w)
+        if self.getDebug():
+            print("     ----> k, w:", k, w)
         
         cwl  = mth.cos(w*l)
         swl  = mth.sin(w*l)
 
-        TrnsMtrx = np.array([                                      \
-            [    cwl, swl/w,     0.,    0., 0., 0.], \
-            [ -w*swl,   cwl,     0.,    0., 0., 0.], \
-            [     0.,    0.,    cwl, swl/w, 0., 0.], \
-            [     0.,    0., -w*swl,   cwl, 0., 0.], \
-            [0., 0., 0., 0., 1., 0.],                              \
-            [0., 0., 0., 0., 0., 1.]                               \
+        TrnsMtrx = np.array([                               \
+            [    cwl, swl/w,     0.,    0.,        0., 0.], \
+            [ -w*swl,   cwl,     0.,    0.,        0., 0.], \
+            [     0.,    0.,    cwl, swl/w,        0., 0.], \
+            [     0.,    0., -w*swl,   cwl,        0., 0.], \
+            [     0.,    0.,     0.,    0.,  1., l/b02/g02],\
+            [     0.,    0.,     0.,    0.,  0.,        1.] \
                              ])
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
 
         self._TrnsMtrx = TrnsMtrx
 
@@ -1942,6 +2009,9 @@ class GaborLens(BeamLineElement):
 
     def getLength(self):
         return self._Length
+
+    def getStrength(self):
+        return self._Strength
 
     def getElectronDensity(self):
         return self._ElectronDensity
