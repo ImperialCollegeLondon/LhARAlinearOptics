@@ -105,7 +105,7 @@ DefocusQuadrupoleTest += 1
 print()
 print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, \
       " test transport through defocusing quadrupole.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+R      = np.array([0.01, 0.1, -0.01, -0.2, 0., 0.])
 Rprime = DfQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
@@ -128,8 +128,8 @@ print("         ", DfQuad.getTransferMatrix()[3,0], \
                    DfQuad.getTransferMatrix()[3,3])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.949563524, 10.01608306, -0.112493763,
-                       3.456264689, 0.,  0.])
+RprimeTest = np.array([0.031506217, 0.383933123, -0.018491197, 
+                       0.052540446, 0.,  0.])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)
