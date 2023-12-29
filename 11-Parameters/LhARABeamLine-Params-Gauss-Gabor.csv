@@ -1,6 +1,7 @@
 ﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
 0,Facility,Global,Name,Name,LhARA,,
 0,Facility,Global,Reference particle,Kinetic energy,15,MeV,
+0,Facility,Global,Vacuum chamber,Mother volume radius,0.2,m,
 1,Source,Source,Parameterised TNSA,SourceMode,1,,Gaussian kinetic energy
 1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
 1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y"

@@ -375,6 +375,7 @@ class BeamLine(object):
 
     @classmethod
     def parseFacility(cls):
+        cls.setDebug(True)
         Name  = None
         p0    = None
         if cls.getDebug():
@@ -395,9 +396,22 @@ class BeamLine(object):
                         (pndsFacility["Parameter"]=="Kinetic energy") ]. \
                             iloc[0]["Value"] \
                     )
+
+        VCMVr = float(pndsFacility[ \
+                        (pndsFacility["Type"]=="Vacuum chamber") & \
+                        (pndsFacility["Parameter"]=="Mother volume radius") ]. \
+                            iloc[0]["Value"] \
+                    )
         
         if cls.getDebug():
-            print("                 <---- Name, K0:", Name, K0)
+            print("                     ----> Name:", Name, \
+                  "; reference particle kinetic energy:", K0, "MeV")
+            print( \
+        "                     ----> Vacuum chamber mother volume radius:", \
+                   VCMVr, "m")
+            print("                 <---- Done.")
+            
+        cls.setDebug(False)
 
         return Name, K0
 
