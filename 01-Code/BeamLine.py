@@ -324,7 +324,7 @@ class BeamLine(object):
             print("             ----> BeamLine.addFacility starts:")
 
         #.. Parse the dataframe to get Facility parameters:
-        Name, K0 = cls.parseFacility()
+        Name, K0, VCMVr = cls.parseFacility()
 
         #.. Create the Facility beam line element:
         rStrt  = np.array([0., 0., 0.])
@@ -335,7 +335,7 @@ class BeamLine(object):
         p0     = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
 
         FacilityBLE = BLE.Facility(Name, rStrt, vStrt, drStrt, dvStrt, \
-                                   p0)
+                                   p0, VCMVr)
         cls._Element.append(FacilityBLE)
 
         if cls.getDebug():
@@ -413,7 +413,7 @@ class BeamLine(object):
             
         cls.setDebug(False)
 
-        return Name, K0
+        return Name, K0, VCMVr
 
     @classmethod
     def parseSource(cls):

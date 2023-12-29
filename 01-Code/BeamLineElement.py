@@ -276,8 +276,7 @@ class BeamLineElement:
     def OutsideBeamPipe(self, _R):
         Outside = False
         Rad = np.sqrt(_R[0]**2 + _R[2]**2)
-        #print(" BeamLineElelent:: R:", _R)
-        if Rad >= 0.02:
+        if Rad >= Facility.getInstance().getVCMVr():
             Outside = True
         return Outside
 
@@ -288,15 +287,16 @@ class BeamLineElement:
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
 
+        if self.getDebug():
+            print(" BeamLineElement.Transport:", \
+                  Facility.getInstance().getName(), \
+                  Facility.getInstance().getVCMVr())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> _R:", _R)
+            print("     ----> Outside:", self.OutsideBeamPipe(_R))
+            
         if self.OutsideBeamPipe(_R):
-            #_Rprime = None
-            if isinstance(self, DefocusQuadrupole) or \
-               isinstance(self, FocusQuadrupole)   or \
-               isinstance(self, Solenoid)          or \
-               isinstance(self, SectorDipole)      or \
-               isinstance(self, GaborLens):
-                self.setTransferMatrix(_R)
-            _Rprime = self.getTransferMatrix().dot(_R)
+            _Rprime = None
         else:
             if isinstance(self, DefocusQuadrupole) or \
                isinstance(self, FocusQuadrupole)   or \
@@ -305,7 +305,16 @@ class BeamLineElement:
                isinstance(self, GaborLens):
                 self.setTransferMatrix(_R)
             _Rprime = self.getTransferMatrix().dot(_R)
-        
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Rprime:", _Rprime)
+
+        if not isinstance(_Rprime, np.ndarray):
+            x=1.
+            y=0.
+            z=x/y
+
         return _Rprime
 
     def Shift2Local(self, _R):
@@ -386,15 +395,18 @@ class Facility(BeamLineElement):
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
-                 _p0=None):
+                 _p0=None, _VCMVr=None):
 
         if Facility.instance == None:
             Facility.instance = self
             
             if self.__Debug:
                 print(' Facility.__init__: ', \
-                      'creating the Facility object: Name=', _Name, \
-                      'p0=', _p0)
+                      'creating the Facility object:')
+                print("     ----> Name:", _Name)
+                print("     ----> Reference particle momentum:", _p0)
+                print("     ----> Vacuum chamber mother volume radius", \
+                      _VCMVr)
 
             Facility.instance = self
 
@@ -404,9 +416,15 @@ class Facility(BeamLineElement):
 
             if not isinstance(_p0, float):
                 raise badBeamLineElement( \
-                        " Facility: bad specification for length of Facility!"
+                " Facility: bad specification for reference particle mometnum!"
                                          )
+            if not isinstance(_VCMVr, float):
+                raise badBeamLineElement( \
+            " Facility: bad specification for vacuum chamber mother volume!"
+                                         )
+            
             self.setp0(_p0)
+            self.setVCMVr(_VCMVr)
                 
             if self.__Debug:
                 print("     ----> New Facility instance: \n", \
@@ -427,12 +445,15 @@ class Facility(BeamLineElement):
         print("     ----> Debug flag:", Facility.getDebug())
         print("     ----> Name      :", self.getName())
         print("     ----> p0 (MeV/c):", self.getp0())
+        print("     ----> Vacuum chamber mother volume radius (m):", \
+              self.getVCMVr())
         BeamLineElement.__str__(self)
         return " <---- Facility parameter dump complete."
 
     def SummaryStr(self):
         Str  = "Facility         : " + BeamLineElement.SummaryStr(self) + \
-            "; Name = " + self.getName() + "; p0 = " + str(self.getp0())
+            "; Name = " + self.getName() + "; p0 = " + str(self.getp0()) + \
+            "; VCMVr = " + str(self.getVCMVr())
         return Str
 
 
@@ -441,15 +462,29 @@ class Facility(BeamLineElement):
     def setp0(self, _p0=None):
         if not isinstance(_p0, float):
             raise badParameter( \
-                     " BeamLineElement.Facility.setLength: bad p0",
+                     " BeamLineElement.Facility.setp0: bad p0",
                                 _p0)
         self._p0 = _p0
+
+    def setVCMVr(self, _VCMVr=None):
+        if not isinstance(_VCMVr, float):
+            raise badParameter( \
+                     " BeamLineElement.Facility.setVCMVr: bad VCMVr",
+                                _VCMVr)
+        self._VCMVr = _VCMVr
 
         
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)
+    @classmethod
+    def getInstance(cls):
+        return cls.instance
+    
     def getp0(self):
         return self._p0
+    
+    def getVCMVr(self):
+        return self._VCMVr
     
         
 """
@@ -785,9 +820,12 @@ class Aperture(BeamLineElement):
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
                                 _R)
+
+        if self.getDebug():
+            print(" Aperture(BeamLineElement).Transport:", \
+                  self.getType(), self.getParams())
+            
         NotCut = True
-        #print(" Aperture(BeamLineElement).Transport:", \
-        #      self.getType(), self.getParams())
         if self.getType() == 0:
             Rad = np.sqrt(_R[0]**2 + _R[2]**2)
             #print(" Aperture cut: R, Raptr:", Rad, self.getParams()[0])
