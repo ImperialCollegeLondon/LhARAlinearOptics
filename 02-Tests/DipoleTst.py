@@ -113,8 +113,8 @@ print("SectorDipoleTest:", SectorDipoleTest, " test transport through dipole.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.05])
 Rprime = Dpl.Transport(R)
 print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.464454646, -0.166046948, -0.504091844, -0.2, \
-                       0., 0.05])
+RprimeTest = np.array([0.580323519, 0.022084405, -0.504091844, -0.2, \
+                       -0.659963612, 0.05])
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
 with np.printoptions(linewidth=500,precision=7,suppress=True):

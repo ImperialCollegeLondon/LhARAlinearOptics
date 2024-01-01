@@ -1333,6 +1333,7 @@ class SectorDipole(BeamLineElement):
 
         self.setAngle(_Angle)
         self.setB(_B)
+        self.setLength()
 
         if self.getDebug():
             print("     ----> New SectorDipole instance: \n", self)
@@ -1373,6 +1374,31 @@ class SectorDipole(BeamLineElement):
                                "bad B:", _B)
         self._B = _B
 
+    def setLength(self):
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+
+        iPrev = len(iRefPrtcl.getPrOut()) - 1
+
+        p0   = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
+                                    iRefPrtcl.getPrOut()[iPrev][:3]))
+
+        if self.getDebug():
+            print(" Dipole(BeamLineElement).setLength:")
+            print("     ----> Reference particle 4-mmtm:", \
+                  iRefPrtcl.getPrIn()[0])
+            print("         ----> p0:", p0)
+        
+        Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+        r    = Brho / self.getB()
+        l    = r * self.getAngle()
+
+        if self.getDebug():
+            print("     ----> Brho, r, l:", Brho, r, l)
+
+        self._Length = l
+
     def setTransferMatrix(self, _R):
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
@@ -1404,19 +1430,23 @@ class SectorDipole(BeamLineElement):
         r    = Brho / self.getB()
         c    = np.cos(self.getAngle())
         s    = np.sin(self.getAngle())
-        l    = r * self.getAngle()
+        l    = self.getLength()
 
         if self.getDebug():
-            print("     ----> r, c, s, l:", r, c, s, l)
+            print("     ----> Brho, r, c, s, l:", Brho, r, c, s, l)
 
         TrnsMtrx = np.array([
             [     c,            r*s, 0., 0., 0.,                r*(1-c)/b0],
-            [     s,              c, 0., 0., 0.,                      s/b0],
+            [  -s/r,              c, 0., 0., 0.,                      s/b0],
             [    0.,             0., 1.,  l, 0.,                        0.],
             [    0.,             0., 0., 1., 0.,                        0.],
             [ -s/b0, -(r/b0)*(1.-c), 0., 0., 1., l/b02/g02 - (l-r*s)/b0**2],
             [    0.,             0., 0., 0., 0.,                        1.]
         ])
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
 
         self._TrnsMtrx = TrnsMtrx
 
@@ -1435,6 +1465,9 @@ class SectorDipole(BeamLineElement):
 
     def getB(self):
         return self._B
+
+    def getLength(self):
+        return self._Length
 
 
 class Octupole(BeamLineElement):

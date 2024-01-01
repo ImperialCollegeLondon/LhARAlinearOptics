@@ -20,7 +20,7 @@ print()
 print("SimulationTest:", SimulationTest, " check if class is a singleton.")
 LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
 filename     = os.path.join(LhARAOpticsPATH, \
-                        '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
+                        '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
 rootfilename = os.path.join(LhARAOpticsPATH, \
                             '99-Scratch/LhARA-Simulation-tst.root')
 print(filename)

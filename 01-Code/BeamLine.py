@@ -375,7 +375,6 @@ class BeamLine(object):
 
     @classmethod
     def parseFacility(cls):
-        cls.setDebug(True)
         Name  = None
         p0    = None
         if cls.getDebug():
@@ -411,8 +410,6 @@ class BeamLine(object):
                    VCMVr, "m")
             print("                 <---- Done.")
             
-        cls.setDebug(False)
-
         return Name, K0, VCMVr
 
     @classmethod

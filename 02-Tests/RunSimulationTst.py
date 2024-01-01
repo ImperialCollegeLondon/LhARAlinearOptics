@@ -17,7 +17,7 @@ print()
 LhARAOpticsPATH = os.getenv('LhARAOpticsPATH')
 print("LhARAOpticsPATH", LhARAOpticsPATH)
 filename  = os.path.join(LhARAOpticsPATH, \
-                         '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
+                         '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
 
 Smltn = Simu.Simulation(100000, filename)
 print()

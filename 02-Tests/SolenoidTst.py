@@ -89,11 +89,11 @@ BLE.Solenoid.setDebug(False)
 SolenoidTest += 1
 print()
 print("SolenoidTest:", SolenoidTest, " test transport through solenoid.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.00])
+R      = np.array([0.1, 0.1, -0.1, -0.2, 0., 0.00])
 Rprime = Sol.Transport(R)
 print("     ----> Input trace-space vector:", R)
 print("     ----> Transported trace-space vector:", Rprime)
-RprimeTest = np.array([0.228273338, -0.166572584, -0.54739631, 0.092788839, \
+RprimeTest = np.array([0.021647418, -0.033490533, -0.223887704, -0.115574124, \
                        0., 0. ])
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
