@@ -25,7 +25,8 @@ Class Particle:
    _Location[] :   str   : Name of location where trace space recorded
    _z[]        : float   : z coordinate at which trace space recorded
    _s[]        : float   : s coordinate at which trace space recorded
-   _TrcSpc[]   : ndarray : 6D trace space: x, x', y, y', t, E (m, s, MeV)
+   _TrcSpc[]   : ndarray : 6D trace space: x, x', y, y', z, delta, all
+                           in reference particle local coordinates
    _PhsSpc[]   : array   : RPLC 6D phase space: [(x, y, z), (px, py, pz)]
                            List ot two ndarrays.
    _LabPhsSpc[]: array   : Lab 6D phase space: [(x, y, z), (px, py, pz)]
@@ -362,17 +363,23 @@ class Particle:
                 'weight': 'normal', \
                 'size': 16, \
                 }
-        
-        xLoc  = []
-        xpLoc = []
-        yLoc  = []
-        ypLoc = []
-        ELoc  = []
+
+        nLoc   = []
+        xLoc   = []
+        xpLoc  = []
+        yLoc   = []
+        ypLoc  = []
+        ELoc   = []
+        nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
+            nPrtcl += 1
+            if isinstance(iPrtcl, ReferenceParticle):
+                continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
                 if iLoc > (len(xLoc)-1):
+                    nLoc.append(iPrtcl.getLocation()[iLoc])
                     xLoc.append([])
                     xpLoc.append([])
                     yLoc.append([])
@@ -399,7 +406,7 @@ class Particle:
                             ha='center', va='center', fontsize=18, \
                             color='darkgrey')
             """
-            Ttl = BLE.BeamLineElement.getinstances()[iLoc].getName()
+            Ttl = nLoc[iLoc]
             fig.suptitle(Ttl, fontdict=font)
 
             #axs[0, 0].set_title('x,y')
@@ -409,7 +416,7 @@ class Particle:
             
             #axs[0, 1].set_title('Energy')
             axs[0, 1].hist(ELoc[iLoc], 100)
-            axs[0, 1].set_xlabel('dp/p')
+            axs[0, 1].set_xlabel('delta')
             axs[0, 1].set_ylabel('Number')
             
             #axs[1, 0].set_title('x, xprime')
@@ -729,7 +736,7 @@ Derived class ReferenceParticle(Particle):
   Class attributes:
   -----------------
   __instance : Instances of ReferenceParticle class
-<  __Debug    : Debug flag
+    : Debug flag
 
       
   Instance attributes:
@@ -843,7 +850,7 @@ class ReferenceParticle(Particle):
             Particle.__init__(self)
         
             # Only constants; print values that will be used:
-            if self.__RPDebug:
+            if self.getRPDebug():
                 print(self)
                 
         else:
@@ -1048,6 +1055,13 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtSource(self):
+        nRcrds  = len(self.getsIn())
+        
+        Success = self.setLocation(BLE.BeamLineElement.getinstances()\
+                                   [nRcrds+1].getName())
+        if not Success:
+            raise fail2setReferenceParticle("Name")
+
         Success = self.setsIn(0.)
         if not Success:
             raise fail2setReferenceParticle("sIn")
@@ -1111,6 +1125,11 @@ class ReferenceParticle(Particle):
     def setReferenceParticleAtDrift(self, iBLE=None):
         nRcrds  = len(self.getsIn())
         
+        Success = self.setLocation(BLE.BeamLineElement.getinstances()\
+                                   [nRcrds+1].getName())
+        if not Success:
+            raise fail2setReferenceParticle("Name")
+
         Success = self.setsIn(self.getsOut()[nRcrds-1])
         if not Success:
             raise fail2setReferenceParticle("sIn")

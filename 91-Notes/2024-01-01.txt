@@ -1,0 +1,68 @@
+--------  --------  --------  --------  --------  --------  --------  01Jan24
+Fix all active 11-Parameter specification files.
+Tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Scripts:
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotTrajectory.py       - OK - had to fix length of b/l. Had not been
+                                  corrected from change from positioning at
+				  centre to positionoing at start.
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamLineTst.py          - 
+ - BeamLineElementTst.py   - 
+ - DRACOfacilityTst.py     - 
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DriftTst.py             - 
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         - 
+ - LIONfacilityTst.py      - 
+ - LhARAFacilityTst.py     - 
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - 
+ - PhysicalConstantsTst.py - 
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestRead.py             - 
+ - TestWrite.py            - 
+
+Scripts:
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotTrajectory.py       - 

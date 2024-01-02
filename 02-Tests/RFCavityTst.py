@@ -27,17 +27,17 @@ try:
     RF = BLE.RFCavity()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0.,0.,0.])
-vCtr = np.array([0.,0.])
-drCtr = np.array([0.,0.,0.])
-dvCtr = np.array([0.,0.])
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([0.,0.])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([0.,0.])
 try:
-    RF = BLE.RFCavity("Cavity", rCtr, vCtr, drCtr, dvCtr)
+    RF = BLE.RFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no RF cavity parameters exception.')
 
 #.. Create valid instance:
-RF = BLE.RFCavity("Cavity", rCtr, vCtr, drCtr, dvCtr, 1.5, 1E6, 1.5)
+RF = BLE.RFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt, 1.5, 1E6, 1.5)
     
 #.. __repr__
 print("    __repr__:")

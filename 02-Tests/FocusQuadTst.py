@@ -10,32 +10,23 @@ FocusQuadrupole.py -- set "relative" path to code
 
 import numpy as np
 import scipy as sp
+import math  as mth
 import os
 
-import BeamLineElement as BLE
-import BeamLine        as BL
-import Particle        as Prtcl
+import PhysicalConstants as PhysCnst
+import BeamLineElement   as BLE
+import BeamLine          as BL
+import Particle          as Prtcl
+
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
 
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-BLI  = BL.BeamLine(filename)
-
-iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+                        '11-Parameters/Dummy4Tests.csv')
 
 ##! Start:
 print("========  FocusQuadrupole: tests start  ========")
-
-print("Reference particle:")
-xx    = iRefPrtcl.getPrIn()[0]
-xx[2] = 194.7585262
-iRefPrtcl._PrIn[0] = xx
-p0        = iRefPrtcl.getMomentumIn(0)
-with np.printoptions(linewidth=500,precision=7,suppress=True):
-    print("     ----> Three momentum (in, RPLC):", \
-          iRefPrtcl.getPrIn()[0][0:3])
-    print("                           Magnitude:", p0)
-
 
 ##! Test built-in methods:
 FocusQuadrupoleTest = 1
@@ -49,19 +40,41 @@ try:
     FQuad = BLE.FocusQuadrupole()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rCtr = np.array([0., 0., 0.])
-vCtr = np.array([0., 0.])
-drCtr = np.array([0., 0., 0.])
-dvCtr = np.array([0., 0.])
+rStrt = np.array([0., 0., 0.])
+vStrt = np.array([0., 0.])
+drStrt = np.array([0., 0., 0.])
+dvStrt = np.array([0., 0.])
 try:
-    FQuad = BLE.FocusQuadrupole("NoStrength", rCtr, vCtr, drCtr, dvCtr)
+    FQuad = BLE.FocusQuadrupole("NoStrength", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no quadrupole strength exception.')
 
-#.. Create valid instance:
-FQuad = BLE.FocusQuadrupole("ValidQuad", rCtr, vCtr, drCtr, dvCtr, \
-                            0.1, 100.)
     
+#--------> Clean instances and restart:
+BLE.BeamLineElement.cleanInstances()
+
+BLI  = BL.BeamLine(filename)
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+print(" ----> Reference particle:")
+pz = 194.7585262
+E0 = mth.sqrt(protonMASS**2 + pz**2)
+p0 = np.array([0., 0., pz, E0])
+iRefPrtcl.setPrIn(p0)
+iRefPrtcl.setPrOut(p0)
+
+print("     ----> Reference particle set:")
+print("         ----> In:", iRefPrtcl.getPrIn())
+print("              Out:", iRefPrtcl.getPrOut())
+
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("         ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
+
+#.. Create valid instance:
+FQuad = BLE.FocusQuadrupole("ValidQuad", rStrt, vStrt, drStrt, dvStrt, \
+                            0.1, 100.)
 #.. __repr__
 print("    __repr__:")
 print("      ---->", repr(FQuad))

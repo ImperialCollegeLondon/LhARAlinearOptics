@@ -31,22 +31,123 @@ $\underline{\underline{T}}$, so only quote results here.
 
 A ``drift'' space refers to a region in which the beam propagates in
 the absence of any electromagnetic fields.
-In a drift, particles propogate in straight lines, therefore:
+In a drift, particles propagate in straight lines, therefore:
 \begin{equation}
   \underline{\underline{T}}_{\rm~drift} =
         \begin{pmatrix}
-          1 & l & 0 & 0 &              0 & 0 \\
-          0 & 1 & 0 & 0 &              0 & 0 \\
-          0 & 0 & 1 & l &              0 & 0 \\
-          0 & 0 & 0 & 1 &              0 & 0 \\
-          0 & 0 & 0 & 0 & 1 & f_{\rm drift}(s) \\
-          0 & 0 & 0 & 0 &              0 & 1
+          1 & l & 0 & 0 & 0 &                             0 \\
+          0 & 1 & 0 & 0 & 0 &                             0 \\
+          0 & 0 & 1 & l & 0 &                             0 \\
+          0 & 0 & 0 & 1 & 0 &                             0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, ; 
 \end{equation}
-where $l$ is the length of the drift and $f_{\rm drift}(s)$ indicates
-that the time taken to cross the drift is yet to be included in the
-transfer matrix.
+where $l$ is the length of the drift and
+$\gamma_0=(1-\beta_0^2)^{-\frac{1}{2}}$.
 The increment in the reference particle trajectory is:
 \begin{equation}
   \delta s = l \, .
 \end{equation}
+
+\subsection{Quadrupole}
+
+The passage of a beam particle through a quadrupole magnet may be
+described by specifying the field gradient, $g$, within the magnet and
+the length, $l$, of the quadrupole measured along its axis.
+The impact of a quadrupole on the trajectory of a particle in the $xy$
+plane is independent of the impact of the magnet on the particle's
+trajectory in the $yz$ plane.   
+In this sense quadrupole focusing in the $xz$ and $yz$ planes is said
+to be ``uncoupled''. 
+
+If the field gradient along the $x$ and $y$ axes is identical, then:
+\begin{equation}
+  g_x = \frac{\partial B_x}{\partial x} =
+  g_y = \frac{\partial B_y}{\partial y} = g \, ; 
+\end{equation}
+where the field in the quadrupole, $\bm{B}$, has components
+$(B_x, B_y, 0)$.
+
+In the ``hard-edge'' approximation, where the field falls to zero at
+the start and end of the quadrupole, the transfer matrix for a
+quadrupole focusing in the $xz$ plane (a ``focusing quadrupole'') may
+be written: 
+\begin{equation}
+  \underline{\underline{T}}_{\rm~Fquad} =
+    \begin{pmatrix}
+          \cos(\sqrt{k} l) & \frac{\sin(\sqrt{k} l)}{\sqrt{k}} & 0 & 0             & 0 & 0 \\
+-\sqrt{k} \sin(\sqrt{k} l) &                  \cos(\sqrt{k} l) & 0 & 0             & 0 & 0 \\
+          0 & 0 &           \cosh(\sqrt{k} l) & \frac{\sinh(\sqrt{k} l)}{\sqrt{k}} & 0 & 0 \\
+          0 & 0 &  \sqrt{k} \sinh(\sqrt{k} l) &                  \cosh(\sqrt{k} l) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          0 & 0 & 0 & 0 & 0 &                             1
+        \end{pmatrix} \, ; 
+\end{equation}
+where:
+\begin{equation}
+  k = \frac{gc}{p} \times 10^{-6} \, ,
+\end{equation}
+and $c$ is the speed of light in metres per second, p is the magnitude
+of the momentum of the particle in MeV/c, and the field gradient, $g$,
+is given in T/m.
+As before, $\beta_0$ is the relativistic velocity of the reference
+particle and $\gamma_0=(1-\beta_0^2)^{-\frac{1}{2}}$.
+The increment in the reference particle trajectory is:
+\begin{equation}
+  \delta s = l \, .
+\end{equation}
+
+In the same notation, the transfer matrix for a quadrupole focusing in
+the $yz$ plane (a ``defocusing quadrupole'') may be written: 
+\begin{equation}
+  \underline{\underline{T}}_{\rm~Dquad} =
+    \begin{pmatrix}
+          \cosh(\sqrt{k} l) & \frac{\sinh(\sqrt{k} l)}{\sqrt{k}} & 0 & 0             & 0 & 0 \\
+ \sqrt{k} \sinh(\sqrt{k} l) &                  \cosh(\sqrt{k} l) & 0 & 0             & 0 & 0 \\
+          0 & 0 &            \cos(\sqrt{k} l) &  \frac{\sin(\sqrt{k} l)}{\sqrt{k}} & 0 & 0 \\
+          0 & 0 &  -\sqrt{k} \sin(\sqrt{k} l) &                   \cos(\sqrt{k} l) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          0 & 0 & 0 & 0 & 0 &                             1
+        \end{pmatrix} \, .
+\end{equation}
+
+\subsection{Solenoid}
+
+The passahge of a beam particle through a solenoid is determined by
+the magnetic field strength, $\bm{B}$, within the solenoid and the
+length of the solenoid, $l$, measured along its axis.
+As the particle enters the solenoid, the fringe fields impart momentum
+transverse to the axis of the magnet.
+This results in the particle executing a helical trajectory, the axis
+of the helix being parallel to the solenoid axis.
+The sense of the rotation depends on the particle charge and the
+polarity of the field.
+The helical motion means that the evolution of the particle motion in
+the $xz$ plane is coupled with the evolution of the particle motion in
+the $yz$ plane.
+
+In the ``hard-edge'' approximation, the magnetic field inside the
+magnet is given by $\bm{B} = (0, 0, B_0)$, where the solenoid axis
+lies along the $z_{\rm RPLC}$ axis.
+The solenoid field strength parameter is then given by:
+\begin{equation}
+  k_s = \left[ \frac{B_0 c}{2p} \times 10^{-6} \right]^2\,;
+\end{equation}
+where $B_0$ is measured in T, $p$ in MeV/c and $c$ in m/s.
+
+The transfer matrix for passage of a positive particle through a
+solenoid with field pointing in the positive $z_{\rm RPLC}$ direction
+may may be written: 
+\begin{equation}
+  \underline{\underline{T}}_{\rm~Sol} =
+    \begin{pmatrix}
+                             \cos^2(\sqrt{k_s} l) &   \frac{1}{2\sqrt{k_s}} \sin(\sqrt{k_s} l) &         \frac{1}{2} \sin(2\sqrt{k_s} l) & \frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l) & 0 & 0 \\
+          -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l) &                     \cos^2(\sqrt{k_s} l) &           -\sqrt{k_s}\sin^2(\sqrt{k_s} l) &         \frac{1}{2} \sin(2\sqrt{k_s} l) & 0 & 0 \\
+                 -\frac{1}{2} \sin(2\sqrt{k_s} l) & -\frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l) &                    \cos^2(\sqrt{k_s} l) & \frac{1}{2\sqrt{k_s}} \sin(2\sqrt{k_s} l) & 0 & 0 \\
+                    \sqrt{k_s} \sin^2(\sqrt{k_s} l) &         -\frac{1}{2} \sin(2\sqrt{k_s} l) & -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l) &                    \cos^2(\sqrt{k_s} l) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          0 & 0 & 0 & 0 & 0 &                             1
+        \end{pmatrix} \, .
+\end{equation}
+

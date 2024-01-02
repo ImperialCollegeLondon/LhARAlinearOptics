@@ -114,6 +114,7 @@ constants_instance = PhysicalConstants()
 
 protonMASS         = constants_instance.mp()
 speed_of_light     = constants_instance.SoL()
+mu0                = constants_instance.mu0()
 
 class BeamLine(object):
     __BeamLineInst = None
@@ -163,16 +164,6 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> Build facility:")
 
-#    ----> Facility:  --------  --------  --------  --------
-            if cls.getDebug():
-                print("         ----> Facility: ")
-
-            cls.addFacility()
-        
-            if cls.getDebug():
-                print("         <---- Facility done.")
-#    <---- Done facility  --------  --------  --------  --------
-
 #    ----> Create reference particle:  --------  --------  --------  --------
 #..  Instance only at this stage:
             if cls.getDebug():
@@ -183,6 +174,16 @@ class BeamLine(object):
             if cls.getDebug():
                 print("        <---- Reference particle created. ")
 #    <---- Done reference particle  --------  --------  --------  --------
+
+#    ----> Facility:  --------  --------  --------  --------
+            if cls.getDebug():
+                print("         ----> Facility: ")
+
+            cls.addFacility()
+        
+            if cls.getDebug():
+                print("         <---- Facility done.")
+#    <---- Done facility  --------  --------  --------  --------
 
 #    ----> Source:  --------  --------  --------  --------
             if cls.getDebug():
@@ -230,8 +231,16 @@ class BeamLine(object):
         print(" ============================")
         print("     ----> Debug flag:", BeamLine.getDebug())
         print("     ----> Source and beam line:")
+        Section = ""
         for iBLE in BLE.BeamLineElement.getinstances():
-            print("               ", iBLE.SummaryStr())            
+            NameStrs = iBLE.getName().split(":")
+            if len(NameStrs) == 1:
+                Section = NameStrs[0]
+                print("        ---->", NameStrs[0])
+            elif NameStrs[2] != Section:
+                Section = NameStrs[2]
+                print("        ---->", NameStrs[2])
+            print("            ---->", iBLE.SummaryStr())            
         print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
         return " <---- Beam line parameter dump complete."
@@ -295,6 +304,14 @@ class BeamLine(object):
     def getSrcTrcSpc(cls):
         return cls.__SrcTrcSpc
     
+    @classmethod
+    def addBeamLineElement(self, iBLE=False):
+        if self.getDebug():
+            print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
+        if not isinstance(iBLE, BeamLineElement):
+            raise badBeamLineElement()
+        self._Element.append(FacilityBLE)
+        
         
 #--------  Processing methods:
     def csv2pandas(_filename):
@@ -307,18 +324,18 @@ class BeamLine(object):
             print("             ----> BeamLine.addFacility starts:")
 
         #.. Parse the dataframe to get Facility parameters:
-        Name, K0 = cls.parseFacility()
+        Name, K0, VCMVr = cls.parseFacility()
 
         #.. Create the Facility beam line element:
-        rCtr  = np.array([0., 0., 0.])
-        vCtr  = np.array([0., 0., 0.])
-        drCtr = np.array([0., 0., 0.])
-        dvCtr = np.array([0., 0., 0.])
+        rStrt  = np.array([0., 0., 0.])
+        vStrt  = np.array([0., 0., 0.])
+        drStrt = np.array([0., 0., 0.])
+        dvStrt = np.array([0., 0., 0.])
 
-        p0    = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
+        p0     = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
 
-        FacilityBLE = BLE.Facility(Name, rCtr, vCtr, drCtr, dvCtr, \
-                                   p0)
+        FacilityBLE = BLE.Facility(Name, rStrt, vStrt, drStrt, dvStrt, \
+                                   p0, VCMVr)
         cls._Element.append(FacilityBLE)
 
         if cls.getDebug():
@@ -332,13 +349,15 @@ class BeamLine(object):
             
         #.. Parse the dataframe to get source parameters:
         Name, SrcMode, SrcParam = cls.parseSource()
+        if Name == None and SrcMode == None and SrcMode == None:
+            return
 
         #.. Create the source beam line element:
-        rCtr = np.array([0.,0.,0.])
-        vCtr = np.array([0.,0.])
-        drCtr = np.array([0.,0.,0.])
-        dvCtr = np.array([0.,0.])
-        SourceBLE = BLE.Source(Name, rCtr, vCtr, drCtr, dvCtr, \
+        rStrt = np.array([0.,0.,0.])
+        vStrt = np.array([0.,0.])
+        drStrt = np.array([0.,0.,0.])
+        dvStrt = np.array([0.,0.])
+        SourceBLE = BLE.Source(Name, rStrt, vStrt, drStrt, dvStrt, \
                                SrcMode, SrcParam)
 
         cls._Element.append(SourceBLE)
@@ -376,11 +395,22 @@ class BeamLine(object):
                         (pndsFacility["Parameter"]=="Kinetic energy") ]. \
                             iloc[0]["Value"] \
                     )
+
+        VCMVr = float(pndsFacility[ \
+                        (pndsFacility["Type"]=="Vacuum chamber") & \
+                        (pndsFacility["Parameter"]=="Mother volume radius") ]. \
+                            iloc[0]["Value"] \
+                    )
         
         if cls.getDebug():
-            print("                 <---- Name, K0:", Name, K0)
-
-        return Name, K0
+            print("                     ----> Name:", Name, \
+                  "; reference particle kinetic energy:", K0, "MeV")
+            print( \
+        "                     ----> Vacuum chamber mother volume radius:", \
+                   VCMVr, "m")
+            print("                 <---- Done.")
+            
+        return Name, K0, VCMVr
 
     @classmethod
     def parseSource(cls):
@@ -393,6 +423,11 @@ class BeamLine(object):
         pndsSource = cls.getBeamLineParamPandas()[ \
                      cls.getBeamLineParamPandas()["Section"] == "Source" \
                                                   ]
+
+        if pndsSource.empty:
+            print(" Beamline.parseSource: empty source, return.")
+            return None, None, None
+            
         SrcMode = int( \
            pndsSource[pndsSource["Parameter"]=="SourceMode"]["Value"].iloc[0] \
                        )
@@ -415,6 +450,13 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="SigmaEnergy"]["Value"].iloc[0])
             MinCTheta = float(\
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+        elif SrcMode == 2:               #.. Gaussian:
+            Emin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
+            Emax = float( \
+             pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
+            MinCTheta = float( \
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
 
         SigmaX  = float( \
             pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
@@ -430,15 +472,19 @@ class BeamLine(object):
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
-            print("                         ----> Min cos(Theta):", MinCTheta)
-            
+            elif SrcMode == 2:
+                print("                         ----> MinE and MaxE:", \
+                      MinE, MaxE)
+
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
 
-        
+        elif SrcMode == 2:
+            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax]
+
         Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                        + str(pndsSource["Stage"].iloc[0]) + ":" \
                        + pndsSource["Section"].iloc[0]    + ":" \
@@ -461,9 +507,20 @@ class BeamLine(object):
                     (cls.getBeamLineParamPandas()["Section"] != "Facility") \
                                                   ]
 
+        if pndsBeamline.empty:
+            print(" BeamLine.addBeamline: empty beam line, return.")
+            return
+            
         Section    = ""
         NewElement = True
         s         = 0.
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
+                                    iRefPrtcl.getPrIn()[0][:3]))
+        
         for iLine in pndsBeamline.itertuples():
             Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                            + str(iLine.Stage) + ":"  \
@@ -476,28 +533,31 @@ class BeamLine(object):
                 nAperture = 0
                 nFquad    = 0
                 nDquad    = 0
+                nSlnd     = 0
+                nGbrLns   = 0
+                nDpl      = 0
 
             if iLine.Element == "Drift":
                 nDrift   += 1
                 Name      = Name + str(nDrift)
                 Length    = float(iLine.Value)
-                rCtr      = np.array([0.,0.,s+Length/2.])
-                vCtr      = np.array([0.,0.])
-                drCtr     = np.array([0.,0.,0.])
-                dvCtr     = np.array([0.,0.])
+                rStrt      = np.array([0.,0.,s])
+                vStrt      = np.array([0.,0.])
+                drStrt     = np.array([0.,0.,0.])
+                dvStrt     = np.array([0.,0.])
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.Drift(Name, \
-                             rCtr, vCtr, drCtr, dvCtr, Length)
+                             rStrt, vStrt, drStrt, dvStrt, Length)
                 cls._Element.append(iBLE)
                 s += Length
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
-                rCtr  = np.array([0.,0.,s])
-                vCtr  = np.array([0.,0.])
-                drCtr = np.array([0.,0.,0.])
-                dvCtr = np.array([0.,0.])
+                rStrt  = np.array([0.,0.,s])
+                vStrt  = np.array([0.,0.])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([0.,0.])
                 if iLine.Type == "Circular":
                     Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
@@ -513,7 +573,7 @@ class BeamLine(object):
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.Aperture(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, Param)
+                                    rStrt, vStrt, drStrt, dvStrt, Param)
                 cls._Element.append(iBLE)
                 s += 0.
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
@@ -523,21 +583,25 @@ class BeamLine(object):
                     FqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
                     FqS = float(iLine.Value)
+                elif iLine.Parameter == "kq":
+                    kq   = float(iLine.Value)
+                    Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+                    FqS  = kq * Brho
                 if NewElement:
                     NewElement = False
                     continue
                 else:
                     NewElement = True
-                rCtr  = np.array([0.,0.,s+FqL/2.])
-                vCtr  = np.array([0.,0.])
-                drCtr = np.array([0.,0.,0.])
-                dvCtr = np.array([0.,0.])
+                rStrt  = np.array([0.,0.,s])
+                vStrt  = np.array([0.,0.])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([0.,0.])
                 nFquad += 1
                 Name       = Name + str(nFquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.FocusQuadrupole(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, FqL, FqS)
+                                    rStrt, vStrt, drStrt, dvStrt, FqL, FqS)
                 cls._Element.append(iBLE)
                 s += FqL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
@@ -547,26 +611,151 @@ class BeamLine(object):
                     DqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
                     DqS = float(iLine.Value)
+                elif iLine.Parameter == "kq":
+                    kq   = float(iLine.Value)
+                    Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+                    DqS  = kq * Brho
                 if NewElement:
                     NewElement = False
                     continue
                 else:
                     NewElement = True
-                rCtr  = np.array([0.,0.,s+DqL/2.])
-                vCtr  = np.array([0.,0.])
-                drCtr = np.array([0.,0.,0.])
-                dvCtr = np.array([0.,0.])
+                rStrt  = np.array([0.,0.,s+DqL])
+                vStrt  = np.array([0.,0.])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([0.,0.])
                 nDquad += 1
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.DefocusQuadrupole(Name, \
-                                    rCtr, vCtr, drCtr, dvCtr, DqL, DqS)
+                                    rStrt, vStrt, drStrt, dvStrt, DqL, DqS)
                 cls._Element.append(iBLE)
                 s += DqL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-                
+            elif iLine.Element == "Solenoid":
+                if NewElement:
+                    if iLine.Type == "Length, layers and turns":
+                        nLnsSlnd = 4
+                        iLnSlnd  = 1
+                    elif iLine.Type == "Length, strength":
+                        nLnsSlnd = 2
+                        iLnSlnd  = 1
+                    else:
+                        raise badParameter(" BeamLine.addbeam: Solenoid", \
+                                           " Type=", iLine.Type, \
+                                           " invalid.")
+                if iLine.Parameter == "Length":
+                    SlndL = float(iLine.Value)
+                elif iLine.Parameter == "Current":
+                    SlndI = float(iLine.Value)
+                elif iLine.Parameter == "Layers":
+                    SlndLy = float(iLine.Value)
+                elif iLine.Parameter == "Turns":
+                    SlndT = float(iLine.Value)
+                elif iLine.Parameter == "Strength":
+                    Slndks = float(iLine.Value)
+                if iLnSlnd < nLnsSlnd:
+                    iLnSlnd += 1
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                rStrt   = np.array([0.,0.,s])
+                vStrt   = np.array([0.,0.])
+                drStrt  = np.array([0.,0.,0.])
+                dvStrt  = np.array([0.,0.])
+                nSlnd += 1
+                Name  += str(nSlnd)
+                if iLine.Type == "Length, layers and turns":
+                    nTrns  = float(SlndLy) * float(SlndT)
+                    B0     = mu0*nTrns*SlndI/SlndL
+                elif iLine.Type == "Length, strength":
+                    Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+                    B0 = Slndks * Brho
+                else:
+                    raise badParameter(" BeamLine.addbeam: Solenoid", \
+                                       " Type=", iLine.Type, \
+                                       " invalid.")
+                if cls.getDebug():
+                    print("             ----> Add", Name)
+                cls._Element.append(BLE.Solenoid(Name, \
+                                rStrt, vStrt, drStrt, dvStrt, SlndL, B0) )
+                s += SlndL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+            elif iLine.Element == "Gabor lens":
+                if NewElement:
+                    if iLine.Type == "Length, strength":
+                        nLnsGbrLns = 2
+                        iLnGbrLns  = 1
+                    else:
+                        raise badParameter(" BeamLine.addbeam: Gabor lens", \
+                                           " Type=", iLine.Type, \
+                                           " invalid.")
+                if iLine.Parameter == "Length":
+                    GbrLnsL = float(iLine.Value)
+                elif iLine.Parameter == "Strength":
+                    GbrLnsks = float(iLine.Value)
+                if iLnGbrLns < nLnsGbrLns:
+                    iLnGbrLns += 1
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                rStrt   = np.array([0.,0.,s])
+                vStrt   = np.array([0.,0.])
+                drStrt  = np.array([0.,0.,0.])
+                dvStrt  = np.array([0.,0.])
+                nGbrLns += 1
+                Name  += str(nGbrLns)
+                if iLine.Type == "Length, strength":
+                    Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+                    B0 = GbrLnsks * Brho
+                else:
+                    raise badParameter(" BeamLine.addbeam: Gabor lens", \
+                                       " Type=", iLine.Type, \
+                                       " invalid.")
+                if cls.getDebug():
+                    print("             ----> Add", Name)
+                cls._Element.append(BLE.GaborLens(Name, \
+                                rStrt, vStrt, drStrt, dvStrt, \
+                                None, None, None, None, GbrLnsL, B0) )
+                s += GbrLnsL
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+            elif iLine.Element == "Dipole":
+                if NewElement:
+                    if iLine.Type == "Sector (Length, angle)":
+                        nLnsDpl = 2
+                        iLnDpl  = 1
+                    else:
+                        raise badParameter(" BeamLine.addbeam: Dipole", \
+                                           " Type=", iLine.Type, \
+                                           " invalid.")
+                if iLine.Parameter == "Length":
+                    DplL = float(iLine.Value)
+                elif iLine.Parameter == "Angle":
+                    DplA = float(iLine.Value)
+                    DplA = DplA * mth.pi / 180.
+                if iLnDpl < nLnsDpl:
+                    iLnDpl += 1
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                rStrt   = np.array([0.,0.,s])
+                vStrt   = np.array([0.,0.])
+                drStrt  = np.array([0.,0.,0.])
+                dvStrt  = np.array([0.,0.])
+                nDpl   += 1
+                Name   += str(nDpl)
+                rho     = DplL/DplA
+                B       = (1/(speed_of_light*1.E-9))*p0/rho/1000.
+                cls._Element.append(BLE.SectorDipole(Name, \
+                                rStrt, vStrt, drStrt, dvStrt, DplA, B))
+
             if cls.getDebug():
                 print("                 ---->", Name, \
                       "beam line element created.")
@@ -576,12 +765,11 @@ class BeamLine(object):
                 print("                         Momentum:", \
                       refPrtcl.getPrIn()[0])
                 print("                 <---- Done.")
-                
         
     def checkConsistency(self):
         ConsChk = False
         s       = 0.
-        if self._Element[0].getrCtr()[2] != 0.:
+        if self._Element[0].getrStrt()[2] != 0.:
             return
         for iBLE in BLE.BeamLineElement.getinstances():
             if isinstance(iBLE, BLE.Drift):
@@ -590,10 +778,14 @@ class BeamLine(object):
                 s += iBLE.getLength()
             elif isinstance(iBLE, BLE.DefocusQuadrupole):
                 s += iBLE.getLength()
+            elif isinstance(iBLE, BLE.Solenoid):
+                s += iBLE.getLength()
+            elif isinstance(iBLE, BLE.GaborLens):
+                s += iBLE.getLength()
 
         iBLElast = BLE.BeamLineElement.getinstances() \
                             [len(BLE.BeamLineElement.getinstances())-1]
-        dif = (iBLElast.getrCtr()[2] + iBLElast.getLength()/2.) - s
+        dif = iBLElast.getrStrt()[2] + iBLElast.getLength() - s
 
         if abs(dif) > 1E-6:
             return ConsChk
@@ -648,7 +840,6 @@ class BeamLine(object):
             #.. Track through beam line:
             TrcSpc_i = SrcTrcSpc
             TrcSpc   = SrcTrcSpc
-            HlfLngth = 0.
             if cls.getDebug():
                 print("     ----> Transport through beam line")
             iLoc = -1
@@ -659,10 +850,7 @@ class BeamLine(object):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
-                HlfLngth = iBLE.getLength() / 2.
-                if isinstance(iBLE, BLE.FocusQuadrupole) or \
-                   isinstance(iBLE, BLE.DefocusQuadrupole):
-                    p0     = iRefPrtcl.getMomentumIn(iLoc)
+                
                 TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
@@ -675,7 +863,7 @@ class BeamLine(object):
                               " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd    = iBLE.getrCtr()[2] + HlfLngth
+                    zEnd    = iBLE.getrStrt()[2]
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
                                                        zEnd, \

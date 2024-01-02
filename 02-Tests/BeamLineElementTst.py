@@ -30,11 +30,11 @@ except:
 
 #.. Create valid instance:
 Name = "BLE1"
-rCtr = np.array([0.,0.,0.])
-vCtr = np.array([0.,0.])
-drCtr = np.array([0.,0.,0.])
-dvCtr = np.array([0.,0.])
-BmLnElmnt = BLE.BeamLineElement(Name, rCtr, vCtr, drCtr, dvCtr)
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([0.,0.])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([0.,0.])
+BmLnElmnt = BLE.BeamLineElement(Name, rStrt, vStrt, drStrt, dvStrt)
     
 #.. __repr__
 print("    __repr__:")
@@ -67,8 +67,8 @@ print("BeamLineElementTest:", BeamLineElementTest, \
       " coordinate transformations.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
 print("     ----> Input phase-space vector:", R)
-BmLnElmnt.setdrCtr(np.array([0.1, 0.2, 0.3]))
-print("     ----> Offset to centre of element position:", BmLnElmnt.getdrCtr())
+BmLnElmnt.setdrStrt(np.array([0.1, 0.2, 0.3]))
+print("     ----> Offset to start of element position:", BmLnElmnt.getdrStrt())
 Rprime = BmLnElmnt.Shift2Local(R)
 print("         ----> Phase-space vector in local coordiantes:", Rprime)
 R2prime = BmLnElmnt.Shift2Global(Rprime)

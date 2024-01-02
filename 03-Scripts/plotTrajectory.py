@@ -43,7 +43,7 @@ while not EndOfFile:
     EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     iEvt      += 1
     iPrtcl    = Prtcl.Particle.getParticleInstances()[1]
-    if iPrtcl.getz()[len(iPrtcl.getz())-1] > 1.9:
+    if iPrtcl.getz()[len(iPrtcl.getz())-1] > 1.88:
         print("     ----> iEvt:", iEvt, " made it all the way.")
         break
     else:
