@@ -1,5 +1,5 @@
 Stage,Section,Element,Type,Parameter,Value,Unit,Comment
-0,Facility,Global,Name,Name,LhARA,,"Bio PoP, configuration 1.1 (Triplet 3 + triplet 2)"
+0,Facility,Global,Name,Name,SCAPA,,"Bio PoP, configuration 1.1 (Triplet 3 + triplet 2)"
 0,Facility,Global,Reference particle,Kinetic energy,12,MeV,Same energy as in reference document
 1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy
 1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
