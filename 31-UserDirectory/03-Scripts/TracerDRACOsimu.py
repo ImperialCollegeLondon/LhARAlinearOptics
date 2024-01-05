@@ -13,8 +13,8 @@ data_file     = 'DRACOsimu.dat'
 
 #We start with beamline plotting 
 
-Tr.BeamlinePlotter.Tracer(10, 40, colour='r', label='E<40MeV', filename=data_file, facility = beamline_file, maxz = 2.135)
-Tr.BeamlinePlotter.Tracer(40, 100, colour='b', label='E>40MeV', filename=data_file, facility = beamline_file, maxz = 2.135)
+Tr.BeamlinePlotter.Tracer(19.5, 20.5, colour='b', label='E=20MeV', filename=data_file, facility = beamline_file, maxz = 2.135)
+Tr.BeamlinePlotter.Tracer(20.5, 21.5, colour='r', label='E=21MeV', filename=data_file, facility = beamline_file, maxz = 2.135)
 
 Tr.BeamlinePlotter.plt_apt(filename=beamline_file)
 Tr.BeamlinePlotter.plt_solenoid(filename=beamline_file)
