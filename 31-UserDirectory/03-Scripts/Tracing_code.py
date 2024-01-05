@@ -231,8 +231,7 @@ class BeamlinePlotter(object):
 
     def plt_quad(filename, HOMEPATH = os.getenv('HOMEPATH')):
 
-            filename    = os.path.join(HOMEPATH, \
-                             '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
+            filename    = os.path.join(HOMEPATH, filename)
             params = pd.read_csv(filename)           
             z = BeamlinePlotter.get_zlist(HOMEPATH  = HOMEPATH, filename = filename)   
             elements = BeamlinePlotter.get_elementlist(HOMEPATH  = HOMEPATH, filename = filename)
