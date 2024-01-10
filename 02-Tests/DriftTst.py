@@ -104,7 +104,7 @@ BLE.Drift.setDebug(False)
 DriftTest += 1
 print()
 print("DriftTest:", DriftTest, " test transport through drift.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.05])
 Rprime = Drft.Transport(R)
 print("     ----> Input phase-space vector:", R)
 print("     ----> Relevant portions of transfer matrix:")
@@ -124,11 +124,14 @@ print("         ", Drft.getTransferMatrix()[3,0], \
                    Drft.getTransferMatrix()[3,1], \
                    Drft.getTransferMatrix()[3,2], \
                    Drft.getTransferMatrix()[3,3])
-print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ 0.65,  0.1,  -0.6,  -0.2,   0.,    0.  ])
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Transported phase-space vector:", Rprime)
+RprimeTest = np.array([ 0.65, 0.1, -0.6, -0.2, 1.840707893, 0.05])
+                        
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
-print("     ----> Difference Rprime - RprimeTest:", Diff)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Difference Rprime - RprimeTest:", Diff)
 print("     ----> Magnitude of Diff:", Norm)
 if Norm > 1E-6:
     raise Exception(" !!!!----> FAILED: drift transport result not as expected.")

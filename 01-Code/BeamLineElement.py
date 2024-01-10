@@ -4,6 +4,9 @@
 To do:
 ======
  - Still to do:
+   - Editing/checking pass through BLEs to make sure up to date with
+     documentation.
+   - Constants
    - KL: Add length to aperture: i.e. there can be a length to the plate
          or other collimator structure.
    - KL: Add rotation to Shift2Local and Shift2Global.  Need to update dvStrt
@@ -96,6 +99,8 @@ constants_instance: Instance of PhysicalConstants class
 
 Created on Mon 12Jun23: Version history:
 ----------------------------------------
+ 1.1: 10Jan24: Update setTraceSpaceAtSource to make it match documented
+               definititions.
  1.0: 12Jun23: First implementation
 
 @author: kennethlong
@@ -2538,29 +2543,20 @@ class Source(BeamLineElement):
             print(" BeamLineElement(Source).getParticleFromSource: start")
 
         #.. Generate initial particle:
-        GotOne = False
-        nTrys  = 0
-        while not GotOne:
-            nTrys += 1
-            x, y, K, cTheta, Phi = self.getParticle()
-            if self.__Debug:
-                print("     ----> x, y, K, cTheta, Phi:", \
-                      x, y, K, cTheta, Phi)
+        x, y, K, cTheta, Phi = self.getParticle()
+        if self.__Debug:
+            print("     ----> x, y, K, cTheta, Phi:", \
+                  x, y, K, cTheta, Phi)
 
-            #.. Convert to trace space:
-            TrcSpc = self.getTraceSpace(x, y, K, cTheta, Phi)
-            if self.__Debug:
-                print("     ----> Trace space:", TrcSpc)
+        #.. Convert to trace space:
+        TrcSpc = self.getTraceSpace(x, y, K, cTheta, Phi)
+        if self.__Debug:
+            print("     ----> Trace space:", TrcSpc)
 
-            if not isinstance(TrcSpc, np.ndarray):
-                if self.__Debug:
-                    print("     ----> Failed to pass aperture cut.")
-                continue
+        if not isinstance(TrcSpc, np.ndarray):
+            if self.__Debug:
+                raise FailToCreateTraceSpaceAtSource()
                 
-            GotOne = True
-            if self.__Debug:
-                print("     <---- Finally got one after", nTrys, " trys.")
-
         if self.__Debug:
             print(" <---- BeamLineElement(Source).getParticleFromSource,", \
                   " done.", \
@@ -2646,23 +2642,27 @@ class Source(BeamLineElement):
             print("     ----> x, y, K, cTheta, Phi:", \
                   x, y, K, cTheta, Phi)
             
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        p0        = iRefPrtcl.getMomentumIn(0)
+        E0        = mth.sqrt( protonMASS**2 + p0**2)
+        b0        = p0/E0
+        if self.getDebug():
+            print("     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, \
+                  "(", E0-protonMASS, ")")
+
+        E = protonMASS+K
+        p = mth.sqrt(E**2 - protonMASS**2)
+        if self.getDebug():
+            print("     ----> K, E, p:", K, E, p)
+        
         sTheta = mth.sqrt(1.-cTheta**2)
-        xPrime = sTheta * mth.cos(Phi)
-        yPrime = sTheta * mth.sin(Phi)
+        xPrime = sTheta * mth.cos(Phi) * p / p0
+        yPrime = sTheta * mth.sin(Phi) * p / p0
         
         if self.getDebug():
             print("     ----> sTheta, xPrime, yPrime:", 
                   sTheta, xPrime, yPrime)
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        p0        = iRefPrtcl.getMomentumIn(0)
-        E0        = mth.sqrt( protonMASS**2 + p0**2)
-        b0        = p0/E0
-
-        if self.getDebug():
-            print("     ----> p0, E0, b0:", p0, E0, b0)
-
-        E         = protonMASS+K
         delta     = (E - E0) / p0
         
         if self.getDebug():
@@ -2694,5 +2694,8 @@ class badParameters(Exception):
     pass
 
 class ReferenceParticleNotSpecified(Exception):
+    pass
+
+class FailToCreateTraceSpaceAtSource(Exception):
     pass
 

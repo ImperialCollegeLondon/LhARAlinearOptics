@@ -1,0 +1,39 @@
+--------  --------  --------  --------  --------  --------  --------  10Jan24
+New understanding of trace space as gleaned from Wolski's book and some
+labour.  Start to work through updates; documentation and code modes at
+the same time.  Start with set of particle from source.
+ - Fixed "setTraceSpaceAtSource"; scale by p/p0
+ - Created 6D spreadsheet for test of Drift.
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamLineTst.py          - 
+ - BeamLineElementTst.py   - 
+ - DRACOfacilityTst.py     - 
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DriftTst.py             - 
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         - 
+ - LIONfacilityTst.py      - 
+ - LhARAFacilityTst.py     - 
+ - OctupoleTst.py          - Runs, but, reports difference with expected result
+ - ParticleTst.py          - 
+ - PhysicalConstantsTst.py - 
+ - RFCavityTst.py          - Fails with "bad beamline element" interupt
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestRead.py             - 
+ - TestWrite.py            - 
+
+Scripts:
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotTrajectory.py       - 
