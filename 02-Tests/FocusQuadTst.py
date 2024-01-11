@@ -73,8 +73,11 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-FQuad = BLE.FocusQuadrupole("ValidQuad", rStrt, vStrt, drStrt, dvStrt, \
+FQuad = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
                             0.1, 100.)
+FQuad = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
+                            0.1, None, 153.93033817278908)
+            
 #.. __repr__
 print("    __repr__:")
 print("      ---->", repr(FQuad))

@@ -898,8 +898,10 @@ Derived class FocusQuadrupole:
   Set methods:
     setLength: set length:
           Input: _Length (float): length of quad (m)
-  setStrength: -Strength (float): strength of quad (T/m)
-          Input: _Length (float): length of quad
+  setStrength: _Strength (float): strength (gradient) of quad (T/m)
+          Input: _Strength (float)
+       setkFQ: _kFQ (float): quad focusing, k (m**-2)
+          Input: _kFQ (float)
 
 setTransferMatrix: Set transfer matrix; calculate using i/p brhop
           Input: Brho (T m)
@@ -921,11 +923,11 @@ setTransferMatrix: Set transfer matrix; calculate using i/p brhop
 """
 class FocusQuadrupole(BeamLineElement):
     instances = []
-    __Debug = False
+    __Debug = True
 
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
-                 _Length=None, _Strength=None):
+                 _Length=None, _Strength=None, _kFQ=None):
         
         if self.getDebug():
             print(' FocusQuadrupole.__init__: ', \
@@ -934,21 +936,30 @@ class FocusQuadrupole(BeamLineElement):
 
         FocusQuadrupole.instances.append(self)
 
+        self.setAll2None()
+
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement("FocusQuadrupole: bad specification", \
                                      " for length!")
-        if not isinstance(_Strength, float):
+        if not isinstance(_Strength, float) and \
+           not isinstance(_kFQ, float):
             raise badBeamLineElement("FocusQuadrupole: bad specification", \
                                      " for quadrupole strength!")
 
         self.setLength(_Length)
-        self.setStrength(_Strength)
-
+        if isinstance(_Strength, float):
+            self.setStrength(_Strength)
+            self.setkFQ(self.calckFQ())
+        if isinstance(_kFQ, float):
+            self.setkFQ(_kFQ)
+            self.setStrength(self.calcStrength())
+                
         if self.getDebug():
             print("     ----> New FocusQuadrupole instance: \n", self)
+            print(" <---- Done.")
 
     def __repr__(self):
         return "FocusQuadrupole()"
@@ -967,12 +978,23 @@ class FocusQuadrupole(BeamLineElement):
     def SummaryStr(self):
         Str  = "FocusQuadrupole  : " + BeamLineElement.SummaryStr(self) + \
             "; Length = " + str(self.getLength()) + \
-            "; Strength = " + str(self.getStrength())
+            "; Strength (gradient) = " + str(self.getStrength()) + \
+            "; kFQ = ", + str(self.getStrength())
         return Str
 
     
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
+    def setAll2None(self):
+        self._Length   = None
+        self._Strength = None
+        self._kFQ      = None
+        self._TrnsMtrx = None
+        
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
@@ -987,6 +1009,13 @@ class FocusQuadrupole(BeamLineElement):
                     " bad quadrupole strength:", _Strength)
         self._Strength = _Strength
 
+    def setkFQ(self, _kFQ):
+        if not isinstance(_kFQ, float):
+            raise badParameter( \
+                    "BeamLineElement.FocusQuadrupole.setStrength:", \
+                                " bad quadrupole k constant:", _kFQ)
+        self._kFQ = _kFQ
+
     def setTransferMatrix(self, _R):
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
@@ -997,7 +1026,8 @@ class FocusQuadrupole(BeamLineElement):
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
                                     iRefPrtcl.getPrOut()[iPrev][:3]))
         E0        = iRefPrtcl.getPrOut()[iPrev][3]
-        b02       = (p0/E0)**2
+        b0        = p0/E0
+        b02       = b0**2
         g02       = 1./(1.-b02)
         
         if self.getDebug():
@@ -1012,23 +1042,22 @@ class FocusQuadrupole(BeamLineElement):
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> Trace space:", _R)
                 
-        E    = E0 + p0*_R[5]
-        p    = mth.sqrt(E**2 - protonMASS**2)
+        D = mth.sqrt(1. + 2.*_R[5]/b0 + _R[5]**2)
         
         if self.getDebug():
-            print("     ----> Particle energy and mmtm:", E, p)
+            print("     ----> D:", D)
 
-        Brho = (1./(speed_of_light*1.E-9))*p/1000.
-        k = self.getStrength() / Brho
+        k = self.getkFQ()
         l = self.getLength()
 
-        b = mth.sqrt(k)
+        b = mth.sqrt(k/D)
         a = l * b
+        b = b * D
 
         if self.getDebug():
-            print("     ----> Length, Strength:", \
-                  self.getLength(), self.getStrength())
-            print("     ----> Brho, k, l:", Brho, k, l)
+            print("     ----> Length, Strength, kFQ:", \
+                  self.getLength(), self.getStrength(), self.getkFQ())
+            print("     ----> omegaPrime*L, omegaPrime*D:", a, b)
 
         TrnsMtrx = np.array([                                             \
             [   np.cos(a), np.sin(a)/b, 0., 0.,                   0., 0.],\
@@ -1048,12 +1077,73 @@ class FocusQuadrupole(BeamLineElement):
         
 # -------- "Get methods"
 # Methods believed to be self-documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+    
     def getLength(self):
         return self._Length
 
     def getStrength(self):
         return self._Strength
 
+    def getkFQ(self):
+        return self._kFQ
+
+# -------- Utilities:
+    def calckFQ(self):
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+
+        iPrev = len(iRefPrtcl.getPrOut()) - 1
+
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
+                                    iRefPrtcl.getPrOut()[iPrev][:3]))
+        
+        if self.getDebug():
+            print(" FocusQuadrupole(BeamLineElement).calckFQ:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Reference particle 4-mmtm:", \
+                      iRefPrtcl.getPrOut()[iPrev])
+            print("         ----> p0:", p0)
+
+        Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+        kFQ  = self.getStrength() / Brho
+
+        if self.getDebug():
+            print("     <---- kFQ:", kFQ)
+            print(" <---- Done.")
+
+        return kFQ
+
+    def calcStrength(self):
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+
+        iPrev = len(iRefPrtcl.getPrOut()) - 1
+
+        p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
+                                    iRefPrtcl.getPrOut()[iPrev][:3]))
+        
+        if self.getDebug():
+            print(" FocusQuadrupole(BeamLineElement).calcStrength:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Reference particle 4-mmtm:", \
+                      iRefPrtcl.getPrOut()[iPrev])
+            print("         ----> p0:", p0)
+
+        Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+        Strn = self.getkFQ() * Brho
+
+        if self.getDebug():
+            print("     <---- Strength:", Strn)
+            print(" <---- Done.")
+
+        return Strn
+
+    
     
 """
 Derived class DefocusQuadrupole:
