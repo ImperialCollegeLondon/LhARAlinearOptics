@@ -287,6 +287,7 @@ class BeamLineElement:
 
 #--------  Utilities:
     def Transport(self, _R):
+        self.setDebug(True)
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
@@ -320,6 +321,7 @@ class BeamLineElement:
             y=0.
             z=x/y
 
+        self.setDebug(False)
         return _Rprime
 
     def Shift2Local(self, _R):

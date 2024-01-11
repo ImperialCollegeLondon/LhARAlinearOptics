@@ -107,7 +107,7 @@ FocusQuadrupoleTest += 1
 print()
 print("FocusQuadrupoleTest:", FocusQuadrupoleTest, \
       " test transport through focusing quadrupole.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = FQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
@@ -130,8 +130,8 @@ print("         ", FQuad.getTransferMatrix()[3,0], \
                    FQuad.getTransferMatrix()[3,3])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ 0.169698254, -5.836075396, -0.58761661, \
-                        -6.271951923, 0.,  0. ])
+RprimeTest = np.array([ 0.356538237, -6.855300654, -0.406762285, \
+                        -5.375084494, 1.260471929, 0.5 ])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)

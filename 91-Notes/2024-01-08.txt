@@ -1,3 +1,9 @@
+--------  --------  --------  --------  --------  --------  --------  11Jan24
+Update quadrupoles now to correspond to new trace space.  Use the form that
+accounts for dispersion and separates longitudinal and transverse trace space.
+ - Update to FocusQuadrupole and FocusQuadrupoleTst
+   - Presently documentation is behind
+   
 --------  --------  --------  --------  --------  --------  --------  10Jan24
 New understanding of trace space as gleaned from Wolski's book and some
 labour.  Start to work through updates; documentation and code modes at
