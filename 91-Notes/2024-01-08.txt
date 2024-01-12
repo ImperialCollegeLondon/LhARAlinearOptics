@@ -1,7 +1,9 @@
 --------  --------  --------  --------  --------  --------  --------  11Jan24
 Update quadrupoles now to correspond to new trace space.  Use the form that
 accounts for dispersion and separates longitudinal and transverse trace space.
- - Update to FocusQuadrupole and FocusQuadrupoleTst
+ - Update to FocusQuadrupole, FocusQuadrupoleTst, and spreadsheet
+   - Presently documentation is behind
+ - Update to DeocusQuadrupole and DefocusQuadrupoleTst, and spreadsheet
    - Presently documentation is behind
    
 --------  --------  --------  --------  --------  --------  --------  10Jan24

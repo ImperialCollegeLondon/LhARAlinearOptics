@@ -73,8 +73,11 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-DfQuad = BLE.DefocusQuadrupole("ValidDquad", \
-                               rStrt, vStrt, drStrt, dvStrt, 0.1, 100.)
+DfQuad = BLE.DefocusQuadrupole("ValidDquad1", rStrt, vStrt, drStrt, dvStrt, \
+                               0.1, 100.)
+    
+DfQuad = BLE.DefocusQuadrupole("ValidDquad2", rStrt, vStrt, drStrt, dvStrt, \
+                               0.1, None, 153.93033817278908)
     
 #.. __repr__
 print("    __repr__:")
@@ -105,7 +108,7 @@ DefocusQuadrupoleTest += 1
 print()
 print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, \
       " test transport through defocusing quadrupole.")
-R      = np.array([0.01, 0.1, -0.01, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = DfQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
@@ -128,8 +131,8 @@ print("         ", DfQuad.getTransferMatrix()[3,0], \
                    DfQuad.getTransferMatrix()[3,3])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.031506217, 0.383933123, -0.018491197, 
-                       0.052540446, 0.,  0.])
+RprimeTest = np.array([0.667543064, 8.649032875, -0.218994666, 4.01436403, \
+                       1.260471929, 0.5])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)
