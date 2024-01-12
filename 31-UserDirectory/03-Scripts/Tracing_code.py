@@ -111,10 +111,27 @@ class BeamlinePlotter(object):
                 i += 1
         my_list = new_list
         
+        #Eliminate one of the apertures for every Fquad and Dquad
+        
+        lst = my_list
+        result = []
+        skip_next = False
+
+        for i in range(len(lst)):
+            if skip_next:
+                skip_next = False
+                #continue
+
+            if lst[i] == "Aperture" and i + 1 < len(lst) and (lst[i + 1] == "Fquad" or lst[i + 1] == "Dquad"):
+                skip_next = True
+            else:
+                result.append(lst[i])
+        my_list = result
+        
         #Eliminate the Drifts
         new_list = []
         for i in my_list:
-            if i != 'Drift':
+            if i != 'Drift' and i != 'Global':
                 new_list.append(i)
         
         return new_list
@@ -196,7 +213,9 @@ class BeamlinePlotter(object):
             j      = find_rows(params, 'Aperture', avoid='Radius of solenoid bore')
 
             z        = BeamlinePlotter.get_zlist(HOMEPATH  = HOMEPATH, filename = filename)
+            #print(z, len(z))
             elements = BeamlinePlotter.get_elementlist(HOMEPATH  = HOMEPATH, filename = filename)
+            #print(elements, len(elements))
             aux_elem = elements.copy()
             
             index = []
@@ -206,12 +225,14 @@ class BeamlinePlotter(object):
                 index.append(ind)
                 aux_elem.remove('Aperture')
                 aux_elem.insert(ind, 'removed')
-
-            for i in range(len(j)):
+            
+            #print(index)
+            
+            for i in range(len(index)):
 
                 label = 'Aperture'
 
-                apt_posi = z[index[i]-1]
+                apt_posi = z[index[i]]
 
                 apt_rad = float(params.iloc[j[i]][5])
 
@@ -221,8 +242,8 @@ class BeamlinePlotter(object):
 
                 axs[1].plot(apt_z, apt_x, linestyle='-', label = 'Aperture %d'%(i+1))
 
-                if index[i] == 2: #Automatizar apertura elíptica
-                        apt_rad = params.iloc[9][5] # for eliptical aperture, new radius in y-plane
+              #  if index[i] == 2: #Automatizar apertura elíptica
+               #         apt_rad = params.iloc[9][5] # for eliptical aperture, new radius in y-plane
                 apt_y = np.array([-3*apt_rad, -apt_rad, None, apt_rad, 3*apt_rad])
                 axs[2].plot(apt_z, apt_y, linestyle='-', label = label)
                 
@@ -231,10 +252,13 @@ class BeamlinePlotter(object):
 
     def plt_quad(filename, HOMEPATH = os.getenv('HOMEPATH')):
 
-            filename    = os.path.join(HOMEPATH, filename)
-            params = pd.read_csv(filename)           
-            z = BeamlinePlotter.get_zlist(HOMEPATH  = HOMEPATH, filename = filename)   
+            filedir    = os.path.join(HOMEPATH, \
+                             '11-Parameters/' + filename)
+            params = pd.read_csv(filedir)
+            z = BeamlinePlotter.get_zlist(HOMEPATH  = HOMEPATH, filename = filename)
+            #print(z)
             elements = BeamlinePlotter.get_elementlist(HOMEPATH  = HOMEPATH, filename = filename)
+            #print(elements)
             Daux_elem = elements.copy()
             Faux_elem = elements.copy()
             
@@ -251,15 +275,15 @@ class BeamlinePlotter(object):
                 ind = Faux_elem.index('Fquad')
                 Findex.append(ind)
                 Faux_elem.remove('Fquad')
-                Faux_elem.insert(ind, 'removed')            
-            
-            j      = find_rows(params, 'Dquad')
-            for i in range(len(j)):
+                Faux_elem.insert(ind, 'removed')
+                
+            j      = find_rows(params, 'Dquad', use_include = True, include = 'Length') #esto incluye la fila con strength
+            for i in range(len(j)): #formerly j
                     label_name = 'DQuad'
 
                     quad_posi = z[Dindex[i]]
-                    quad_lnth = params.iloc[j[i]][5]
-
+                    quad_lnth = float(params.iloc[j[i]][5])
+                    
                     ori = -1
 
                     quad_coords = [(quad_posi - quad_lnth, ori*6E-3), (quad_posi -(quad_lnth), ori*5E-3), (quad_posi, ori*5E-3), (quad_posi, ori*6E-3), (quad_posi - quad_lnth, ori*6E-3)]      
@@ -268,12 +292,14 @@ class BeamlinePlotter(object):
                     axs[1].plot(quad_w, quad_h, linestyle='-', label = label_name)
                     axs[2].plot(quad_w, quad_h, linestyle='-', label = label_name)
                     
-            j      = find_rows(params, 'Fquad')
+            j      = find_rows(params, 'Fquad', use_include = True, include = 'Length')
+            
             for i in range(len(j)):
                     label_name = 'FQuad'
 
                     quad_posi = z[Findex[i]]
-                    quad_lnth = params.iloc[j[i]][5]
+                    quad_lnth = float(params.iloc[j[i]][5]) #formerly 5
+                    print(quad_lnth)
 
                     ori = 1
 
@@ -352,13 +378,13 @@ class BeamlinePlotter(object):
             axs[0].set_title('Particle Beam at Final Collimator x-y plane')
 
             axs[1].grid(True)
-            axs[1].legend(loc = 'upper left', fontsize = 'small')
+           # axs[1].legend(loc = 'upper left', fontsize = 'small')
             axs[1].set_xlabel('z-axis')
             axs[1].set_ylabel('x-axis')
             axs[1].set_title('Particle Trajectory x-z plane')
 
             axs[2].grid(True)
-            axs[2].legend(loc = 'upper left', fontsize = 'small')
+          #  axs[2].legend(loc = 'upper left', fontsize = 'small')
             axs[2].set_xlabel('z-axis')
             axs[2].set_ylabel('y-axis')
             axs[2].set_title('Particle Trajectory y-z plane')
@@ -430,8 +456,7 @@ class BeamlinePlotter(object):
 def plt_colim(z): 
         #HOMEPATH = os.getenv('HOMEPATH')
         HOMEPATH   = '/Users/alfredo/Desktop/PhD/LhARA/LhARAlinearOptics/'
-        filename    = os.path.join(HOMEPATH, \
-                         '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
+        filename    = os.path.join(HOMEPATH, filename)
         params = pd.read_csv(filename)
         
         elip = False #figure out how to automatise this
