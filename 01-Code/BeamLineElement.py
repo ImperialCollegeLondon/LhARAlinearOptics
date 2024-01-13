@@ -2836,12 +2836,12 @@ class Source(BeamLineElement):
             print("     ----> K, E, p:", K, E, p)
         
         sTheta = mth.sqrt(1.-cTheta**2)
-        """
         xPrime = sTheta * mth.cos(Phi) * p / p0
         yPrime = sTheta * mth.sin(Phi) * p / p0
         """
         xPrime = sTheta * mth.cos(Phi)
         yPrime = sTheta * mth.sin(Phi)
+        """
         
         if self.getDebug():
             print("     ----> sTheta, xPrime, yPrime:", 
