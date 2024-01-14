@@ -59,7 +59,10 @@ except:
     print('      ----> Correctly trapped no solenoid length exception.')
 
 #.. Create valid instance:
-Sol = BLE.Solenoid("Solenoid2", rStrt, vStrt, drStrt, dvStrt, 0.5, 1.4)
+Sol  = BLE.Solenoid("ValidSolenoid1", rStrt, vStrt, drStrt, dvStrt, \
+                    0.5, 1.4)
+Sol1 = BLE.Solenoid("ValidSolenoid2", rStrt, vStrt, drStrt, dvStrt, \
+                    0.5, None, 2.155024734419047)
     
 #.. __repr__
 print("    __repr__:")

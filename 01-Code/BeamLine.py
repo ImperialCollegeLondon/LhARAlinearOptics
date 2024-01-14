@@ -232,7 +232,9 @@ class BeamLine(object):
         print("     ----> Debug flag:", BeamLine.getDebug())
         print("     ----> Source and beam line:")
         Section = ""
+        iCnt = -1
         for iBLE in BLE.BeamLineElement.getinstances():
+            iCnt += 1
             NameStrs = iBLE.getName().split(":")
             if len(NameStrs) == 1:
                 Section = NameStrs[0]
@@ -240,7 +242,7 @@ class BeamLine(object):
             elif NameStrs[2] != Section:
                 Section = NameStrs[2]
                 print("        ---->", NameStrs[2])
-            print("            ---->", iBLE.SummaryStr())            
+            print("            ---->", iCnt, ":", iBLE.SummaryStr())            
         print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
         return " <---- Beam line parameter dump complete."
@@ -755,6 +757,8 @@ class BeamLine(object):
                 B       = (1/(speed_of_light*1.E-9))*p0/rho/1000.
                 cls._Element.append(BLE.SectorDipole(Name, \
                                 rStrt, vStrt, drStrt, dvStrt, DplA, B))
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
 
             if cls.getDebug():
                 print("                 ---->", Name, \
@@ -781,6 +785,8 @@ class BeamLine(object):
             elif isinstance(iBLE, BLE.Solenoid):
                 s += iBLE.getLength()
             elif isinstance(iBLE, BLE.GaborLens):
+                s += iBLE.getLength()
+            elif isinstance(iBLE, BLE.SectorDipole):
                 s += iBLE.getLength()
 
         iBLElast = BLE.BeamLineElement.getinstances() \

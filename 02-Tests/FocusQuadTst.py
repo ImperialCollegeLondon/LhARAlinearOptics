@@ -73,8 +73,11 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-FQuad = BLE.FocusQuadrupole("ValidQuad", rStrt, vStrt, drStrt, dvStrt, \
+FQuad = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
                             0.1, 100.)
+FQuad = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
+                            0.1, None, 153.93033817278908)
+            
 #.. __repr__
 print("    __repr__:")
 print("      ---->", repr(FQuad))
@@ -104,31 +107,16 @@ FocusQuadrupoleTest += 1
 print()
 print("FocusQuadrupoleTest:", FocusQuadrupoleTest, \
       " test transport through focusing quadrupole.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = FQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
-print("     ----> Relevant portions of transfer matrix:")
-print("         ", FQuad.getTransferMatrix()[0,0], \
-                   FQuad.getTransferMatrix()[0,1], \
-                   FQuad.getTransferMatrix()[0,2], \
-                   FQuad.getTransferMatrix()[0,3])
-print("         ", FQuad.getTransferMatrix()[1,0], \
-                   FQuad.getTransferMatrix()[1,1], \
-                   FQuad.getTransferMatrix()[1,2], \
-                   FQuad.getTransferMatrix()[1,3])
-print("         ", FQuad.getTransferMatrix()[2,0], \
-                   FQuad.getTransferMatrix()[2,1], \
-                   FQuad.getTransferMatrix()[2,2], \
-                   FQuad.getTransferMatrix()[2,3])
-print("         ", FQuad.getTransferMatrix()[3,0], \
-                   FQuad.getTransferMatrix()[3,1], \
-                   FQuad.getTransferMatrix()[3,2], \
-                   FQuad.getTransferMatrix()[3,3])
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Transfer matrix: \n", FQuad.getTransferMatrix())
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ 0.169698254, -5.836075396, -0.58761661, \
-                        -6.271951923, 0.,  0. ])
+RprimeTest = np.array([ 0.361914303, -2.717602932, -0.419983646, -2.322331701, \
+                        1.260471929, 0.5 ])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)

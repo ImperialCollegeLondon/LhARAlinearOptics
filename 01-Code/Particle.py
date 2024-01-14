@@ -363,17 +363,22 @@ class Particle:
                 'weight': 'normal', \
                 'size': 16, \
                 }
-
+        plt.rcParams["figure.figsize"] = (7.5, 10.)
+        
         nLoc   = []
         xLoc   = []
         xpLoc  = []
         yLoc   = []
         ypLoc  = []
         ELoc   = []
+        ELab   = []
+        Scl    = []
+        
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
             if isinstance(iPrtcl, ReferenceParticle):
+                iRefPrtcl = iPrtcl
                 continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
@@ -385,16 +390,44 @@ class Particle:
                     yLoc.append([])
                     ypLoc.append([])
                     ELoc.append([])
+                    ELab.append([])
+                    Scl.append([])
 
+                """
+                print(" Here:", iLoc)
+                print("     ---->", iPrtcl.getTraceSpace()[iLoc])
+                print("     ---->", iRefPrtcl.getPrOut()[iLoc])
+                """
+
+                p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc][:3], \
+                                     iRefPrtcl.getPrOut()[iLoc][:3]))
+                E0  = iRefPrtcl.getPrOut()[iLoc][3]
+                b0  = p0/E0
+                E   = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
+                p   = mth.sqrt(E**2 - protonMASS**2)
+                E  -= protonMASS
+                D   = mth.sqrt(1. + \
+                               2.*iPrtcl.getTraceSpace()[iLoc][5]/b0 +
+                               iPrtcl.getTraceSpace()[iLoc][5]**2)
+
+                """
+                eps = ( iPrtcl.getTraceSpace()[iLoc][1]**2 +    \
+                        iPrtcl.getTraceSpace()[iLoc][3]**2  ) / \
+                        (2.*D**2)
+                """
+                eps = (p - p0) / p0
+                
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
                 yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
                 ypLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][3])
                 ELoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
+                ELab[iLoc].append(E)
+                Scl[iLoc].append(eps)
 
         for iLoc in range(len(xLoc)):
-            fig, axs = plt.subplots(nrows=2, ncols=2)
-            fig, axs = plt.subplots(ncols=2, nrows=2, figsize=(6., 6.), \
+            fig, axs = plt.subplots(nrows=3, ncols=2)
+            fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
                                     layout="constrained")
             # add an artist, in this case a nice label in the middle...
             """
@@ -428,6 +461,14 @@ class Particle:
             axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
             axs[1, 1].set_xlabel('y (m)')
             axs[1, 1].set_ylabel('yprime (m)')
+
+            axs[2, 0].hist(ELab[iLoc], 100)
+            axs[2, 0].set_xlabel('Kinetic energy (MeV)')
+            axs[2, 0].set_ylabel('Number')
+
+            axs[2, 1].hist(Scl[iLoc], 100)
+            axs[2, 1].set_xlabel('dp/p')
+            axs[2, 1].set_ylabel('Number')
 
         
             plotFILE = '99-Scratch/ParticleProgressionPlot' + \

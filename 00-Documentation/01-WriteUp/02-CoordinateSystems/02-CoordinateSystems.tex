@@ -25,12 +25,20 @@ reference particle at position $s$:
   \bm{p}_0 & = & \bm{p}_0(s)\, {\rm ; and}           \\
        E_0 & = &      E_0(s)\, .           \nonumber
 \end{eqnarray}
+The magnitude of the reference particle velocity is $v_0$ and the
+relativistic parameters that determine the reference particle energy
+and momentum are:
+\begin{eqnarray}
+  \beta_0  & = & \frac{v_0}{c}                  \, {\rm ; and} \nonumber \\
+  \gamma_0 & = & \frac{1}{\sqrt{1 - \beta^2_0}} \,; \nonumber
+\end{eqnarray}
+where $c$ is the speed of light.
 The time, $t$, at which the reference particle is at $s$ is also a
 function of $s$:
 \begin{eqnarray}
-        t  & = & t(s) = \frac{c}{s} \frac{c p_0}{E_0}\, ; 
+        t  & = & t(s) = \frac{s}{v_0} = \frac{s}{c} \frac{E_0}{c p_0}\, ;
 \end{eqnarray}
-where $p_0=\left|\bm{p}_0\right|$ and $c$ is the speed of light.
+where $p_0=\left|\bm{p}_0\right|$.
 
 \subsection{Reference particle local coordinate system}
 
@@ -40,6 +48,19 @@ may be defined using the direction in which the particle is
 travelling. 
 The position of the particle defines the origin of the RPLC system,
 see figure~\ref{fig:RPLC}.
+The tangent to the reference particle trajectory at $s$ defines the
+$z_{\rm RPLC}$ axis with unit vector $\bm{k}_{\rm RPLC}$.
+In the laboratory frame, the presence of local electric or magnetic
+fields may cause the reference particle's trajectory to change.
+In the neighbourhood of the particle, the curved trajectory may be
+described in terms of an arc of a circle.
+The $x_{\rm RPLC}$ axis (with unit vector $\bm{i}_{\rm RPLC}$) is then
+taken to be in the direction pointing away from the centre of the
+circle. 
+The third coordinate axis, $y_{\rm RPLC}$, is defined to complete the
+right-handed orthogonal coordinate system; the unit vector along the
+$y_{\rm RPLC}$ axis being given by
+$\bm{j}_{\rm RPLC} = \bm{k}_{\rm RPLC} \times \bm{i}_{\rm RPLC}$.
 \begin{figure}
   \begin{center}
     \includegraphics[width=0.55\linewidth]{RPLC.pdf}
@@ -58,20 +79,6 @@ see figure~\ref{fig:RPLC}.
   }
   \label{fig:RPLC}
 \end{figure}
-
-The tangent to the reference particle trajectory at $s$ defines the
-$z_{\rm RPLC}$ axis with unit vector $\bm{k}_{\rm RPLC}$.
-In the laboratory frame, the presence of local electric or magnetic
-fields may cause the reference particle's trajectory to change.
-In the neighbourhood of the particle, the curved trajectory may be
-described in terms of an arc of a circle.
-The $x_{\rm RPLC}$ axis (with unit vector $\bm{i}_{\rm RPLC}$) is then
-taken to be in the direction pointing towards the centre of the
-circle. 
-The third coordinate axis, $y_{\rm RPLC}$, is defined to complete the
-right-handed orthogonal coordinate system; the unit vector along the
-$y_{\rm RPLC}$ axis being given by
-$\bm{j}_{\rm RPLC} = \bm{k}_{\rm RPLC} \times \bm{i}_{\rm RPLC}$.
 
 The trajectory of the reference particle will be a straight line as it
 traverses a drift space or when the particle's energy is increased (or

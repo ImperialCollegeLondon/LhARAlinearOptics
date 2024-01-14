@@ -73,8 +73,11 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-DfQuad = BLE.DefocusQuadrupole("ValidDquad", \
-                               rStrt, vStrt, drStrt, dvStrt, 0.1, 100.)
+DfQuad = BLE.DefocusQuadrupole("ValidDquad1", rStrt, vStrt, drStrt, dvStrt, \
+                               0.1, 100.)
+    
+DfQuad = BLE.DefocusQuadrupole("ValidDquad2", rStrt, vStrt, drStrt, dvStrt, \
+                               0.1, None, 153.93033817278908)
     
 #.. __repr__
 print("    __repr__:")
@@ -105,31 +108,16 @@ DefocusQuadrupoleTest += 1
 print()
 print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, \
       " test transport through defocusing quadrupole.")
-R      = np.array([0.01, 0.1, -0.01, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = DfQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
-print("     ----> Relevant portions of transfer matrix:")
-print("         ", DfQuad.getTransferMatrix()[0,0], \
-                   DfQuad.getTransferMatrix()[0,1], \
-                   DfQuad.getTransferMatrix()[0,2], \
-                   DfQuad.getTransferMatrix()[0,3])
-print("         ", DfQuad.getTransferMatrix()[1,0], \
-                   DfQuad.getTransferMatrix()[1,1], \
-                   DfQuad.getTransferMatrix()[1,2], \
-                   DfQuad.getTransferMatrix()[1,3])
-print("         ", DfQuad.getTransferMatrix()[2,0], \
-                   DfQuad.getTransferMatrix()[2,1], \
-                   DfQuad.getTransferMatrix()[2,2], \
-                   DfQuad.getTransferMatrix()[2,3])
-print("         ", DfQuad.getTransferMatrix()[3,0], \
-                   DfQuad.getTransferMatrix()[3,1], \
-                   DfQuad.getTransferMatrix()[3,2], \
-                   DfQuad.getTransferMatrix()[3,3])
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Transfer matrix: \n", DfQuad.getTransferMatrix())
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.031506217, 0.383933123, -0.018491197, 
-                       0.052540446, 0.,  0.])
+RprimeTest = np.array([0.674153745, 3.561111554, -0.229746796, 1.531745398, \
+                       1.260471929, 0.5])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)
