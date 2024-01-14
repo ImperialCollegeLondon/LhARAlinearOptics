@@ -1,28 +1,26 @@
 \section*{Introduction}
 This document summarises the steps needed to set-up and run
-LhARA\_Beamline linear optics simulation of the LhARA beamine.
+the linear optics simulation of the LhARA beamine.
 A summary of the tasks that LhARA\_Beamline software suite performs
 will be documented in due course.
-LhARA\_Beamline has been developed in python; python~3 is assumed.
+The code has been developed in python; python~3 is assumed.
 
 \section*{Getting the code}
-LhARA\_Beamline is maintained using the GitHub version-control system.
-The latest release can be downloaded from the {\color{red} \ldots
-should we moce to the LhARA repository ... its git, but, bespoke to
-CCAP/LhARA}.
+The linear optics package is maintained using the GitHub
+version-control system.
+The latest release can be downloaded from: \\
+\centerline{
+  \href{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git{}
+}
 
 \section*{Dependencies and required packages}
-LhARA\_Beamline requires the following packages:
+The package requires the following packages:
 \begin{itemize}
-  \item Python modules: \verb+scipy+, \verb+matplotlib+,
-    \verb+pandas+, and \verb+iminuit+; 
-  \item CERN programme library: \verb+pyroot+ (which may be installed
-    using the standard \verb+root+ installers, see the documentation
-    at \href{https://root.cern/install/}{\underline{\color{blue}https://root.cern/install/}}).
+  \item Python modules: \verb+scipy+ and\verb+matplotlib+. 
 \end{itemize}
 It may be convenient to run LhARA\_Beamline in a ``virtual environment''.
-To set this up, after updating your python installation to python~3.9.2,
-and installing root, execute the following commands:
+To set this up, after updating your python installation to python~3.9,
+execute the following commands:
 \begin{enumerate}
   \item \verb+python3 -m venv --system-site-packages venv+
     \begin{itemize}
@@ -30,7 +28,7 @@ and installing root, execute the following commands:
         related to the virtual environment.
     \end{itemize}
   \item \verb+source venv/bin/activate+
-  \item \verb+python -m pip install pandas scipy matplotlib iminuit+
+  \item \verb+python -m pip install pandas scipy matplotlib+
 \end{enumerate}
 To exit from the virtual environment, execute the command
 \verb+deactivate+. \\
@@ -38,8 +36,11 @@ To exit from the virtual environment, execute the command
 The command \verb+source venv/bin/activate+ places you back
 into the virtual environment.
 
+Note that the Imperial HEP linux cluster provides python 3.9.18 by
+default.
+
 \section*{Unpacking the code, directories, and running the tests}
-After downloading the package from GitHub, or cloning the repositiry,
+After downloading the package from GitHub, or cloning the repository,
 you will find a ``\verb+README.md+'' file which provides some orientation
 and instructions to run the code.
 In particular, a \verb+bash+ script ``\verb+startup.bash+'' is
@@ -69,13 +70,15 @@ The instruction in the \verb+README.md+ file should be followed to set
 up and run the code.
 
 \section*{Running the code}
-The file in 02-Tests/RunSimulation.py - will run the code.
-
-\noindent The file {\bf RunSimulation.py} contains:
+Execute "startup.bash" from the top directory (i.e. run the bash
+command "source startup.bash").  This will:
 \begin{itemize}
-  \item The definition of csv  input file to control the running of
-    the Simulation; and
-  \item The call to the Simulation class with; the number of events to
-    generate; the central energy to generate; and the
-    filenames.
+  \item Set up "LhARAOpticsPATH"; and
+  \item Add "01-Code" to the PYTHONPATH.  The scripts in "02-Tests"
+    may then be run with the command "python 02-Tests/<filename>.py";
+  \item Example scripts are provided in "03-Scripts'', these can be
+    used first to ``Run'' the simulation and then to ``Read'' the data
+    file produced.
+    Example scripts are provided for the DRACO, LION, and LhARA Stage
+    1 beam lines.
 \end{itemize}

@@ -1,3 +1,41 @@
+--------  --------  --------  --------  --------  --------  --------  14Jan24
+Have now worjed through all beam line elements.  All seem to be OK and seem to
+correspond to AW book.  Now on to documentation, in parallel, do tests and
+scripts.
+Tests:
+ - BeamLineTst.py          - OK; but, works good for straight beam line.  Need
+                             update to make final check work for arck in LhARA
+			     beamline.
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails.
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Scripts:
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotTrajectory.py       - OK
+
 --------  --------  --------  --------  --------  --------  --------  11Jan24
 Update quadrupoles now to correspond to new trace space.  Use the form that
 accounts for dispersion and separates longitudinal and transverse trace space.

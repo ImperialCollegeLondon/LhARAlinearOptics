@@ -112,26 +112,11 @@ R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = DfQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
-print("     ----> Relevant portions of transfer matrix:")
-print("         ", DfQuad.getTransferMatrix()[0,0], \
-                   DfQuad.getTransferMatrix()[0,1], \
-                   DfQuad.getTransferMatrix()[0,2], \
-                   DfQuad.getTransferMatrix()[0,3])
-print("         ", DfQuad.getTransferMatrix()[1,0], \
-                   DfQuad.getTransferMatrix()[1,1], \
-                   DfQuad.getTransferMatrix()[1,2], \
-                   DfQuad.getTransferMatrix()[1,3])
-print("         ", DfQuad.getTransferMatrix()[2,0], \
-                   DfQuad.getTransferMatrix()[2,1], \
-                   DfQuad.getTransferMatrix()[2,2], \
-                   DfQuad.getTransferMatrix()[2,3])
-print("         ", DfQuad.getTransferMatrix()[3,0], \
-                   DfQuad.getTransferMatrix()[3,1], \
-                   DfQuad.getTransferMatrix()[3,2], \
-                   DfQuad.getTransferMatrix()[3,3])
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Transfer matrix: \n", DfQuad.getTransferMatrix())
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.667543064, 8.649032875, -0.218994666, 4.01436403, \
+RprimeTest = np.array([0.674153745, 3.561111554, -0.229746796, 1.531745398, \
                        1.260471929, 0.5])
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
