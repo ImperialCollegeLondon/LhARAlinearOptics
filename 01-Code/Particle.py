@@ -410,12 +410,12 @@ class Particle:
                                2.*iPrtcl.getTraceSpace()[iLoc][5]/b0 +
                                iPrtcl.getTraceSpace()[iLoc][5]**2)
 
-                """
                 eps = ( iPrtcl.getTraceSpace()[iLoc][1]**2 +    \
                         iPrtcl.getTraceSpace()[iLoc][3]**2  ) / \
                         (2.*D**2)
                 """
                 eps = (p - p0) / p0
+                """
                 
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
@@ -467,7 +467,7 @@ class Particle:
             axs[2, 0].set_ylabel('Number')
 
             axs[2, 1].hist(Scl[iLoc], 100)
-            axs[2, 1].set_xlabel('dp/p')
+            axs[2, 1].set_xlabel('Epsilon')
             axs[2, 1].set_ylabel('Number')
 
         

@@ -1,7 +1,7 @@
 \section*{Introduction}
 This document summarises the steps needed to set-up and run
-the linear optics simulation of the LhARA beamine.
-A summary of the tasks that LhARA\_Beamline software suite performs
+the linear optics simulation of the LhARA beam line.
+A summary of the tasks that the software suite performs
 will be documented in due course.
 The code has been developed in python; python~3 is assumed.
 
@@ -10,15 +10,15 @@ The linear optics package is maintained using the GitHub
 version-control system.
 The latest release can be downloaded from: \\
 \centerline{
-  \href{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git{}
+  \href{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}
 }
 
 \section*{Dependencies and required packages}
-The package requires the following packages:
+The linear optics code requires the following packages:
 \begin{itemize}
-  \item Python modules: \verb+scipy+ and\verb+matplotlib+. 
+  \item Python modules: \verb+scipy+ and \verb+matplotlib+. 
 \end{itemize}
-It may be convenient to run LhARA\_Beamline in a ``virtual environment''.
+It may be convenient to run the package in a ``virtual environment''.
 To set this up, after updating your python installation to python~3.9,
 execute the following commands:
 \begin{enumerate}
@@ -31,13 +31,11 @@ execute the following commands:
   \item \verb+python -m pip install pandas scipy matplotlib+
 \end{enumerate}
 To exit from the virtual environment, execute the command
-\verb+deactivate+. \\
-\noindent
+\verb+deactivate+. 
 The command \verb+source venv/bin/activate+ places you back
 into the virtual environment.
 
-Note that the Imperial HEP linux cluster provides python 3.9.18 by
-default.
+The Imperial HEP linux cluster provides python 3.9.18 by default.
 
 \section*{Unpacking the code, directories, and running the tests}
 After downloading the package from GitHub, or cloning the repository,
@@ -62,11 +60,10 @@ presented is:
   \item\verb+02-Tests+: contains self-contained test scripts that
     run the various methods and simulation packages defined in the
     code directory.
-  \item\verb+11-Parameters+: contains the parameter set used in
-    \verb+02-Tests/RunSimulation.py+ to generate muon decays in
-    the production straight.
+  \item\verb+11-Parameters+: contains the parameter set used to 
+    specifiy the various beam lines presently implemented.
 \end{description}
-The instruction in the \verb+README.md+ file should be followed to set
+The instructions in the \verb+README.md+ file should be followed to set
 up and run the code.
 
 \section*{Running the code}
@@ -79,6 +76,6 @@ command "source startup.bash").  This will:
   \item Example scripts are provided in "03-Scripts'', these can be
     used first to ``Run'' the simulation and then to ``Read'' the data
     file produced.
-    Example scripts are provided for the DRACO, LION, and LhARA Stage
-    1 beam lines.
+    Example scripts are provided for the DRACO, LION, and LhARA
+    Stage~1 beam lines.
 \end{itemize}
