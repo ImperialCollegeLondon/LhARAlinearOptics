@@ -164,3 +164,45 @@ may may be written:
 \end{equation}
 As in the case of the quadrupoles, dispersion is accounted for using
 equation~\ref{Eq:Effectiveks}.
+
+\subsection{Non-neutral (electron) plasma (Gabor) lens}
+
+A dense gas of electrons confined in a Penning-Malmberg trap provides
+an electric field that can be used to focus a positive ion beam.
+The electron gas is confined axially in the lens by an electostatic
+potential created using a central anode of length $l$.
+The gas is confined radially using the uniform field of a solenoid.
+Assuming a uniform electron density, $n_e$, the focusing parameter,
+$k_G$, may be written:
+\begin{equation}
+  k_G = \frac{e}{2\epsilon_0} \frac{m_p \gamma}{p^2} n_e \,;
+            \label{Eq:EffectivekG}
+\end{equation}
+where $e$ is the charge on the electron, $\epsilon_0$ is the
+permittivity of free space, and $m_p$ is the proton mass.
+As in the case of the quadrupoles and solenoid, dispersion is
+accounted for using equation~\ref{Eq:EffectivekG}.
+The force on a particle passing through the electron gas is towards
+the axis of the lens and is proportional to the radia distance of the
+particle from the axis.
+Focusing is therefore cylindrically symmetric and does not couple
+motion in the the $xz$ and $yz$ planes.
+
+In the ``hard-edge'' approximation, the electric field inside the
+lens falls to zero at the end of the electron gas and the contribution
+of the magnetic field used to confine the electron gas in the
+transverse direction has a negligible effect on particles passing
+through hthe lens.
+The transfer matrix for passage of a positive particle through the
+lens may be written: 
+\begin{equation}
+  \underline{\underline{T}}_{G} =
+    \begin{pmatrix}
+                    \cos(\sqrt{k_G} l) & \frac{\sin(\sqrt{k_G} l)}{\sqrt{k_G}} &  0 & 0 & 0 & 0 \\
+        -\sqrt{k_G} \sin(\sqrt{k_G} l) &                    \cos(\sqrt{k_G} l) &  0 & 0 & 0 & 0 \\
+                                     0 &                                     0 &              \cos(\sqrt{k_G} l) & \frac{\sin(\sqrt{k_G} l)}{\sqrt{k_G}}  & 0 & 0 \\
+                                     0 &                                     0 &  -\sqrt{k_G} \sin(\sqrt{k_G} l) &                     \cos(\sqrt{k_G} l) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          0 & 0 & 0 & 0 & 0 &                             1
+        \end{pmatrix} \, .
+\end{equation}
