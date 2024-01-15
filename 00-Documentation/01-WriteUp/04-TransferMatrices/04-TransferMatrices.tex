@@ -53,7 +53,7 @@ The increment in the reference particle trajectory is:
 
 The passage of a beam particle through a quadrupole magnet may be
 described by specifying the field gradient, $g$, within the magnet and
-the length, $l$, of the quadrupole measured along its axis.
+the length, $l_q$, of the quadrupole measured along its axis.
 The impact of a quadrupole on the trajectory of a particle in the $xy$
 plane is independent of the impact of the magnet on the particle's
 trajectory in the $yz$ plane.   
@@ -62,11 +62,11 @@ to be ``uncoupled''.
 
 If the field gradient along the $x$ and $y$ axes is identical, then:
 \begin{equation}
-  g_x = \frac{\partial B_x}{\partial x} =
-  g_y = \frac{\partial B_y}{\partial y} = g \, ; 
+  g_x = \frac{\partial B_{qx}}{\partial x} =
+  g_y = \frac{\partial B_{qy}}{\partial y} = g \, ; 
 \end{equation}
-where the field in the quadrupole, $\bm{B}$, has components
-$(B_x, B_y, 0)$.
+where the field in the quadrupole, $\bm{B_q}$, has components
+$(B_{qx}, B_{qy}, 0)$.
 
 In the ``hard-edge'' approximation, where the field falls to zero at
 the start and end of the quadrupole, the transfer matrix for a
@@ -75,17 +75,17 @@ be written:
 \begin{equation}
   \underline{\underline{T}}_{\rm~Fquad} =
     \begin{pmatrix}
-          \cos(\sqrt{k} l) & \frac{\sin(\sqrt{k} l)}{\sqrt{k}} & 0 & 0             & 0 & 0 \\
--\sqrt{k} \sin(\sqrt{k} l) &                  \cos(\sqrt{k} l) & 0 & 0             & 0 & 0 \\
-          0 & 0 &           \cosh(\sqrt{k} l) & \frac{\sinh(\sqrt{k} l)}{\sqrt{k}} & 0 & 0 \\
-          0 & 0 &  \sqrt{k} \sinh(\sqrt{k} l) &                  \cosh(\sqrt{k} l) & 0 & 0 \\
-          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          \cos(\sqrt{k_q} l_q) & \frac{\sin(\sqrt{k_q} l_q)}{\sqrt{k_q}} & 0 & 0             & 0 & 0 \\
+-\sqrt{k_q} \sin(\sqrt{k_q} l_q) &                  \cos(\sqrt{k_q} l_q) & 0 & 0             & 0 & 0 \\
+          0 & 0 &           \cosh(\sqrt{k_q} l_q) & \frac{\sinh(\sqrt{k_q} l_q)}{\sqrt{k_q}} & 0 & 0 \\
+          0 & 0 &  \sqrt{k_q} \sinh(\sqrt{k_q} l_q) &                  \cosh(\sqrt{k_q} l_q) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l_q}{\beta_0^2 \gamma_0^2} \\
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, ; 
 \end{equation}
 where:
 \begin{equation}
-  k = \frac{gc}{p} \times 10^{-6} \, ,
+  k_q = \frac{gc}{p} \times 10^{-3} \, ,  \label{Eq:Effectivekq}
 \end{equation}
 and $c$ is the speed of light in metres per second, p is the magnitude
 of the momentum of the particle in MeV/c, and the field gradient, $g$,
@@ -94,27 +94,40 @@ As before, $\beta_0$ is the relativistic velocity of the reference
 particle and $\gamma_0=(1-\beta_0^2)^{-\frac{1}{2}}$.
 The increment in the reference particle trajectory is:
 \begin{equation}
-  \delta s = l \, .
+  \delta s = l_q \, .
 \end{equation}
+
+It is important to include a description of the effect of dispersion
+on focusing in the LhARA beam line since the laser-driven proton and
+ion source provides a broad energy spectrum.
+Reference \cite{Wolski:2014} provides two methods for the description of
+dispersion in a linear approximation.
+The first is to use the reference momentum to calculate the quadrupole
+focusing strength ($k_{0q} = \frac{gc}{p_0} \times 10^{-3}$) and to
+include terms in the expressions for $x$, $x^\prime$, $y$, and
+$y^\prime$ dependent on $\delta$.
+The second is to use equation~\ref{Eq:Effectivekq} to calculate the
+effective quadrupole focusing strength.
+The second approach has been adopted here.
 
 In the same notation, the transfer matrix for a quadrupole focusing in
 the $yz$ plane (a ``defocusing quadrupole'') may be written: 
 \begin{equation}
   \underline{\underline{T}}_{\rm~Dquad} =
     \begin{pmatrix}
-          \cosh(\sqrt{k} l) & \frac{\sinh(\sqrt{k} l)}{\sqrt{k}} & 0 & 0             & 0 & 0 \\
- \sqrt{k} \sinh(\sqrt{k} l) &                  \cosh(\sqrt{k} l) & 0 & 0             & 0 & 0 \\
-          0 & 0 &            \cos(\sqrt{k} l) &  \frac{\sin(\sqrt{k} l)}{\sqrt{k}} & 0 & 0 \\
-          0 & 0 &  -\sqrt{k} \sin(\sqrt{k} l) &                   \cos(\sqrt{k} l) & 0 & 0 \\
-          0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
+          \cosh(\sqrt{k_q} l_q) & \frac{\sinh(\sqrt{k_q} l_q)}{\sqrt{k_q}} & 0 & 0             & 0 & 0 \\
+ \sqrt{k_q} \sinh(\sqrt{k_q} l_q) &                  \cosh(\sqrt{k_q} l_q) & 0 & 0             & 0 & 0 \\
+          0 & 0 &            \cos(\sqrt{k_q} l_q) &  \frac{\sin(\sqrt{k_q} l_q)}{\sqrt{k_q}} & 0 & 0 \\
+          0 & 0 &  -\sqrt{k_q} \sin(\sqrt{k_q} l_q) &                   \cos(\sqrt{k_q} l_q) & 0 & 0 \\
+          0 & 0 & 0 & 0 & 1 & \frac{l_q}{\beta_0^2 \gamma_0^2} \\
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
 
 \subsection{Solenoid}
 
-The passahge of a beam particle through a solenoid is determined by
-the magnetic field strength, $\bm{B}$, within the solenoid and the
+The passage of a beam particle through a solenoid is determined by
+the magnetic field strength, $\bm{B}_s$, within the solenoid and the
 length of the solenoid, $l$, measured along its axis.
 As the particle enters the solenoid, the fringe fields impart momentum
 transverse to the axis of the magnet.
@@ -127,13 +140,13 @@ the $xz$ plane is coupled with the evolution of the particle motion in
 the $yz$ plane.
 
 In the ``hard-edge'' approximation, the magnetic field inside the
-magnet is given by $\bm{B} = (0, 0, B_0)$, where the solenoid axis
+magnet is given by $\bm{B}_s = (0, 0, B_{s0})$, where the solenoid axis
 lies along the $z_{\rm RPLC}$ axis.
 The solenoid field strength parameter is then given by:
 \begin{equation}
-  k_s = \left[ \frac{B_0 c}{2p} \times 10^{-6} \right]^2\,;
+  k_s = \left[ \frac{B_{s0} c}{2p} \times 10^{-3} \right]^2\,; \label{Eq:Effectiveks}
 \end{equation}
-where $B_0$ is measured in T, $p$ in MeV/c and $c$ in m/s.
+where $B_{s0}$ is measured in T, $p$ in MeV/c and $c$ in m/s.
 
 The transfer matrix for passage of a positive particle through a
 solenoid with field pointing in the positive $z_{\rm RPLC}$ direction
@@ -149,4 +162,5 @@ may may be written:
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
-
+As in the case of the quadrupoles, dispersion is accounted for using
+equation~\ref{Eq:Effectiveks}.
