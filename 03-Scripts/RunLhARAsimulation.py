@@ -19,9 +19,9 @@ print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
 #                         '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
 #                         '11-Parameters/LhARABeamLine-Params-Gauss.csv')
-                         '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
+                         '11-Parameters/BioPoP_Triplet3.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(2000000, filename, datafiledir, 'LhARAsimu.dat')
+Smltn = Simu.Simulation(100000, filename, datafiledir, 'LhARAsimu.dat')
 print()
 print(" <---- Simulation initialised.")
 
