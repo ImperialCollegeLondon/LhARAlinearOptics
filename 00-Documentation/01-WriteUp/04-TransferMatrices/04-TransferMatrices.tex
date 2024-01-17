@@ -183,7 +183,7 @@ permittivity of free space, and $m_p$ is the proton mass.
 As in the case of the quadrupoles and solenoid, dispersion is
 accounted for using equation~\ref{Eq:EffectivekG}.
 The force on a particle passing through the electron gas is towards
-the axis of the lens and is proportional to the radia distance of the
+the axis of the lens and is proportional to the radial distance of the
 particle from the axis.
 Focusing is therefore cylindrically symmetric and does not couple
 motion in the the $xz$ and $yz$ planes.
@@ -192,7 +192,7 @@ In the ``hard-edge'' approximation, the electric field inside the
 lens falls to zero at the end of the electron gas and the contribution
 of the magnetic field used to confine the electron gas in the
 transverse direction has a negligible effect on particles passing
-through hthe lens.
+through the lens.
 The transfer matrix for passage of a positive particle through the
 lens may be written: 
 \begin{equation}
@@ -212,12 +212,12 @@ lens may be written:
 The reference particle trajectory in the beam elements described above
 passes along the axis of the element.
 In contrast, a dipole bends the reference trajectory so that it
-desribes the arc of a circle (see figure~\ref{fig:Dipole}).
+describes the arc of a circle (see figure~\ref{fig:Dipole}).
 The codes provides for transport through a ``sector dipole'' in the
 hard-edge approximation.
 In this case, the field within the magnet is taken to be constant and
-parallel to $\bm{j}_{\rm RPLC}$, i.e. $\bm{B}_D = (0, B_{0D}, 0)$. 
-No edge focussing is considered.
+parallel to $\bm{j}_{\rm RPLC}$, i.e. $\bm{B}_D = (0, B_{D0}, 0)$. 
+No edge focusing is considered.
 \begin{figure}
   \begin{center}
     \includegraphics[width=0.85\textwidth]{Dipole.pdf}
@@ -240,3 +240,35 @@ No edge focussing is considered.
   \label{fig:Dipole}
 \end{figure}
 
+The passage of particles through a dipole may be described by defining
+the parameter, $k_D$:
+\begin{equation}
+  k_D = \left[ \frac{B_{D0} c}{p} \times 10^{-3} \right]^2\,.
+  \label{Eq:EffectivekD}
+\end{equation}
+The momentum of the reference particle is related to the
+curvature. $\rho$, by:
+\begin{equation}
+  p_0 = B_{D0} \rho \, ;
+\end{equation}
+so:
+\begin{equation}
+  k_D = \frac{1}{\rho} \, ; 
+\end{equation}
+and the angle $\phi$ is given by:
+\begin{equation}
+  \phi = \frac{l}{\rho} \, .
+\end{equation}
+With these definitions the transfer matrix for passage through a
+dipole may be written:
+\begin{equation}
+  \underline{\underline{T}}_{D} =
+    \begin{pmatrix}
+                    \cos(\phi) &                                  \rho \sin(\phi) & 0 & 0 & 0 &                 \frac{\rho}{\beta_0}\left(1 - \cos(\phi) \right) \\
+      -\frac{\sin(\phi)}{\rho} &                                       \cos(\phi) & 0 & 0 & 0 &                                       \frac{\sin(\phi)}{\beta_0} \\
+                             0 &                                                0 & 1 & l & 0 &                                                                0 \\
+                             0 &                                                0 & 0 & 1 & 0 &                                                                0 \\
+   -\frac{\sin(\phi)}{\beta_0} &  -\frac{\rho}{\beta_0}\left(1 -\cos(\phi)\right) & 0 & 0 & 1 & \frac{l}{\beta^2 \gamma^2} - \frac{l - \rho\sin(\phi)}{\beta_0^2} \\
+                             0 &                                                0 & 0 & 0 & 0 &                                                                1
+        \end{pmatrix} \, .
+\end{equation}
