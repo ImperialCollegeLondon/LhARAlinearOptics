@@ -206,3 +206,37 @@ lens may be written:
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
+
+\subsection{Dipole}
+
+The reference particle trajectory in the beam elements described above
+passes along the axis of the element.
+In contrast, a dipole bends the reference trajectory so that it
+desribes the arc of a circle (see figure~\ref{fig:Dipole}).
+The codes provides for transport through a ``sector dipole'' in the
+hard-edge approximation.
+In this case, the field within the magnet is taken to be constant and
+parallel to $\bm{j}_{\rm RPLC}$, i.e. $\bm{B}_D = (0, B_{0D}, 0)$. 
+No edge focussing is considered.
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{Dipole.pdf}
+  \end{center}
+  \caption{
+    Schematic representation of the passage of the reference particle
+    through a sector dipole.
+    The outline of the sector dipole is shown by the solid black
+    lines.
+    The trajectory of the reference particle is shown as the dashed
+    line.
+    The length of the reference-particle trajectory inside the field
+    of the sector dipole is $l_D$.
+    The $x_{\rm RPLC}$ and $z_{\rm RPLC}$ coordinate axes at the entry
+    and exit of the sector dipole are shown.
+    The radius of curvature of the reference particle-trajectory
+    trajectory inside the magnet is $\rho$ and the angle through which
+    the $x_{\rm RPLC}$ is rotated is $\phi$.
+  }
+  \label{fig:Dipole}
+\end{figure}
+
