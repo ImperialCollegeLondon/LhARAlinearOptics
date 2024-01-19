@@ -17,11 +17,12 @@ print()
 HOMEPATH = os.getenv('HOMEPATH')
 print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
-#                         '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-#                         '11-Parameters/LhARABeamLine-Params-Gauss.csv')
-                         '11-Parameters/BioPoP_Triplet3.csv')
+#                        '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
+                        '11-Parameters/LhARABeamLine-Params-Gauss.csv')
+#                        '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
 Smltn = Simu.Simulation(100000, filename, datafiledir, 'LhARAsimu.dat')
+
 print()
 print(" <---- Simulation initialised.")
 

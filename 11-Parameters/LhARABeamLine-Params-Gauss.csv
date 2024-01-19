@@ -1,6 +1,6 @@
 Stage,Section,Element,Type,Parameter,Value,Unit,Comment
 0,Facility,Global,Name,Name,LhARA,,
-0,Facility,Global,Reference particle,K,15,MeV,
+0,Facility,Global,Reference particle,Kinetic energy,15,MeV,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
 1,Source,Source,Parameterised TNSA,SourceMode,1,,Gaussian kinetic energy
 1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
@@ -18,7 +18,7 @@ Stage,Section,Element,Type,Parameter,Value,Unit,Comment
 1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
 1,Capture,Drift,,Length,0.15,m,Drift to next solenoid
 1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
-1,Capture,Solenoid,"Length, strength",Strength,1.018747261,rad/m,ks
+1,Capture,Solenoid,"Length, strength",Strength,1.018747261,rad/m,ks>
 1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
 1,Energy selection,Drift,,Length,0.5,m,"Space for first cavity, modelled as drift"
 1,Energy selection,Drift,,Length,0.15,m,Drift to next solenoid
