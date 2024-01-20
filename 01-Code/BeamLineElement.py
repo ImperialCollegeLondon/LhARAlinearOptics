@@ -203,6 +203,18 @@ class BeamLineElement:
             print(' BeamLineElement.cleanInstance: instances removed.')
 
     @classmethod
+    def removeInstance(cls, inst):
+        if inst in cls.getinstances():
+            if cls.getDebug():
+                print(" BeamLineElement.removeInstance: remove", \
+                      inst.getName(), "from beamline instances list")
+            cls.getinstances().remove(inst)
+        else:
+            if cls.getDebug():
+                print(" BeamLineElement.removeInstance: instance", \
+                      inst.Name, "not in BeamLineElement.Instances!")
+
+    @classmethod
     def setDebug(self, Debug=False):
         if self.__Debug:
             print(" BeamLineElement.setdebug: ", Debug)
@@ -307,7 +319,8 @@ class BeamLineElement:
                isinstance(self, FocusQuadrupole)   or \
                isinstance(self, Solenoid)          or \
                isinstance(self, SectorDipole)      or \
-               isinstance(self, GaborLens):
+               isinstance(self, GaborLens)         or \
+               isinstance(self, QuadDoublet):
                 self.setTransferMatrix(_R)
             _Rprime = self.getTransferMatrix().dot(_R)
 
@@ -2982,6 +2995,461 @@ class Source(BeamLineElement):
 
         return TrcSpc
 
+    
+"""
+To do:
+------
+ - put z/s position of components of doublet
+ - put length of the doublet
+
+Derived class QuadDoublet:
+==========================
+
+  QuadDoublet class derived from BeamLineElement to contain paramters
+  for an quad doublet.
+
+
+  Class attributes:
+  -----------------
+    instances : List of instances of QuadDoublet class
+  __Debug     : Debug flag
+
+
+  Parent class instance attributes:
+  ---------------------------------
+  Calling arguments:
+   _Name : Name
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
+
+  _TrnsMtrx : Transfer matrix:
+
+
+  Instance attributes to define quadrupole:
+  -----------------------------------------
+  _xxx  : 
+  _yyy  : 
+
+    
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+    SummaryStr: No arguments, returns one-line string summarising quad
+                parameterrs.
+
+  Set methods:
+     setDebug: Set debug flag
+          Input: Debug (bool) 
+
+  Get methods:
+      getDebug
+
+  Utilities:
+
+"""
+class QuadDoublet(BeamLineElement):
+    instances = []
+    __Debug   = False
+
+    def __init__(self, _Name=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None,
+                 _FDorDF=None, _Q1par=None, _d=None, _Q2par=None):
+        
+        if self.getDebug():
+            print(' QuadDoublet.__init__: ', \
+                  'creating the QuadDoublet object: ')
+
+        QuadDoublet.instances.append(self)
+
+        self.setAll2None()
+
+        # BeamLineElement class initialization:
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, \
+                                 _dvStrt)
+
+        if _FDorDF != "FD" and _FDorDF != "DF":
+            raise badBeamLineElement("QuadDoublet: bad specification", \
+                                     " for FDorDF")
+
+        if isinstance(_Q1par,list):
+            if len(_Q1par) != 3:
+                raise badBeamLineElement("QuadDoublet: bad specification", \
+                                         " for Q1par")
+        else:
+            raise badBeamLineElement("QuadDoublet: bad specification", \
+                                     " for Q1par")
+
+        if isinstance(_Q1par,list):
+            if len(_Q1par) != 3:
+                raise badBeamLineElement("QuadDoublet: bad specification", \
+                                         " for Q1par")
+        else:
+            raise badBeamLineElement("QuadDoublet: bad specification", \
+                                     " for Q1par")
+
+        if not(isinstance(_d, float)):
+            raise badBeamLineElement("QuadDoublet: bad specification", \
+                                     " for Q1par")
+
+        if isinstance(_Q2par,list):
+            if len(_Q2par) != 3:
+                raise badBeamLineElement("QuadDoublet: bad specification", \
+                                         " for Q2par")
+        else:
+            raise badBeamLineElement("QuadDoublet: bad specification", \
+                                     " for Q2par")
+        
+        self.setFDorDF(_FDorDF)
+        self.setQ1par(_Q1par)
+        self.setSeparation(_d)
+        self.setQ2par(_Q2par)
+
+        if self.getFDorDF() == "FD":
+            iQ1 = FocusQuadrupole(_Name+":FQ1", \
+                            _rStrt, _vStrt, _drStrt, _dvStrt, \
+                self.getQ1par()[0], self.getQ1par()[1], self.getQ1par()[2])
+        else:
+            iQ1 = DefocusQuadrupole(_Name+":DQ1", \
+                            _rStrt, _vStrt, _drStrt, _dvStrt, \
+                self.getQ1par()[0], self.getQ1par()[1], self.getQ1par()[2])
+        iD = Drift(_Name+":sep", \
+                            _rStrt, _vStrt, _drStrt, _dvStrt, \
+                            self.getSeparation())
+        if self.getFDorDF() == "FD":
+            iQ2 = DefocusQuadrupole(_Name+":DQ2", \
+                            _rStrt, _vStrt, _drStrt, _dvStrt, \
+                self.getQ2par()[0], self.getQ2par()[1], self.getQ2par()[2])
+        else:
+            iQ2 = FocusQuadrupole(_Name+":FQ2", \
+                            _rStrt, _vStrt, _drStrt, _dvStrt, \
+                self.getQ2par()[0], self.getQ2par()[1], self.getQ2par()[2])
+
+        if self.getDebug():
+            print("     ----> Dump componenets:")
+            print(iQ1)
+            print(iD)
+            print(iQ2)
+
+        
+        BeamLineElement.removeInstance(iQ1)
+        BeamLineElement.removeInstance(iD)
+        BeamLineElement.removeInstance(iQ2)
+        self.setQ1(iQ1)
+        self.setD(iD)
+        self.setQ2(iQ2)
+                   
+        if self.getDebug():
+            print("     ----> New QuadDoublet instance: \n", self)
+            print(" <---- Done.")
+
+    def __repr__(self):
+        return "QuadDoublet()"
+
+    def __str__(self):
+        print(" QuadDoublet:")
+        print(" ------------")
+        print("     ---->     Debug flag:", QuadDoublet.getDebug())
+        print("     ---->         FDorDF:", self.getFDorDF())
+        print("     ---->          Q1par:", self.getQ1par())
+        print("     ---->     Separation:", self.getSeparation())
+        print("     ---->          Q2par:", self.getQ2par())
+        print("     ---->     Components:", self.getQ1().getName(), \
+              self.getD().getName(), self.getQ2().getName())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        BeamLineElement.__str__(self)
+        return " <---- QuadDoublet parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "QuadDoublet  : " + BeamLineElement.SummaryStr(self) + \
+            "; FDorDF = ", self.getFDorDF() + \
+            "; Q1par = ", str(self.getQ1par()) + \
+            "; separation = ", str(self.getSeparation()) + \
+            "; Q2par = ", str(self.getQ2par())
+        return Str
+
+    
+# -------- "Set methods"
+# Methods believed to be self-documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
+    def setAll2None(self):
+        self._FDorDF   = None
+        self._Q1par    = None
+        self._d        = None
+        self._Q2par    = None
+        self._TrnsMtrx = None
+        
+
+    def setFDorDF(self, _FDorDF):
+        if _FDorDF != "FD" and _FDorDF != "DF":
+            raise badParameter( \
+                    "BeamLineElement.QuadDoublet.setFDorDF:", \
+                                " bad FDorDF:", _FDorDF)
+        self._FDorDF = _FDorDF
+        
+    def setSeparation(self, _d):
+        if not(isinstance(_d, float)):
+            raise badParameter( \
+                    "BeamLineElement.QuadDoublet.setSeparation:", \
+                    " bad separation:", _d)
+               
+        self._Separation = _d
+        
+    def setQ1par(self, _Q1par):
+        if isinstance(_Q1par,list):
+            if len(_Q1par) != 3:
+                raise badBeamLineElement(
+                    "BeamLineElement.QuadDoublet.setQ1par:", \
+                    " for Q1par")
+        else:
+            raise badBeamLineElement(
+                "BeamLineElement.QuadDoublet.setQ1par:", \
+                " for Q1par")
+        
+        self._Q1par = _Q1par
+        
+    def setQ2par(self, _Q2par):
+        if isinstance(_Q2par,list):
+            if len(_Q2par) != 3:
+                raise badBeamLineElement(
+                    "BeamLineElement.QuadDoublet.setQ2par:", \
+                    " for Q2par")
+        else:
+            raise badBeamLineElement(
+                "BeamLineElement.QuadDoublet.setQ2par:", \
+                " for Q2par")
+        
+        self._Q2par = _Q2par
+
+    def setQ1(self, iQ1):
+        if not isinstance(iQ1, BeamLineElement):
+            raise badBeamLineElement(
+                "BeamLineElement.QuadDoublet.setQ1:", \
+                " not a beamline element")
+        self._iQ1 = iQ1
+            
+    def setD(self, iD):
+        if not isinstance(iD, BeamLineElement):
+            raise badBeamLineElement(
+                "BeamLineElement.QuadDoublet.setD:", \
+                " not a beamline element")
+        self._iD = iD
+            
+    def setQ2(self, iQ2):
+        if not isinstance(iQ2, BeamLineElement):
+            raise badBeamLineElement(
+                "BeamLineElement.QuadDoublet.setQ2:", \
+                " not a beamline element")
+        self._iQ2 = iQ2
+            
+    def setTransferMatrix(self, _R):
+        
+        if self.getDebug():
+            print(" QuadDoublet(BeamLineElement).setTransferMatrix:")
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Trace space:", _R)
+
+        self.getQ1().setTransferMatrix(_R)
+        TrnsfrQ1 = self.getQ1().getTransferMatrix()
+
+        self.getD().setTransferMatrix()
+        TrnsfrD  = self.getD().getTransferMatrix()
+
+        self.getQ2().setTransferMatrix(_R) 
+        TrnsfrQ2 = self.getQ2().getTransferMatrix()
+
+        if self.getDebug():
+            print("     ----> Transfer matrix for Q1:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsfrQ1)
+            print("     ----> Transfer matrix for D:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsfrD)
+            print("     ----> Transfer matrix for Q2:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsfrQ2)
+
+        
+        TrnsMtrx = TrnsfrD.dot(TrnsfrQ1)
+        TrnsMtrx = TrnsfrQ2.dot(TrnsMtrx)
+
+        if self.getDebug():
+            print("     ----> Transfer matrix for QuadDoublet:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+
+        self._TrnsMtrx = TrnsMtrx
+
+        
+# -------- "Get methods"
+# Methods believed to be self-documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
+    def getFDorDF(self):
+        return self._FDorDF
+
+    def getQ1par(self):
+        return self._Q1par
+
+    def getSeparation(self):
+        return self._Separation
+
+    def getQ2par(self):
+        return self._Q2par
+
+    def getQ1(self):
+        return self._iQ1
+
+    def getD(self):
+        return self._iD
+
+    def getQ2(self):
+        return self._iQ2
+
+    
+# -------- Utilities:
+    
+    
+"""
+Derived class QuadTriplet:
+==========================
+
+  QuadTriplet class derived from BeamLineElement to contain paramters
+  for an quad doublet.
+
+
+  Class attributes:
+  -----------------
+    instances : List of instances of QuadTriplet class
+  __Debug     : Debug flag
+
+
+  Parent class instance attributes:
+  ---------------------------------
+  Calling arguments:
+   _Name : Name
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
+
+  _TrnsMtrx : Transfer matrix:
+
+
+  Instance attributes to define quadrupole:
+  -----------------------------------------
+  _xxx  : 
+  _yyy  : 
+
+    
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+    SummaryStr: No arguments, returns one-line string summarising quad
+                parameterrs.
+
+  Set methods:
+     setDebug: Set debug flag
+          Input: Debug (bool) 
+
+  Get methods:
+      getDebug
+
+  Utilities:
+
+"""
+class QuadTriplet(BeamLineElement):
+    instances = []
+    __Debug   = False
+
+    def __init__(self, _Name=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
+        
+        if self.getDebug():
+            print(' QuadTriplet.__init__: ', \
+                  'creating the QuadTriplet object: ')
+
+        QuadTriplet.instances.append(self)
+
+        self.setAll2None()
+
+        # BeamLineElement class initialization:
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+
+        if self.getDebug():
+            print("     ----> New QuadTriplet instance: \n", self)
+            print(" <---- Done.")
+
+    def __repr__(self):
+        return "QuadTriplet()"
+
+    def __str__(self):
+        print(" QuadTriplet:")
+        print(" ----------------")
+        print("     ---->     Debug flag:", QuadTriplet.getDebug())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        BeamLineElement.__str__(self)
+        return " <---- QuadTriplet parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "QuadTriplet  : " + BeamLineElement.SummaryStr(self)
+        return Str
+
+    
+# -------- "Set methods"
+# Methods believed to be self-documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
+    def setAll2None(self):
+        self._TrnsMtrx = None
+    
+    def setTransferMatrix(self, _R):
+        
+        if self.getDebug():
+            print(" QuadTriplet(BeamLineElement).setTransferMatrix:")
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Trace space:", _R)
+
+        TrnsMtrx = None
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+
+        self._TrnsMtrx = TrnsMtrx
+
+        
+# -------- "Get methods"
+# Methods believed to be self-documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
+    
+# -------- Utilities:
+    
     
 #--------  Exceptions:
 class badBeamLineElement(Exception):
