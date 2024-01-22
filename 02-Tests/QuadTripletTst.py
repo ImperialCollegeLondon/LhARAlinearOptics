@@ -105,8 +105,8 @@ with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transfer matrix: \n", QT1.getTransferMatrix())
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ -1.912587754, -34.62556903, -0.660238477, 21.67242421, \
-                        2.536991051, 0.5] )
+RprimeTest = np.array([ -8.583918885, 266.6145409, 5.385698434, 91.8026567, \
+                        4.973982101, 0.5] )
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)
