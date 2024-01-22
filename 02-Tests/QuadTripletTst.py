@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Test script for "QuadTriplet" class
-=======================================
+===================================
 
 QuadTriplet.py -- set "relative" path to code
 
@@ -47,7 +47,7 @@ dvStrt = np.array([0., 0.])
 try:
     QT = BLE.QuadTriplet("NoStrength", rStrt, vStrt, drStrt, dvStrt)
 except:
-    print('      ----> Correctly trapped no quadrupole strength exception.')
+    print('      ----> Correctly trapped no Triplet argument exception.')
 
     
 #--------> Clean instances and restart:
@@ -72,32 +72,25 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
     print("         ----> Three momentum (in, RPLC):", \
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
-#.. Create valid instance:
-QT = BLE.QuadTriplet("ValidQuad1", rStrt, vStrt, drStrt, dvStrt)
+#.. Create valid instances:
+QT1 = BLE.QuadTriplet("ValidQuadTriplet1", rStrt, vStrt, drStrt, dvStrt, \
+                      "FDF", [0.1, 500., None], 0.01, \
+                             [0.2, 500., None], 0.01, \
+                             [0.1, 500., None])
+QT2 = BLE.QuadTriplet("ValidQuadTriplet2", rStrt, vStrt, drStrt, dvStrt, \
+                      "DFD", [0.1, 500., None], 0.01, \
+                             [0.2, 500., None], 0.01, \
+                             [0.1, 500., None])
             
 #.. __repr__
 print("    __repr__:")
-print("      ---->", repr(QT))
+print("      ---->", repr(QT1))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-print(str(QT))
+print(str(QT1))
+print(str(QT2))
 print("    <---- __str__ done.")
-
-##! Check get methods:
-QuadTripletTest = 3
-print()
-print("QuadTripletTest:", QuadTripletTest, " check get methods.")
-print("    ----> print() method; tests all get methods")
-print(QT)
-
-##! Check set method:
-QuadTripletTest = 4
-print()
-print("QuadTripletTest:", QuadTripletTest, " check set method.")
-BLE.QuadTriplet.setDebug(True)
-print(QT)
-BLE.QuadTriplet.setDebug(False)
 
 ##! Check transport:
 QuadTripletTest += 1
@@ -105,15 +98,15 @@ print()
 print("QuadTripletTest:", QuadTripletTest, \
       " test transport through focusing quadrupole.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
-Rprime = QT.Transport(R)
+Rprime = QT1.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Input phase-space vector:", R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
-     print("     ----> Transfer matrix: \n", QT.getTransferMatrix())
+     print("     ----> Transfer matrix: \n", QT1.getTransferMatrix())
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([ 0.361914303, -2.717602932, -0.419983646, -2.322331701, \
-                        1.260471929, 0.5 ])
+RprimeTest = np.array([ -1.912587754, -34.62556903, -0.660238477, 21.67242421, \
+                        2.536991051, 0.5] )
 with np.printoptions(linewidth=500,precision=5,suppress=True): \
      print("     ----> Pre-calculated          Rprime:", RprimeTest)
 Diff       = np.subtract(Rprime, RprimeTest)
