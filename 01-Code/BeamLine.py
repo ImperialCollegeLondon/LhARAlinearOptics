@@ -141,6 +141,8 @@ class BeamLine(object):
                             " BeamLine.__new__: no parameter file given.")
         
             if not os.path.exists(_BeamLineSpecificationCVSfile):
+                print(" BeamLine.__New__: _BeamLineSpecificationCVSfile:", \
+                      _BeamLineSpecificationCVSfile)
                 raise Exception( \
                     " BeamLine.__new__: parameter file does not exist.")
         
