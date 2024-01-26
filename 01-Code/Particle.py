@@ -247,6 +247,8 @@ class Particle:
         self._TrcSpc    = []
         self._PhsSpc    = []
         self._LabPhsSpc = []
+        self._x = []
+        
         
     def setLocation(self, Location):
         Success = False
@@ -261,6 +263,8 @@ class Particle:
             self._z.append(z)
             Success = True
         return Success
+    
+    
 
     def sets(self, s):
         Success = False
@@ -428,7 +432,7 @@ class Particle:
         for iLoc in range(len(xLoc)):
             fig, axs = plt.subplots(nrows=3, ncols=2)
             fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
-                                    layout="constrained")
+                                    constrained_layout=True)
             # add an artist, in this case a nice label in the middle...
             """
             for row in range(2):
@@ -1146,9 +1150,9 @@ class ReferenceParticle(Particle):
         Theta=np.pi/4
     
         Rot2LabOut = np.array( [ \
-                              [np.cos(Theta).,  0., np.sin(Thetha).], \
+                              [np.cos(Theta),  0., np.sin(Theta)], \
                               [0., 1., 0.], \
-                              [-np.sin(Theta)., 0., np.cos(Theta).], \
+                              [-np.sin(Theta), 0., np.cos(Theta)], \
                               
                         ] )
         #Rotates in x and z by angle theta
