@@ -1,0 +1,14 @@
+﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
+0,Facility,Global,Name,Name,BioPoP1.1,,"Bio PoP, configuration 1.1 (Triplet 3 + triplet 2)"
+0,Facility,Global,Reference particle,Kinetic energy,12,MeV,Same energy as in reference document
+0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
+1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy
+1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
+1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y"
+1,Source,Source,Parameterised TNSA,Emin,1,MeV,Minimum of energy distribution
+1,Source,Source,Parameterised TNSA,Emax,25,MeV,b
+1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF
+1,Source,Source,Parameterised TNSA,MinCTheta,0.998,,Maximum theta for flat cos theta
+1,TestArc,Drift,,Length,0.2,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,45,degrees,

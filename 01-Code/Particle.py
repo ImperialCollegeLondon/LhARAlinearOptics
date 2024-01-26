@@ -430,9 +430,9 @@ class Particle:
                 Scl[iLoc].append(eps)
 
         for iLoc in range(len(xLoc)):
-            fig, axs = plt.subplots(nrows=3, ncols=2)
-            fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
-                                    constrained_layout=True)
+            #fig, axs = plt.subplots(nrows=3, ncols=2)
+            fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), constrained_layout=True)#, \
+            #                        constrained_layout=True)
             # add an artist, in this case a nice label in the middle...
             """
             for row in range(2):
