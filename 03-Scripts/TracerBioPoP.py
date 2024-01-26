@@ -10,7 +10,7 @@ import Tracing_code as Tr
 import os
 HOMEPATH = os.getenv('HOMEPATH')
 
-beamline_file = 'LhARABeamLine-Params-LsrDrvn.csv'
+beamline_file = 'LhARABeamLine-Params-Gauss-Gabor.csv'
 data_file     = 'LhARAsimu.dat'
 
 
