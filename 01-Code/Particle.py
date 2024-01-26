@@ -1137,11 +1137,22 @@ class ReferenceParticle(Particle):
                                [0., 1., 0.],      \
                                [0., 0., 1.]       \
                                       ])
-        Rot2LabOut = np.array([                   \
-                               [1., 0., 0.],      \
-                               [0., 1., 0.],      \
-                               [0., 0., 1.]       \
-                              ])
+        #Rot2LabOut = np.array([                   \
+                              # [1., 0., 0.],      \
+                              # [0., 1., 0.],      \
+                              # [0., 0., 1.]       \
+                             # ])
+
+        Theta=np.pi/4
+    
+        Rot2LabOut = np.array( [ \
+                              [np.cos(Theta).,  0., np.sin(Thetha).], \
+                              [0., 1., 0.], \
+                              [-np.sin(Theta)., 0., np.cos(Theta).], \
+                              
+                        ] )
+        #Rotates in x and z by angle theta
+
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
