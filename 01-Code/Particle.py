@@ -248,6 +248,7 @@ class Particle:
         self._TrcSpc = []
         self._PhsSpc = []
         self._LabPhsSpc = []
+        self._x = []
 
     def setLocation(self, Location):
         Success = False

@@ -157,75 +157,65 @@ class BeamlinePlotter(object):
         index = params[params["Parameter"] == "Kinetic energy"].index
         E = float(params["Value"][index])
         return E
-
-    # --------Beamline plotting Methods---------------
-
-    def Tracer(
-        mini,
-        maxi,
-        filename,
-        maxz=2.135,
-        facility=None,
-        HOMEPATH=os.getenv("HOMEPATH"),
-        label=None,
-        NEvts=False,
-        alpha=0.5,
-        colour="r",
-    ):
-        ParticleFILE = Prtcl.Particle.openParticleFile(
-            HOMEPATH + "/99-Scratch", filename
-        )
-
-        EndOfFile = False
-        iEvt = 0
-        iPrtcl = None
-
-        DRACObI = BL.BeamLine(HOMEPATH + "/11-Parameters/" + facility)
-
-        RefE = BeamlinePlotter.get_ReferenceEnergy(HOMEPATH=HOMEPATH, filename=facility)
-
-        try:
-            while not EndOfFile:
-                EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
-
-                iPrtcl = Prtcl.Particle.getParticleInstances()[
-                    1
-                ]  # used to be 0 in the previous PhaseSpace implementation
-
-                if iPrtcl.getz()[-1] > maxz:  # the ones that get to the end of beamline
-                    if mini < iPrtcl.getTraceSpace()[0][5] + RefE < maxi:
-                        iEvt += 1
-                        particle = iPrtcl
-
-                        x = []
-                        y = []
-                        z = particle.getz()
-
-                        for i in range(len(particle.getTraceSpace())):
-                            x.append(particle.getTraceSpace()[i][0])
-                            y.append(particle.getTraceSpace()[i][2])
-
-                        xd = x[-1]
-                        yd = y[-1]
-
-                        if iEvt == 1:
-                            axs[0].plot(
-                                xd, yd, "o", color=colour, alpha=alpha, label=label
-                            )
-
-                        else:
-                            axs[0].plot(xd, yd, "o", color=colour, alpha=alpha)
-                        axs[1].plot(z, x, color=colour, alpha=alpha)
-                        axs[2].plot(z, y, color=colour, alpha=alpha)
-
-                        cleaned = Prtcl.Particle.cleanParticles()
-
-                        if iEvt == NEvts:  # Ends the loop if everything is plotted
-                            EndOfFile = True
-                    else:
-                        cleaned = Prtcl.Particle.cleanParticles()
-                else:
-                    cleaned = Prtcl.Particle.cleanParticles()
+    
+#--------Beamline plotting Methods---------------    
+    
+    def Tracer(mini, maxi, filename, maxz = 2.135, facility = None, HOMEPATH = os.getenv('HOMEPATH'), label = None, NEvts = False, alpha = 0.5, colour = 'r'):
+          
+                ParticleFILE = Prtcl.Particle.openParticleFile(HOMEPATH + "/99-Scratch", filename)
+        
+                EndOfFile = False
+                iEvt      = 0
+                iPrtcl    = None
+                
+                DRACObI  = BL.BeamLine(HOMEPATH + '/11-Parameters/' + facility)
+                
+                RefE = BeamlinePlotter.get_ReferenceEnergy(HOMEPATH=HOMEPATH, filename = facility)
+                
+                try:
+                    
+                        while not EndOfFile:
+                                
+                                EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+        
+                                iPrtcl = Prtcl.Particle.getParticleInstances()[1] #used to be 0 in the previous PhaseSpace implementation
+                    
+                                if iPrtcl.getz()[-1] > maxz: #the ones that get to the end of beamline
+                    
+                                            if mini < iPrtcl.getTraceSpace()[0][5] + RefE < maxi:
+                                                    
+                                                    iEvt += 1
+                                                    particle = iPrtcl
+                                                
+                                                    x = []
+                                                    y = []
+                                                    z = particle.getz()
+                                                    
+                                            
+                                                    for i in range(len(particle.getLabPhaseSpace())):
+                                                          x.append(particle.getLabPhaseSpace()[i][0])
+                                                          y.append(particle.getLabPhaseSpace()[i][2])
+                                                          
+                                                    xd = x[-1]
+                                                    yd = y[-1] 
+                                                          
+                                                    if iEvt == 1:      
+                                                        axs[0].plot(xd, yd, 'o', color = colour, alpha = alpha, label = label)
+                                                    
+                                                    else:
+                                                        axs[0].plot(xd, yd, 'o', color = colour, alpha = alpha)
+                                                    axs[1].plot(z, x, color = colour, alpha = alpha)
+                                                    axs[2].plot(z, y, color = colour, alpha = alpha)
+                                            
+                                                    cleaned = Prtcl.Particle.cleanParticles()
+                                                    
+                                                    if iEvt == NEvts: #Ends the loop if everything is plotted
+                                                        EndOfFile = True    
+                                            else:
+                                                cleaned = Prtcl.Particle.cleanParticles()
+                                else:
+                                                                       
+                                    cleaned = Prtcl.Particle.cleanParticles()
 
         except:  # Handles the exception if you already plotted all the particles within energy range
             IndexError

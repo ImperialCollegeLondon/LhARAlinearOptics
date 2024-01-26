@@ -343,7 +343,7 @@ class BeamLineElement:
         _Rprime[2] += self._drStrt[1]
         
         return _Rprime
-
+"""
     def CoordRot(self, _R, Theta):
     
         RotMtrx = np.array( [ \
@@ -356,8 +356,7 @@ class BeamLineElement:
                              ] )
         #Rotates in x and z by angle theta
 
-
-
+"""
 
 #--------  Derived classes  --------  --------  --------  --------  --------
 """
