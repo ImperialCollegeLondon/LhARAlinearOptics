@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append('/Users/alfredo/Desktop/PhD/LhARA/LhARAlinearOptics/01-Code/')
 
 import numpy as np
 import os
