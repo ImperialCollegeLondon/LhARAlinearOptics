@@ -8,12 +8,11 @@ import Simulation as Simu
 ##! Start:
 print("========  Simulation: start  ========")
 print()
-HOMEPATH = os.getenv('HOMEPATH')
+HOMEPATH = os.getenv("HOMEPATH")
 print("HOMEPATH", HOMEPATH)
-filename    = os.path.join(HOMEPATH, \
-                        '11-Parameters/DipoleTest.csv')
-datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(100000, filename, datafiledir, 'DipoleTest.dat')
+filename = os.path.join(HOMEPATH, "11-Parameters/DipoleTest.csv")
+datafiledir = os.path.join(HOMEPATH, "99-Scratch")
+Smltn = Simu.Simulation(10, filename, datafiledir, "DipoleTest.dat")
 
 print()
 print(" <---- Simulation initialised.")
