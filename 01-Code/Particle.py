@@ -859,7 +859,7 @@ Derived class ReferenceParticle(Particle):
                                Sets attributes for reference partice for a
                                drift space.  Also works for apertures,
                                quads, and any element that has length but
-                               does not bend the beam, sich as a dipole.
+                               does not bend the beam, such as quadropole.
 
   I/o methods:
      None so far.
@@ -1133,22 +1133,21 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("PrOut")
 
-        Rot2LabIn = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
-        # Rot2LabOut = np.array([                   \
-        # [1., 0., 0.],      \
-        # [0., 1., 0.],      \
-        # [0., 0., 1.]       \
-        # ])
-
-        Theta = np.pi / 4
-
-        Rot2LabOut = np.array(
+        Rot2LabIn = np.array(
             [
-                [np.cos(Theta), 0.0, np.sin(Theta)],
+                [1.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0],
-                [-np.sin(Theta), 0.0, np.cos(Theta)],
+                [0.0, 0.0, 1.0],
             ]
         )
+        Rot2LabOut = np.array(
+            [
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+            ]
+        )
+
         # Rotates in x and z by angle theta
 
         Success = self.setRot2LabIn(Rot2LabIn)
@@ -1197,6 +1196,92 @@ class ReferenceParticle(Particle):
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
         cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
+        RrOut = np.array(
+            [
+                RrIn[0] + cx * iBLE.getLength(),
+                RrIn[1] + cy * iBLE.getLength(),
+                RrIn[2] + cz * iBLE.getLength(),
+                0.0,
+            ]
+        )
+        Success = self.setRrIn(RrIn)
+        if not Success:
+            raise fail2setReferenceParticle("RrIn")
+        Success = self.setRrOut(RrOut)
+        if not Success:
+            raise fail2setReferenceParticle("RrOut")
+
+        PrIn = self.getPrOut()[nRcrds - 1]
+        PrOut = PrIn
+        Success = self.setPrIn(PrIn)
+        if not Success:
+            raise fail2setReferenceParticle("PrIn")
+        Success = self.setPrOut(PrOut)
+        if not Success:
+            raise fail2setReferenceParticle("PrOut")
+
+        Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]
+        Rot2LabOut = Rot2LabIn
+        Success = self.setRot2LabIn(Rot2LabIn)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabIn")
+        Success = self.setRot2LabOut(Rot2LabOut)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabOut")
+
+        # .. Now particle position/trace space:
+        Success = self.setz(self.getRrOut()[nRcrds][2])
+        if not Success:
+            raise fail2setReferenceParticle("setz")
+        Success = self.sets(self.getsOut()[nRcrds])
+        if not Success:
+            raise fail2setReferenceParticle("sets")
+        TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
+        Success = self.setTraceSpace(TrcSpc)
+        if not Success:
+            raise fail2setReferenceParticle("setTraceSpace")
+
+        return Success
+
+    def setReferenceParticleAtSectorDipole(self, iBLE=None):
+        nRcrds = len(self.getsIn())
+
+        Success = self.setLocation(
+            BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
+        )
+        if not Success:
+            raise fail2setReferenceParticle("Name")
+
+        # For the dipole this should still be fine; s is RPLC phase space.
+        # So just adding on the ``path length'' of the dipole. Check if this is set
+        # Correctly
+
+        Success = self.setsIn(self.getsOut()[nRcrds - 1])
+        if not Success:
+            raise fail2setReferenceParticle("sIn")
+        Success = self.setsOut(self.getsOut()[nRcrds - 1] + iBLE.getLength())
+        if not Success:
+            raise fail2setReferenceParticle("sOut")
+
+        # RrOut and RrIn are documented as lab frame!
+        # Position coord in is taken as the last position out - still fine.
+
+        RrIn = self.getRrOut()[nRcrds - 1]
+
+        # Working out total momentum? (Lab Frame!)
+
+        Mmtm = mth.sqrt(
+            self.getPrOut()[nRcrds - 1][0] ** 2
+            + self.getPrOut()[nRcrds - 1][1] ** 2
+            + self.getPrOut()[nRcrds - 1][2] ** 2
+        )
+
+        # My guess: working out velocity in the lab frame. Do we need this?
+
+        cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
+        cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
+        cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
+
         RrOut = np.array(
             [
                 RrIn[0] + cx * iBLE.getLength(),
