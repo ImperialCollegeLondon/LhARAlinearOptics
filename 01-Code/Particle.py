@@ -891,11 +891,11 @@ class ReferenceParticle(Particle):
                 )
             ReferenceParticle.setinstance(self)
 
-            # .. Set ReferenceParticle attributes to None:
-            self.setAllRP2None()
-
             # .. Particle class initialisation:
             Particle.__init__(self)
+
+            # .. Set ReferenceParticle attributes to None: (Switched position!)
+            self.setAllRP2None()
 
             # Only constants; print values that will be used:
             if self.getRPDebug():
@@ -1106,6 +1106,8 @@ class ReferenceParticle(Particle):
     def setReferenceParticleAtSource(self):
         nRcrds = len(self.getsIn())
 
+        # Not sure about this? Assuming source is in position 1?
+
         Success = self.setLocation(
             BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
         )
@@ -1181,6 +1183,8 @@ class ReferenceParticle(Particle):
     def setReferenceParticleAtDrift(self, iBLE=None):
         nRcrds = len(self.getsIn())
 
+        # Changed to (nRcrds + 1) -> nRcds
+
         Success = self.setLocation(
             BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
         )
@@ -1255,6 +1259,8 @@ class ReferenceParticle(Particle):
     def setReferenceParticleAtSectorDipole(self, iBLE=None):
         nRcrds = len(self.getsIn())
 
+        # Changed to (nRcrds + 1) -> nRcds
+
         Success = self.setLocation(
             BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
         )
@@ -1307,7 +1313,7 @@ class ReferenceParticle(Particle):
         cxp, cyp, czp = RotTheta(thetap) @ unit
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
-        r = Brho / self.getB()
+        r = Brho / iBLE.getB()
         d = 2 * r * np.sin(theta / 2)
         RrOut = np.array(
             [
@@ -1328,7 +1334,9 @@ class ReferenceParticle(Particle):
         # Momentum; rotate by theta?
 
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
-        PrOut = RotTheta(theta) @ PrIn  # Rotate PrOut
+        PrOut = np.zeros(4)
+        PrOut[0:3] = RotTheta(theta) @ PrIn[0:3]  # Rotate PrOut
+        PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
         if not Success:
             raise fail2setReferenceParticle("PrIn")
@@ -1348,6 +1356,8 @@ class ReferenceParticle(Particle):
             raise fail2setReferenceParticle("Rot2LabOut")
 
         # .. Now particle position/trace space:
+
+        # WRONG CHANGE!!!
         Success = self.setz(self.getRrOut()[nRcrds][2])
         if not Success:
             raise fail2setReferenceParticle("setz")
