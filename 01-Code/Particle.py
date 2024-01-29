@@ -158,6 +158,7 @@ from PhysicalConstants import PhysicalConstants
 
 constants_instance = PhysicalConstants()
 protonMASS = constants_instance.mp()
+speed_of_light = constants_instance.SoL()
 
 
 class Particle:
@@ -1278,20 +1279,39 @@ class ReferenceParticle(Particle):
             + self.getPrOut()[nRcrds - 1][2] ** 2
         )
 
-        # My guess: working out velocity in the lab frame. Do we need this?
+        # B field in y direction
+
+        theta = iBLE.getAngle()  # only dipole here
+        thetap = theta / 2
+
+        RotTheta = lambda theta: np.array(
+            [
+                [np.cos(theta), 0, np.sin(theta)],
+                [0.0, 1.0, 0.0],
+                [-np.sin(theta), 0, np.cos(theta)],
+            ]
+        )  # anti-clockwise rotation by theta around y
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
         cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
 
+        unit = np.array([cx, cy, cz])
+
+        cxp, cyp, czp = RotTheta(thetap) @ unit
+
+        Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
+        r = Brho / self.getB()
+        d = 2 * r * np.sin(theta / 2)
         RrOut = np.array(
             [
-                RrIn[0] + cx * iBLE.getLength(),
-                RrIn[1] + cy * iBLE.getLength(),
-                RrIn[2] + cz * iBLE.getLength(),
-                0.0,
+                RrIn[0] + cxp * d,
+                RrIn[1] + cyp * d,
+                RrIn[2] + czp * d,
+                0.0,  # ignore time
             ]
         )
+
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1299,8 +1319,10 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        PrIn = self.getPrOut()[nRcrds - 1]
-        PrOut = PrIn
+        # Momentum; rotate by theta?
+
+        PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
+        PrOut = RotTheta(theta) @ PrIn  # Rotate PrOut
         Success = self.setPrIn(PrIn)
         if not Success:
             raise fail2setReferenceParticle("PrIn")
@@ -1308,8 +1330,10 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("PrOut")
 
-        Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]
-        Rot2LabOut = Rot2LabIn
+        # Now define coordinate axes rotation
+
+        Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
+        Rot2LabOut = RotTheta(theta) @ Rot2LabIn
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
@@ -1324,6 +1348,8 @@ class ReferenceParticle(Particle):
         Success = self.sets(self.getsOut()[nRcrds])
         if not Success:
             raise fail2setReferenceParticle("sets")
+
+        # Not sure about this?
         TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:
