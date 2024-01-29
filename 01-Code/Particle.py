@@ -1188,6 +1188,7 @@ class ReferenceParticle(Particle):
             raise fail2setReferenceParticle("sOut")
 
         RrIn = self.getRrOut()[nRcrds - 1]
+        # This may be a bug? v = p / sqrt(invariant); but only spatial components used!
         Mmtm = mth.sqrt(
             self.getPrOut()[nRcrds - 1][0] ** 2
             + self.getPrOut()[nRcrds - 1][1] ** 2
@@ -1204,6 +1205,7 @@ class ReferenceParticle(Particle):
                 0.0,
             ]
         )
+        # Nothing done to time coordinate either?
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1252,7 +1254,7 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("Name")
 
-        # For the dipole this should still be fine; s is RPLC phase space.
+        # For the dipole this should still be fine.
         # So just adding on the ``path length'' of the dipole. Check if this is set
         # Correctly
 

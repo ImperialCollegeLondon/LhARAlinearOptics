@@ -201,9 +201,9 @@ class BeamlinePlotter(object):
                         y = []
                         z = particle.getz()
 
-                        for i in range(len(particle.getLabPhaseSpace())):
-                            x.append(particle.getLabPhaseSpace()[i][0])
-                            y.append(particle.getLabPhaseSpace()[i][2])
+                        for i in range(len(particle.getTraceSpace())):
+                            x.append(particle.getTraceSpace()[i][0])
+                            y.append(particle.getTraceSpace()[i][2])
 
                         xd = x[-1]
                         yd = y[-1]
