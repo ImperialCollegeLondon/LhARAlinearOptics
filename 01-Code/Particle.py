@@ -1086,6 +1086,12 @@ class ReferenceParticle(Particle):
                 Success = self.setReferenceParticleAtDrift(iBLE)
                 if not Success:
                     raise fail2setReferenceParticle("setReferenceParticleAtDrift")
+            elif isinstance(iBLE, BLE.SectorDipole):
+                Success = self.setReferenceParticleAtSectorDipole(iBLE)
+                if not Success:
+                    raise fail2setReferenceParticle(
+                        "setReferenceParticleAtSectorDipole"
+                    )
 
             Success = self.setLocation(iBLE.getName())
             if not Success:
