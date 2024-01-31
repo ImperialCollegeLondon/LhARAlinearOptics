@@ -208,19 +208,6 @@ class BeamLine(object):
                 print("        <---- Beam line done.")
             #    <---- Done beam line  --------  --------  --------  --------
 
-            #    ----> Reference particle:  --------  --------  --------  --------
-            if cls.getDebug():
-                print("        ----> Reference particle: ")
-
-            # This seems to be done several times in the code!?
-
-            # refPrtclSet = refPrtcl.setReferenceParticle()
-
-            if cls.getDebug():
-                print("            ----> Reference particle set, success:")
-                print("        <---- Reference particle done. ")
-        #    <---- Done reference particle -----  --------  --------  --------
-
         else:
             if cls.getDebug():
                 print(" BeamLine.__new__: ", "existing BeamLine object will be used")

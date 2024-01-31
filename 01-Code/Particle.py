@@ -1105,7 +1105,7 @@ class ReferenceParticle(Particle):
 
     def setReferenceParticleAtSource(self):
         nRcrds = len(self.getsIn())
-
+        print(nRcrds)
         # Not sure about this? Assuming source is in position 1?
 
         Success = self.setLocation(
@@ -1199,7 +1199,7 @@ class ReferenceParticle(Particle):
             raise fail2setReferenceParticle("sOut")
 
         RrIn = self.getRrOut()[nRcrds - 1]
-        # This may be a bug? v = p / sqrt(invariant); but only spatial components used!
+
         Mmtm = mth.sqrt(
             self.getPrOut()[nRcrds - 1][0] ** 2
             + self.getPrOut()[nRcrds - 1][1] ** 2
@@ -1258,8 +1258,6 @@ class ReferenceParticle(Particle):
 
     def setReferenceParticleAtSectorDipole(self, iBLE=None):
         nRcrds = len(self.getsIn())
-
-        # Changed to (nRcrds + 1) -> nRcds
 
         Success = self.setLocation(
             BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
