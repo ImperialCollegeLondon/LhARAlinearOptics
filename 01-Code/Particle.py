@@ -158,6 +158,7 @@ from PhysicalConstants import PhysicalConstants
 
 constants_instance = PhysicalConstants()
 protonMASS = constants_instance.mp()
+speed_of_light = constants_instance.SoL()
 
 
 class Particle:
@@ -859,7 +860,7 @@ Derived class ReferenceParticle(Particle):
                                Sets attributes for reference partice for a
                                drift space.  Also works for apertures,
                                quads, and any element that has length but
-                               does not bend the beam, sich as a dipole.
+                               does not bend the beam, such as quadropole.
 
   I/o methods:
      None so far.
@@ -890,11 +891,11 @@ class ReferenceParticle(Particle):
                 )
             ReferenceParticle.setinstance(self)
 
-            # .. Set ReferenceParticle attributes to None:
-            self.setAllRP2None()
-
             # .. Particle class initialisation:
             Particle.__init__(self)
+
+            # .. Set ReferenceParticle attributes to None: (Switched position!)
+            self.setAllRP2None()
 
             # Only constants; print values that will be used:
             if self.getRPDebug():
@@ -1085,6 +1086,12 @@ class ReferenceParticle(Particle):
                 Success = self.setReferenceParticleAtDrift(iBLE)
                 if not Success:
                     raise fail2setReferenceParticle("setReferenceParticleAtDrift")
+            elif isinstance(iBLE, BLE.SectorDipole):
+                Success = self.setReferenceParticleAtSectorDipole(iBLE)
+                if not Success:
+                    raise fail2setReferenceParticle(
+                        "setReferenceParticleAtSectorDipole"
+                    )
 
             Success = self.setLocation(iBLE.getName())
             if not Success:
@@ -1098,6 +1105,8 @@ class ReferenceParticle(Particle):
 
     def setReferenceParticleAtSource(self):
         nRcrds = len(self.getsIn())
+        print(nRcrds)
+        # Not sure about this? Assuming source is in position 1?
 
         Success = self.setLocation(
             BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
@@ -1133,22 +1142,21 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("PrOut")
 
-        Rot2LabIn = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
-        # Rot2LabOut = np.array([                   \
-        # [1., 0., 0.],      \
-        # [0., 1., 0.],      \
-        # [0., 0., 1.]       \
-        # ])
-
-        Theta = np.pi / 4
-
-        Rot2LabOut = np.array(
+        Rot2LabIn = np.array(
             [
-                [np.cos(Theta), 0.0, np.sin(Theta)],
+                [1.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0],
-                [-np.sin(Theta), 0.0, np.cos(Theta)],
+                [0.0, 0.0, 1.0],
             ]
         )
+        Rot2LabOut = np.array(
+            [
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+            ]
+        )
+
         # Rotates in x and z by angle theta
 
         Success = self.setRot2LabIn(Rot2LabIn)
@@ -1175,6 +1183,8 @@ class ReferenceParticle(Particle):
     def setReferenceParticleAtDrift(self, iBLE=None):
         nRcrds = len(self.getsIn())
 
+        # Changed to (nRcrds + 1) -> nRcds
+
         Success = self.setLocation(
             BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
         )
@@ -1189,6 +1199,7 @@ class ReferenceParticle(Particle):
             raise fail2setReferenceParticle("sOut")
 
         RrIn = self.getRrOut()[nRcrds - 1]
+
         Mmtm = mth.sqrt(
             self.getPrOut()[nRcrds - 1][0] ** 2
             + self.getPrOut()[nRcrds - 1][1] ** 2
@@ -1205,6 +1216,7 @@ class ReferenceParticle(Particle):
                 0.0,
             ]
         )
+        # Nothing done to time coordinate either?
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1237,6 +1249,121 @@ class ReferenceParticle(Particle):
         Success = self.sets(self.getsOut()[nRcrds])
         if not Success:
             raise fail2setReferenceParticle("sets")
+        TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
+        Success = self.setTraceSpace(TrcSpc)
+        if not Success:
+            raise fail2setReferenceParticle("setTraceSpace")
+
+        return Success
+
+    def setReferenceParticleAtSectorDipole(self, iBLE=None):
+        nRcrds = len(self.getsIn())
+
+        Success = self.setLocation(
+            BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
+        )
+        if not Success:
+            raise fail2setReferenceParticle("Name")
+
+        # For the dipole this should still be fine.
+        # So just adding on the ``path length'' of the dipole. Check if this is set
+        # Correctly
+
+        Success = self.setsIn(self.getsOut()[nRcrds - 1])
+        if not Success:
+            raise fail2setReferenceParticle("sIn")
+        Success = self.setsOut(self.getsOut()[nRcrds - 1] + iBLE.getLength())
+        if not Success:
+            raise fail2setReferenceParticle("sOut")
+
+        # RrOut and RrIn are documented as lab frame!
+        # Position coord in is taken as the last position out - still fine.
+
+        RrIn = self.getRrOut()[nRcrds - 1]
+
+        # Working out total momentum? (Lab Frame!)
+
+        Mmtm = mth.sqrt(
+            self.getPrOut()[nRcrds - 1][0] ** 2
+            + self.getPrOut()[nRcrds - 1][1] ** 2
+            + self.getPrOut()[nRcrds - 1][2] ** 2
+        )
+
+        # B field in y direction
+
+        theta = iBLE.getAngle()  # only dipole here
+        thetap = theta / 2
+
+        RotTheta = lambda theta: np.array(
+            [
+                [np.cos(theta), 0, np.sin(theta)],
+                [0.0, 1.0, 0.0],
+                [-np.sin(theta), 0, np.cos(theta)],
+            ]
+        )  # anti-clockwise rotation by theta around y
+
+        cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
+        cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
+        cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
+
+        unit = np.array([cx, cy, cz])
+
+        cxp, cyp, czp = RotTheta(thetap) @ unit
+
+        Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
+        r = Brho / iBLE.getB()
+        d = 2 * r * np.sin(theta / 2)
+        RrOut = np.array(
+            [
+                RrIn[0] + cxp * d,
+                RrIn[1] + cyp * d,
+                RrIn[2] + czp * d,
+                0.0,  # ignore time
+            ]
+        )
+
+        Success = self.setRrIn(RrIn)
+        if not Success:
+            raise fail2setReferenceParticle("RrIn")
+        Success = self.setRrOut(RrOut)
+        if not Success:
+            raise fail2setReferenceParticle("RrOut")
+
+        # Momentum; rotate by theta?
+
+        PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
+        PrOut = np.zeros(4)
+        PrOut[0:3] = RotTheta(theta) @ PrIn[0:3]  # Rotate PrOut
+        PrOut[3] = PrIn[3]  # Energy unchanged
+        Success = self.setPrIn(PrIn)
+        if not Success:
+            raise fail2setReferenceParticle("PrIn")
+        Success = self.setPrOut(PrOut)
+        if not Success:
+            raise fail2setReferenceParticle("PrOut")
+
+        # Now define coordinate axes rotation
+
+        Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
+        Rot2LabOut = RotTheta(theta) @ Rot2LabIn
+        Success = self.setRot2LabIn(Rot2LabIn)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabIn")
+        Success = self.setRot2LabOut(Rot2LabOut)
+        if not Success:
+            raise fail2setReferenceParticle("Rot2LabOut")
+
+        # .. Now particle position/trace space:
+
+        # WRONG CHANGE!!!
+        Success = self.setz(self.getRrOut()[nRcrds][2])
+        if not Success:
+            raise fail2setReferenceParticle("setz")
+        Success = self.sets(self.getsOut()[nRcrds])
+        if not Success:
+            raise fail2setReferenceParticle("sets")
+
+        # Not sure about this?
         TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:
