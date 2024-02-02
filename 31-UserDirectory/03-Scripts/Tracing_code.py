@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append('/Users/alfredo/Desktop/PhD/LhARA/LhARAlinearOptics/01-Code/')
-
+#sys.path.append('/Users/alfredo/Desktop/PhD/LhARA/LhARAlinearOptics/01-Code/')
+sys.path.append('HOMEPATH')
 import numpy as np
 import os
 import pandas as pd
@@ -77,10 +77,19 @@ class BeamlinePlotter(object):
         z = []
         params  = pd.read_csv(HOMEPATH + '11-Parameters/' + filename)
         indexes = params[params['Parameter'] == 'Length'].index.tolist()
+        indexes_Fquad = params[params['Element'] == 'Fquad'].index.tolist()
+        indexes_Dquad = params[params['Element'] == 'Dquad'].index.tolist()
+                    
         for i in indexes:
             aux += float(params['Value'][i])
             z.append(aux)
-        
+            for j in indexes_Dquad: #duplicates the position for quads and their apertures
+                if i == j:
+                    z.append(aux)
+            for k in indexes_Fquad:
+                if i == k:
+                    z.append(aux)
+                    
         z.insert(0, 0.) #insert source position
             
         return z
@@ -113,20 +122,20 @@ class BeamlinePlotter(object):
         
         #Eliminate one of the apertures for every Fquad and Dquad
         
-        lst = my_list
-        result = []
-        skip_next = False
+       # lst = my_list
+        #result = []
+        #skip_next = False
 
-        for i in range(len(lst)):
-            if skip_next:
-                skip_next = False
-                #continue
+        #for i in range(len(lst)):
+         #   if skip_next:
+          #      skip_next = False
+           #     continue
 
-            if lst[i] == "Aperture" and i + 1 < len(lst) and (lst[i + 1] == "Fquad" or lst[i + 1] == "Dquad"):
-                skip_next = True
-            else:
-                result.append(lst[i])
-        my_list = result
+            #if lst[i] == "Aperture" and i + 1 < len(lst) and (lst[i + 1] == "Fquad" or lst[i + 1] == "Dquad"):
+             #   skip_next = True
+            #else:
+             #   result.append(lst[i])
+        #my_list = result
         
         #Eliminate the Drifts
         new_list = []
@@ -221,10 +230,12 @@ class BeamlinePlotter(object):
             index = []
             
             while aux_elem.count('Aperture') != 0:
+                #print(aux_elem)
                 ind = aux_elem.index('Aperture')
                 index.append(ind)
                 aux_elem.remove('Aperture')
                 aux_elem.insert(ind, 'removed')
+            
             
             #print(index)
             
@@ -282,7 +293,9 @@ class BeamlinePlotter(object):
                     label_name = 'DQuad'
 
                     quad_lnth = float(params.iloc[j[i]][5])
-                    quad_posi = z[Dindex[i]]+quad_lnth
+                    #print(quad_lnth)
+                    quad_posi = z[Dindex[i]]#+quad_lnth
+                    #print(quad_posi)
                     
                     ori = -1
 
@@ -298,8 +311,9 @@ class BeamlinePlotter(object):
                     label_name = 'FQuad'
 
                     quad_lnth = float(params.iloc[j[i]][5]) #formerly 5
-                    quad_posi = z[Findex[i]]+quad_lnth
-                    print(quad_lnth)
+                    quad_posi = z[Findex[i]]#+quad_lnth
+                    #print(quad_lnth)
+                    #print(quad_posi)
 
                     ori = 1
 
