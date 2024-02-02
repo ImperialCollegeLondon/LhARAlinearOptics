@@ -339,21 +339,6 @@ class BeamLineElement:
         return _Rprime
 
 
-"""
-    def CoordRot(self, _R, Theta):
-    
-        RotMtrx = np.array( [ \
-                              [np.cos(Theta).,  0., np.sin(Thetha)., 0., 0., 0.], \
-                              [0., 1., 0., 0., 0.,        0.], \
-                              [-np.sin(Theta)., 0., np.cos(Theta).,  0., 0., 0.], \
-                              [0., 0., 0., np.cos(Theta)., 0.,  np.sin(Thetha).], \
-                              [0., 0., 0., 0., 1., 0.], \
-                              [0., 0., 0.,-np.sin(Theta) ., 0., np.cos(Theta).]  \
-                             ] )
-        #Rotates in x and z by angle theta
-
-"""
-
 # --------  Derived classes  --------  --------  --------  --------  --------
 """
 Derived class Facility:
@@ -1575,7 +1560,8 @@ Derived class SectorDipole:
 ===========================
 
   SectorDipole class derived from BeamLineElement to contain parameters
-  for a sector dipole
+  for a sector dipole. Coordinate axes set such that the direction of the B field in the
+  dipole is in the x direction for no rotation of the SectorDipole
 
 
   Class attributes:
@@ -1596,11 +1582,11 @@ Derived class SectorDipole:
   _TrnsMtrx : Transfer matrix
 
 
-  Instance attributes to define quadrupole:
-  -----------------------------------------
+  Instance attributes to define SectorDipole
+  -------------------------------------------
   _Angle  : Bending angle, degrees
 
-    
+
   Methods:
   --------
   Built-in methods __init__, __repr__ and __str__.
@@ -1616,9 +1602,9 @@ Derived class SectorDipole:
           Input: _Angle (float): angle through which dipole bends reference
                                  particle
 
-setTransferMatrix: Set transfer matrix; calculate using i/p brhop
-          Input: Brho (T m)
-         Return: np.array(6,6,) transfer matrix
+    setTransferMatrix: Set transfer matrix; calculate using i/p brhop
+            Input: Brho (T m)
+            Return: np.array(6,6,) transfer matrix
 
   Get methods:
       getAngle
@@ -1659,7 +1645,7 @@ class SectorDipole(BeamLineElement):
 
         self.setAngle(_Angle)
         self.setB(_B)
-        self.setLength() # Works out length - good.
+        self.setLength()  # Works out length - good.
 
         if self.getDebug():
             print("     ----> New SectorDipole instance: \n", self)
@@ -1709,10 +1695,9 @@ class SectorDipole(BeamLineElement):
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
-        
         iPrev = len(iRefPrtcl.getPrOut()) - 1
-        
-        #pg 90 Wolski
+
+        # pg 90 Wolski
 
         p0 = mth.sqrt(
             np.dot(iRefPrtcl.getPrOut()[iPrev][:3], iRefPrtcl.getPrOut()[iPrev][:3])

@@ -58,19 +58,19 @@ Class Particle:
 
          sets: float : Set s coordinate at which phase-space is stored.
 
-setTraceSpace: np.ndarray(6,) : trace space 6 floats
+    setTraceSpace: np.ndarray(6,) : trace space 6 floats
 
-setRPLCPhaseSpace: [np.ndarray(3,), np.ndarray(3,)]: two three vectors
+    setRPLCPhaseSpace: [np.ndarray(3,), np.ndarray(3,)]: two three vectors
 
-setLabPhaseSpace: [np.ndarray(3,), np.ndarray(3,)]: two three vectors
+    setLabPhaseSpace: [np.ndarray(3,), np.ndarray(3,)]: two three vectors
 
-recordParticle: i/p: Location, s, z, TraceSpace:
-                calls, setLocation, setz, sets, setTraceSpace in turn
-                to store all variables.
+    recordParticle: i/p: Location, s, z, TraceSpace:
+                    calls, setLocation, setz, sets, setTraceSpace in turn
+                    to store all variables.
 
-  setSourceTraceSpace: set trace space after source
-           Input: numpy.array(6,); 6D phase to store
-          Return: Success: bool, True if stored OK.
+    setSourceTraceSpace: set trace space after source
+            Input: numpy.array(6,); 6D phase to store
+            Return: Success: bool, True if stored OK.
 
 
   Get methods:
@@ -149,6 +149,7 @@ import numpy as np
 import math as mth
 import os
 import io
+from Utilities import RotMat_x, RotMat_y, RotMat_z
 
 import BeamLine as BL
 import BeamLineElement as BLE
@@ -1291,16 +1292,9 @@ class ReferenceParticle(Particle):
 
         # B field in y direction
 
-        theta = iBLE.getAngle()  # only dipole here
-        thetap = theta / 2
-
-        RotTheta = lambda theta: np.array(
-            [
-                [np.cos(theta), 0, np.sin(theta)],
-                [0.0, 1.0, 0.0],
-                [-np.sin(theta), 0, np.cos(theta)],
-            ]
-        )  # anti-clockwise rotation by theta around y
+        theta = -iBLE.getAngle()  # only dipole here
+        thetap = theta
+        thetazSD = np.pi / 2
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
@@ -1308,20 +1302,22 @@ class ReferenceParticle(Particle):
 
         unit = np.array([cx, cy, cz])
 
-        cxp, cyp, czp = RotTheta(thetap) @ unit
+        cx, cy, cz = RotMat_x(thetap) @ unit
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
         r = Brho / iBLE.getB()
-        d = 2 * r * np.sin(theta / 2)
+        d = 2 * r * np.abs(np.sin(theta / 2))
+
+        # works out chord vector
+
         RrOut = np.array(
             [
-                RrIn[0] + cxp * d,
-                RrIn[1] + cyp * d,
-                RrIn[2] + czp * d,
+                RrIn[0] + cx * d,
+                RrIn[1] + cy * d,
+                RrIn[2] + cz * d,
                 0.0,  # ignore time
             ]
         )
-
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1333,7 +1329,7 @@ class ReferenceParticle(Particle):
 
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
         PrOut = np.zeros(4)
-        PrOut[0:3] = RotTheta(theta) @ PrIn[0:3]  # Rotate PrOut
+        PrOut[0:3] = RotMat_x(theta) @ PrIn[0:3]  # Rotate PrOut
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1343,9 +1339,9 @@ class ReferenceParticle(Particle):
             raise fail2setReferenceParticle("PrOut")
 
         # Now define coordinate axes rotation
-
+        # Fix these later
         Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
-        Rot2LabOut = RotTheta(theta) @ Rot2LabIn
+        Rot2LabOut = RotMat_x(theta) @ Rot2LabIn
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
