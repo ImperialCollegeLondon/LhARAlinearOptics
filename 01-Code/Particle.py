@@ -1294,7 +1294,6 @@ class ReferenceParticle(Particle):
 
         theta = -iBLE.getAngle()  # only dipole here
         thetap = theta
-        thetazSD = np.pi / 2
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
