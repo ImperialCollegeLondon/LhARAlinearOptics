@@ -142,8 +142,10 @@ Created on Mon 03Jul23: Version history:
 @author: kennethlong
 """
 
+from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
+
 import struct            as strct
 import numpy             as np
 import math              as mth
@@ -424,57 +426,47 @@ class Particle:
                 ELoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
                 ELab[iLoc].append(E)
                 Scl[iLoc].append(eps)
+                
+        plotFILE = '99-Scratch/ParticleProgressionPlot.pdf'
+        with PdfPages(plotFILE) as pdf:
+            for iLoc in range(len(xLoc)):
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
+                                        layout="constrained")
+                # add an artist, in this case a nice label in the middle...
+                Ttl = nLoc[iLoc]
+                fig.suptitle(Ttl, fontdict=font)
 
-        for iLoc in range(len(xLoc)):
-            fig, axs = plt.subplots(nrows=3, ncols=2)
-            fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
-                                    layout="constrained")
-            # add an artist, in this case a nice label in the middle...
-            """
-            for row in range(2):
-                for col in range(2):
-                    axs[row, col].annotate( \
-                            f'axs[{row}, {col}]', (0.5, 0.5),  \
-                            transform=axs[row, col].transAxes, \
-                            ha='center', va='center', fontsize=18, \
-                            color='darkgrey')
-            """
-            Ttl = nLoc[iLoc]
-            fig.suptitle(Ttl, fontdict=font)
-
-            #axs[0, 0].set_title('x,y')
-            axs[0, 0].hist2d(xLoc[iLoc], yLoc[iLoc], bins=100)
-            axs[0, 0].set_xlabel('x (m)')
-            axs[0, 0].set_ylabel('y (m)')
+                #axs[0, 0].set_title('x,y')
+                axs[0, 0].hist2d(xLoc[iLoc], yLoc[iLoc], bins=100)
+                axs[0, 0].set_xlabel('x (m)')
+                axs[0, 0].set_ylabel('y (m)')
             
-            #axs[0, 1].set_title('Energy')
-            axs[0, 1].hist(ELoc[iLoc], 100)
-            axs[0, 1].set_xlabel('delta')
-            axs[0, 1].set_ylabel('Number')
+                #axs[0, 1].set_title('Energy')
+                axs[0, 1].hist(ELoc[iLoc], 100)
+                axs[0, 1].set_xlabel('delta')
+                axs[0, 1].set_ylabel('Number')
             
-            #axs[1, 0].set_title('x, xprime')
-            axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
-            axs[1, 0].set_xlabel('x (m)')
-            axs[1, 0].set_ylabel('xprime (m)')
+                #axs[1, 0].set_title('x, xprime')
+                axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
+                axs[1, 0].set_xlabel('x (m)')
+                axs[1, 0].set_ylabel('xprime (m)')
 
-            #axs[1, 1].set_title('y, yprime')
-            axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
-            axs[1, 1].set_xlabel('y (m)')
-            axs[1, 1].set_ylabel('yprime (m)')
+                #axs[1, 1].set_title('y, yprime')
+                axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
+                axs[1, 1].set_xlabel('y (m)')
+                axs[1, 1].set_ylabel('yprime (m)')
 
-            axs[2, 0].hist(ELab[iLoc], 100)
-            axs[2, 0].set_xlabel('Kinetic energy (MeV)')
-            axs[2, 0].set_ylabel('Number')
+                axs[2, 0].hist(ELab[iLoc], 100)
+                axs[2, 0].set_xlabel('Kinetic energy (MeV)')
+                axs[2, 0].set_ylabel('Number')
 
-            axs[2, 1].hist(Scl[iLoc], 100)
-            axs[2, 1].set_xlabel('Epsilon')
-            axs[2, 1].set_ylabel('Number')
+                axs[2, 1].hist(Scl[iLoc], 100)
+                axs[2, 1].set_xlabel('Epsilon')
+                axs[2, 1].set_ylabel('Number')
 
         
-            plotFILE = '99-Scratch/ParticleProgressionPlot' + \
-                str(iLoc) + '.pdf'
-            plt.savefig(plotFILE)
-            plt.close()
+                pdf.savefig()
+                plt.close()
             
 
     def printProgression(self):
