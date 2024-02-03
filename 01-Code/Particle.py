@@ -646,7 +646,6 @@ class Particle:
             if self.getDebug():
                 print("         ----> Location:", bLocation.decode('utf-8'))
 
-            
             record = strct.pack(">8d",                           \
                                 self.getz()[iLoc],               \
                                 self.gets()[iLoc],               \

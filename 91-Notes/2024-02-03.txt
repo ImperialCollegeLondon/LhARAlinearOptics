@@ -1,5 +1,8 @@
 --------  --------  --------  --------  --------  --------  --------  03Feb24
-Fix position at which particle phase space is recorded reported by Paul K. Turned out to be bugs in updating of s in addBeamLine.  Do tests etc:
+Fix position at which particle phase space is recorded reported by Paul K.
+Turned out to be bugs in updating of s in addBeamLine.
+
+Do tests etc:
 
 Tests:
  - BeamLineTst.py          - OK
@@ -25,14 +28,15 @@ Tests:
  - TestWrite.py            - OK
 
 Scripts:
- - RunDRACOsimulation.py   - 
- - ReadDRACOsimu.py        - 
- - RunLIONsimulation.py    - 
- - ReadLIONsimu.py         - 
- - RunLhARAsimulation.py   - 
- - ReadLhARAsimu.py        - 
- - plotQuadTriplet.py      - 
- - plotTrajectory.py       - 
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotQuadTriplet.py      - OK
+ - plotTrajectory.py       - OK -- had to fix getz->gets
+ - LhARAMagnetTable.py     - OK
 
 --------  --------  --------  --------  --------  --------  --------  --------
 Tests:
@@ -67,4 +71,5 @@ Scripts:
  - ReadLhARAsimu.py        - 
  - plotQuadTriplet.py      - 
  - plotTrajectory.py       - 
+ - LhARAMagnetTable.py     - 
 
