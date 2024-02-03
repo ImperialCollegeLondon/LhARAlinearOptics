@@ -11,7 +11,7 @@ import BeamLine as BL
 ##! Start:
 print("========  Read and plot: start  ========")
 
-HOMEPATH    = os.getenv('HOMEPATH')
+HOMEPATH = os.getenv("HOMEPATH")
 print(" ----> Initialising with HOMEPATH:", HOMEPATH)
 print()
 Debug = False
@@ -20,10 +20,9 @@ ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "LhARAsimu.dat")
 
 ##! Create LhARA instance:
 print("     ----> Create LhARA instance:")
-filename     = os.path.join(HOMEPATH, \
-                        '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
+filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv")
 print("         ----> Parameters will be read from:", filename)
-LhARAbI  = BL.BeamLine(filename)
+LhARAbI = BL.BeamLine(filename)
 if Debug:
     print(LhARAbI)
 
@@ -41,7 +40,7 @@ print()
 EndOfFile = False
 iEvt = 0
 iCnt = 0
-Scl  = 10
+Scl = 10
 while not EndOfFile:
     EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     if not EndOfFile:
@@ -51,9 +50,9 @@ while not EndOfFile:
             iCnt += 1
             if iCnt == 10:
                 iCnt = 1
-                Scl  = Scl * 10
-        if iEvt > 100000:
-            break
+                Scl = Scl * 10
+#        if iEvt > 100000:
+#            break
 
 print(" <----", iEvt, "events read")
 
