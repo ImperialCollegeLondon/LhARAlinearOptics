@@ -1,6 +1,5 @@
 --------  --------  --------  --------  --------  --------  --------  03Feb24
-Fix position at which particle phase space is recorded reported by Paul K.
-Turned out to be bugs in updating of s in addBeamLine.  Do tests etc:
+Fix position at which particle phase space is recorded reported by Paul K. Turned out to be bugs in updating of s in addBeamLine.  Do tests etc:
 
 Tests:
  - BeamLineTst.py          - OK
