@@ -1294,6 +1294,9 @@ class ReferenceParticle(Particle):
 
         theta = -iBLE.getAngle()  # only dipole here
         thetap = theta
+        thetaX = 0
+        thetaY = 0
+        thetaZ = np.pi / 2  # probably the only one you need
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
@@ -1301,7 +1304,16 @@ class ReferenceParticle(Particle):
 
         unit = np.array([cx, cy, cz])
 
-        cx, cy, cz = RotMat_x(thetap) @ unit
+        cx, cy, cz = (
+            RotMat_z(thetaZ)
+            @ RotMat_x(thetaX)
+            @ RotMat_y(thetaY)
+            @ RotMat_x(thetap)
+            @ RotMat_y(thetaX).T
+            @ RotMat_x(thetaY).T
+            @ RotMat_z(thetaZ).T
+            @ unit
+        )
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
         r = Brho / iBLE.getB()
@@ -1328,7 +1340,16 @@ class ReferenceParticle(Particle):
 
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
         PrOut = np.zeros(4)
-        PrOut[0:3] = RotMat_x(theta) @ PrIn[0:3]  # Rotate PrOut
+        PrOut[0:3] = (
+            RotMat_z(thetaZ)
+            @ RotMat_x(thetaX)
+            @ RotMat_y(thetaY)
+            @ RotMat_x(theta)
+            @ RotMat_y(thetaX).T
+            @ RotMat_x(thetaY).T
+            @ RotMat_z(thetaZ).T
+            @ PrIn[0:3]
+        )  # Rotate PrOut
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1340,7 +1361,16 @@ class ReferenceParticle(Particle):
         # Now define coordinate axes rotation
         # Fix these later
         Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
-        Rot2LabOut = RotMat_x(theta) @ Rot2LabIn
+        Rot2LabOut = (
+            RotMat_z(thetaZ)
+            @ RotMat_x(thetaX)
+            @ RotMat_y(thetaY)
+            @ RotMat_x(theta)
+            @ RotMat_y(thetaX).T
+            @ RotMat_x(thetaY).T
+            @ RotMat_z(thetaZ).T
+            @ Rot2LabIn
+        )
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
