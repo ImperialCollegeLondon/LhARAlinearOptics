@@ -230,7 +230,7 @@ class BeamLineElement:
         
     def setName(self, _Name):
         if not isinstance(_Name, str):
-            raise badParameter(" BeamLineElement.setrStrt: bad name:", \
+            raise badParameter(" BeamLineElement.setName: bad name:", \
                                _Name)
         self._Name = _Name
         
@@ -259,8 +259,8 @@ class BeamLineElement:
                                " bad orienttion offset:", \
                                _dvStrt)
         self._dvStrt = _dvStrt
-        
 
+        
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 

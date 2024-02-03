@@ -98,6 +98,8 @@ Created on Mon 02Oct23: Version history:
 @author: rehanahrazak
 """
 
+import sys
+
 import os
 import io
 import math   as mth
@@ -624,7 +626,7 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt  = np.array([0.,0.,s+DqL])
+                rStrt  = np.array([0.,0.,s])
                 vStrt  = np.array([0.,0.])
                 drStrt = np.array([0.,0.,0.])
                 dvStrt = np.array([0.,0.])
@@ -871,10 +873,11 @@ class BeamLine(object):
                               " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd    = iBLE.getrStrt()[2]
+                    zEnd    = -999999.
+                    sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
-                                                       zEnd, \
+                                                       sEnd, \
                                                        TrcSpc)
                 TrcSpc_i = TrcSpc
 

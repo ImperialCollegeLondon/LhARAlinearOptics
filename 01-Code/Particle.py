@@ -197,7 +197,7 @@ class Particle:
         return " Partcle __str__ done."
 
     def print(self):
-        print(" Particle:")
+        print("\n Particle:")
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Number of phase-space records:", \
@@ -208,6 +208,15 @@ class Particle:
             print("         ---->", self.getLocation()[iLctn], ":")
             print("             ----> z, s", self.getz()[iLctn], \
                                              self.gets()[iLctn])
+            try:
+                print("             ----> ", \
+              BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
+                      "; length ", \
+              BLE.BeamLineElement.getinstances()[iLctn+1].getLength())
+            except:
+                print("             ----> ", \
+                      BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
+                      "; has no length ")
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("             ---->     trace space:", \
                       self.getTraceSpace()[iLctn])
@@ -745,6 +754,7 @@ class Particle:
             print(iPrtcl)
             print(" <---- readParticle done.")
             
+        cls.setDebug(False)
         return False        
         
     @classmethod
