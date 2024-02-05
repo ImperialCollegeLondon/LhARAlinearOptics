@@ -58,7 +58,8 @@ print(" <----", iEvt, "events read")
 
 print()
 print(" ----> Plot progression:")
-Prtcl.Particle.plotTraceSpaceProgression()
+#Prtcl.Particle.plotTraceSpaceProgression()
+Prtcl.Particle.plotParticleTrajectory_Lab()
 print(" <---- Done.")
 
 ##! Complete:

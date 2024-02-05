@@ -89,6 +89,7 @@ Class Particle:
 
           printProgression: print progression through the beamline
          No input or return
+ plotParticleTrajectory_Lab: create plots showing the progression of particle in the lab frame.
 
    fillPhaseSpaceAll: Class method, no arguments.  Fills RPLC and Lab
           phase-space attrutes for all particle
@@ -473,6 +474,127 @@ class Particle:
                 pdf.savefig()
                 plt.close()
 
+    @classmethod
+    def plotParticleTrajectory_Lab(cls):
+        font = {
+            "family": "serif",
+            "color": "darkred",
+            "weight": "normal",
+            "size": 16,
+        }
+        plt.rcParams["figure.figsize"] = (7.5, 10.0)      
+        nLoc = []
+        xLoc = []
+        xpLoc = []
+        yLoc = []
+        ypLoc = []
+        ELoc = []
+        ELab = []
+        Scl = []
+        x_lab = []
+        y_lab = []
+        z_lab = []
+
+        nPrtcl = 0       
+        for iPrtcl in cls.getParticleInstances():
+            nPrtcl += 1
+                  
+            if isinstance(iPrtcl, ReferenceParticle):
+                iRefPrtcl = iPrtcl
+                continue
+            iLoc = -1
+            for iTrcSpc in iPrtcl.getTraceSpace():
+                iLoc += 1
+                
+                if iLoc > (len(xLoc) - 1):
+                    nLoc.append(iPrtcl.getLocation()[iLoc])
+                    xLoc.append([])
+                    xpLoc.append([])
+                    yLoc.append([])
+                    ypLoc.append([])
+                    ELoc.append([])
+                    ELab.append([])
+                    Scl.append([])
+                    x_lab.append([])
+                    y_lab.append([])
+                    z_lab.append([])
+                    
+
+                """
+                print(" Here:", iLoc)
+                print("     ---->", iPrtcl.getTraceSpace()[iLoc])
+                print("     ---->", iRefPrtcl.getPrOut()[iLoc])
+                """
+
+                p0 = mth.sqrt(
+                    np.dot(
+                        iRefPrtcl.getPrOut()[iLoc][:3], iRefPrtcl.getPrOut()[iLoc][:3]
+                    )
+                )
+                E0 = iRefPrtcl.getPrOut()[iLoc][3]
+                b0 = p0 / E0
+                E = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
+                p = mth.sqrt(E**2 - protonMASS**2)
+                E -= protonMASS
+                D = mth.sqrt(
+                    1.0
+                    + 2.0 * iPrtcl.getTraceSpace()[iLoc][5] / b0
+                    + iPrtcl.getTraceSpace()[iLoc][5] ** 2
+                )
+
+                eps = (
+                    iPrtcl.getTraceSpace()[iLoc][1] ** 2
+                    + iPrtcl.getTraceSpace()[iLoc][3] ** 2
+                ) / (2.0 * D**2)
+                """
+                eps = (p - p0) / p0
+
+                """
+                iPrtcl.fillPhaseSpace() 
+                xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
+                xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
+                yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
+                ypLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][3])
+                ELoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
+                ELab[iLoc].append(E)
+                Scl[iLoc].append(eps)
+                x_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][0])
+                y_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][1])
+                z_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][2])
+        
+
+            plotFILE = "99-Scratch/ParticleTrajectory_Lab.pdf"
+
+            with PdfPages(plotFILE) as pdf:
+                fig, axs  = plt.subplots(nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
+                    )
+                axs[0].plot(x_lab[-1], y_lab[-1], "o")#need condition for these to be the ones that get to the end
+                
+                axs[0].set_xlabel("x-axis")
+                axs[0].set_ylabel("y-axis")
+                axs[0].grid(True)
+                axs[0].set_title("Particle Beam after Final Collimator x-y plane")
+                axs[1].plot(z_lab, x_lab)
+                axs[1].grid(True)
+                
+                axs[1].set_xlabel("z-axis")
+                axs[1].set_ylabel("x-axis")
+                axs[1].set_title("Particle Trajectory x-z plane")
+                axs[2].plot(z_lab, y_lab)
+                axs[2].grid(True)
+                
+                axs[2].set_xlabel("z-axis")
+                axs[2].set_ylabel("y-axis")
+                axs[2].set_title("Particle Trajectory y-z plane")
+
+                pdf.savefig()
+                plt.close()                
+
+
+                
+                
+
+            
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500, precision=5, suppress=True):
@@ -572,10 +694,12 @@ class Particle:
 
         rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0.0])
 
-        Enrgy = protonMASS + TrcSpc[5]
+        
+        Enrgy = protonMASS + TrcSpc[5]#what?
+        print(Enrgy, protonMASS)
         Mmtm = mth.sqrt(Enrgy**2 - protonMASS**2)
-        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)
-        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])
+        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)#:)
+        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])#:)        
 
         if self.getDebug():
             with np.printoptions(linewidth=500, precision=7, suppress=True):
@@ -1285,7 +1409,7 @@ class ReferenceParticle(Particle):
         thetap = theta
         thetaX = 0
         thetaY = 0
-        thetaZ = np.pi / 2  # probably the only one you need
+        thetaZ = 0  # probably the only one you need
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
