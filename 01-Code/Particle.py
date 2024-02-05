@@ -564,31 +564,50 @@ class Particle:
         
 
             plotFILE = "99-Scratch/ParticleTrajectory_Lab.pdf"
+        for i in range(len(z_lab)):
+            print(f"Length of z_lab[{i}]: {len(z_lab[i])}")
+            print(f"Length of x_lab[{i}]: {len(x_lab[i])}")
+            #as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
+        with PdfPages(plotFILE) as pdf:
+            fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True)
 
-            with PdfPages(plotFILE) as pdf:
-                fig, axs  = plt.subplots(nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
-                    )
-                axs[0].plot(x_lab[-1], y_lab[-1], "o")#need condition for these to be the ones that get to the end
-                
-                axs[0].set_xlabel("x-axis")
-                axs[0].set_ylabel("y-axis")
-                axs[0].grid(True)
-                axs[0].set_title("Particle Beam after Final Collimator x-y plane")
-                axs[1].plot(z_lab, x_lab)
-                axs[1].grid(True)
-                
-                axs[1].set_xlabel("z-axis")
-                axs[1].set_ylabel("x-axis")
-                axs[1].set_title("Particle Trajectory x-z plane")
-                axs[2].plot(z_lab, y_lab)
-                axs[2].grid(True)
-                
-                axs[2].set_xlabel("z-axis")
-                axs[2].set_ylabel("y-axis")
-                axs[2].set_title("Particle Trajectory y-z plane")
+            for i in range(len(x_lab)):
+                # Plot the last point of each set on the first subplot (axs[0])
+                #print(x_lab[i][-1])
+                axs[0].plot(x_lab[i][-1], y_lab[i][-1], "o")
 
-                pdf.savefig()
-                plt.close()                
+            axs[0].set_xlabel("x-axis")
+            axs[0].set_ylabel("y-axis")
+            axs[0].grid(True)
+            axs[0].set_title("Particle Beam after Final Collimator x-y plane")
+            
+            #print(x_lab)
+            # Plot all sets on the second subplot (axs[1])
+            for i in range(len(z_lab)):
+                for j in range(len(x_lab[i])):
+                    print(x_lab[i][j])
+                    axs[1].plot(z_lab[i][j], x_lab[i][j],"x", color = "blue")
+
+            axs[1].grid(True)
+            axs[1].set_xlabel("z-axis")
+            axs[1].set_ylabel("x-axis")
+            axs[1].set_title("Particle Trajectory x-z plane")
+            
+
+            # Plot all sets on the third subplot (axs[2])
+            
+            for i in range(len(z_lab)):
+                for j in range(len(x_lab[i])):
+                    axs[2].plot(z_lab[i][j], y_lab[i][j], "x",color = "blue")
+
+            axs[2].grid(True)
+            axs[2].set_xlabel("z-axis")
+            axs[2].set_ylabel("y-axis")
+            axs[2].set_title("Particle Trajectory y-z plane")
+            
+
+            pdf.savefig()
+            plt.close()             
 
 
                 
@@ -694,10 +713,10 @@ class Particle:
 
         rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0.0])
 
-        
-        Enrgy = protonMASS + TrcSpc[5]#what?
-        print(Enrgy, protonMASS)
-        Mmtm = mth.sqrt(Enrgy**2 - protonMASS**2)
+        p0 = BL.BeamLine.getElement()[0].getp0()
+        Enrgy = protonMASS**2 + (TrcSpc[5]*p0)**2#what?
+        #print(Enrgy, protonMASS)
+        Mmtm = mth.sqrt(Enrgy - protonMASS**2)
         zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)#:)
         pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])#:)        
 
