@@ -482,7 +482,7 @@ class Particle:
             "weight": "normal",
             "size": 16,
         }
-        plt.rcParams["figure.figsize"] = (7.5, 10.0)      
+        plt.rcParams["figure.figsize"] = (7.5, 10.0)
         nLoc = []
         xLoc = []
         xpLoc = []
@@ -495,17 +495,17 @@ class Particle:
         y_lab = []
         z_lab = []
 
-        nPrtcl = 0       
+        nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
-                  
+
             if isinstance(iPrtcl, ReferenceParticle):
                 iRefPrtcl = iPrtcl
                 continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
-                
+
                 if iLoc > (len(xLoc) - 1):
                     nLoc.append(iPrtcl.getLocation()[iLoc])
                     xLoc.append([])
@@ -518,7 +518,6 @@ class Particle:
                     x_lab.append([])
                     y_lab.append([])
                     z_lab.append([])
-                    
 
                 """
                 print(" Here:", iLoc)
@@ -550,7 +549,7 @@ class Particle:
                 eps = (p - p0) / p0
 
                 """
-                iPrtcl.fillPhaseSpace() 
+                iPrtcl.fillPhaseSpace()
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
                 yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
@@ -561,40 +560,37 @@ class Particle:
                 x_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][0])
                 y_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][1])
                 z_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][2])
-        
 
             plotFILE = "99-Scratch/ParticleTrajectory_Lab.pdf"
 
             with PdfPages(plotFILE) as pdf:
-                fig, axs  = plt.subplots(nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
-                    )
-                axs[0].plot(x_lab[-1], y_lab[-1], "o")#need condition for these to be the ones that get to the end
-                
+                fig, axs = plt.subplots(
+                    nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
+                )
+                axs[0].plot(
+                    x_lab[-1], y_lab[-1], "o"
+                )  # need condition for these to be the ones that get to the end
+
                 axs[0].set_xlabel("x-axis")
                 axs[0].set_ylabel("y-axis")
                 axs[0].grid(True)
                 axs[0].set_title("Particle Beam after Final Collimator x-y plane")
                 axs[1].plot(z_lab, x_lab)
                 axs[1].grid(True)
-                
+
                 axs[1].set_xlabel("z-axis")
                 axs[1].set_ylabel("x-axis")
                 axs[1].set_title("Particle Trajectory x-z plane")
                 axs[2].plot(z_lab, y_lab)
                 axs[2].grid(True)
-                
+
                 axs[2].set_xlabel("z-axis")
                 axs[2].set_ylabel("y-axis")
                 axs[2].set_title("Particle Trajectory y-z plane")
 
                 pdf.savefig()
-                plt.close()                
+                plt.close()
 
-
-                
-                
-
-            
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500, precision=5, suppress=True):
@@ -694,12 +690,11 @@ class Particle:
 
         rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0.0])
 
-        
-        Enrgy = protonMASS + TrcSpc[5]#what?
-        print(Enrgy, protonMASS)
+        Enrgy = protonMASS + TrcSpc[5]  # what?
+
         Mmtm = mth.sqrt(Enrgy**2 - protonMASS**2)
-        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)#:)
-        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])#:)        
+        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)  #:)
+        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])  #:)
 
         if self.getDebug():
             with np.printoptions(linewidth=500, precision=7, suppress=True):
