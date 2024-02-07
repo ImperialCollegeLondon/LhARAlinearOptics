@@ -708,9 +708,9 @@ class Particle:
 
         p0 = BL.BeamLine.getElement()[0].getp0()
 
-        E0= np.sqrt(protonMASS**2+p0**2)
-        Enrgy = E0 + (TrcSpc[5]*p0)
-        #print(Enrgy, protonMASS)
+        E0 = np.sqrt(protonMASS**2 + p0**2)
+        Enrgy = E0 + (TrcSpc[5] * p0)
+        # print(Enrgy, protonMASS)
 
         Enrgy = protonMASS**2 + (TrcSpc[5] * p0) ** 2  # what?
         # print(Enrgy, protonMASS)
