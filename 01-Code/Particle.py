@@ -570,7 +570,10 @@ class Particle:
 
         rRPLC  = np.array([TrcSpc[0], TrcSpc[2], 0.])
 
-        Enrgy  = protonMASS + TrcSpc[5]
+        p0     = BL.BeamLine.getElement()[0].getp0()
+        E      = np.sprt(protonMASS**2 + p0**2)
+        Enrgy  = protonMASS + TrcSpc[5]*p0
+        
         Mmtm   = mth.sqrt(Enrgy**2 - protonMASS**2)
         zPrm   = mth.sqrt(1.-TrcSpc[1]**2-TrcSpc[3]**2)
         pRPLC  = np.array([TrcSpc[1]*Mmtm, \
