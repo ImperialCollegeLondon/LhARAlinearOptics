@@ -482,7 +482,7 @@ class Particle:
             "weight": "normal",
             "size": 16,
         }
-        plt.rcParams["figure.figsize"] = (7.5, 10.0)      
+        plt.rcParams["figure.figsize"] = (7.5, 10.0)
         nLoc = []
         xLoc = []
         xpLoc = []
@@ -495,17 +495,17 @@ class Particle:
         y_lab = []
         z_lab = []
 
-        nPrtcl = 0       
+        nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
-                  
+
             if isinstance(iPrtcl, ReferenceParticle):
                 iRefPrtcl = iPrtcl
                 continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
-                
+
                 if iLoc > (len(xLoc) - 1):
                     nLoc.append(iPrtcl.getLocation()[iLoc])
                     xLoc.append([])
@@ -518,7 +518,6 @@ class Particle:
                     x_lab.append([])
                     y_lab.append([])
                     z_lab.append([])
-                    
 
                 """
                 print(" Here:", iLoc)
@@ -550,7 +549,7 @@ class Particle:
                 eps = (p - p0) / p0
 
                 """
-                iPrtcl.fillPhaseSpace() 
+                iPrtcl.fillPhaseSpace()
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
                 yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
@@ -561,59 +560,53 @@ class Particle:
                 x_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][0])
                 y_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][1])
                 z_lab[iLoc].append(iPrtcl.getLabPhaseSpace()[iLoc][0][2])
-        
 
             plotFILE = "99-Scratch/ParticleTrajectory_Lab.pdf"
         for i in range(len(z_lab)):
             print(f"Length of z_lab[{i}]: {len(z_lab[i])}")
             print(f"Length of x_lab[{i}]: {len(x_lab[i])}")
-            #as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
+            # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
         with PdfPages(plotFILE) as pdf:
-            fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True)
+            fig, axs = plt.subplots(
+                nrows=3, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
+            )
 
             for i in range(len(x_lab)):
                 # Plot the last point of each set on the first subplot (axs[0])
-                #print(x_lab[i][-1])
+                # print(x_lab[i][-1])
                 axs[0].plot(x_lab[i][-1], y_lab[i][-1], "o")
 
             axs[0].set_xlabel("x-axis")
             axs[0].set_ylabel("y-axis")
             axs[0].grid(True)
             axs[0].set_title("Particle Beam after Final Collimator x-y plane")
-            
-            #print(x_lab)
+
+            # print(x_lab)
             # Plot all sets on the second subplot (axs[1])
             for i in range(len(z_lab)):
                 for j in range(len(x_lab[i])):
                     print(x_lab[i][j])
-                    axs[1].plot(z_lab[i][j], x_lab[i][j],"x", color = "blue")
+                    axs[1].plot(z_lab[i][j], x_lab[i][j], "x", color="blue")
 
             axs[1].grid(True)
             axs[1].set_xlabel("z-axis")
             axs[1].set_ylabel("x-axis")
             axs[1].set_title("Particle Trajectory x-z plane")
-            
 
             # Plot all sets on the third subplot (axs[2])
-            
+
             for i in range(len(z_lab)):
                 for j in range(len(x_lab[i])):
-                    axs[2].plot(z_lab[i][j], y_lab[i][j], "x",color = "blue")
+                    axs[2].plot(z_lab[i][j], y_lab[i][j], "x", color="blue")
 
             axs[2].grid(True)
             axs[2].set_xlabel("z-axis")
             axs[2].set_ylabel("y-axis")
             axs[2].set_title("Particle Trajectory y-z plane")
-            
 
             pdf.savefig()
-            plt.close()             
+            plt.close()
 
-
-                
-                
-
-            
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500, precision=5, suppress=True):
@@ -714,12 +707,17 @@ class Particle:
         rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0.0])
 
         p0 = BL.BeamLine.getElement()[0].getp0()
+<<<<<<< HEAD
         E0= np.sqrt(protonMASS**2+p0**2)
         Enrgy = E0 + (TrcSpc[5]*p0)
         #print(Enrgy, protonMASS)
+=======
+        Enrgy = protonMASS**2 + (TrcSpc[5] * p0) ** 2  # what?
+        # print(Enrgy, protonMASS)
+>>>>>>> a6e1bb3eac3d3903c203c7b7adc8208532ac3e29
         Mmtm = mth.sqrt(Enrgy - protonMASS**2)
-        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)#:)
-        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])#:)        
+        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)  #:)
+        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])  #:)
 
         if self.getDebug():
             with np.printoptions(linewidth=500, precision=7, suppress=True):
