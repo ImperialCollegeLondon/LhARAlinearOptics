@@ -447,6 +447,21 @@ class BeamLine(object):
              int(pndsSource[pndsSource["Parameter"]=="nPnts"]["Value"].iloc[0])
             MinCTheta = float( \
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+            Power = float( \
+             pndsSource[pndsSource["Parameter"]=="Power"]["Value"].iloc[0])
+            Energy = float( \
+             pndsSource[pndsSource["Parameter"]=="Energy"]["Value"].iloc[0])
+            Wavelength = float( \
+             pndsSource[pndsSource["Parameter"]=="Wavelength"]["Value"].iloc[0])
+            Duration = float( \
+             pndsSource[pndsSource["Parameter"]=="Duration"]["Value"].iloc[0])
+            Thickness = float( \
+             pndsSource[pndsSource["Parameter"]=="Thickness"]["Value"].iloc[0])
+            Intensity = float( \
+             pndsSource[pndsSource["Parameter"]=="Intensity"]["Value"].iloc[0])
+            DivAngle = float( \
+             pndsSource[pndsSource["Parameter"]=="DivAngle"]["Value"].iloc[0])
+            
         elif SrcMode == 1:               #.. Gaussian:
             MeanE  = float( \
              pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
@@ -471,8 +486,8 @@ class BeamLine(object):
             print("                         ----> SigmaX, SigmaY:", \
                   SigmaX, SigmaY)
             if SrcMode == 0:
-                print("                         ----> Emin, Emax, nPnts:", \
-                      Emin, Emax, nPnts)
+                print("                         ----> Emin, Emax, nPnts, Power, Energy, Wavelength, Duration, Thickness, Intensity, DivAngle:", \
+                      Emin, Emax, nPnts, Power, Energy, Wavelength, Duration, Thickness, Intensity, DivAngle)
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
@@ -481,7 +496,7 @@ class BeamLine(object):
                       MinE, MaxE)
 
         if SrcMode == 0:
-            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
+            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts, Power, Energy, Wavelength, Duration, Thickness, Intensity, DivAngle]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
