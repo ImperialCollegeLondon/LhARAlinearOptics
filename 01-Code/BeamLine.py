@@ -110,6 +110,7 @@ import BeamLineElement as BLE
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 
+
 # -------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
 
@@ -118,6 +119,12 @@ constants_instance = PhysicalConstants()
 protonMASS = constants_instance.mp()
 speed_of_light = constants_instance.SoL()
 mu0 = constants_instance.mu0()
+
+# --------------------------------------------------------------------------------------
+# BeamLineElement Plotting Patches
+# --------------------------------------------------------------------------------------
+
+import BeamLinePatches as BLP
 
 
 class BeamLine(object):
@@ -915,62 +922,18 @@ class BeamLine(object):
     @classmethod
     def plotBeamLineYZ(self, ax):
 
-        patchesCollection = []  # collect for legend later
+        patchesLegend = []  # collect for legend later
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
         for iLoc, iBLE in enumerate(BLE.BeamLineElement.getinstances()[1:]):
 
-            rBLE = iRefPrtcl.getRrIn()[iLoc]
-            print(iBLE.getName(), "@ (z,y)", (rBLE[2], rBLE[1]))
+            print("Appending: ", iBLE.getName())
 
             if isinstance(iBLE, BLE.Source):
-                patchBLE = patches.Rectangle(
-                    (rBLE[2], rBLE[1]),
-                    0.2,
-                    0.2,
-                    linewidth=1,
-                    edgecolor="b",
-                    facecolor="b",
-                    alpha=0.5,
-                    label="Source",
-                )
-            elif isinstance(iBLE, BLE.FocusQuadrupole):
-                patchBLE = patches.Rectangle(
-                    (rBLE[2], rBLE[1]),
-                    0.1,
-                    0.1,
-                    linewidth=1,
-                    edgecolor="r",
-                    facecolor="none",
-                )
-            elif isinstance(iBLE, BLE.DefocusQuadrupole):
-                patchBLE = patches.Rectangle(
-                    (rBLE[2], rBLE[1]),
-                    0.1,
-                    0.1,
-                    linewidth=1,
-                    edgecolor="r",
-                    facecolor="none",
-                )
-            elif isinstance(iBLE, BLE.Solenoid):
-                patchBLE = patches.Rectangle(
-                    (rBLE[2], rBLE[1]),
-                    0.1,
-                    0.1,
-                    linewidth=1,
-                    edgecolor="r",
-                    facecolor="none",
-                )
-            elif isinstance(iBLE, BLE.GaborLens):
-                patchBLE = patches.Rectangle(
-                    (rBLE[2], rBLE[1]),
-                    0.1,
-                    0.1,
-                    linewidth=1,
-                    edgecolor="r",
-                    facecolor="none",
-                )
+                patchBLE = BLP.sourcePatch(0.5, 0.5)
+            elif isinstance(iBLE, BLE.Aperture):
+                patchBLE = BLP.aperturePatch(iBLE.getParams()[0], 0.1, 0.3)
             elif isinstance(iBLE, BLE.SectorDipole):
 
                 Mmtm = mth.sqrt(
@@ -979,32 +942,24 @@ class BeamLine(object):
                     + iRefPrtcl.getPrIn()[iLoc][2] ** 2
                 )
 
-                cx = iRefPrtcl.getPrOut()[iLoc][0] / Mmtm
-                cy = iRefPrtcl.getPrOut()[iLoc][1] / Mmtm
-                cz = iRefPrtcl.getPrOut()[iLoc][2] / Mmtm
-
-                unit = np.array([cx, cy, cz])
-
                 Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
 
-                r = Brho / iBLE.getB()
+                R = Brho / iBLE.getB()
 
                 angle = iBLE.getAngle()
 
-                print(r, angle)
-                patchBLE = patches.Wedge(
-                    center=[0, 0],
-                    r=r - 0.1,
-                    theta1=np.pi / 2,
-                    theta2=np.pi / 2 - angle,
-                    width=0.2,
-                )
+                patchBLE = BLP.dipolePatch(ax, angle, R, 0.2)
 
             else:
                 continue  # i.e. if something else continue to next BLE
 
-            patchesCollection.append(ax.add_patch(patchBLE))
-        return patchesCollection
+            BLP.transformPatchYZ(
+                ax, patchBLE, iRefPrtcl.getRot2LabIn()[iLoc], iRefPrtcl.getRrIn()[iLoc]
+            )
+
+            ax.add_patch(patchBLE)
+            ax.legend
+        return patchesLegend
 
 
 # --------  Exceptions:

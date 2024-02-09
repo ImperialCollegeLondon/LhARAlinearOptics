@@ -26,33 +26,3 @@ axtest.set_xlim(-1, 12)
 axtest.set_ylim(-5, 5)
 
 plt.savefig("99-Scratch/beamlineplot.pdf")
-
-figwedgetest, axwedgetest = plt.subplots()
-
-axwedgetest.set_xlim(-2, 2)
-axwedgetest.set_ylim(-2, 2)
-R = 1
-rad2deg = lambda rad: rad / (2 * np.pi) * 360
-
-
-patchBLE = patches.Wedge(
-    center=[0, 0],
-    r=R - 0.1,
-    theta1=0,
-    theta2=rad2deg(np.pi / 4),
-    width=0.2,
-    facecolor="lightblue",
-    label="Dipole",
-    alpha=1.0,
-)
-
-r = mpl.transforms.Affine2D().rotate_deg(-90)
-t = mpl.transforms.Affine2D().translate(0, R - 0.2)
-
-rta = r + t + axwedgetest.transData
-
-patchBLE.set_transform(rta)
-
-axwedgetest.add_patch(patchBLE)
-axwedgetest.legend()
-plt.savefig("99-Scratch/wedges.pdf")

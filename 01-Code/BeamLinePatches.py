@@ -31,20 +31,21 @@ def dipolePatch(ax, angle, R, w):
     if angle >= 0:
         trans = r + t + ax.transData
     elif angle < 0:
-        trans = refx + r + t + ax.transData
+        trans = r + t + refx + ax.transData
 
     patchBLE.set_transform(trans)
 
     return patchBLE
 
 
-def sourcePatch(L):
+def sourcePatch(w, L):
 
     patchBLE = patches.Arrow(
         x=0,
         y=0,
         dx=L,
         dy=0,
+        width=w,
         label="Source",
         facecolor="green",
     )
@@ -63,7 +64,7 @@ def aperturePatch(D, L, h):
     )
 
     patchBLEii = patches.Rectangle(
-        xy=(-L / 2, -D / 2),
+        xy=(-L / 2, -D / 2 - h),
         width=L,
         height=h,
         label="Aperture",
@@ -71,4 +72,24 @@ def aperturePatch(D, L, h):
         hatch="//",
     )
 
-    return patchBLEi + patchBLEii
+    return patchBLEi, patchBLEii
+
+
+def transformPatchYZ(ax, patch, Rot2Lab, R2Lab):
+
+    Mat = Rot2Lab[1:, 1:]
+    dR = R2Lab[1:3]
+    A2D = np.eye(3)
+
+    A2D[0:2, 0:2] = Mat
+    A2D[0:2, 2] = dR[::-1]
+
+    print(A2D)
+
+    transA2D = mpl.transforms.Affine2D(A2D)
+
+    trans = transA2D + patch.get_transform()
+
+    patch.set_transform(trans)
+
+    return patch
