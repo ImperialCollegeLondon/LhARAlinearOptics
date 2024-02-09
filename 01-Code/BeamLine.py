@@ -107,6 +107,9 @@ import pandas as pnds
 import Particle as Prtcl
 import BeamLineElement as BLE
 
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+
 # -------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
 
@@ -296,9 +299,9 @@ class BeamLine(object):
     def addBeamLineElement(self, iBLE=False):
         if self.getDebug():
             print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
-        if not isinstance(iBLE, BeamLineElement):
+        if not isinstance(iBLE, BLE):
             raise badBeamLineElement()
-        self._Element.append(FacilityBLE)
+        self._Element.append(iBLE)
 
     # --------  Processing methods:
     def csv2pandas(_filename):
@@ -465,7 +468,7 @@ class BeamLine(object):
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", MeanE, SigmaE)
             elif SrcMode == 2:
-                print("                         ----> MinE and MaxE:", MinE, MaxE)
+                print("                         ----> MinE and MaxE:", Emin, Emax)
 
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
@@ -909,9 +912,111 @@ class BeamLine(object):
         if cls.getDebug() or NEvts > 1:
             print(" <---- End of this simulation, ", iEvt, " events generated")
 
+    @classmethod
+    def plotBeamLineYZ(self, ax):
+
+        patchesCollection = []  # collect for legend later
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+        for iLoc, iBLE in enumerate(BLE.BeamLineElement.getinstances()[1:]):
+
+            rBLE = iRefPrtcl.getRrIn()[iLoc]
+            print(iBLE.getName(), "@ (z,y)", (rBLE[2], rBLE[1]))
+
+            if isinstance(iBLE, BLE.Source):
+                patchBLE = patches.Rectangle(
+                    (rBLE[2], rBLE[1]),
+                    0.2,
+                    0.2,
+                    linewidth=1,
+                    edgecolor="b",
+                    facecolor="b",
+                    alpha=0.5,
+                    label="Source",
+                )
+            elif isinstance(iBLE, BLE.FocusQuadrupole):
+                patchBLE = patches.Rectangle(
+                    (rBLE[2], rBLE[1]),
+                    0.1,
+                    0.1,
+                    linewidth=1,
+                    edgecolor="r",
+                    facecolor="none",
+                )
+            elif isinstance(iBLE, BLE.DefocusQuadrupole):
+                patchBLE = patches.Rectangle(
+                    (rBLE[2], rBLE[1]),
+                    0.1,
+                    0.1,
+                    linewidth=1,
+                    edgecolor="r",
+                    facecolor="none",
+                )
+            elif isinstance(iBLE, BLE.Solenoid):
+                patchBLE = patches.Rectangle(
+                    (rBLE[2], rBLE[1]),
+                    0.1,
+                    0.1,
+                    linewidth=1,
+                    edgecolor="r",
+                    facecolor="none",
+                )
+            elif isinstance(iBLE, BLE.GaborLens):
+                patchBLE = patches.Rectangle(
+                    (rBLE[2], rBLE[1]),
+                    0.1,
+                    0.1,
+                    linewidth=1,
+                    edgecolor="r",
+                    facecolor="none",
+                )
+            elif isinstance(iBLE, BLE.SectorDipole):
+
+                Mmtm = mth.sqrt(
+                    iRefPrtcl.getPrIn()[iLoc][0] ** 2
+                    + iRefPrtcl.getPrIn()[iLoc][1] ** 2
+                    + iRefPrtcl.getPrIn()[iLoc][2] ** 2
+                )
+
+                cx = iRefPrtcl.getPrOut()[iLoc][0] / Mmtm
+                cy = iRefPrtcl.getPrOut()[iLoc][1] / Mmtm
+                cz = iRefPrtcl.getPrOut()[iLoc][2] / Mmtm
+
+                unit = np.array([cx, cy, cz])
+
+                Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
+
+                r = Brho / iBLE.getB()
+
+                angle = iBLE.getAngle()
+
+                print(r, angle)
+                patchBLE = patches.Wedge(
+                    center=[0, 0],
+                    r=r - 0.1,
+                    theta1=np.pi / 2,
+                    theta2=np.pi / 2 - angle,
+                    width=0.2,
+                )
+
+            else:
+                continue  # i.e. if something else continue to next BLE
+
+            patchesCollection.append(ax.add_patch(patchBLE))
+        return patchesCollection
+
 
 # --------  Exceptions:
 class badParameter(Exception):
+    pass
+
+
+class ReferenceParticleNotSpecified(Exception):
+    pass
+
+
+class badBeamLineElement(Exception):
     pass
 
 
