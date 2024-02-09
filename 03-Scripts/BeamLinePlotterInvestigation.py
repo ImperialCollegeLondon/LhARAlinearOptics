@@ -41,7 +41,11 @@ patchBLE = patches.Wedge(
     theta1=0,
     theta2=rad2deg(np.pi / 4),
     width=0.2,
+    facecolor="lightblue",
+    label="Dipole",
+    alpha=1.0,
 )
+
 r = mpl.transforms.Affine2D().rotate_deg(-90)
 t = mpl.transforms.Affine2D().translate(0, R - 0.2)
 
@@ -50,4 +54,5 @@ rta = r + t + axwedgetest.transData
 patchBLE.set_transform(rta)
 
 axwedgetest.add_patch(patchBLE)
+axwedgetest.legend()
 plt.savefig("99-Scratch/wedges.pdf")
