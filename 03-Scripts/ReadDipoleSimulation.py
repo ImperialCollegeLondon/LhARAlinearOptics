@@ -62,6 +62,7 @@ print()
 print(" ----> Plot progression:")
 #Prtcl.Particle.plotTraceSpaceProgression()
 Prtcl.Particle.plotParticleTrajectory_Lab()
+Prtcl.Particle.plotParticleTrajectory_RPLC()
 print(" <---- Done.")
 
 ##! Complete:
