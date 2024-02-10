@@ -85,6 +85,7 @@ class dipolePatch(patchBLE):
             facecolor="lightblue",
             label="Dipole",
             alpha=1.0,
+            zorder=999,
         )
 
         r = mpl.transforms.Affine2D().rotate_deg(-90)
@@ -113,6 +114,7 @@ class sourcePatch(patchBLE):
             width=w,
             label="Source",
             facecolor="green",
+            zorder=999,
         )
 
         self.set_Patch(Patch)
@@ -130,6 +132,7 @@ class aperturePatch(patchBLE):
             height=h,
             edgecolor="black",
             hatch="//",
+            zorder=999,
         )
 
         Patchii = patches.Rectangle(
@@ -139,6 +142,7 @@ class aperturePatch(patchBLE):
             label="Aperture",
             edgecolor="black",
             hatch="//",
+            zorder=999,
         )
 
         self.set_Patch((Patchi, Patchii))

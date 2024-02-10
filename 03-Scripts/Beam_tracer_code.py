@@ -221,11 +221,18 @@ class BeamlinePlotter(object):
 
                         if iEvt == 1:
                             axs[0].plot(
-                                x_lab_d, y_lab_d, "o", color=colour, alpha=alpha, label=label
+                                x_lab_d,
+                                y_lab_d,
+                                "o",
+                                color=colour,
+                                alpha=alpha,
+                                label=label,
                             )
 
                         else:
-                            axs[0].plot(x_lab_d, y_lab_d, "o", color=colour, alpha=alpha)
+                            axs[0].plot(
+                                x_lab_d, y_lab_d, "o", color=colour, alpha=alpha
+                            )
                         axs[1].plot(z_lab, x_lab, color=colour, alpha=alpha)
                         axs[2].plot(z_lab, y_lab, color=colour, alpha=alpha)
 
@@ -245,7 +252,7 @@ class BeamlinePlotter(object):
             )
             pass
 
- 
+        return fig, axs
 
     def plt_save(path="99-Scratch/ParticleTrajectory.pdf"):
         axs[0].grid(True)
@@ -275,9 +282,6 @@ class BeamlinePlotter(object):
         axs[2].set_title("Particle Trajectory y-z plane")
 
         fig.tight_layout()
+        fig.legend()
         plt.savefig(path)
         plt.close()
-
-
-
-    
