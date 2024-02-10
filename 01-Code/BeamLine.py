@@ -109,6 +109,7 @@ import BeamLineElement as BLE
 
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 # -------- Physical Constants Instances and Methods ----------------
@@ -922,8 +923,6 @@ class BeamLine(object):
     @classmethod
     def plotBeamLineYZ(self, ax):
 
-        patchesLegend = []  # collect for legend later
-
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
         for iLoc, iBLE in enumerate(BLE.BeamLineElement.getinstances()[1:]):
@@ -931,9 +930,9 @@ class BeamLine(object):
             print("Appending: ", iBLE.getName())
 
             if isinstance(iBLE, BLE.Source):
-                patchBLE = BLP.sourcePatch(0.5, 0.5)
+                patchBLE = BLP.sourcePatch(ax, 0.5, 0.5)
             elif isinstance(iBLE, BLE.Aperture):
-                patchBLE = BLP.aperturePatch(iBLE.getParams()[0], 0.1, 0.3)
+                patchBLE = BLP.aperturePatch(ax, iBLE.getParams()[0], 0.1, 0.3)
             elif isinstance(iBLE, BLE.SectorDipole):
 
                 Mmtm = mth.sqrt(
@@ -953,13 +952,14 @@ class BeamLine(object):
             else:
                 continue  # i.e. if something else continue to next BLE
 
-            BLP.transformPatchYZ(
-                ax, patchBLE, iRefPrtcl.getRot2LabIn()[iLoc], iRefPrtcl.getRrIn()[iLoc]
-            )
+            # switch y <-> z since we are plotting (z,y)
 
-            ax.add_patch(patchBLE)
-            ax.legend
-        return patchesLegend
+            Rot2Lab = iRefPrtcl.getRot2LabIn()[iLoc].T
+
+            R2Lab = iRefPrtcl.getRrIn()[iLoc][::-1]
+
+            patchBLE.transformPatchYZ(Rot2Lab, R2Lab)
+            patchBLE.render_Patch()
 
 
 # --------  Exceptions:
