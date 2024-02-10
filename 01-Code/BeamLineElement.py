@@ -110,6 +110,8 @@ import numpy as np
 import math as mth
 import random as rnd
 
+import matplotlib.patches as patches
+
 import PhysicalConstants as PhysCnst
 import Particle as Prtcl
 
@@ -2056,7 +2058,7 @@ class Solenoid(BeamLineElement):
             raise badParameter(
                 "BeamLineElement.Solenloid.setcsol:",
                 " bad quadrupole k constant:",
-                _kDQ,
+                _ksol,
             )
         self._ksol = _ksol
 

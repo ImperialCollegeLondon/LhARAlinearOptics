@@ -107,6 +107,11 @@ import pandas as pnds
 import Particle as Prtcl
 import BeamLineElement as BLE
 
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+
 # -------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
 
@@ -115,6 +120,12 @@ constants_instance = PhysicalConstants()
 protonMASS = constants_instance.mp()
 speed_of_light = constants_instance.SoL()
 mu0 = constants_instance.mu0()
+
+# --------------------------------------------------------------------------------------
+# BeamLineElement Plotting Patches
+# --------------------------------------------------------------------------------------
+
+import BeamLinePatches as BLP
 
 
 class BeamLine(object):
@@ -296,9 +307,9 @@ class BeamLine(object):
     def addBeamLineElement(self, iBLE=False):
         if self.getDebug():
             print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
-        if not isinstance(iBLE, BeamLineElement):
+        if not isinstance(iBLE, BLE):
             raise badBeamLineElement()
-        self._Element.append(FacilityBLE)
+        self._Element.append(iBLE)
 
     # --------  Processing methods:
     def csv2pandas(_filename):
@@ -465,7 +476,7 @@ class BeamLine(object):
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", MeanE, SigmaE)
             elif SrcMode == 2:
-                print("                         ----> MinE and MaxE:", MinE, MaxE)
+                print("                         ----> MinE and MaxE:", Emin, Emax)
 
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts]
@@ -909,9 +920,58 @@ class BeamLine(object):
         if cls.getDebug() or NEvts > 1:
             print(" <---- End of this simulation, ", iEvt, " events generated")
 
+    @classmethod
+    def plotBeamLineYZ(self, ax):
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+        for iLoc, iBLE in enumerate(BLE.BeamLineElement.getinstances()[1:]):
+
+            print("Appending: ", iBLE.getName())
+
+            if isinstance(iBLE, BLE.Source):
+                patchBLE = BLP.sourcePatch(ax, 0.5, 0.5)
+            elif isinstance(iBLE, BLE.Aperture):
+                patchBLE = BLP.aperturePatch(ax, iBLE.getParams()[0], 0.1, 0.3)
+            elif isinstance(iBLE, BLE.SectorDipole):
+
+                Mmtm = mth.sqrt(
+                    iRefPrtcl.getPrIn()[iLoc][0] ** 2
+                    + iRefPrtcl.getPrIn()[iLoc][1] ** 2
+                    + iRefPrtcl.getPrIn()[iLoc][2] ** 2
+                )
+
+                Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
+
+                R = Brho / iBLE.getB()
+
+                angle = iBLE.getAngle()
+
+                patchBLE = BLP.dipolePatch(ax, angle, R, 0.2)
+
+            else:
+                continue  # i.e. if something else continue to next BLE
+
+            # switch y <-> z since we are plotting (z,y)
+
+            Rot2Lab = iRefPrtcl.getRot2LabIn()[iLoc].T
+
+            R2Lab = iRefPrtcl.getRrIn()[iLoc][::-1]
+
+            patchBLE.transformPatchYZ(Rot2Lab, R2Lab)
+            patchBLE.render_Patch()
+
 
 # --------  Exceptions:
 class badParameter(Exception):
+    pass
+
+
+class ReferenceParticleNotSpecified(Exception):
+    pass
+
+
+class badBeamLineElement(Exception):
     pass
 
 
