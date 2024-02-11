@@ -30,4 +30,6 @@ fig, axs = Br.BeamlinePlotter.Tracer(
 
 BL.BeamLine.plotBeamLineYZ(axs[2])
 
+axs[2].set_aspect("equal")
+
 Br.BeamlinePlotter.plt_save()

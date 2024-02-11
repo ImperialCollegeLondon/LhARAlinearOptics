@@ -9,10 +9,10 @@ fig, ax = plt.subplots()
 ax.set_xlim(-2, 2)
 ax.set_ylim(-2, 2)
 
-dipolePatch(ax, 45, 1, 0.1).render_Patch()
-dipolePatch(ax, -45, 1, 0.1).render_Patch()
-aperturePatch(ax, 1, 0.1, 0.2).render_Patch()
-sourcePatch(ax, 0.2, 0.5).render_Patch()
+dipolePatch(ax, np.pi / 2, 1, 0.1).render_Patch()
+# dipolePatch(ax, -45, 1, 0.1).render_Patch()
+# aperturePatch(ax, 1, 0.1, 0.2).render_Patch()
+# sourcePatch(ax, 0.2).render_Patch()
 
 testRot = np.array(
     [
@@ -23,8 +23,8 @@ testRot = np.array(
 )
 testdR = np.array([0.0, 1, 0.1, 0.0])
 
-dipolePatch(ax, 45, 1, 0.1).transformPatchYZ(testRot, testdR).render_Patch()
-
+dipolePatch(ax, np.pi / 4, 1, 0.1).transformPatchYZ(testRot, testdR).render_Patch()
+ax.set_aspect("equal")
 ax.legend()
 
 
@@ -37,7 +37,7 @@ ax2.set_ylim(-2, 2)
 
 for i in range(10):
 
-    patchBLE = sourcePatch(ax2, 0.5, 0.5)
+    patchBLE = sourcePatch(ax2, 0.5)
 
     Rot2Lab = np.eye(3)
 

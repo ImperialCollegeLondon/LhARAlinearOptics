@@ -483,18 +483,17 @@ class Particle:
             "size": 16,
         }
         plt.rcParams["figure.figsize"] = (7.5, 10.0)
-           
+
         x_lab = []
         y_lab = []
         z_lab = []
-    
 
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
             if isinstance(iPrtcl, ReferenceParticle):
                 iRefPrtcl = iPrtcl
-                uba_iq = len(cls.getParticleInstances())-1
+                uba_iq = len(cls.getParticleInstances()) - 1
                 Devil = len(iPrtcl.getLocation())
                 x_lab = np.full((Devil, uba_iq), np.nan)
                 y_lab = np.full((Devil, uba_iq), np.nan)
@@ -502,10 +501,9 @@ class Particle:
                 continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
-                #print(iTrcSpc)
-                iLoc += 1       
-                
-                
+                # print(iTrcSpc)
+                iLoc += 1
+
                 p0 = mth.sqrt(
                     np.dot(
                         iRefPrtcl.getPrOut()[iLoc][:3], iRefPrtcl.getPrOut()[iLoc][:3]
@@ -530,24 +528,20 @@ class Particle:
                 eps = (p - p0) / p0
 
                 """
-                iPrtcl.fillPhaseSpace()               
-               
-                              
-                x_lab[iLoc][nPrtcl-2] = iPrtcl.getLabPhaseSpace()[iLoc][0][0]
-                y_lab[iLoc][nPrtcl-2] = iPrtcl.getLabPhaseSpace()[iLoc][0][1]
-                z_lab[iLoc][nPrtcl-2] = iPrtcl.getLabPhaseSpace()[iLoc][0][2]
-            
-                
-                
-                
+                iPrtcl.fillPhaseSpace()
+
+                x_lab[iLoc][nPrtcl - 2] = iPrtcl.getLabPhaseSpace()[iLoc][0][0]
+                y_lab[iLoc][nPrtcl - 2] = iPrtcl.getLabPhaseSpace()[iLoc][0][1]
+                z_lab[iLoc][nPrtcl - 2] = iPrtcl.getLabPhaseSpace()[iLoc][0][2]
+
         plotFILE = "99-Scratch/ParticleTrajectory_Lab.pdf"
-       
-            
-            # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
+
+        # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(
-                nrows=2, ncols=1, figsize=(10.0, 6.0), constrained_layout=True)           
-                                
+                nrows=2, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
+            )
+
             axs[0].plot(z_lab, x_lab, color="cyan")
             axs[0].plot()
             axs[0].grid(True)
@@ -557,8 +551,6 @@ class Particle:
 
             # Plot all sets on the third subplot (axs[2])
 
-            
-
             axs[1].plot(z_lab, y_lab, color="mediumorchid")
             axs[1].grid(True)
             axs[1].set_xlabel("z-axis (m)")
@@ -567,7 +559,7 @@ class Particle:
 
             pdf.savefig()
             plt.close()
-   
+
     @classmethod
     def plotParticleTrajectory_RPLC(cls):
         font = {
@@ -577,18 +569,17 @@ class Particle:
             "size": 16,
         }
         plt.rcParams["figure.figsize"] = (7.5, 10.0)
-           
+
         x_RPLC = []
         y_RPLC = []
         z_RPLC = []
-    
 
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
             if isinstance(iPrtcl, ReferenceParticle):
                 iRefPrtcl = iPrtcl
-                Particle_number = len(cls.getParticleInstances())-1
+                Particle_number = len(cls.getParticleInstances()) - 1
                 Number_of_loc = len(iPrtcl.getLocation())
                 x_RPLC = np.full((Number_of_loc, Particle_number), np.nan)
                 y_RPLC = np.full((Number_of_loc, Particle_number), np.nan)
@@ -596,9 +587,9 @@ class Particle:
                 continue
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
-                #print(iTrcSpc)
-                iLoc += 1     
-                
+                # print(iTrcSpc)
+                iLoc += 1
+
                 p0 = mth.sqrt(
                     np.dot(
                         iRefPrtcl.getPrOut()[iLoc][:3], iRefPrtcl.getPrOut()[iLoc][:3]
@@ -623,23 +614,20 @@ class Particle:
                 eps = (p - p0) / p0
 
                 """
-                iPrtcl.fillPhaseSpace()     
+                iPrtcl.fillPhaseSpace()
 
-                x_RPLC[iLoc][nPrtcl-2] = iPrtcl.getTraceSpace()[iLoc][0]
-                y_RPLC[iLoc][nPrtcl-2] = iPrtcl.getTraceSpace()[iLoc][2]
-                z_RPLC[iLoc][nPrtcl-2] = iPrtcl.gets()[iLoc]
-            
-                
-                
-            
+                x_RPLC[iLoc][nPrtcl - 2] = iPrtcl.getTraceSpace()[iLoc][0]
+                y_RPLC[iLoc][nPrtcl - 2] = iPrtcl.getTraceSpace()[iLoc][2]
+                z_RPLC[iLoc][nPrtcl - 2] = iPrtcl.gets()[iLoc]
+
         plotFILE = "99-Scratch/ParticleTrajectory_RPLC.pdf"
-       
-            
-            # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
+
+        # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(
-                nrows=2, ncols=1, figsize=(10.0, 6.0), constrained_layout=True)           
-                                
+                nrows=2, ncols=1, figsize=(10.0, 6.0), constrained_layout=True
+            )
+
             axs[0].plot(z_RPLC, x_RPLC, color="cyan")
             axs[0].plot()
             axs[0].grid(True)
@@ -647,7 +635,7 @@ class Particle:
             axs[0].set_ylabel("x-axis (m)")
             axs[0].set_title("Particle Trajectory x-z plane")
 
-            # Plot all sets on the third subplot (axs[2])           
+            # Plot all sets on the third subplot (axs[2])
 
             axs[1].plot(z_RPLC, y_RPLC, color="mediumorchid")
             axs[1].grid(True)
@@ -1475,10 +1463,8 @@ class ReferenceParticle(Particle):
         # B field in y direction
 
         theta = -iBLE.getAngle()  # only dipole here
-        thetap = theta
-        thetaX = 0
-        thetaY = 0
-        thetaZ = 0  # probably the only one you need
+        thetap = theta / 2
+        thetaZ = 0  # chooses the plane of bend
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
@@ -1486,28 +1472,21 @@ class ReferenceParticle(Particle):
 
         unit = np.array([cx, cy, cz])
 
-        cx, cy, cz = (
-            RotMat_z(thetaZ)
-            @ RotMat_x(thetaX)
-            @ RotMat_y(thetaY)
-            @ RotMat_x(thetap)
-            @ RotMat_y(thetaX).T
-            @ RotMat_x(thetaY).T
-            @ RotMat_z(thetaZ).T
-            @ unit
-        )
+        cx, cy, cz = RotMat_z(thetaZ) @ RotMat_x(thetap) @ RotMat_z(thetaZ).T @ unit
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
         r = Brho / iBLE.getB()
-        d = 2 * r * np.abs(np.sin(theta / 2))
+        d = 2 * r * np.sin(theta / 2)
 
+        print("d:", d)
+        print("r:", r)
         # works out chord vector
 
         RrOut = np.array(
             [
-                RrIn[0] + cx * d,
-                RrIn[1] + cy * d,
-                RrIn[2] + cz * d,
+                RrIn[0] + cx * np.abs(d),
+                RrIn[1] + cy * np.abs(d),
+                RrIn[2] + cz * np.abs(d),
                 0.0,  # ignore time
             ]
         )
@@ -1523,14 +1502,7 @@ class ReferenceParticle(Particle):
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
         PrOut = np.zeros(4)
         PrOut[0:3] = (
-            RotMat_z(thetaZ)
-            @ RotMat_x(thetaX)
-            @ RotMat_y(thetaY)
-            @ RotMat_x(theta)
-            @ RotMat_y(thetaX).T
-            @ RotMat_x(thetaY).T
-            @ RotMat_z(thetaZ).T
-            @ PrIn[0:3]
+            RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
         )  # Rotate PrOut
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
@@ -1543,16 +1515,7 @@ class ReferenceParticle(Particle):
         # Now define coordinate axes rotation
 
         Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
-        Rot2LabOut = (
-            RotMat_z(thetaZ)
-            @ RotMat_x(thetaX)
-            @ RotMat_y(thetaY)
-            @ RotMat_x(theta)
-            @ RotMat_y(thetaX).T
-            @ RotMat_x(thetaY).T
-            @ RotMat_z(thetaZ).T
-            @ Rot2LabIn
-        )
+        Rot2LabOut = RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ Rot2LabIn
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")

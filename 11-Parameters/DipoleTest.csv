@@ -10,23 +10,8 @@
 1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF
 1,Source,Source,Parameterised TNSA,MinCTheta,0.998,,Maximum theta for flat cos theta
 1,TestArc,Drift,,Length,5,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,90,degrees,
+1,TestArc,Drift,,Length,5,m,
+
+

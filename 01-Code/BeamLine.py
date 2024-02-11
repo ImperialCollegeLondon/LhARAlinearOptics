@@ -930,9 +930,9 @@ class BeamLine(object):
             print("Appending: ", iBLE.getName())
 
             if isinstance(iBLE, BLE.Source):
-                patchBLE = BLP.sourcePatch(ax, 0.5, 0.5)
+                patchBLE = BLP.sourcePatch(ax, 0.1)
             elif isinstance(iBLE, BLE.Aperture):
-                patchBLE = BLP.aperturePatch(ax, iBLE.getParams()[0], 0.1, 0.3)
+                patchBLE = BLP.aperturePatch(ax, 0.1, 0.05, 0.2)
             elif isinstance(iBLE, BLE.SectorDipole):
 
                 Mmtm = mth.sqrt(
@@ -949,6 +949,14 @@ class BeamLine(object):
 
                 patchBLE = BLP.dipolePatch(ax, angle, R, 0.2)
 
+                print("arc length:", R * angle)
+
+            elif isinstance(iBLE, BLE.DefocusQuadrupole):
+                patchBLE = BLP.fquadPatch(ax, 0.1, 0.2)
+            elif isinstance(iBLE, BLE.FocusQuadrupole):
+                patchBLE = BLP.dquadPatch(ax, 0.1, 0.2)
+            elif isinstance(iBLE, BLE.Solenoid):
+                patchBLE = BLP.solenoidPatch(ax, 0.3, 0.2)
             else:
                 continue  # i.e. if something else continue to next BLE
 

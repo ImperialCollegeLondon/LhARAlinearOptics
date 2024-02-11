@@ -33,33 +33,14 @@ pltout = listRrOut[:, 1:3:1]
 print(pltin)
 print(pltout)
 
-plt.plot(pltin[:, 1], pltin[:, 0], ".", label="RrIn")
-plt.plot(pltout[:, 1], pltout[:, 0], "y", label="RrOut")
-plt.xlabel("z")
-plt.ylabel("y")
-plt.legend()
+fig, ax = plt.subplots()
+
+BL.BeamLine.plotBeamLineYZ(ax)
+
+ax.plot(pltin[:, 1], pltin[:, 0], ".", label="RrIn")
+ax.plot(pltout[:, 1], pltout[:, 0], "y", label="RrOut")
+ax.set_aspect("equal")
+ax.set_xlabel("z [m]")
+ax.set_ylabel("y [m]")
+ax.legend()
 plt.savefig("99-Scratch/test.pdf")
-
-fig2 = plt.figure(figsize=(10, 10))
-ax2 = plt.axes(projection="3d")
-
-ax2.plot(
-    listRrIn[:, 0],
-    listRrIn[:, 1],
-    listRrIn[:, 2],
-    label="RrIn",
-)
-ax2.plot(
-    listRrOut[:, 0],
-    listRrOut[:, 1],
-    listRrOut[:, 2],
-    label="RrOut",
-    color="purple",
-)
-ax2.legend()
-ax2.set_xlabel("x")
-ax2.set_ylabel("y")
-ax2.set_zlabel("z")
-
-
-plt.savefig("99-Scratch/3dtest.pdf")

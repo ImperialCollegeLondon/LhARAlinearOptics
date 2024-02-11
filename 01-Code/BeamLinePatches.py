@@ -8,7 +8,7 @@ import numpy as np
 
 
 def rad2deg(rad):
-    return rad / np.pi * 180
+    return (rad / np.pi) * 180
 
 
 class patchBLE:
@@ -76,20 +76,22 @@ class dipolePatch(patchBLE):
 
     def __init__(self, ax, angle, R, w):
 
+        print("patch3:", R)
+
         Patch = patches.Wedge(
             center=[0, 0],
-            r=R - w,
+            r=R + w,
             theta1=0,
             theta2=rad2deg(np.abs(angle)),
             width=2 * w,
             facecolor="lightblue",
             label="Dipole",
-            alpha=1.0,
+            alpha=0.75,
             zorder=999,
         )
 
         r = mpl.transforms.Affine2D().rotate_deg(-90)
-        t = mpl.transforms.Affine2D().translate(0, R - 2 * w)
+        t = mpl.transforms.Affine2D().translate(0, R)
         refx = mpl.transforms.Affine2D(np.array([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))
 
         if angle >= 0:
@@ -105,21 +107,20 @@ class dipolePatch(patchBLE):
 
 class sourcePatch(patchBLE):
 
-    def __init__(self, ax, w, L):
-        Patch = patches.Arrow(
-            x=0,
-            y=0,
-            dx=L,
-            dy=0,
-            width=w,
-            label="Source",
+    def __init__(self, ax, w):
+
+        Patch = patches.Polygon(
+            ((-w / 2, -np.sqrt(3) / 2 * w), (w, 0), (-w / 2, np.sqrt(3) / 2 * w)),
             facecolor="green",
             zorder=999,
         )
 
+        trans = mpl.transforms.Affine2D().rotate_deg(-30)
+
         self.set_Patch(Patch)
         self.set_ax(ax)
         self.reset_Trans()
+        self.append_Trans(trans)
 
 
 class aperturePatch(patchBLE):
@@ -131,8 +132,10 @@ class aperturePatch(patchBLE):
             width=L,
             height=h,
             edgecolor="black",
-            hatch="//",
+            hatch="////",
             zorder=999,
+            facecolor="none",
+            linewidth=0.5,
         )
 
         Patchii = patches.Rectangle(
@@ -141,8 +144,10 @@ class aperturePatch(patchBLE):
             height=h,
             label="Aperture",
             edgecolor="black",
-            hatch="//",
+            hatch="////",
             zorder=999,
+            facecolor="none",
+            linewidth=0.5,
         )
 
         self.set_Patch((Patchi, Patchii))
@@ -157,3 +162,57 @@ class aperturePatch(patchBLE):
         for iPatch in Patch:
             iPatch.set_transform(Trans + ax.transData)
             ax.add_patch(iPatch)
+
+
+class fquadPatch(patchBLE):
+
+    def __init__(self, ax, w, h):
+
+        Patch = patches.Rectangle(
+            xy=[0, 0],
+            width=w,
+            height=h,
+            zorder=999,
+            label="FQuad",
+            facecolor="purple",
+        )
+
+        self.set_Patch(Patch)
+        self.set_ax(ax)
+        self.reset_Trans()
+
+
+class dquadPatch(patchBLE):
+
+    def __init__(self, ax, w, h):
+
+        Patch = patches.Rectangle(
+            xy=[0, -h],
+            width=w,
+            height=h,
+            zorder=999,
+            label="DQuad",
+            facecolor="silver",
+        )
+
+        self.set_Patch(Patch)
+        self.set_ax(ax)
+        self.reset_Trans()
+
+
+class solenoidPatch(patchBLE):
+
+    def __init__(self, ax, w, h):
+
+        Patch = patches.Rectangle(
+            xy=[0, -h / 2],
+            width=w,
+            height=h,
+            zorder=999,
+            label="DQuad",
+            facecolor="gold",
+        )
+
+        self.set_Patch(Patch)
+        self.set_ax(ax)
+        self.reset_Trans()
