@@ -557,9 +557,9 @@ class Particle:
             axs[1].set_ylabel("y-axis (m)")
             axs[1].set_title("Particle Trajectory y-z plane")
 
-            BL.BeamLine.plotBeamLineYZ(axs[2])
+            BL.BeamLine.plotBeamLineYZ(axs[1])
 
-            axs[2].set_aspect("equal")
+            axs[1].set_aspect("equal")
             pdf.savefig()
             plt.close()
 
