@@ -11,7 +11,17 @@
 1,Source,Source,Parameterised TNSA,MinCTheta,0.998,,Maximum theta for flat cos theta
 1,TestArc,Drift,,Length,5,m,
 1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
-1,TestArc,Dipole,"Sector (Length, angle)",Angle,90,degrees,
-1,TestArc,Drift,,Length,5,m,
-
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
+1,TestArc,Drift,,Length,1,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,5,degrees,
+1,TestArc,Drift,,Length,1,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Length,3,m,
+1,TestArc,Dipole,"Sector (Length, angle)",Angle,10,degrees,
 
