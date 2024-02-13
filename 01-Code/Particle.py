@@ -970,6 +970,13 @@ class ReferenceParticle(Particle):
         
     def getRot2LabOut(self):
         return self._Rot2LabOut
+
+    def getb0(self, iLoc):
+        p0  = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
+                              self.getPrOut()[iLoc][:3]))
+        E0  = self.getPrOut()[iLoc][3]
+        b0 = p0/E0
+        return b0
         
 
 #--------  "Set methods";

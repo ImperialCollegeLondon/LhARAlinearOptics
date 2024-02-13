@@ -1,30 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Test script for "RFCavity" class
-===============================
+Test script for "CylindricalRFCavity" class
+===========================================
 
-RFCavity.py -- set "relative" path to code
+CylindricalRFCavity.py -- set "relative" path to code
 
 """
 
+import os
+import math  as mth
 import numpy as np
 
-import BeamLineElement as BLE
+import Particle          as Prtcl
+import BeamLine          as BL
+import BeamLineElement   as BLE
+import PhysicalConstants as PhysCnst
+
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/Dummy4Tests.csv')
 
 ##! Start:
-print("========  RF Cavity: tests start  ========")
+print("========  Cylindrical RF cavity: tests start  ========")
 
-##! Test singleton class feature:
-RFCavityTest = 1
+##! Test set up of class
+CylindricalRFCavityTest = 1
 print()
-print("RFCavityTest:", RFCavityTest, \
+print("CylindricalRFCavityTest:", CylindricalRFCavityTest, \
       " check built-in methods.")
 
 #.. __init__
 print("    __init__:")
 try:
-    RF = BLE.RFCavity()
+    RF = BLE.CylindricalRFCavity()
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
@@ -32,12 +44,33 @@ vStrt = np.array([0.,0.])
 drStrt = np.array([0.,0.,0.])
 dvStrt = np.array([0.,0.])
 try:
-    RF = BLE.RFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt)
+    RF = BLE.CylindricalRFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt)
 except:
-    print('      ----> Correctly trapped no RF cavity parameters exception.')
+    print('      ----> Correctly trapped no Cylindrical', \
+          ' RF cavity parameters exception.')
+
+BLI  = BL.BeamLine(filename)
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+print(" ----> Reference particle:")
+pz = 194.7585262
+E0 = mth.sqrt(protonMASS**2 + pz**2)
+p0 = np.array([0., 0., pz, E0])
+iRefPrtcl.setPrIn(p0)
+iRefPrtcl.setPrOut(p0)
+
+print("     ----> Reference particle set:")
+print("         ----> In:", iRefPrtcl.getPrIn())
+print("              Out:", iRefPrtcl.getPrOut())
+
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("         ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-RF = BLE.RFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt, 1.5, 1E6, 1.5)
+RF = BLE.CylindricalRFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt, \
+                             4.0, 200., 0.)
     
 #.. __repr__
 print("    __repr__:")
@@ -49,24 +82,24 @@ print(str(RF))
 print("    <---- __str__ done.")
 
 ##! Check get methods:
-RFCavityTest = 3
+CylindricalRFCavityTest = 3
 print()
-print("RFCavityTest:", RFCavityTest, " check get methods.")
+print("CylindricalRFCavityTest:", CylindricalRFCavityTest, " check get methods.")
 print("    ----> print() method; tests all get methods")
 print(RF)
 
 ##! Check set method:
-RFCavityTest = 4
+CylindricalRFCavityTest = 4
 print()
-print("RFCavityTest:", RFCavityTest, " check set method.")
-BLE.RFCavity.setDebug(True)
+print("CylindricalRFCavityTest:", CylindricalRFCavityTest, " check set method.")
+BLE.CylindricalRFCavity.setDebug(True)
 print(RF)
-BLE.RFCavity.setDebug(False)
+BLE.CylindricalRFCavity.setDebug(False)
 
 ##! Check set method:
-RFCavityTest += 1
+CylindricalRFCavityTest += 1
 print()
-print("RFCavityTest:", RFCavityTest, " test transport through RF cavity.")
+print("CylindricalRFCavityTest:", CylindricalRFCavityTest, " test transport through Cylindrical RF cavity.")
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
 Rprime = RF.Transport(R)
 print("     ----> Input phase-space vector:", R)
@@ -94,10 +127,10 @@ Norm       = np.linalg.norm(Diff)
 print("     ----> Difference Rprime - RprimeTest:", Diff)
 print("     ----> Magnitude of Diff:", Norm)
 if Norm > 1E-6:
-    raise Exception(" !!!!----> FAILED: RF cavity transport result not as expected.")
+    raise Exception(" !!!!----> FAILED: Cylindrical RF cavity transport result not as expected.")
 else:
-    print(" <---- RF cavity transport test successful.")
+    print(" <---- Cylindrical RF cavity transport test successful.")
 
 ##! Complete:
 print()
-print("========  RF Cavity: tests complete  ========")
+print("========  Cylindrical Cylindrical RF cavity: tests complete  ========")
