@@ -86,7 +86,7 @@ class dipolePatch(patchBLE):
             width=2 * w,
             facecolor="lightblue",
             label="Dipole",
-            alpha=0.75,
+            alpha=1,
             zorder=999,
         )
 
