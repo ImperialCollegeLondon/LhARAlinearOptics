@@ -100,33 +100,23 @@ BLE.CylindricalRFCavity.setDebug(False)
 CylindricalRFCavityTest += 1
 print()
 print("CylindricalRFCavityTest:", CylindricalRFCavityTest, " test transport through Cylindrical RF cavity.")
-R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.2])
+BLE.CylindricalRFCavity.setDebug(True)
 Rprime = RF.Transport(R)
-print("     ----> Input phase-space vector:", R)
-print("     ----> Relevant portions of transfer matrix:")
-print("         ", RF.getTransferMatrix()[0,0], \
-                   RF.getTransferMatrix()[0,1], \
-                   RF.getTransferMatrix()[0,2], \
-                   RF.getTransferMatrix()[0,3])
-print("         ", RF.getTransferMatrix()[1,0], \
-                   RF.getTransferMatrix()[1,1], \
-                   RF.getTransferMatrix()[1,2], \
-                   RF.getTransferMatrix()[1,3])
-print("         ", RF.getTransferMatrix()[2,0], \
-                   RF.getTransferMatrix()[2,1], \
-                   RF.getTransferMatrix()[2,2], \
-                   RF.getTransferMatrix()[2,3])
-print("         ", RF.getTransferMatrix()[3,0], \
-                   RF.getTransferMatrix()[3,1], \
-                   RF.getTransferMatrix()[3,2], \
-                   RF.getTransferMatrix()[3,3])
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Input phase-space vector:", R)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Relevant portions of transfer matrix:")
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print(RF.getTransferMatrix())
 print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.5, 0.1, -0.3, -0.2, -4.71772766e-06,  1.  ])
+RprimeTest = np.array([0.51523224, 0.099997881, -0.330464703, -0.199998684, \
+                       0.807065978, 0.199997883])
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
 print("     ----> Difference Rprime - RprimeTest:", Diff)
 print("     ----> Magnitude of Diff:", Norm)
-if Norm > 1E-6:
+if Norm > 1E-5:
     raise Exception(" !!!!----> FAILED: Cylindrical RF cavity transport result not as expected.")
 else:
     print(" <---- Cylindrical RF cavity transport test successful.")

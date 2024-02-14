@@ -978,6 +978,12 @@ class ReferenceParticle(Particle):
         b0 = p0/E0
         return b0
         
+    def getg0b0(self, iLoc):
+        p0   = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
+                              self.getPrOut()[iLoc][:3]))
+        g0b0 = p0/protonMASS
+        return g0b0
+        
 
 #--------  "Set methods";
     @classmethod

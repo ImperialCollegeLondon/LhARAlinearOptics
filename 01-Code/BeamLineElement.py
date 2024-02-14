@@ -2491,7 +2491,8 @@ class CylindricalRFCavity(BeamLineElement):
             raise ReferenceParticleNotSpecified()
         iPrev = len(iRefPrtcl.getPrOut()) - 1
         b0        = iRefPrtcl.getb0(iPrev)
-        print(b0)
+        g0b0      = iRefPrtcl.getg0b0(iPrev)
+        print(b0, g0b0)
         
         _Length   = mth.pi*b0*speed_of_light / \
             self.getAngularFrequency()
@@ -2510,10 +2511,25 @@ class CylindricalRFCavity(BeamLineElement):
         _alpha = self.getV0()/iRefPrtcl.getMomentumIn(iPrev)/1000.
         self.setalpha(_alpha)
 
+        _wperp = self.getWaveNumber()*mth.sqrt( \
+                        self.getalpha()*mth.cos(self.getPhase())/2./mth.pi)
+        self.setwperp(_wperp)
+        _cperp = mth.cos(self.getwperp()*self.getLength())
+        self.setcperp(_cperp)
+        _sperp = mth.sin(self.getwperp()*self.getLength()) / self.getwperp()
+        self.setsperp(_sperp)
         
-        """
+        _wprll = self.getWaveNumber()*mth.sqrt( \
+                        self.getalpha()*mth.cos(self.getPhase())/mth.pi) / \
+                        g0b0
+        self.setwprll(_wprll)
+        _cprll = mth.cos(self.getwprll()*self.getLength())
+        self.setcprll(_cprll)
+        _sprll = mth.sin(self.getwprll()*self.getLength()) / self.getwprll()
+        self.setsprll(_sprll)
+        
         self.setTransferMatrix()
-        """
+        self.setmrf()
 
         if self.__Debug:
             print("     ----> New CylindricalRFCavity instance: \n", self)
@@ -2543,17 +2559,51 @@ class CylindricalRFCavity(BeamLineElement):
               self.getV0())
         print("         ---->                      alpha:", \
               self.getalpha())
+        print("         ---->                      wperp:", \
+              self.getwperp())
+        print("         ---->                      cperp:", \
+              self.getcperp())
+        print("         ---->                      sperp:", \
+              self.getsperp())
+        print("         ---->                      wprll:", \
+              self.getwprll())
+        print("         ---->                      cprll:", \
+              self.getcprll())
+        print("         ---->                      sprll:", \
+              self.getsprll())
         print("     <---- End derived quantities:")
-        print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> Transfer matrix: \n", self.getTransferMatrix())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ----> m_rf: \n", self.getmrf())
         BeamLineElement.__str__(self)
         return " <---- CylindricalRFCavity parameter dump complete."
 
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
+    @classmethod
+    def setDebug(cls, _Debug):
+        if not isinstance(_Debug, bool):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setDebug:" + \
+                                " bad flag:", _Debug)
+        cls.__Debug = _Debug
+        
     def setAll2None(self):
-        self._Gradient  = None
-        self._Frequency = None
-        self._Phase     = None
+        self._Gradient          = None
+        self._Frequency         = None
+        self._Phase             = None
+        self._TransitTimeFactor = None
+        self._V0                = None
+        self._alpha             = None
+        self._wperp             = None
+        self._cperp             = None
+        self._sperp             = None
+        self._wprll             = None
+        self._cprll             = None
+        self._sprll             = None
+
+        self._TrnsMtrx  = None
 
     def setGradient(self, _Gradient):
         if not isinstance(_Gradient, float):
@@ -2625,50 +2675,110 @@ class CylindricalRFCavity(BeamLineElement):
                                 " bad phase:", _alpha)
         self._alpha = _alpha        
         
-
+    def setwperp(self, _wperp):
+        if not isinstance(_wperp, float):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setPhase:" + \
+                                " bad phase:", _wperp)
+        self._wperp = _wperp        
         
-    def setTransferMatrix(self, _R):
+    def setcperp(self, _cperp):
+        if not isinstance(_cperp, float):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setPhase:" + \
+                                " bad phase:", _cperp)
+        self._cperp = _cperp        
+        
+    def setsperp(self, _sperp):
+        if not isinstance(_sperp, float):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setPhase:" + \
+                                " bad phase:", _sperp)
+        self._sperp = _sperp        
+        
+    def setwprll(self, _wprll):
+        if not isinstance(_wprll, float):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setPhase:" + \
+                                " bad phase:", _wprll)
+        self._wprll = _wprll        
+        
+    def setcprll(self, _cprll):
+        if not isinstance(_cprll, float):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setPhase:" + \
+                                " bad phase:", _cprll)
+        self._cprll = _cprll        
+        
+    def setsprll(self, _sprll):
+        if not isinstance(_sprll, float):
+            raise badParameter( \
+                    "BeamLineElement.CylindricalRFCavity.setPhase:" + \
+                                " bad phase:", _sprll)
+        self._sprll = _sprll        
+        
+        
+    def setmrf(self):
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
+        iPrev  = len(iRefPrtcl.getPrOut()) - 1
+        g02b02 = iRefPrtcl.getg0b0(iPrev)**2
 
-        iPrev = len(iRefPrtcl.getPrOut()) - 1
-
-        p0  = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
-                              iRefPrtcl.getPrOut()[iPrev][:3]))
-        E0  = iRefPrtcl.getPrOut()[iPrev][3]
-        b02 = (p0/E0)**2
-        g02 = 1./(1.-b02)
-        g0  = mth.sqrt(g02)
+        if self.getDebug():
+            print(" CylindricalRFCavity(BeamLineElement).setmrf:")
+            print("     ----> Reference particle g02b02:", g02b02)
         
+        _mrf   = np.array([0., 0., 0., 0., \
+        (1.-self.getcprll())*mth.tan(self.getPhase())/self.getWaveNumber(), \
+        g02b02*self.getwprll()**2*self.getsprll()*                          \
+                        mth.tan(self.getPhase())/self.getWaveNumber()])
+            
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> mrf:", _mrf)
+
+        self._mrf = _mrf
+
+    def setTransferMatrix(self):
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+        iPrev  = len(iRefPrtcl.getPrOut()) - 1
+        g02b02 = iRefPrtcl.getg0b0(iPrev)**2
+
         if self.getDebug():
             print(" CylindricalRFCavity(BeamLineElement).setTransferMatrix:")
-            print("     ----> Reference particle 4-mmtm:", \
-                  iRefPrtcl.getPrIn()[0])
-            b0 = mth.sqrt(b02)
-            print("         ----> p0, E0:", p0, E0)
-            print("     <---- b0, g0:", b0, g0)
-
+            print("     ----> Reference particle g02b02:", g02b02)
+        
+        TrnsMtrx = np.array([
+            [                    self.getcperp(), self.getsperp(), \
+                                                         0., 0., 0., 0.], \
+            [-self.getwperp()**2*self.getsperp(), self.getcperp(), \
+                                                         0., 0., 0., 0.], \
+            [0., 0.,                     self.getcperp(), self.getsperp(), \
+                                                                 0., 0.], \
+            [0., 0., -self.getwperp()**2*self.getsperp(), self.getcperp(), \
+                                                                 0., 0.], \
+            [0., 0., 0., 0., \
+                 self.getcprll(),                 self.getsprll()/g02b02], \
+            [0., 0., 0., 0., \
+                 -g02b02*self.getwprll()**2*self.getsprll(), \
+                                                         self.getcprll()] \
+        ])
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Trace space:", _R)
-
-
-        
-        TrnsMtrx = np.array([
-            [1, 0, 0, 0, 0, 0],
-            [0, 1, 0, 0, 0, 0],
-            [0, 0, 1, 0, 0, 0],
-            [0, 0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 1, 0],
-            [0, 0, 0, 0, 0, 1]
-        ])
+                print(TrnsMtrx)
 
         self._TrnsMtrx = TrnsMtrx
 
 # -------- "Get methods"
 # Methods believed to be self-documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+    
     def getGradient(self):
         return self._Gradient
 
@@ -2699,8 +2809,63 @@ class CylindricalRFCavity(BeamLineElement):
     def getalpha(self):
         return self._alpha
 
+    def getwperp(self):
+        return self._wperp
+
+    def getcperp(self):
+        return self._cperp
+
+    def getsperp(self):
+        return self._sperp
+
+    def getwprll(self):
+        return self._wprll
+
+    def getcprll(self):
+        return self._cprll
+
+    def getsprll(self):
+        return self._sprll
+
+    def getmrf(self):
+        return self._mrf
+
     
 #--------  Utilities:
+    def Transport(self, _R=None):
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
+            raise ReferenceParticleNotSpecified()
+        iPrev  = len(iRefPrtcl.getPrOut()) - 1
+        g02b02 = iRefPrtcl.getg0b0(iPrev)**2
+        
+        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
+            raise badParameter( \
+            " CylindricalRFCavity(BeamLineElement).Transport:" + \
+                                "bad input vector:", \
+                                _R)
+
+        if self.getDebug():
+            print(" BeamLineElement.Transport:", \
+                  Facility.getInstance().getName(), \
+                  Facility.getInstance().getVCMVr())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> _R:", _R)
+            print("     ----> Outside:", self.OutsideBeamPipe(_R))
+            
+        if self.OutsideBeamPipe(_R):
+            _Rprime = None
+        else:
+            _Rprime = self.getTransferMatrix().dot(_R) + self.getmrf()
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Rprime:", _Rprime)
+
+        if not isinstance(_Rprime, np.ndarray):
+            pass
+
+        return _Rprime
 
     
 """
