@@ -111,6 +111,8 @@ import math   as mth
 import random as rnd
 import scipy
 from scipy.optimize import fsolve
+import random as random
+import math
 
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
@@ -2943,6 +2945,60 @@ class Source(BeamLineElement):
         cosTheta = rnd.uniform(self.getParameters()[2], 1.)
         Phi      = rnd.uniform( 0., 2.*mth.pi)
         return cosTheta, Phi
+    
+
+
+    ### Gaussian Angular Distribution ### 
+    # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
+    def g_theta(self,energy):
+        theta = 20 - 0.565 * energy      
+        return theta
+    
+    # Single angle generator with acceptance-rejection
+    def angle_generator(self,E_MeV):
+
+        while True:
+
+            theta_E = self.g_theta(E_MeV)         # [degrees]
+            theta_E = np.radians(theta_E)         # [rad]
+            phi = random.uniform(0, 2 * math.pi)  # [rad]
+
+            sigma_x = 10e-6
+            sigma_y = 10e-6
+
+            # Generate x, y as per Gaussian distribution
+            x = np.random.normal(0, sigma_x)
+            y = np.random.normal(0, sigma_y)
+
+            # Check acceptance based on Gaussian probability density function
+            acceptance_prob = self.g_xy(x, y, sigma_x, sigma_y)
+            if np.random.random() < acceptance_prob:
+
+                theta = np.random.normal(0, theta_E)
+
+                return theta, phi
+
+
+    def getGaussianThetaPhi(self):
+
+        P_L = self._Param[6]
+        E_laser = self._Param[7]
+        lamda = self._Param[8]
+        t_laser = self._Param[9]
+        d = self._Param[10]
+        I = self._Param[11]
+        theta_degrees = self._Param[12]
+
+        E_MeV = self.getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
+
+        theta = self.angle_generator(self,E_MeV)[0]
+        cosTheta = np.cos(theta)
+        Phi = self.angle_generator(self,E_MeV)[1]
+
+        return cosTheta, Phi
+
+
+
 
     #def getLaserDrivenProtonEnergy(self):
     #    if not Source.LsrDrvnIni:
