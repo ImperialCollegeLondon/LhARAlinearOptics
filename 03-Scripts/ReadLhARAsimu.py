@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -95,32 +96,28 @@ print()
 print("========  Plotting: START  ========")
 print()
 
-figRPLCxz, axRPLCxz = plt.subplots()
-figRPLCyz, axRPLCyz = plt.subplots()
+figRPLC, axRPLC = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True)
+axRPLC[0].set_ylim(-0.04,0.04)
+axRPLC[1].set_ylim(-0.04,0.04)
 
-figLABxz, axLABxz = plt.subplots()
-figLAByz, axLAByz = plt.subplots()
+figLAB, axLAB = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0),constrained_layout=True)
 
+axLAB[0].set_ylim(-0.05,0.05)
+axLAB[1].set_ylim(-0.5,5)
 print(" ----> Plot progression:")
 
 print("     ----> Plot LAB:")
-linesLAB = Prtcl.Particle.plotParticleTrajectory_Lab(axyz=axLAByz, axxz=axLABxz)
+linesLAB = Prtcl.Particle.plotParticleTrajectory_Lab(axyz=axLAB[1], axxz=axLAB[0])
 print("     <---- Done.")
 
 print("     ----> Plot LAB YZ BeamLineElements:")
-patches = BL.BeamLine.plotBeamLineYZ(axLAByz)
+patches = BL.BeamLine.plotBeamLineYZ(axLAB[1])
 print("     <---- Done.")
 
 print("     ----> Plot RPLC:")
-linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLCyz, axxz=axRPLCxz)
+linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLC[1], axxz=axRPLC[0])
 print("     <---- Done.")
 
-axLAByz.autoscale(enable=True)
-axLABxz.autoscale(enable=True)
-axLAByz.set_aspect("equal")
-
-axRPLCyz.autoscale(enable=True)
-axRPLCxz.autoscale(enable=True)
 
 print("========  Plotting: END  ========")
 print()
@@ -130,3 +127,5 @@ save_all_figs(
     loc=figDIRECTORY,
     dpi=300,
 )
+
+
