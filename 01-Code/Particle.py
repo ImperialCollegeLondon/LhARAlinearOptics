@@ -142,8 +142,10 @@ Created on Mon 03Jul23: Version history:
 @author: kennethlong
 """
 
+from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
+
 import struct            as strct
 import numpy             as np
 import math              as mth
@@ -195,7 +197,7 @@ class Particle:
         return " Partcle __str__ done."
 
     def print(self):
-        print(" Particle:")
+        print("\n Particle:")
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Number of phase-space records:", \
@@ -206,6 +208,15 @@ class Particle:
             print("         ---->", self.getLocation()[iLctn], ":")
             print("             ----> z, s", self.getz()[iLctn], \
                                              self.gets()[iLctn])
+            try:
+                print("             ----> ", \
+              BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
+                      "; length ", \
+              BLE.BeamLineElement.getinstances()[iLctn+1].getLength())
+            except:
+                print("             ----> ", \
+                      BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
+                      "; has no length ")
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("             ---->     trace space:", \
                       self.getTraceSpace()[iLctn])
@@ -410,12 +421,12 @@ class Particle:
                                2.*iPrtcl.getTraceSpace()[iLoc][5]/b0 +
                                iPrtcl.getTraceSpace()[iLoc][5]**2)
 
-                """
                 eps = ( iPrtcl.getTraceSpace()[iLoc][1]**2 +    \
                         iPrtcl.getTraceSpace()[iLoc][3]**2  ) / \
                         (2.*D**2)
                 """
                 eps = (p - p0) / p0
+                """
                 
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
@@ -424,57 +435,47 @@ class Particle:
                 ELoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
                 ELab[iLoc].append(E)
                 Scl[iLoc].append(eps)
+                
+        plotFILE = '99-Scratch/ParticleProgressionPlot.pdf'
+        with PdfPages(plotFILE) as pdf:
+            for iLoc in range(len(xLoc)):
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
+                                        layout="constrained")
+                # add an artist, in this case a nice label in the middle...
+                Ttl = nLoc[iLoc]
+                fig.suptitle(Ttl, fontdict=font)
 
-        for iLoc in range(len(xLoc)):
-            fig, axs = plt.subplots(nrows=3, ncols=2)
-            fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
-                                    layout="constrained")
-            # add an artist, in this case a nice label in the middle...
-            """
-            for row in range(2):
-                for col in range(2):
-                    axs[row, col].annotate( \
-                            f'axs[{row}, {col}]', (0.5, 0.5),  \
-                            transform=axs[row, col].transAxes, \
-                            ha='center', va='center', fontsize=18, \
-                            color='darkgrey')
-            """
-            Ttl = nLoc[iLoc]
-            fig.suptitle(Ttl, fontdict=font)
-
-            #axs[0, 0].set_title('x,y')
-            axs[0, 0].hist2d(xLoc[iLoc], yLoc[iLoc], bins=100)
-            axs[0, 0].set_xlabel('x (m)')
-            axs[0, 0].set_ylabel('y (m)')
+                #axs[0, 0].set_title('x,y')
+                axs[0, 0].hist2d(xLoc[iLoc], yLoc[iLoc], bins=100)
+                axs[0, 0].set_xlabel('x (m)')
+                axs[0, 0].set_ylabel('y (m)')
             
-            #axs[0, 1].set_title('Energy')
-            axs[0, 1].hist(ELoc[iLoc], 100)
-            axs[0, 1].set_xlabel('delta')
-            axs[0, 1].set_ylabel('Number')
+                #axs[0, 1].set_title('Energy')
+                axs[0, 1].hist(ELoc[iLoc], 100)
+                axs[0, 1].set_xlabel('delta')
+                axs[0, 1].set_ylabel('Number')
             
-            #axs[1, 0].set_title('x, xprime')
-            axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
-            axs[1, 0].set_xlabel('x (m)')
-            axs[1, 0].set_ylabel('xprime (m)')
+                #axs[1, 0].set_title('x, xprime')
+                axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
+                axs[1, 0].set_xlabel('x (m)')
+                axs[1, 0].set_ylabel('xprime (m)')
 
-            #axs[1, 1].set_title('y, yprime')
-            axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
-            axs[1, 1].set_xlabel('y (m)')
-            axs[1, 1].set_ylabel('yprime (m)')
+                #axs[1, 1].set_title('y, yprime')
+                axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
+                axs[1, 1].set_xlabel('y (m)')
+                axs[1, 1].set_ylabel('yprime (m)')
 
-            axs[2, 0].hist(ELab[iLoc], 100)
-            axs[2, 0].set_xlabel('Kinetic energy (MeV)')
-            axs[2, 0].set_ylabel('Number')
+                axs[2, 0].hist(ELab[iLoc], 100)
+                axs[2, 0].set_xlabel('Kinetic energy (MeV)')
+                axs[2, 0].set_ylabel('Number')
 
-            axs[2, 1].hist(Scl[iLoc], 100)
-            axs[2, 1].set_xlabel('dp/p')
-            axs[2, 1].set_ylabel('Number')
+                axs[2, 1].hist(Scl[iLoc], 100)
+                axs[2, 1].set_xlabel('Epsilon')
+                axs[2, 1].set_ylabel('Number')
 
         
-            plotFILE = '99-Scratch/ParticleProgressionPlot' + \
-                str(iLoc) + '.pdf'
-            plt.savefig(plotFILE)
-            plt.close()
+                pdf.savefig()
+                plt.close()
             
 
     def printProgression(self):
@@ -569,7 +570,10 @@ class Particle:
 
         rRPLC  = np.array([TrcSpc[0], TrcSpc[2], 0.])
 
-        Enrgy  = protonMASS + TrcSpc[5]
+        p0     = BL.BeamLine.getElement()[0].getp0()
+        E      = np.sprt(protonMASS**2 + p0**2)
+        Enrgy  = protonMASS + TrcSpc[5]*p0
+        
         Mmtm   = mth.sqrt(Enrgy**2 - protonMASS**2)
         zPrm   = mth.sqrt(1.-TrcSpc[1]**2-TrcSpc[3]**2)
         pRPLC  = np.array([TrcSpc[1]*Mmtm, \
@@ -645,7 +649,6 @@ class Particle:
             if self.getDebug():
                 print("         ----> Location:", bLocation.decode('utf-8'))
 
-            
             record = strct.pack(">8d",                           \
                                 self.getz()[iLoc],               \
                                 self.gets()[iLoc],               \
@@ -753,6 +756,7 @@ class Particle:
             print(iPrtcl)
             print(" <---- readParticle done.")
             
+        cls.setDebug(False)
         return False        
         
     @classmethod
@@ -966,6 +970,19 @@ class ReferenceParticle(Particle):
         
     def getRot2LabOut(self):
         return self._Rot2LabOut
+
+    def getb0(self, iLoc):
+        p0  = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
+                              self.getPrOut()[iLoc][:3]))
+        E0  = self.getPrOut()[iLoc][3]
+        b0 = p0/E0
+        return b0
+        
+    def getg0b0(self, iLoc):
+        p0   = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
+                              self.getPrOut()[iLoc][:3]))
+        g0b0 = p0/protonMASS
+        return g0b0
         
 
 #--------  "Set methods";
