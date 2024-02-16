@@ -70,7 +70,7 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
 
 #.. Create valid instance:
 RF = BLE.CylindricalRFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt, \
-                             4.0, 200., 0.1)
+                             20.0, 200., 0.1)
     
 #.. __repr__
 print("    __repr__:")
@@ -110,8 +110,8 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
 with np.printoptions(linewidth=500,precision=7,suppress=True):
     print(RF.getTransferMatrix())
 print("     ----> Transported phase-space vector:", Rprime)
-RprimeTest = np.array([0.515232241, 0.099997892, -0.330464703, -0.199998691, \
-                       0.807066354, 0.200003483])
+RprimeTest = np.array([0.515232238, 0.099997858, -0.330464701, -0.19999867, \
+                       0.80706628, 0.200003494])
 Diff       = np.subtract(Rprime, RprimeTest)
 Norm       = np.linalg.norm(Diff)
 print("     ----> Difference Rprime - RprimeTest:", Diff)

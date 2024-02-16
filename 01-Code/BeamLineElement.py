@@ -2501,9 +2501,14 @@ class CylindricalRFCavity(BeamLineElement):
         _Radius   = sp.special.jn_zeros(0, 1)[0]/self.getWaveNumber()
         self.setRadius(_Radius)
 
-        _TransitTimeFactor = (2.*mth.pi*b0)                             / \
-                             (self.getWaveNumber()*self.getLength())**2 * \
-           mth.sin(self.getWaveNumber()*self.getLength()/2./b0)
+        """
+          Eqn 3.141 in Wolsli seems to have an error, expression for
+          transit time factor below rederived 16Feb24, need to check
+          with Andy.
+        """
+        _TransitTimeFactor = (2.*b0)                                 / \
+                             (self.getWaveNumber()*self.getLength()) * \
+                  mth.sin(self.getWaveNumber()*self.getLength()/2./b0)
         self.setTransitTimeFactor(_TransitTimeFactor)
         _V0 = self.getLength()*self.getGradient()*self.getTransitTimeFactor()
         self.setV0(_V0)
@@ -2541,7 +2546,7 @@ class CylindricalRFCavity(BeamLineElement):
         print(" CylindricalRFCavity:")
         print(" --------------------")
         print("     ---->        Debug flag:", CylindricalRFCavity.getDebug())
-        print("     ---->   Gradient (kV/m):", self.getGradient())
+        print("     ---->   Gradient (MV/m):", self.getGradient())
         print("     ---->   Frequency (MHz):", self.getFrequency())
         print("     ---->       Phase (rad):", self.getPhase())
         print("     ----> Derived quantities:")
@@ -2555,7 +2560,7 @@ class CylindricalRFCavity(BeamLineElement):
               self.getRadius())
         print("         ---->          TransitTimeFactor:", \
               self.getTransitTimeFactor())
-        print("         ---->                    V0 (kV):", \
+        print("         ---->                    V0 (MV):", \
               self.getV0())
         print("         ---->                      alpha:", \
               self.getalpha())
