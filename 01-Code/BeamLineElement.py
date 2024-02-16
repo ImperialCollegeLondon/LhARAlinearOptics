@@ -114,6 +114,7 @@ import matplotlib.patches as patches
 
 import PhysicalConstants as PhysCnst
 import Particle as Prtcl
+from Utilities import TrRotMat_z 
 
 # .. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
