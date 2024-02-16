@@ -2670,7 +2670,8 @@ class Source(BeamLineElement):
     #ParamList  = [ [float, float, float, float, float, int], \
     #               [float, float, float, float, float],      \
     #               [float, float, float, float, float] ]
-    ParamList  = [ [float, float, float, float, float, int, float, float, float, float, float, float, float], \
+    ParamList  = [ [float, float, float, float, float, int, \
+                    float, float, float, float, float, float, float], \
                    [float, float, float, float, float],      \
                    [float, float, float, float, float] ]
 
@@ -2989,7 +2990,8 @@ class Source(BeamLineElement):
         I = self._Param[11]
         theta_degrees = self._Param[12]
 
-        E_MeV = self.getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
+        E_MeV = self.getLaserDrivenProtonEnergy(self, \
+                    P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
 
         theta = self.angle_generator(self,E_MeV)[0]
         cosTheta = np.cos(theta)
@@ -3046,7 +3048,8 @@ class Source(BeamLineElement):
         T_p = m_e*(c**2)*(np.sqrt(1 + (I*(lamda**2)/(1.37*1e18)))-1)    
         T_e = T_p   # Hot electron temperature [J]
 
-        # Fraction of laser energy converted into hot electron energy, intensity in [W/cm2]
+        # Fraction of laser energy converted into hot electron energy,
+        # intensity in [W/cm2]
         f = 1.2* (10**(-15)) * (I**(0.75)) 
         if f < 0.5:
             f = f
@@ -3056,8 +3059,8 @@ class Source(BeamLineElement):
         # Total number of electrons accelerated into the targe
         N_E = f*E_laser/T_p    
 
-        I_m = I*10000                        # Convert intensity from W/cm2 to W/m2
-        r0 = np.sqrt(P_L/(I_m*np.pi))        # Radius of the laser spot [m]
+        I_m = I*10000                    # Convert intensity from W/cm2 to W/m2
+        r0 = np.sqrt(P_L/(I_m*np.pi))    # Radius of the laser spot [m]
 
         # Area over which electrons are accelerated and spread [m^2]
         theta = mth.radians(theta_degrees)  # Half-angle divergence [radians] 
@@ -3070,7 +3073,8 @@ class Source(BeamLineElement):
         r_e = 2.82e-15              # Electron radius [m]
         P_R = m_e * (c**3) / r_e    # Relativistic power unit [W]
 
-        # Maximum possible energy without considering the laser pulse length (infinite acceleration)
+        # Maximum possible energy without considering the laser pulse
+        # length (infinite acceleration)
         E_i_inf = Z * 2 * m_e * (c**2) * np.sqrt((f*P_L)/P_R)  # [J]
 
         # Calculates the ballistic time [s]
@@ -3079,7 +3083,8 @@ class Source(BeamLineElement):
 
         # Defines the function to solve for f(x) = 0
         def equation(X, t_laser, t_0):
-            return (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
+            return (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
+                (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
         # Solves the equation numerically for X
         initial_guess = 0.5  
         X_solution = fsolve(equation, initial_guess, args=(t_laser, t_0))
@@ -3107,11 +3112,17 @@ class Source(BeamLineElement):
         I = self._Param[11]
         theta_degrees = self._Param[12]
 
-        ne_0 = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[0]      # Hot electron density [pp/m^3]
-        c_s = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[1]       # Ion-acoustic velocity [m/s]
-        s_sheath = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[2]  # Area over which electrons are accelerated and spread [m^2]
-        T_e = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[3]       # Hot electron temperature [J]
-        E_max = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[4]     # Maximum ion energy [J]
+        ne_0 = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                        theta_degrees)[0]      # Hot electron density [pp/m^3]
+        c_s = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                         theta_degrees)[1]       # Ion-acoustic velocity [m/s]
+        s_sheath = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+            theta_degrees)[2]  # Area over which electrons are 
+                               # accelerated and spread [m^2]
+        T_e = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                        theta_degrees)[3]       # Hot electron temperature [J]
+        E_max = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                                theta_degrees)[4]     # Maximum ion energy [J]
         
         E_min = 0.00001*1.6e-19*1e6        # [J]
         E = np.linspace(E_min,E_max,1000)  # [J]
@@ -3120,20 +3131,20 @@ class Source(BeamLineElement):
         g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * np.exp(-np.sqrt(2 * E / T_e))
         g_E /= np.sum(g_E)   # Normalize the probability distribution
 
-        # Generate random numbers from the distribution using inverse transform sampling
-        cumulative_prob = np.cumsum(g_E)     # Computes the cumulative probability distribution
-        random_numbers = np.random.random()  # Generates a random number between 0 and 1
-        sampled_indices = np.searchsorted(cumulative_prob, random_numbers)  # Finds the index in cumulative_prob
-        sampled_data = E[sampled_indices]    # Selects the energy value corresponding to this index
+        # Generate random numbers from the distribution using inverse \
+        # transform sampling
+        cumulative_prob = np.cumsum(g_E)     # Computes the cumulative \
+                                             # probability distribution
+        random_numbers = np.random.random()  # Generates a random number \
+                                             # between 0 and 1
+        sampled_indices = np.searchsorted(cumulative_prob, random_numbers)
+        # Finds the index in cumulative_prob
+        sampled_data = E[sampled_indices]    # Selects the energy value
+                                             # corresponding to this index
 
         E = sampled_data/1.6e-19/1e6         # [MeV]
 
         return E
-
-
-
-        
-        
 
     def getTraceSpace(self, x, y, K, cTheta, Phi):
         if self.getDebug():
