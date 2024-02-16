@@ -97,7 +97,7 @@ Created on Mon 02Oct23: Version history:
 
 @author: rehanahrazak
 """
-
+import sys
 import os
 import io
 import math as mth
@@ -633,7 +633,7 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt = np.array([0.0, 0.0, s + DqL])
+                rStrt = np.array([0.0, 0.0, s ])
                 vStrt = np.array([0.0, 0.0])
                 drStrt = np.array([0.0, 0.0, 0.0])
                 dvStrt = np.array([0.0, 0.0])
@@ -899,10 +899,13 @@ class BeamLine(object):
                         print("              ---->", " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd = iBLE.getrStrt()[2]
-                    Success = PrtclInst.recordParticle(
-                        iBLE.getName(), zEnd, zEnd, TrcSpc
-                    )
+                    zEnd    = -999999.
+                    sEnd    = iBLE.getrStrt()[2] 
+                    print("test",iBLE.getrStrt()[2])
+                    Success = PrtclInst.recordParticle(iBLE.getName(), \
+                                    zEnd, \
+                                    sEnd, \
+                                    TrcSpc)
                 TrcSpc_i = TrcSpc
 
             if cls.getDebug():

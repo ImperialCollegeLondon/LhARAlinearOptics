@@ -153,6 +153,7 @@ import math as mth
 import os
 import io
 from Utilities import RotMat_x, RotMat_y, RotMat_z
+import matplotlib.transforms as mt
 
 import BeamLine as BL
 import BeamLineElement as BLE
@@ -200,7 +201,7 @@ class Particle:
         return " Partcle __str__ done."
 
     def print(self):
-        print(" Particle:")
+        print("\n Particle:")
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Number of phase-space records:", len(self.getLocation()))
@@ -209,6 +210,15 @@ class Particle:
         for iLctn in range(len(self.getLocation())):
             print("         ---->", self.getLocation()[iLctn], ":")
             print("             ----> z, s", self.getz()[iLctn], self.gets()[iLctn])
+            try:
+                print("             ----> ", \
+              BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
+                      "; length ", \
+              BLE.BeamLineElement.getinstances()[iLctn+1].getLength())
+            except:
+                print("             ----> ", \
+                      BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
+                      "; has no length")
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print(
                     "             ---->     trace space:", self.getTraceSpace()[iLctn]
@@ -480,6 +490,8 @@ class Particle:
     def plotParticleTrajectory_Lab(cls, axyz=None, axxz=None):
 
         line_collection_list = []
+        line_collection_list_term = []
+        
 
         x_lab = []
         y_lab = []
@@ -502,32 +514,54 @@ class Particle:
             x_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 0]
             y_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 1]
             z_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 2]
-
+        #print(x_lab)
         segmentsYZ = np.dstack((z_lab, y_lab))
         segmentsXZ = np.dstack((z_lab, x_lab))
 
         if axxz is not None:
-
+            
+            #Finding the elements that have nan at end:
+                    
+            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:,-1, 1])]
+            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:,-1, 1])]
             # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
-            line_collection_1 = LineCollection(
-                segmentsXZ, linewidths=0.5, colors="black", linestyle="solid"
+            line_collection_end = LineCollection(
+                segments_end_XZ, linewidths=0.5, colors="green", linestyle="solid"
             )
-            line_collection_list.append(line_collection_1)
-            axxz.add_collection(line_collection_1)
+            line_collection_terminated = LineCollection(
+                segments_terminated_XZ, linewidths=0.5, color = "red", linestyle = "solid"
+            )
+            line_collection_list.append(line_collection_end)
+            line_collection_list_term.append(line_collection_terminated)            
+            axxz.add_collection(line_collection_end)
+            axxz.add_collection(line_collection_terminated)
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (Lab; x-z plane)")
+            for row in segments_end_XZ[0,:,0]:
+              axxz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
+        
+            
 
         if axyz is not None:
-
+            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:,-1, 1])]
+            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:,-1, 1])]
             line_collection_2 = LineCollection(
-                segmentsYZ, linewidths=0.5, colors="blue", linestyle="solid"
+                segments_end_YZ, linewidths=0.5, colors="blue", linestyle="solid"
             )
+            line_collection_terminated = LineCollection(
+                segments_terminated_YZ, linewidths=0.5, color = "purple", linestyle = "solid"
+            )
+
             line_collection_list.append(line_collection_2)
+            line_collection_list_term.append(line_collection_terminated)
             axyz.add_collection(line_collection_2)
+            axyz.add_collection(line_collection_terminated)
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
+            for row in segments_end_YZ[0,:,0]:
+              axyz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
 
         return line_collection_list
 
@@ -535,6 +569,7 @@ class Particle:
     def plotParticleTrajectory_RPLC(cls, axyz=None, axxz=None):
 
         line_collection_list = []
+        line_collection_list_term = []
 
         x_RPLC = []
         y_RPLC = []
@@ -555,40 +590,61 @@ class Particle:
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
             icoords = np.array(iPrtcl.gets())
+            
             maxN = len(iTraceSpace)
 
             x_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 0]
             y_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 2]
             z_RPLC[nPrtcl, :maxN] = icoords[:]
-
+        
         segmentsYZ = np.dstack((z_RPLC, y_RPLC))
         segmentsXZ = np.dstack((z_RPLC, x_RPLC))
 
         if axxz is not None:
-
+            
+            #Finding the elements that have nan at end:                    
+            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:,-1, 1])]            
+            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:,-1, 1])]
+            #print(segments_end_XZ[1])
             # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
-
-            line_collection_1 = LineCollection(
-                segmentsXZ, linewidths=0.5, colors="black", linestyle="solid"
+            line_collection_end = LineCollection(
+                segments_end_XZ, linewidths=0.5, colors="green", linestyle="solid"
             )
-            line_collection_list.append(line_collection_1)
-            axxz.add_collection(line_collection_1)
+            line_collection_terminated = LineCollection(
+                segments_terminated_XZ, linewidths=0.5, color = "red", linestyle = "solid"
+            )
+            line_collection_list.append(line_collection_end)
+            line_collection_list_term.append(line_collection_terminated)            
+            axxz.add_collection(line_collection_end)
+            axxz.add_collection(line_collection_terminated)
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
+                       
+            for row in segments_end_XZ[0,:,0]:
+              axxz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
+            
 
         if axyz is not None:
-
-            # Plot all sets on the third subplot (axs[2])
-
+            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:,-1, 1])]
+            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:,-1, 1])]
             line_collection_2 = LineCollection(
-                segmentsYZ, linewidths=0.5, colors="blue", linestyle="solid"
+                segments_end_YZ, linewidths=0.5, colors="green", linestyle="solid"
             )
+            line_collection_terminated = LineCollection(
+                segments_terminated_YZ, linewidths=0.5, color = "red", linestyle = "solid"
+            )
+
             line_collection_list.append(line_collection_2)
+            line_collection_list_term.append(line_collection_terminated)
             axyz.add_collection(line_collection_2)
+            axyz.add_collection(line_collection_terminated)
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
+            
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
+            for row in segments_end_YZ[0,:,0]:
+              axyz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
 
         return line_collection_list
 
@@ -873,7 +929,7 @@ class Particle:
             print("     <---- Particle instsance")
             print(iPrtcl)
             print(" <---- readParticle done.")
-
+        cls.setDebug(False)
         return False
 
     @classmethod
