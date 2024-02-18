@@ -763,7 +763,7 @@ class BeamLine(object):
             elif iLine.Element == "Dipole":
                 if NewElement:
                     if iLine.Type == "Sector (Length, Angle, Plane)":
-                        nLnsDpl = 2
+                        nLnsDpl = 3
                         iLnDpl = 1
                     else:
                         raise badParameter(
@@ -778,10 +778,10 @@ class BeamLine(object):
                     DplA = float(iLine.Value)
                     DplA = DplA * mth.pi / 180.0
                 elif iLine.Parameter == "Plane":
-                    if str(iLine.Value) == "XZ":
-                        thetaZ = np.pi / 2
-                    elif str(iLine.Value) == "YZ":
-                        thetaZ = np.pi / 2
+                    if str(iLine.Value) == "XZ" or str(iLine.Value) == "YZ":
+                        plane = str(iLine.Value)
+                    else:
+                        raise badParameter("bad Plane specification.")
                 if iLnDpl < nLnsDpl:
                     iLnDpl += 1
                     NewElement = False
@@ -796,7 +796,7 @@ class BeamLine(object):
                 Name += str(nDpl)
                 rho = DplL / DplA
                 B = (1 / (speed_of_light * 1.0e-9)) * p0 / rho / 1000.0
-                iBLE = BLE.SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, DplA, B)
+                iBLE = BLE.SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, DplA, B, plane)
                 cls._Element.append(iBLE)
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtSectorDipole(iBLE)

@@ -1629,6 +1629,7 @@ class SectorDipole(BeamLineElement):
         _dvStrt=None,
         _Angle=None,
         _B=None,
+        _Plane="XY",
     ):
         if self.getDebug():
             print(" SectorDipole(BeamLineElement).__init__: ")
@@ -1645,6 +1646,7 @@ class SectorDipole(BeamLineElement):
                 "SectorDipole: bad specification for bending angle (Angle)!"
             )
 
+        self.setPlane(_Plane)
         self.setAngle(_Angle)
         self.setB(_B)
         self.setLength()  # Works out length - good.
@@ -1678,6 +1680,16 @@ class SectorDipole(BeamLineElement):
 
     # -------- "Set methods"
     # ..  Methods believed to be self-documenting(!)
+
+    def setPlane(self, _Plane):
+        if not _Plane == "XZ" or _Plane == "YZ":
+            raise badParameter(
+                "BeamLineElement.SectorDipole.setPlane:",
+                "bad plane specification (Plane):",
+                _Plane,
+            )
+        self._Plane = _Plane
+
     def setAngle(self, _Angle):
         if not isinstance(_Angle, float):
             raise badParameter(
@@ -1788,6 +1800,9 @@ class SectorDipole(BeamLineElement):
     @classmethod
     def getDebug(cls):
         return cls.__Debug
+
+    def getPlane(self):
+        return self._Plane
 
     def getAngle(self):
         return self._Angle

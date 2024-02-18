@@ -1465,6 +1465,7 @@ class ReferenceParticle(Particle):
 
         # B field in y direction
 
+        print(iBLE.getPlane())
         theta = -iBLE.getAngle()  # only dipole here
         thetap = theta / 2
         thetaZ = 0  # chooses the plane of bend
