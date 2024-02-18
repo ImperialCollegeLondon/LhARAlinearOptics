@@ -496,6 +496,14 @@ class Particle:
         x_lab = []
         y_lab = []
         z_lab = []
+        print("beamline",BLE.BeamLineElement.getinstances()[1:])
+
+        mask = np.array([isinstance(element, (BLE.Aperture, BLE.Solenoid, BLE.DefocusQuadrupole,\
+                                               BLE.FocusQuadrupole, BLE.SectorDipole)) for element \
+                                                in BLE.BeamLineElement.getinstances()[1:]])
+
+
+        
 
         for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
             if isinstance(iPrtcl, ReferenceParticle):
@@ -507,7 +515,7 @@ class Particle:
                 continue
 
             iPrtcl.fillPhaseSpace()
-
+            
             iLabPhaseSpace = np.array(iPrtcl.getLabPhaseSpace())
             maxN = len(iLabPhaseSpace)
 
@@ -538,7 +546,7 @@ class Particle:
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (Lab; x-z plane)")
-            for row in segments_end_XZ[0,:,0]:
+            for row in segments_end_XZ[0,:,0][mask]:
               axxz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
         
             
@@ -560,7 +568,9 @@ class Particle:
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
-            for row in segments_end_YZ[0,:,0]:
+            print("vline", len(segments_end_YZ[0,:,0]))
+            for row in segments_end_YZ[0,:,0][mask]:
+            
               axyz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
 
         return line_collection_list
@@ -574,7 +584,10 @@ class Particle:
         x_RPLC = []
         y_RPLC = []
         z_RPLC = []
-
+        mask = np.array([isinstance(element, (BLE.Aperture, BLE.Solenoid, BLE.DefocusQuadrupole,\
+                                               BLE.FocusQuadrupole, BLE.SectorDipole)) for element \
+                                                in BLE.BeamLineElement.getinstances()[1:]])
+        print(BLE.BeamLineElement.getinstances()[1:])
         nPrtcl = 0
 
         for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
@@ -621,7 +634,7 @@ class Particle:
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
                        
-            for row in segments_end_XZ[0,:,0]:
+            for row in segments_end_XZ[0,:,0][mask]:
               axxz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
             
 
@@ -643,7 +656,7 @@ class Particle:
             axyz.set_ylabel("y [m]")
             
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
-            for row in segments_end_YZ[0,:,0]:
+            for row in segments_end_YZ[0,:,0][mask]:
               axyz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
 
         return line_collection_list
