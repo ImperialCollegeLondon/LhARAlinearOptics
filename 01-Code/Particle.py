@@ -1478,7 +1478,7 @@ class ReferenceParticle(Particle):
         # removed thetaz, as we are not dealing with intermediate planes
 
         # Default is an upward bend in YZ plane
-
+        dipolePlane = iBLE.getPlane()
         theta = -iBLE.getAngle()
         thetap = theta / 2
         Rotation = RotMat_x(thetap)  # On momenta unit vector
