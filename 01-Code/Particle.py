@@ -1527,22 +1527,20 @@ class ReferenceParticle(Particle):
 
         # Default is an upward bend in YZ plane
         dipolePlane = iBLE.getPlane()
-        theta = -iBLE.getAngle()
-        thetap = theta / 2
-        Rotation = RotMat_x(thetap)  # On momenta unit vector
-        Rotation2 = RotMat_x(theta)  # On coordinates
+        dipoleDirection = iBLE.getDirection()
+
 
         # Default is upward bend in YZ
 
-        if "up" == True and "YZ" == True:
-            theta = theta
+        if dipoleDirection == "U" and dipolePlane == "YZ":
+            theta = -iBLE.getAngle()
             thetap = theta / 2
-            Rotation = Rotation
-            Rotation2 = Rotation2
+            Rotation = RotMat_x(thetap)
+            Rotation2 = RotMat_x(theta)
 
         # Conditions for upward bend in XZ
 
-        elif "up" == True and "YZ" == False:
+        elif dipoleDirection == "U" and dipolePlane == "XZ":
             theta = iBLE.getAngle()
             thetap = theta / 2
             Rotation = RotMat_y(thetap)
@@ -1550,18 +1548,21 @@ class ReferenceParticle(Particle):
 
         # Conditions for downward bend in YZ
 
-        elif "up" == False and "YZ" == True:
+        elif dipoleDirection == "D" and dipolePlane == "YZ":
             theta = iBLE.getAngle()
             thetap = theta / 2
             Rotation = RotMat_x(thetap)
             Rotation2 = RotMat_x(theta)
 
         # Conditions for downward bend in XZ
-        else:
+        elif dipoleDirection == "D" and dipolePlane == "XZ":
             theta = theta
             thetap = theta / 2
             Rotation = RotMat_y(thetap)
             Rotation2 = RotMat_y(theta)
+
+        else:
+            raise badParameter("bad bend specification")
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm

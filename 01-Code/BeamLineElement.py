@@ -1685,10 +1685,21 @@ class SectorDipole(BeamLineElement):
     # ..  Methods believed to be self-documenting(!)
 
     def setDirection(self, _Direction):
-
+        if not (_Direction == "U" or _Direction == "D"):
+            raise badParameter(
+                "BeamLineElement.SectorDipole.setDirection:",
+                "bad plane specification (Direction):",
+                _Direction,
+            )
         self._Direction = _Direction
 
     def setPlane(self, _Plane):
+        if not (_Plane == "XZ" or _Plane == "YZ"):
+            raise badParameter(
+                "BeamLineElement.SectorDipole.setPlane:",
+                "bad plane specification (Plane):",
+                _Plane,
+            )
 
         self._Plane = _Plane
 
@@ -1791,7 +1802,27 @@ class SectorDipole(BeamLineElement):
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print(TrnsMtrx)
 
-        self._TrnsMtrx = TrnsMtrx
+        dipolePlane = self.getPlane()
+        dipoleDirection = self.getDirection()
+
+        if dipoleDirection == "U" and dipolePlane == "YZ":
+            self._TrnsMtrx = TrRotMat_z(-np.pi) @ TrnsMtrx @ TrRotMat_z(np.pi)
+
+        elif dipoleDirection == "U" and dipolePlane == "XZ":
+            self._TrnsMtrx = (
+                TrRotMat_z(-np.pi - np.pi / 2)
+                @ TrnsMtrx
+                @ TrRotMat_z(np.pi + np.pi / 2)
+            )
+
+        elif dipoleDirection == "D" and dipolePlane == "YZ":
+            self._TrnsMtrx = TrRotMat_z(-np.pi / 2) @ TrnsMtrx @ TrRotMat_z(np.pi / 2)
+
+        elif dipoleDirection == "D" and dipolePlane == "XZ":
+            self._TrnsMtrx = TrnsMtrx
+
+        else:
+            raise badParameter("bad bend specification")
 
     @classmethod
     def setDebug(cls, Debug):
