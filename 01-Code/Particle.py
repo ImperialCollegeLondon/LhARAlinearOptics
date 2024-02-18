@@ -1463,18 +1463,65 @@ class ReferenceParticle(Particle):
         )
 
         # B field in y direction
+        
+        
 
-        theta = -iBLE.getAngle()  # only dipole here
+        #if "AC"==True: 
+            #theta = iBLE.getAngle()  # only dipole here
+            #thetap = theta / 2
+        #else: 
+            #theta = -iBLE.getAngle()  # only dipole here
+            #thetap = theta / 2
+
+            #thetaZ = 0  # chooses the plane of bend
+        #removed thetaz, as we are not dealing with intermediate planes 
+
+        #Default is an upward bend in YZ plane
+
+        theta=-iBLE.getAngle()
         thetap = theta / 2
-        thetaZ = 0  # chooses the plane of bend
+        Rotation = RotMat_x(thetap) #On momenta unit vector
+        Rotation2 = RotMat_x(theta) #On coordinates
 
+        #Default is upward bend in YZ
+
+        if "up"==True and "YZ"==True: 
+            theta=theta
+            thetap = theta / 2
+            Rotation=Rotation 
+            Rotation2=Rotation2 
+        
+        #Conditions for upward bend in XZ
+
+        elif "up"==True and "YZ"==False:
+            theta=iBLE.getAngle()
+            thetap = theta / 2
+            Rotation=RotMat_y(thetap)
+            Rotation2=RotMat_y(theta)
+
+        #Conditions for downward bend in YZ
+
+        elif "up"==False and "YZ"==True: 
+            theta=iBLE.getAngle()
+            thetap = theta / 2
+            Rotation=RotMat_x(thetap)
+            Rotation2=RotMat_x(theta)
+
+        #Conditions for downward bend in XZ
+        else: 
+            theta=theta
+            thetap = theta / 2
+            Rotation=RotMat_y(thetap)
+            Rotation2=RotMat_y(theta)
+    
+    
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
         cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
 
         unit = np.array([cx, cy, cz])
 
-        cx, cy, cz = RotMat_z(thetaZ) @ RotMat_x(thetap) @ RotMat_z(thetaZ).T @ unit
+        cx,cy,cz= Rotation@unit
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
         r = Brho / iBLE.getB()
@@ -1482,6 +1529,7 @@ class ReferenceParticle(Particle):
 
         print("d:", d)
         print("r:", r)
+
         # works out chord vector
 
         RrOut = np.array(
@@ -1499,13 +1547,16 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        # Momentum; rotate by theta?
-
+        # Momentum; rotate by theta
+    
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
         PrOut = np.zeros(4)
-        PrOut[0:3] = (
-            RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
-        )  # Rotate PrOut
+        PrOut[0:3]=(Rotation2@PrIn[0:3])
+
+        #PrOut[0:3] = (
+        #RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
+        #)  # Rotate PrOut
+
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1517,7 +1568,8 @@ class ReferenceParticle(Particle):
         # Now define coordinate axes rotation
 
         Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
-        Rot2LabOut = RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ Rot2LabIn
+        Rot2LabOut=Rotation2 @ Rot2LabIn
+
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
