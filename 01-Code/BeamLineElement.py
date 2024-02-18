@@ -114,6 +114,7 @@ import matplotlib.patches as patches
 
 import PhysicalConstants as PhysCnst
 import Particle as Prtcl
+from Utilities import TrRotMat_z 
 
 # .. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -220,7 +221,7 @@ class BeamLineElement:
 
     def setName(self, _Name):
         if not isinstance(_Name, str):
-            raise badParameter(" BeamLineElement.setrStrt: bad name:", _Name)
+            raise badParameter(" BeamLineElement.setName: bad name:", _Name)
         self._Name = _Name
 
     def setrStrt(self, _rStrt):
