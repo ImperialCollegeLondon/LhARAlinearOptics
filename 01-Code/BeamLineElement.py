@@ -114,7 +114,7 @@ import matplotlib.patches as patches
 
 import PhysicalConstants as PhysCnst
 import Particle as Prtcl
-from Utilities import TrRotMat_z 
+from Utilities import TrRotMat_z
 
 # .. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -1790,7 +1790,27 @@ class SectorDipole(BeamLineElement):
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print(TrnsMtrx)
 
-        self._TrnsMtrx = TrnsMtrx
+        dipolePlane = self.getPlane()
+        dipoleDirection = self.getDirection()
+
+        if dipoleDirection == "U" and dipolePlane == "YZ":
+            self._TrnsMtrx = TrRotMat_z(-np.pi) @ TrnsMtrx @ TrRotMat_z(np.pi)
+
+        elif dipoleDirection == "U" and dipolePlane == "XZ":
+            self._TrnsMtrx = (
+                TrRotMat_z(-np.pi - np.pi / 2)
+                @ TrnsMtrx
+                @ TrRotMat_z(np.pi + np.pi / 2)
+            )
+
+        elif dipoleDirection == "D" and dipolePlane == "YZ":
+            self._TrnsMtrx = TrRotMat_z(-np.pi / 2) @ TrnsMtrx @ TrRotMat_z(np.pi / 2)
+
+        elif dipoleDirection == "D" and dipolePlane == "XZ":
+            self._TrnsMtrx = TrnsMtrx
+
+        else:
+            raise badParameter("bad bend specification")
 
     @classmethod
     def setDebug(cls, Debug):
