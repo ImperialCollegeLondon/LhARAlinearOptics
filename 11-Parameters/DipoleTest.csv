@@ -10,7 +10,8 @@
 1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF
 1,Source,Source,Parameterised TNSA,MinCTheta,0.998,,Maximum theta for flat cos theta
 1,TestArc,Drift,,Length,5,m,
-1,TestArc,Dipole,"Sector (Length, Angle, Plane)",Length,3,m,
-1,TestArc,Dipole,"Sector (Length, Angle, Plane)",Angle,5,degrees,
-1,TestArc,Dipole,"Sector (Length, Angle, Plane)",Plane,XZ,,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Length,0.8,m,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Angle,15,degrees,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Plane,YZ,,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Direction,U,,
 1,TestArc,Drift,,Length,1,m,

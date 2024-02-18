@@ -1630,7 +1630,8 @@ class SectorDipole(BeamLineElement):
         _dvStrt=None,
         _Angle=None,
         _B=None,
-        _Plane="XY",
+        _Plane="YZ",
+        _Direction="U",
     ):
         if self.getDebug():
             print(" SectorDipole(BeamLineElement).__init__: ")
@@ -1648,6 +1649,7 @@ class SectorDipole(BeamLineElement):
             )
 
         self.setPlane(_Plane)
+        self.setDirection(_Direction)
         self.setAngle(_Angle)
         self.setB(_B)
         self.setLength()  # Works out length - good.
@@ -1698,6 +1700,7 @@ class SectorDipole(BeamLineElement):
                 "bad plane specification (Plane):",
                 _Plane,
             )
+
         self._Plane = _Plane
 
     def setAngle(self, _Angle):
@@ -1833,6 +1836,9 @@ class SectorDipole(BeamLineElement):
 
     def getPlane(self):
         return self._Plane
+
+    def getDirection(self):
+        return self._Direction
 
     def getAngle(self):
         return self._Angle

@@ -499,6 +499,23 @@ class Particle:
         x_lab = []
         y_lab = []
         z_lab = []
+        print("beamline", BLE.BeamLineElement.getinstances()[1:])
+
+        mask = np.array(
+            [
+                isinstance(
+                    element,
+                    (
+                        BLE.Aperture,
+                        BLE.Solenoid,
+                        BLE.DefocusQuadrupole,
+                        BLE.FocusQuadrupole,
+                        BLE.SectorDipole,
+                    ),
+                )
+                for element in BLE.BeamLineElement.getinstances()[1:]
+            ]
+        )
 
         for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
             if isinstance(iPrtcl, ReferenceParticle):
@@ -507,6 +524,7 @@ class Particle:
                 x_lab = np.full((NInsts, NLocs), np.nan)
                 y_lab = np.full((NInsts, NLocs), np.nan)
                 z_lab = np.full((NInsts, NLocs), np.nan)
+                z_lab_RefPrtcl = np.array(iPrtcl.getRrIn())[mask][:, 2]
                 continue
 
             iPrtcl.fillPhaseSpace()
@@ -541,8 +559,10 @@ class Particle:
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (Lab; x-z plane)")
-            for row in segments_end_XZ[0, :, 0]:
-                axxz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
+
+            for z in z_lab_RefPrtcl:
+                axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+
 
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
@@ -564,8 +584,11 @@ class Particle:
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
-            for row in segments_end_YZ[0, :, 0]:
-                axyz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
+
+            print("vline", len(segments_end_YZ[0, :, 0]))
+            for z in z_lab_RefPrtcl:
+                axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+
 
         return line_collection_list
 
@@ -578,6 +601,21 @@ class Particle:
         x_RPLC = []
         y_RPLC = []
         z_RPLC = []
+        mask = np.array(
+            [
+                isinstance(
+                    element,
+                    (
+                        BLE.Aperture,
+                        BLE.Solenoid,
+                        BLE.DefocusQuadrupole,
+                        BLE.FocusQuadrupole,
+                        BLE.SectorDipole,
+                    ),
+                )
+                for element in BLE.BeamLineElement.getinstances()[1:]
+            ]
+        )
 
         nPrtcl = 0
 
@@ -590,16 +628,22 @@ class Particle:
                 x_RPLC = np.full((NInsts, NLocs), np.nan)
                 y_RPLC = np.full((NInsts, NLocs), np.nan)
                 z_RPLC = np.full((NInsts, NLocs), np.nan)
+                s_RPLC = np.array(iPrtcl.gets())
+                z_RPLC_RefPrtcl = np.array(iPrtcl.getsIn())[mask]
                 continue
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
-            icoords = np.array(iPrtcl.gets())
+
+            icoords = np.array(iPrtcl.getRPLCPhaseSpace())
+
 
             maxN = len(iTraceSpace)
 
             x_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 0]
             y_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 2]
-            z_RPLC[nPrtcl, :maxN] = icoords[:]
+
+            z_RPLC[nPrtcl, :maxN] = icoords[:, 0, 2] + s_RPLC[:maxN]
+
 
         segmentsYZ = np.dstack((z_RPLC, y_RPLC))
         segmentsXZ = np.dstack((z_RPLC, x_RPLC))
@@ -621,12 +665,14 @@ class Particle:
             line_collection_list_term.append(line_collection_terminated)
             axxz.add_collection(line_collection_end)
             axxz.add_collection(line_collection_terminated)
-            axxz.set_xlabel("z [m]")
+            axxz.set_xlabel("s [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
 
-            for row in segments_end_XZ[0, :, 0]:
-                axxz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
+
+            for z in z_RPLC_RefPrtcl:
+                axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+
 
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
@@ -642,12 +688,14 @@ class Particle:
             line_collection_list_term.append(line_collection_terminated)
             axyz.add_collection(line_collection_2)
             axyz.add_collection(line_collection_terminated)
-            axyz.set_xlabel("z [m]")
+            axyz.set_xlabel("s [m]")
             axyz.set_ylabel("y [m]")
 
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
-            for row in segments_end_YZ[0, :, 0]:
-                axyz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
+
+            for z in z_RPLC_RefPrtcl:
+                axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+
 
         return line_collection_list
 
@@ -748,7 +796,7 @@ class Particle:
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print("     ----> trace space:", TrcSpc)
 
-        rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0.0])
+        rRPLC = np.array([TrcSpc[0], TrcSpc[2], TrcSpc[4]])
 
         p0 = BL.BeamLine.getElement()[0].getp0()
 
@@ -1480,6 +1528,7 @@ class ReferenceParticle(Particle):
         # Default is an upward bend in YZ plane
         dipolePlane = iBLE.getPlane()
         dipoleDirection = iBLE.getDirection()
+
 
         # Default is upward bend in YZ
 
