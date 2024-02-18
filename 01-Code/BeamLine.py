@@ -762,7 +762,7 @@ class BeamLine(object):
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dipole":
                 if NewElement:
-                    if iLine.Type == "Sector (Length, angle)":
+                    if iLine.Type == "Sector (Length, Angle, Plane)":
                         nLnsDpl = 2
                         iLnDpl = 1
                     else:
@@ -777,6 +777,11 @@ class BeamLine(object):
                 elif iLine.Parameter == "Angle":
                     DplA = float(iLine.Value)
                     DplA = DplA * mth.pi / 180.0
+                elif iLine.Parameter == "Plane":
+                    if str(iLine.Value) == "XZ":
+                        thetaZ = np.pi / 2
+                    elif str(iLine.Value) == "YZ":
+                        thetaZ = np.pi / 2
                 if iLnDpl < nLnsDpl:
                     iLnDpl += 1
                     NewElement = False
