@@ -211,14 +211,18 @@ class Particle:
             print("         ---->", self.getLocation()[iLctn], ":")
             print("             ----> z, s", self.getz()[iLctn], self.gets()[iLctn])
             try:
-                print("             ----> ", \
-              BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
-                      "; length ", \
-              BLE.BeamLineElement.getinstances()[iLctn+1].getLength())
+                print(
+                    "             ----> ",
+                    BLE.BeamLineElement.getinstances()[iLctn + 1].getName(),
+                    "; length ",
+                    BLE.BeamLineElement.getinstances()[iLctn + 1].getLength(),
+                )
             except:
-                print("             ----> ", \
-                      BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
-                      "; has no length")
+                print(
+                    "             ----> ",
+                    BLE.BeamLineElement.getinstances()[iLctn + 1].getName(),
+                    "; has no length",
+                )
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print(
                     "             ---->     trace space:", self.getTraceSpace()[iLctn]
@@ -491,7 +495,6 @@ class Particle:
 
         line_collection_list = []
         line_collection_list_term = []
-        
 
         x_lab = []
         y_lab = []
@@ -514,43 +517,44 @@ class Particle:
             x_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 0]
             y_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 1]
             z_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 2]
-        #print(x_lab)
+        # print(x_lab)
         segmentsYZ = np.dstack((z_lab, y_lab))
         segmentsXZ = np.dstack((z_lab, x_lab))
 
         if axxz is not None:
-            
-            #Finding the elements that have nan at end:
-                    
-            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:,-1, 1])]
-            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:,-1, 1])]
+
+            # Finding the elements that have nan at end:
+
+            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:, -1, 1])]
             # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
             line_collection_end = LineCollection(
                 segments_end_XZ, linewidths=0.5, colors="green", linestyle="solid"
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_XZ, linewidths=0.5, color = "red", linestyle = "solid"
+                segments_terminated_XZ, linewidths=0.5, color="red", linestyle="solid"
             )
             line_collection_list.append(line_collection_end)
-            line_collection_list_term.append(line_collection_terminated)            
+            line_collection_list_term.append(line_collection_terminated)
             axxz.add_collection(line_collection_end)
             axxz.add_collection(line_collection_terminated)
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (Lab; x-z plane)")
-            for row in segments_end_XZ[0,:,0]:
-              axxz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
-        
-            
+            for row in segments_end_XZ[0, :, 0]:
+                axxz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
 
         if axyz is not None:
-            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:,-1, 1])]
-            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:,-1, 1])]
+            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
             line_collection_2 = LineCollection(
                 segments_end_YZ, linewidths=0.5, colors="blue", linestyle="solid"
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_YZ, linewidths=0.5, color = "purple", linestyle = "solid"
+                segments_terminated_YZ,
+                linewidths=0.5,
+                color="purple",
+                linestyle="solid",
             )
 
             line_collection_list.append(line_collection_2)
@@ -560,8 +564,8 @@ class Particle:
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
-            for row in segments_end_YZ[0,:,0]:
-              axyz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
+            for row in segments_end_YZ[0, :, 0]:
+                axyz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
 
         return line_collection_list
 
@@ -590,49 +594,48 @@ class Particle:
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
             icoords = np.array(iPrtcl.gets())
-            
+
             maxN = len(iTraceSpace)
 
             x_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 0]
             y_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 2]
             z_RPLC[nPrtcl, :maxN] = icoords[:]
-        
+
         segmentsYZ = np.dstack((z_RPLC, y_RPLC))
         segmentsXZ = np.dstack((z_RPLC, x_RPLC))
 
         if axxz is not None:
-            
-            #Finding the elements that have nan at end:                    
-            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:,-1, 1])]            
-            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:,-1, 1])]
-            #print(segments_end_XZ[1])
+
+            # Finding the elements that have nan at end:
+            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:, -1, 1])]
+            # print(segments_end_XZ[1])
             # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
             line_collection_end = LineCollection(
                 segments_end_XZ, linewidths=0.5, colors="green", linestyle="solid"
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_XZ, linewidths=0.5, color = "red", linestyle = "solid"
+                segments_terminated_XZ, linewidths=0.5, color="red", linestyle="solid"
             )
             line_collection_list.append(line_collection_end)
-            line_collection_list_term.append(line_collection_terminated)            
+            line_collection_list_term.append(line_collection_terminated)
             axxz.add_collection(line_collection_end)
             axxz.add_collection(line_collection_terminated)
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
-                       
-            for row in segments_end_XZ[0,:,0]:
-              axxz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
-            
+
+            for row in segments_end_XZ[0, :, 0]:
+                axxz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
 
         if axyz is not None:
-            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:,-1, 1])]
-            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:,-1, 1])]
+            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
             line_collection_2 = LineCollection(
                 segments_end_YZ, linewidths=0.5, colors="green", linestyle="solid"
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_YZ, linewidths=0.5, color = "red", linestyle = "solid"
+                segments_terminated_YZ, linewidths=0.5, color="red", linestyle="solid"
             )
 
             line_collection_list.append(line_collection_2)
@@ -641,10 +644,10 @@ class Particle:
             axyz.add_collection(line_collection_terminated)
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
-            
+
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
-            for row in segments_end_YZ[0,:,0]:
-              axyz.axvline(x=row, color='black', linestyle='--', linewidth = 0.1)
+            for row in segments_end_YZ[0, :, 0]:
+                axyz.axvline(x=row, color="black", linestyle="--", linewidth=0.1)
 
         return line_collection_list
 
@@ -1463,65 +1466,62 @@ class ReferenceParticle(Particle):
         )
 
         # B field in y direction
-        
-        
 
-        #if "AC"==True: 
-            #theta = iBLE.getAngle()  # only dipole here
-            #thetap = theta / 2
-        #else: 
-            #theta = -iBLE.getAngle()  # only dipole here
-            #thetap = theta / 2
+        # if "AC"==True:
+        # theta = iBLE.getAngle()  # only dipole here
+        # thetap = theta / 2
+        # else:
+        # theta = -iBLE.getAngle()  # only dipole here
+        # thetap = theta / 2
 
-            #thetaZ = 0  # chooses the plane of bend
-        #removed thetaz, as we are not dealing with intermediate planes 
+        # thetaZ = 0  # chooses the plane of bend
+        # removed thetaz, as we are not dealing with intermediate planes
 
-        #Default is an upward bend in YZ plane
+        # Default is an upward bend in YZ plane
 
-        theta=-iBLE.getAngle()
+        theta = -iBLE.getAngle()
         thetap = theta / 2
-        Rotation = RotMat_x(thetap) #On momenta unit vector
-        Rotation2 = RotMat_x(theta) #On coordinates
+        Rotation = RotMat_x(thetap)  # On momenta unit vector
+        Rotation2 = RotMat_x(theta)  # On coordinates
 
-        #Default is upward bend in YZ
+        # Default is upward bend in YZ
 
-        if "up"==True and "YZ"==True: 
-            theta=theta
+        if "up" == True and "YZ" == True:
+            theta = theta
             thetap = theta / 2
-            Rotation=Rotation 
-            Rotation2=Rotation2 
-        
-        #Conditions for upward bend in XZ
+            Rotation = Rotation
+            Rotation2 = Rotation2
 
-        elif "up"==True and "YZ"==False:
-            theta=iBLE.getAngle()
+        # Conditions for upward bend in XZ
+
+        elif "up" == True and "YZ" == False:
+            theta = iBLE.getAngle()
             thetap = theta / 2
-            Rotation=RotMat_y(thetap)
-            Rotation2=RotMat_y(theta)
+            Rotation = RotMat_y(thetap)
+            Rotation2 = RotMat_y(theta)
 
-        #Conditions for downward bend in YZ
+        # Conditions for downward bend in YZ
 
-        elif "up"==False and "YZ"==True: 
-            theta=iBLE.getAngle()
+        elif "up" == False and "YZ" == True:
+            theta = iBLE.getAngle()
             thetap = theta / 2
-            Rotation=RotMat_x(thetap)
-            Rotation2=RotMat_x(theta)
+            Rotation = RotMat_x(thetap)
+            Rotation2 = RotMat_x(theta)
 
-        #Conditions for downward bend in XZ
-        else: 
-            theta=theta
+        # Conditions for downward bend in XZ
+        else:
+            theta = theta
             thetap = theta / 2
-            Rotation=RotMat_y(thetap)
-            Rotation2=RotMat_y(theta)
-    
-    
+            Rotation = RotMat_y(thetap)
+            Rotation2 = RotMat_y(theta)
+
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
         cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
 
         unit = np.array([cx, cy, cz])
 
-        cx,cy,cz= Rotation@unit
+        cx, cy, cz = Rotation @ unit
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
         r = Brho / iBLE.getB()
@@ -1548,14 +1548,14 @@ class ReferenceParticle(Particle):
             raise fail2setReferenceParticle("RrOut")
 
         # Momentum; rotate by theta
-    
+
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
         PrOut = np.zeros(4)
-        PrOut[0:3]=(Rotation2@PrIn[0:3])
+        PrOut[0:3] = Rotation2 @ PrIn[0:3]
 
-        #PrOut[0:3] = (
-        #RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
-        #)  # Rotate PrOut
+        # PrOut[0:3] = (
+        # RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
+        # )  # Rotate PrOut
 
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
@@ -1568,7 +1568,7 @@ class ReferenceParticle(Particle):
         # Now define coordinate axes rotation
 
         Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
-        Rot2LabOut=Rotation2 @ Rot2LabIn
+        Rot2LabOut = Rotation2 @ Rot2LabIn
 
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
