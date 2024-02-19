@@ -563,7 +563,6 @@ class Particle:
             for z in z_lab_RefPrtcl:
                 axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
 
-
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
             segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
@@ -588,7 +587,6 @@ class Particle:
             print("vline", len(segments_end_YZ[0, :, 0]))
             for z in z_lab_RefPrtcl:
                 axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
-
 
         return line_collection_list
 
@@ -627,26 +625,21 @@ class Particle:
                 NLocs = len(iPrtcl.getRrOut())
                 x_RPLC = np.full((NInsts, NLocs), np.nan)
                 y_RPLC = np.full((NInsts, NLocs), np.nan)
-                z_RPLC = np.full((NInsts, NLocs), np.nan)
-                s_RPLC = np.array(iPrtcl.gets())
-                z_RPLC_RefPrtcl = np.array(iPrtcl.getsIn())[mask]
+                s = np.full((NInsts, NLocs), np.nan)
+                s_element_list = np.array(iPrtcl.getsIn())[mask]
                 continue
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
-
-            icoords = np.array(iPrtcl.getRPLCPhaseSpace())
-
+            s_Records = np.array(iPrtcl.gets())
 
             maxN = len(iTraceSpace)
 
             x_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 0]
             y_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 2]
+            s[nPrtcl, :maxN] = s_Records
 
-            z_RPLC[nPrtcl, :maxN] = icoords[:, 0, 2] + s_RPLC[:maxN]
-
-
-        segmentsYZ = np.dstack((z_RPLC, y_RPLC))
-        segmentsXZ = np.dstack((z_RPLC, x_RPLC))
+        segmentsYZ = np.dstack((s, y_RPLC))
+        segmentsXZ = np.dstack((s, x_RPLC))
 
         if axxz is not None:
 
@@ -669,10 +662,8 @@ class Particle:
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
 
-
-            for z in z_RPLC_RefPrtcl:
-                axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
-
+            for s in s_element_list:
+                axxz.axvline(x=s, color="black", linestyle="--", linewidth=0.1)
 
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
@@ -693,9 +684,8 @@ class Particle:
 
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
 
-            for z in z_RPLC_RefPrtcl:
-                axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
-
+            for s in s_element_list:
+                axyz.axvline(x=s, color="black", linestyle="--", linewidth=0.1)
 
         return line_collection_list
 
@@ -1513,22 +1503,8 @@ class ReferenceParticle(Particle):
             + self.getPrOut()[nRcrds - 1][2] ** 2
         )
 
-        # B field in y direction
-
-        # if "AC"==True:
-        # theta = iBLE.getAngle()  # only dipole here
-        # thetap = theta / 2
-        # else:
-        # theta = -iBLE.getAngle()  # only dipole here
-        # thetap = theta / 2
-
-        # thetaZ = 0  # chooses the plane of bend
-        # removed thetaz, as we are not dealing with intermediate planes
-
-        # Default is an upward bend in YZ plane
         dipolePlane = iBLE.getPlane()
         dipoleDirection = iBLE.getDirection()
-
 
         # Default is upward bend in YZ
 
@@ -1556,7 +1532,7 @@ class ReferenceParticle(Particle):
 
         # Conditions for downward bend in XZ
         elif dipoleDirection == "D" and dipolePlane == "XZ":
-            theta = theta
+            theta = -theta
             thetap = theta / 2
             Rotation = RotMat_y(thetap)
             Rotation2 = RotMat_y(theta)

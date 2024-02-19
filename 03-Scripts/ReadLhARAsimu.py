@@ -40,9 +40,9 @@ print("----> Initialising with HOMEPATH:", HOMEPATH)
 # Data and Plot Files
 # --------------------------------------------------------------------------------------
 
-eventFILE = "LhARAsimu.dat"
+eventFILE = "DipoleTest.dat"
 ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", eventFILE)
-filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss.csv")
+filename = os.path.join(HOMEPATH, "11-Parameters/DipoleTest.csv")
 figDIRECTORY = "99-Scratch/"
 
 # --------------------------------------------------------------------------------------
@@ -96,14 +96,18 @@ print()
 print("========  Plotting: START  ========")
 print()
 
-figRPLC, axRPLC = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True)
-axRPLC[0].set_ylim(-0.04,0.04)
-axRPLC[1].set_ylim(-0.04,0.04)
+figRPLC, axRPLC = plt.subplots(
+    nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True
+)
+axRPLC[0].set_ylim(-0.04, 1)
+axRPLC[1].set_ylim(-1, 1)
 
-figLAB, axLAB = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0),constrained_layout=True)
+figLAB, axLAB = plt.subplots(
+    nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True
+)
 
-axLAB[0].set_ylim(-0.05,0.05)
-axLAB[1].set_ylim(-0.5,5)
+axLAB[0].set_ylim(-0.05, 1)
+axLAB[1].set_ylim(-5, 5)
 print(" ----> Plot progression:")
 
 print("     ----> Plot LAB:")
@@ -127,5 +131,3 @@ save_all_figs(
     loc=figDIRECTORY,
     dpi=300,
 )
-
-

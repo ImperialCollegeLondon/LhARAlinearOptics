@@ -1797,10 +1797,7 @@ class SectorDipole(BeamLineElement):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
             ]
         )
-
-        if self.getDebug():
-            with np.printoptions(linewidth=500, precision=7, suppress=True):
-                print(TrnsMtrx)
+        
 
         dipolePlane = self.getPlane()
         dipoleDirection = self.getDirection()
@@ -1823,6 +1820,10 @@ class SectorDipole(BeamLineElement):
 
         else:
             raise badParameter("bad bend specification")
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
+                print(TrnsMtrx)
 
     @classmethod
     def setDebug(cls, Debug):

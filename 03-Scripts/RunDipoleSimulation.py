@@ -12,7 +12,7 @@ HOMEPATH = os.getenv("HOMEPATH")
 print("HOMEPATH", HOMEPATH)
 filename = os.path.join(HOMEPATH, "11-Parameters/DipoleTest.csv")
 datafiledir = os.path.join(HOMEPATH, "99-Scratch")
-Smltn = Simu.Simulation(3000, filename, datafiledir, "DipoleTest.dat")
+Smltn = Simu.Simulation(100, filename, datafiledir, "DipoleTest.dat")
 
 print()
 print(" <---- Simulation initialised.")
