@@ -584,7 +584,7 @@ class Particle:
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
 
-            print("vline", len(segments_end_YZ[0, :, 0]))
+            # print("vline", len(segments_end_YZ[0, :, 0]))
             for z in z_lab_RefPrtcl:
                 axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
 
@@ -626,7 +626,7 @@ class Particle:
                 x_RPLC = np.full((NInsts, NLocs), np.nan)
                 y_RPLC = np.full((NInsts, NLocs), np.nan)
                 s = np.full((NInsts, NLocs), np.nan)
-                s_element_list = np.array(iPrtcl.getsIn())[mask]
+                s_element_list = np.array(iPrtcl.gets())[mask]
                 continue
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
@@ -786,7 +786,15 @@ class Particle:
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print("     ----> trace space:", TrcSpc)
 
-        rRPLC = np.array([TrcSpc[0], TrcSpc[2], TrcSpc[4]])
+        iRefPrtcl = ReferenceParticle.getParticleInstances()[0]
+
+        p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[0][:3], iRefPrtcl.getPrOut()[0][:3]))
+        E0 = iRefPrtcl.getPrOut()[0][3]
+        b0 = p0 / E0
+
+        # do this iteratively
+
+        rRPLC = np.array([TrcSpc[0], TrcSpc[2], TrcSpc[4] * b0])
 
         p0 = BL.BeamLine.getElement()[0].getp0()
 
