@@ -2,50 +2,107 @@
 
 \section{Source}
 
-Para 1:
+
 \begin{itemize}
   \item A variety of options for generating the particle distribution
     at source are included in the package;
   \item The principle (default) option is the model of the TNSA
-    mechanism presented in \cite{PhysRevLett.90.185002}.
+    mechanism presented in \cite{10.1038/nphys199}.
 \end{itemize}
 
-Para 2:
+
+\subsection{Energy Distribution}
+
 \begin{itemize}
   \item The energy spectrum of the protons per unit energy and unit
     solid angle is given by:
     \begin{equation}
-      \frac{dN}{dE} = \frac{n_{i0}c_st}{(2EE_0)^{\frac{1}{2}}}
-                         \exp\left[
-                   -\left( \frac{2E}{E_0} \right)^{\frac{1}{2}} \right]\, ;
+      \frac{dN}{d\varepsilon} = \frac{n_{e0} c_{s} t_{laser} S_{sheath}}{\sqrt{2\varepsilon T_{e}}} exp(- \sqrt{\frac{2\varepsilon}{T_{e}}})
       \label{Eq:Spct:0}
     \end{equation}
-    where $n_{i0}$ is the ion number density at $t=0$, the instant the
-    laser pulse strikes the target; $c_s$ is given by:
+    The variables in the equation are defined in Table \ref{table:EnergySpectrumParameters}.
+  \end{itemize}
+  
+  \begin{itemize}
+  \item The above equation is based on time-limited fluid models which are not very good at predicting the cut-off energy. To predict
+  the cut-off energy of the laser-driven energy spectrum another model should be used that takes into account the laser 
+  acceleration time \cite{10.1103/PhysRevLett.97.045005}.
+  
+  \item To get the cut-off energy, the following equation should be solved for X:
+
+  \begin{equation}
+    \frac{t_{laser}}{t_{0}} = X(1 + \frac{1}{2} \frac{1}{1 - X^{2}}) + \frac{1}{4} ln\frac{1+X}{1-X} 
+    \label{eq:Eq:Spct:1}
+  \end{equation}
+      
+  \item The maximum energy of the particles can then be calculated as follows:
+
     \begin{equation}
-      c_s = \left[ \frac{Z k_{\rm B} T_e}{m_i} \right]^{\frac{1}{2}} \, ;
+      \varepsilon_{max} = X^{2} \varepsilon_{i,\infty}
+      \label{eq:Eq:Spct:2}
     \end{equation}
-    where $Z$ is the ion charge number, $k_{\rm B}$ is the Boltzmann
-    constant; $T_e$ is the electron temperature; $m_i$ is the ion mass;
-    $t$ is the instant in time at which the spectrum is evaluated; and
-    \begin{equation}
-      E_0 = \left[ \frac{n_{e0} k_{\rm B} T_e}{\epsilon_0} \right]^{\frac{1}{2}}
-    \end{equation}
+
+    All the variables in the equations above are defined in Table \ref{table:EnergySpectrumParameters}.
+    
+    \begin{longtable}{c c c c} 
+      \hline
+      \textbf{Parameter} & \textbf{Definition} & \textbf{Value} & \textbf{Unit} \\ [1ex] 
+      \hline \hline
+      \endfirsthead 
+       $N$ & Ion number & - & - \\ 
+       $\varepsilon$ & Ion energy & - & J \\  
+       $n_{e0}$ & Hot electron density & $\frac{N_{E}}{c t_{laser} S_{sheath}}$ & $pp/m^3$ \\ 
+       $N_{e}$ & Accelerated electron number & $\frac{f E_{laser}}{T_e}$ & - \\ 
+       $E_{laser}$ & Laser energy & $70$ & J \\  
+       $f$ & Energy conversion efficiency & $1.2 \times 10^{-15} I^{0.75}$, max=0.5  & - \\   % valid only for I < 3.1x10^19 W/cm2
+       $I$ & Laser intensity & $4 \times 10^{20}$ & $W/cm^{2}$ \\ 
+       $T_{e}$ & Hot electron temperature & $m_{e} c^{2} [\sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}} -1} ]$ & J \\ 
+       $m_{e}$ & Electron mass & $9.11 \times 10^{-31}$ & Kg \\ 
+       $c$ & Speed of light & $3 \times 10^{8}$ & m/s \\ 
+       $\lambda$ & Laser wavelength & 0.8 & $\mu$m \\  
+       $t_{laser}$ & Laser pulse duration & $28 \times 10^{-15}$  & s \\  
+       $B$ & Radius of electron bunch & $B=r_{0} + d tan(\theta)$ & $m$ \\ 
+       $S_{sheath}$ & Electron acceleration area & $\pi B^{2}$ & $m^{2}$ \\ 
+       $r_{0}$ & Laser spot radius & $\sqrt{\frac{P_{laser}}{I \pi}}$, I in $W/m^{2}$ & m \\  
+       $d$ & Target thickness & $400-600 \times 10^{-9}$ & m \\  
+       $\theta$ & Electron half angle divergence & 0.436 & rad \\  
+       $P_{laser}$ & Laser power & $2.5 \times 10^{15}$, $P_{laser}=\frac{E_{laser}}{t_{laser}}$ & W \\  
+       $c_{s}$ & Ion-acoustic velocity & $(\frac{Z k_{B} T_{e}}{m_{i}})^{\frac{1}{2}}$ & m/s \\  
+       $Z$ & Ion charge number & 1 & - \\  
+       $k_{B}$ & Boltzmann constant & $1.380649 \times 10^{-23}$ & $m^{2} kg s^{-2} K^{-1}$ \\  
+       $m_{i}$ & Proton mass & $1.67 \times 10^{-27}$ & Kg \\ 
+       $P_{R}$ & Relativistic power unit & $\frac{m_{e} c^{2}}{r_{e}} = 8.71 \times 10^{9}$ & W \\  
+       $r_{e}$ & Electron radius & $2.82 \times 10^{-15}$ & m \\  
+       $\varepsilon_{i,\infty}$ & Maximum ion energy & $2 Z m_{e} c^{2} \sqrt{\frac{f P_{laser}}{P_{R}}}$ & MeV \\  
+       $t_{0}$ & Ballistic time & $\frac{B}{v(\infty)}$ & s \\  
+       $v(\infty)$ & Ballistic velocity & $\sqrt{\frac{2 \varepsilon_{i,\infty}}{m_{i}}}$ & m/s \\  
+      \hline
+      \caption{Parameters present in the TNSA analytical equation \ref{Eq:Spct:0}.}
+      \label{table:EnergySpectrumParameters}
+      \end{longtable}
+
+  \end{itemize}
+
+  To generate the energy spectrum, a practical approach is taken:
+  \begin{itemize}
+    \item Equation~\ref{Eq:Spct:0} is normalized.
+    \item A random number is generated between 0 and 1 for the y-axis.
+    \item If the number falls below the equation it gets accepted, otherwise the loop is repeated.
+    \item If accepted, the corresponding x-value (energy) is calculated and returned.
+  \end{itemize}
+
+
+
+\subsection{Angular Distribution}
+
+The angular distribution of the particles at the source has been approximated with a Gaussian distribution \cite{10.1038/s41598-019-41705-0}. 
+The following approach has been used to generate it:
+
+\begin{itemize}
+  \item The maximum divergence angle of the protons has been calculated based on the particle's energy.
+  \item A linear equation has been used that generates a maximum divergence angle of 20 degrees for the low energies, down to 5 degrees for the cut-off.
+  \item A gaussian distribution with a FWHM equal to the divergence angle has been used for each particle. 
+  \item A divergence angle is returned that falls within that distribution.
 \end{itemize}
 
-Para 3:
-\begin{itemize}
-  \item To generate the proton spectrum at the source, a practical
-    approach is taken.
-    The leading behaviour of equation \ref{Eq:Spct:0} is taken to be:
-    \begin{equation}
-      \frac{dN}{dE} = \Gamma
-        \frac{\exp\left[ -E^{\frac{1}{2}} \right]}{E^{\frac{1}{2}}}\, ;
-      \label{Eq:Spct:1}
-    \end{equation}
-  \item Normalisation of equation~\ref{Eq:Spct:1} between a minimum
-    energy ($E_{\rm min}$) and a maximum energy ($E_{\rm max}$) is
-    used to determine the constant $\Gamma$.
-    Both $E_{\rm min}$ and $E_{\rm max}$ are user defined and set at
-    the initialisation stage.
-\end{itemize}
+A beam diameter of 10 microns has been used.
