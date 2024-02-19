@@ -158,6 +158,7 @@ import BeamLineElement   as BLE
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
 constants_instance = PhysicalConstants()
+speed_of_light     = constants_instance.SoL()
 protonMASS         = constants_instance.mp()
 
 
@@ -472,6 +473,98 @@ class Particle:
                 axs[2, 1].hist(Scl[iLoc], 100)
                 axs[2, 1].set_xlabel('Epsilon')
                 axs[2, 1].set_ylabel('Number')
+
+        
+                pdf.savefig()
+                plt.close()
+            
+
+    def printProgression(self):
+        for iLoc in range(len(self.getLocation())):
+            with np.printoptions(linewidth=500,precision=5,suppress=True):
+                print(self.getLocation()[iLoc], ": z, s, trace space:", \
+                      self.getz()[iLoc], self.gets()[iLoc], \
+                      self.getTraceSpace()[iLoc])
+
+    @classmethod
+    def plotLongitudinalTraceSpaceProgression(cls):
+
+        font = {'family': 'serif', \
+                'color':  'darkred', \
+                'weight': 'normal', \
+                'size': 16, \
+                }
+        plt.rcParams["figure.figsize"] = (7.5, 10.)
+        
+        nLoc   = []
+        zLoc   = []
+        delLoc  = []
+        tLoc   = []
+        ELoc   = []
+        
+        nPrtcl = 0
+        for iPrtcl in cls.getParticleInstances():
+            nPrtcl += 1
+            if isinstance(iPrtcl, ReferenceParticle):
+                iRefPrtcl = iPrtcl
+                continue
+            iLoc = -1
+            for iTrcSpc in iPrtcl.getTraceSpace():
+                iLoc += 1
+                if iLoc > (len(zLoc)-1):
+                    nLoc.append(iPrtcl.getLocation()[iLoc])
+                    zLoc.append([])
+                    delLoc.append([])
+                    tLoc.append([])
+                    ELoc.append([])
+
+                p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc][:3], \
+                                     iRefPrtcl.getPrOut()[iLoc][:3]))
+                E0  = iRefPrtcl.getPrOut()[iLoc][3]
+                b0  = p0/E0
+                E   = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
+                p   = mth.sqrt(E**2 - protonMASS**2)
+                b   = p/E
+                E  -= protonMASS
+
+                t = iPrtcl.getTraceSpace()[iLoc][4] / (b*speed_of_light)
+                zLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][4])
+                delLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
+                tLoc[iLoc].append(t)
+                ELoc[iLoc].append(E)
+                
+        plotFILE = '99-Scratch/ParticleLongiProgressionPlot.pdf'
+        with PdfPages(plotFILE) as pdf:
+            for iLoc in range(len(zLoc)):
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
+                                        layout="constrained")
+                # add an artist, in this case a nice label in the middle...
+                Ttl = nLoc[iLoc]
+                fig.suptitle(Ttl, fontdict=font)
+
+                axs[0, 0].hist2d(zLoc[iLoc], delLoc[iLoc], bins=100)
+                axs[0, 0].set_xlabel('z (m)')
+                axs[0, 0].set_ylabel('delta')
+            
+                axs[0, 1].hist(delLoc[iLoc], 100)
+                axs[0, 1].set_xlabel('Delta')
+                axs[0, 1].set_ylabel('Number')
+
+                axs[1, 0].hist(zLoc[iLoc], 100)
+                axs[1, 0].set_xlabel('z (m)')
+                axs[1, 0].set_ylabel('Number')
+            
+                axs[1, 1].hist(tLoc[iLoc], 100)
+                axs[1, 1].set_xlabel('t (s)')
+                axs[1, 1].set_ylabel('Number')
+
+                axs[2, 0].hist(ELoc[iLoc], 100)
+                axs[2, 0].set_xlabel('Kinetic energy (MeV)')
+                axs[2, 0].set_ylabel('Number')
+
+                axs[2, 1].hist2d(tLoc[iLoc], ELoc[iLoc], bins=100)
+                axs[2, 1].set_xlabel('t (s)')
+                axs[2, 1].set_ylabel('Kinetic energy (MeV)')
 
         
                 pdf.savefig()
