@@ -527,8 +527,9 @@ class Particle:
                 b   = p/E
                 E  -= protonMASS
 
-                t = iPrtcl.getTraceSpace()[iLoc][4] / (b*speed_of_light)
-                zLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][4])
+                t = iPrtcl.getTraceSpace()[iLoc][4]*b0 / (b*speed_of_light)
+                
+                zLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][4]*b0)
                 delLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
                 tLoc[iLoc].append(t)
                 ELoc[iLoc].append(E)
