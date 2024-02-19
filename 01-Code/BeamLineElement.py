@@ -114,6 +114,7 @@ import matplotlib.patches as patches
 
 import PhysicalConstants as PhysCnst
 import Particle as Prtcl
+from Utilities import TrRotMat_z
 
 # .. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -1629,6 +1630,8 @@ class SectorDipole(BeamLineElement):
         _dvStrt=None,
         _Angle=None,
         _B=None,
+        _Plane="YZ",
+        _Direction="U",
     ):
         if self.getDebug():
             print(" SectorDipole(BeamLineElement).__init__: ")
@@ -1645,6 +1648,8 @@ class SectorDipole(BeamLineElement):
                 "SectorDipole: bad specification for bending angle (Angle)!"
             )
 
+        self.setPlane(_Plane)
+        self.setDirection(_Direction)
         self.setAngle(_Angle)
         self.setB(_B)
         self.setLength()  # Works out length - good.
@@ -1678,6 +1683,26 @@ class SectorDipole(BeamLineElement):
 
     # -------- "Set methods"
     # ..  Methods believed to be self-documenting(!)
+
+    def setDirection(self, _Direction):
+        if not (_Direction == "U" or _Direction == "D"):
+            raise badParameter(
+                "BeamLineElement.SectorDipole.setDirection:",
+                "bad plane specification (Direction):",
+                _Direction,
+            )
+        self._Direction = _Direction
+
+    def setPlane(self, _Plane):
+        if not (_Plane == "XZ" or _Plane == "YZ"):
+            raise badParameter(
+                "BeamLineElement.SectorDipole.setPlane:",
+                "bad plane specification (Plane):",
+                _Plane,
+            )
+
+        self._Plane = _Plane
+
     def setAngle(self, _Angle):
         if not isinstance(_Angle, float):
             raise badParameter(
@@ -1772,12 +1797,33 @@ class SectorDipole(BeamLineElement):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
             ]
         )
+        
+
+        dipolePlane = self.getPlane()
+        dipoleDirection = self.getDirection()
+
+        if dipoleDirection == "U" and dipolePlane == "YZ":
+            self._TrnsMtrx = TrRotMat_z(-np.pi) @ TrnsMtrx @ TrRotMat_z(np.pi)
+
+        elif dipoleDirection == "U" and dipolePlane == "XZ":
+            self._TrnsMtrx = (
+                TrRotMat_z(-np.pi - np.pi / 2)
+                @ TrnsMtrx
+                @ TrRotMat_z(np.pi + np.pi / 2)
+            )
+
+        elif dipoleDirection == "D" and dipolePlane == "YZ":
+            self._TrnsMtrx = TrRotMat_z(-np.pi / 2) @ TrnsMtrx @ TrRotMat_z(np.pi / 2)
+
+        elif dipoleDirection == "D" and dipolePlane == "XZ":
+            self._TrnsMtrx = TrnsMtrx
+
+        else:
+            raise badParameter("bad bend specification")
 
         if self.getDebug():
             with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print(TrnsMtrx)
-
-        self._TrnsMtrx = TrnsMtrx
 
     @classmethod
     def setDebug(cls, Debug):
@@ -1788,6 +1834,12 @@ class SectorDipole(BeamLineElement):
     @classmethod
     def getDebug(cls):
         return cls.__Debug
+
+    def getPlane(self):
+        return self._Plane
+
+    def getDirection(self):
+        return self._Direction
 
     def getAngle(self):
         return self._Angle

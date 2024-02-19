@@ -559,6 +559,7 @@ class Particle:
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (Lab; x-z plane)")
+
             for z in z_lab_RefPrtcl:
                 axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
 
@@ -582,6 +583,7 @@ class Particle:
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
+
             print("vline", len(segments_end_YZ[0, :, 0]))
             for z in z_lab_RefPrtcl:
                 axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
@@ -623,22 +625,21 @@ class Particle:
                 NLocs = len(iPrtcl.getRrOut())
                 x_RPLC = np.full((NInsts, NLocs), np.nan)
                 y_RPLC = np.full((NInsts, NLocs), np.nan)
-                z_RPLC = np.full((NInsts, NLocs), np.nan)
-                s_RPLC = np.array(iPrtcl.gets())
-                z_RPLC_RefPrtcl = np.array(iPrtcl.getsIn())[mask]
+                s = np.full((NInsts, NLocs), np.nan)
+                s_element_list = np.array(iPrtcl.getsIn())[mask]
                 continue
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
-            icoords = np.array(iPrtcl.getRPLCPhaseSpace())
+            s_Records = np.array(iPrtcl.gets())
 
             maxN = len(iTraceSpace)
 
             x_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 0]
             y_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 2]
-            z_RPLC[nPrtcl, :maxN] = icoords[:, 0, 2] + s_RPLC[:maxN]
+            s[nPrtcl, :maxN] = s_Records
 
-        segmentsYZ = np.dstack((z_RPLC, y_RPLC))
-        segmentsXZ = np.dstack((z_RPLC, x_RPLC))
+        segmentsYZ = np.dstack((s, y_RPLC))
+        segmentsXZ = np.dstack((s, x_RPLC))
 
         if axxz is not None:
 
@@ -661,8 +662,8 @@ class Particle:
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
 
-            for z in z_RPLC_RefPrtcl:
-                axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+            for s in s_element_list:
+                axxz.axvline(x=s, color="black", linestyle="--", linewidth=0.1)
 
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
@@ -682,8 +683,9 @@ class Particle:
             axyz.set_ylabel("y [m]")
 
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
-            for z in z_RPLC_RefPrtcl:
-                axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+
+            for s in s_element_list:
+                axyz.axvline(x=s, color="black", linestyle="--", linewidth=0.1)
 
         return line_collection_list
 
@@ -1501,11 +1503,42 @@ class ReferenceParticle(Particle):
             + self.getPrOut()[nRcrds - 1][2] ** 2
         )
 
-        # B field in y direction
+        dipolePlane = iBLE.getPlane()
+        dipoleDirection = iBLE.getDirection()
 
-        theta = -iBLE.getAngle()  # only dipole here
-        thetap = theta / 2
-        thetaZ = 0  # chooses the plane of bend
+        # Default is upward bend in YZ
+
+        if dipoleDirection == "U" and dipolePlane == "YZ":
+            theta = -iBLE.getAngle()
+            thetap = theta / 2
+            Rotation = RotMat_x(thetap)
+            Rotation2 = RotMat_x(theta)
+
+        # Conditions for upward bend in XZ
+
+        elif dipoleDirection == "U" and dipolePlane == "XZ":
+            theta = iBLE.getAngle()
+            thetap = theta / 2
+            Rotation = RotMat_y(thetap)
+            Rotation2 = RotMat_y(theta)
+
+        # Conditions for downward bend in YZ
+
+        elif dipoleDirection == "D" and dipolePlane == "YZ":
+            theta = iBLE.getAngle()
+            thetap = theta / 2
+            Rotation = RotMat_x(thetap)
+            Rotation2 = RotMat_x(theta)
+
+        # Conditions for downward bend in XZ
+        elif dipoleDirection == "D" and dipolePlane == "XZ":
+            theta = -theta
+            thetap = theta / 2
+            Rotation = RotMat_y(thetap)
+            Rotation2 = RotMat_y(theta)
+
+        else:
+            raise badParameter("bad bend specification")
 
         cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
         cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
@@ -1513,7 +1546,7 @@ class ReferenceParticle(Particle):
 
         unit = np.array([cx, cy, cz])
 
-        cx, cy, cz = RotMat_z(thetaZ) @ RotMat_x(thetap) @ RotMat_z(thetaZ).T @ unit
+        cx, cy, cz = Rotation @ unit
 
         Brho = (1 / (speed_of_light * 1.0e-9)) * Mmtm / 1000.0
         r = Brho / iBLE.getB()
@@ -1521,6 +1554,7 @@ class ReferenceParticle(Particle):
 
         print("d:", d)
         print("r:", r)
+
         # works out chord vector
 
         RrOut = np.array(
@@ -1538,13 +1572,16 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        # Momentum; rotate by theta?
+        # Momentum; rotate by theta
 
         PrIn = self.getPrOut()[nRcrds - 1]  # PrIn unchanged
         PrOut = np.zeros(4)
-        PrOut[0:3] = (
-            RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
-        )  # Rotate PrOut
+        PrOut[0:3] = Rotation2 @ PrIn[0:3]
+
+        # PrOut[0:3] = (
+        # RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
+        # )  # Rotate PrOut
+
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1556,7 +1593,8 @@ class ReferenceParticle(Particle):
         # Now define coordinate axes rotation
 
         Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]  # accumulated rotation
-        Rot2LabOut = RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ Rot2LabIn
+        Rot2LabOut = Rotation2 @ Rot2LabIn
+
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")

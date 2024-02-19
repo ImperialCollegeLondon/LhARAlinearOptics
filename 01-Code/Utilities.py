@@ -52,6 +52,27 @@ def RotMat_z(theta):
 
     return Mz
 
+def TrRotMat_z(theta):
+    MTr=np.array(
+        [
+            [np.cos(theta), 0.0, -np.sin(theta),0.0,0.0,0.0],
+            [0.0, np.cos(theta), 0.0,-np.sin(theta),0.0,0.0],
+            [np.sin(theta), 0.0, np.cos(theta) ,0.0,0.0,0.0],
+            [0.0, np.sin(theta), 0.0,np.cos(theta),0.0,0.0],
+            [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0,0.0,0.0,1.0],
+
+
+        ]
+    )
+   
+    return MTr
+
+
+    
+
+
+
 
 # --------------------------------------------------------------------------------------
 # Plotting

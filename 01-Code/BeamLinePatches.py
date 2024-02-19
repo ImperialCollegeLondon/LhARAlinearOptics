@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import matplotlib.patches as patches
@@ -86,7 +87,7 @@ class dipolePatch(patchBLE):
             width=2 * w,
             facecolor="lightblue",
             label="Dipole",
-            alpha=1,
+            alpha=0.5,
             zorder=999,
         )
 

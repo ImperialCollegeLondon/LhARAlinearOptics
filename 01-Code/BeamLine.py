@@ -762,8 +762,8 @@ class BeamLine(object):
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dipole":
                 if NewElement:
-                    if iLine.Type == "Sector (Length, angle)":
-                        nLnsDpl = 2
+                    if iLine.Type == "Sector (Length, Angle, Plane, Direction)":
+                        nLnsDpl = 4
                         iLnDpl = 1
                     else:
                         raise badParameter(
@@ -775,8 +775,18 @@ class BeamLine(object):
                 if iLine.Parameter == "Length":
                     DplL = float(iLine.Value)
                 elif iLine.Parameter == "Angle":
-                    DplA = float(iLine.Value)
+                    DplA = np.abs(float(iLine.Value))
                     DplA = DplA * mth.pi / 180.0
+                elif iLine.Parameter == "Plane":
+                    if str(iLine.Value) == "XZ" or str(iLine.Value) == "YZ":
+                        Plane = str(iLine.Value)
+                    else:
+                        raise badParameter("bad Plane specification.")
+                elif iLine.Parameter == "Direction":
+                    if str(iLine.Value) == "U" or str(iLine.Value) == "D":
+                        Direction = str(iLine.Value)
+                    else:
+                        raise badParameter("bad Direction specification.")
                 if iLnDpl < nLnsDpl:
                     iLnDpl += 1
                     NewElement = False
@@ -791,7 +801,7 @@ class BeamLine(object):
                 Name += str(nDpl)
                 rho = DplL / DplA
                 B = (1 / (speed_of_light * 1.0e-9)) * p0 / rho / 1000.0
-                iBLE = BLE.SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, DplA, B)
+                iBLE = BLE.SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, DplA, B, Plane, Direction)
                 cls._Element.append(iBLE)
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtSectorDipole(iBLE)
