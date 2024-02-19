@@ -99,14 +99,14 @@ print()
 figRPLC, axRPLC = plt.subplots(
     nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True
 )
-axRPLC[0].set_ylim(-0.04, 1)
-axRPLC[1].set_ylim(-1, 1)
+axRPLC[0].set_ylim(-5, 5)
+axRPLC[1].set_ylim(-5, 5)
 
 figLAB, axLAB = plt.subplots(
     nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True
 )
 
-axLAB[0].set_ylim(-0.05, 1)
+axLAB[0].set_ylim(-5, -5)
 axLAB[1].set_ylim(-5, 5)
 print(" ----> Plot progression:")
 

@@ -1797,7 +1797,6 @@ class SectorDipole(BeamLineElement):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
             ]
         )
-        
 
         dipolePlane = self.getPlane()
         dipoleDirection = self.getDirection()

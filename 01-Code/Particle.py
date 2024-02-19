@@ -659,7 +659,7 @@ class Particle:
             axxz.add_collection(line_collection_end)
             axxz.add_collection(line_collection_terminated)
             axxz.set_xlabel("s [m]")
-            axxz.set_ylabel("x [m]")
+            axxz.set_ylabel(r"$x_{\text{RPLC}}$ [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
 
             for s in s_element_list:
@@ -680,7 +680,7 @@ class Particle:
             axyz.add_collection(line_collection_2)
             axyz.add_collection(line_collection_terminated)
             axyz.set_xlabel("s [m]")
-            axyz.set_ylabel("y [m]")
+            axyz.set_ylabel(r"$y_{\text{RPLC}}$ [m]")
 
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
 

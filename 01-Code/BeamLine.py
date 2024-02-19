@@ -633,7 +633,7 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt = np.array([0.0, 0.0, s ])
+                rStrt = np.array([0.0, 0.0, s])
                 vStrt = np.array([0.0, 0.0])
                 drStrt = np.array([0.0, 0.0, 0.0])
                 dvStrt = np.array([0.0, 0.0])
@@ -801,8 +801,11 @@ class BeamLine(object):
                 Name += str(nDpl)
                 rho = DplL / DplA
                 B = (1 / (speed_of_light * 1.0e-9)) * p0 / rho / 1000.0
-                iBLE = BLE.SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, DplA, B, Plane, Direction)
+                iBLE = BLE.SectorDipole(
+                    Name, rStrt, vStrt, drStrt, dvStrt, DplA, B, Plane, Direction
+                )
                 cls._Element.append(iBLE)
+                s += DplL
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtSectorDipole(iBLE)
 
@@ -909,13 +912,12 @@ class BeamLine(object):
                         print("              ---->", " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd    = -999999.
-                    sEnd    = iBLE.getrStrt()[2] 
-                    print("test",iBLE.getrStrt()[2])
-                    Success = PrtclInst.recordParticle(iBLE.getName(), \
-                                    zEnd, \
-                                    sEnd, \
-                                    TrcSpc)
+                    zEnd = -999999.0
+                    sEnd = iBLE.getrStrt()[2]
+                    print("test", iBLE.getrStrt()[2])
+                    Success = PrtclInst.recordParticle(
+                        iBLE.getName(), zEnd, sEnd, TrcSpc
+                    )
                 TrcSpc_i = TrcSpc
 
             if cls.getDebug():
