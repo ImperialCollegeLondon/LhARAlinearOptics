@@ -110,6 +110,10 @@ import scipy  as sp
 import numpy  as np
 import math   as mth
 import random as rnd
+import scipy
+from scipy.optimize import fsolve
+import random as random
+import math
 
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
@@ -1070,7 +1074,8 @@ class FocusQuadrupole(BeamLineElement):
         else:
             E   = E0 + _R[5]*p0
             p   = mth.sqrt(E**2 - protonMASS**2)
-            Scl = p0 / p
+            if p > 0:
+                Scl = p0 / p
         
         if self.getDebug():
             print("     ----> D:", D)
@@ -1381,7 +1386,8 @@ class DefocusQuadrupole(BeamLineElement):
         else:
             E   = E0 + _R[5]*p0
             p   = mth.sqrt(E**2 - protonMASS**2)
-            Scl = p0 / p
+            if p > 0:
+                Scl = p0 / p
         
         if self.getDebug():
             print("     ----> D:", D)
@@ -2913,7 +2919,14 @@ Derived class Source:
              [2] - Minimum cos theta to generate
              [3] - E_min: min energy to generate
              [4] - E_max: max energy to generate
-             [5] - N_stp: number of steps for numerical integration
+             [5] - nPnts: Number of points to sample for integration of PDF
+             [6] - P_L: Laser power [W]
+             [7] - E_L: Laser energy [J]
+             [8] - lamda: Laser wavelength [um]
+             [9] - t_laser: Laser pulse duration [s]
+             [10] - d: Laser thickness [m]
+             [11] - I: Laser intensity [W/cm2]
+             [12] - theta_degrees: Electron divergence angle [degrees]
            Gaussian (Mode=1):
              [0] - Sigma of x gaussian - m
              [1] - Sigma of y gaussian - m
@@ -2993,7 +3006,11 @@ class Source(BeamLineElement):
 
     ModeList   = [0, 1, 2]
     ModeText   = ["Parameterised laser driven", "Gaussian", "Flat"]
-    ParamList  = [ [float, float, float, float, float, int], \
+    #ParamList  = [ [float, float, float, float, float, int], \
+    #               [float, float, float, float, float],      \
+    #               [float, float, float, float, float] ]
+    ParamList  = [ [float, float, float, float, float, int, \
+                    float, float, float, float, float, float, float], \
                    [float, float, float, float, float],      \
                    [float, float, float, float, float] ]
 
@@ -3229,7 +3246,17 @@ class Source(BeamLineElement):
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
             cosTheta, Phi = self.getFlatThetaPhi()
-            KE            = self.getLaserDrivenProtonEnergy()
+
+            # LION beamline
+            P_L = self.getParameters()[6]
+            E_laser = self.getParameters()[7]
+            lamda = self.getParameters()[8]
+            t_laser = self.getParameters()[9]
+            d = self.getParameters()[10]
+            I = self.getParameters()[11]
+            theta_degrees = self.getParameters()[12]
+
+            KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)  # [MeV]
 
         elif self._Mode == 1:
             X             = rnd.gauss(0., self.getParameters()[0])
@@ -3258,37 +3285,204 @@ class Source(BeamLineElement):
         cosTheta = rnd.uniform(self.getParameters()[2], 1.)
         Phi      = rnd.uniform( 0., 2.*mth.pi)
         return cosTheta, Phi
+    
 
-    def getLaserDrivenProtonEnergy(self):
+
+    ### Gaussian Angular Distribution ### 
+    # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
+    def g_theta(self,energy):
+        theta = 20 - 0.565 * energy      
+        return theta
+    
+    # Single angle generator with acceptance-rejection
+    def angle_generator(self,E_MeV):
+
+        while True:
+
+            theta_E = self.g_theta(E_MeV)         # [degrees]
+            theta_E = np.radians(theta_E)         # [rad]
+            phi = random.uniform(0, 2 * math.pi)  # [rad]
+
+            sigma_x = 10e-6
+            sigma_y = 10e-6
+
+            # Generate x, y as per Gaussian distribution
+            x = np.random.normal(0, sigma_x)
+            y = np.random.normal(0, sigma_y)
+
+            # Check acceptance based on Gaussian probability density function
+            acceptance_prob = self.g_xy(x, y, sigma_x, sigma_y)
+            if np.random.random() < acceptance_prob:
+
+                theta = np.random.normal(0, theta_E)
+
+                return theta, phi
+
+
+    def getGaussianThetaPhi(self):
+
+        P_L = self._Param[6]
+        E_laser = self._Param[7]
+        lamda = self._Param[8]
+        t_laser = self._Param[9]
+        d = self._Param[10]
+        I = self._Param[11]
+        theta_degrees = self._Param[12]
+
+        E_MeV = self.getLaserDrivenProtonEnergy(self, \
+                    P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
+
+        theta = self.angle_generator(self,E_MeV)[0]
+        cosTheta = np.cos(theta)
+        Phi = self.angle_generator(self,E_MeV)[1]
+
+        return cosTheta, Phi
+
+
+
+
+    #def getLaserDrivenProtonEnergy(self):
+    #    if not Source.LsrDrvnIni:
+    #        if self.__Debug:
+    #            print(" BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
+    #                  " initialise")
+    #        Source.LsrDrvnIni = True
+    #        E_min = self._Param[3]
+    #        E_max = self._Param[4]
+    #        N_stp = self._Param[5]
+    #        E_stp = (E_max - E_min) / float(N_stp)
+    #        Ei, E_stp1 = np.linspace(E_min, E_max, N_stp, False, True, float)
+    #        g_E = np.exp(-np.sqrt(Ei)) / np.sqrt(Ei)
+    #        g_E /= np.sum(g_E)    # normalize the probability distribution
+    #        G_E  = np.cumsum(g_E) # cumulative probability distribution
+    #        if self.__Debug:
+    #            print("     ----> E_min, E_max, N_stp, E_stp, E_stp1:", \
+    #                  E_min, E_max, N_stp, E_stp, E_stp1)
+    #        Source.LsrDrvnG_E = G_E
+    #
+    #    #.. Generate random numbers from the distribution using
+    #    #   inverse transform sampling
+#
+    #    G_E = Source.LsrDrvnG_E
+    #    iE  = np.searchsorted(G_E, rnd.uniform(0., 1.))
+    #    E   = self._Param[3] + \
+    #        float(iE) * (self._Param[4] - self._Param[3]) / \
+    #        float(self._Param[5])
+    #    if self.__Debug:
+    #        print("     ----> iE, E:", iE, E)
+#
+    #    return E
+
+
+    # Calculates the rest of the parameters needed for the parametrisation
+    def parameters(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+
+        c = 3e8               # Speed of light in vacuum [m/s]
+        m_e = 9.11e-31        # Electron mass [Kg]
+        m_i = 1836*9.1e-31    # Proton mass [kg]
+        k_B = 1.380649e-23    # Boltzman constant [J/K]
+        Z = 1                 # Ion charge number   
+
+        # Laser ponderomotive potential [J], intensity in [W/cm2]
+        T_p = m_e*(c**2)*(np.sqrt(1 + (I*(lamda**2)/(1.37*1e18)))-1)    
+        T_e = T_p   # Hot electron temperature [J]
+
+        # Fraction of laser energy converted into hot electron energy,
+        # intensity in [W/cm2]
+        f = 1.2* (10**(-15)) * (I**(0.75)) 
+        if f < 0.5:
+            f = f
+        else:
+            f = 0.5
+
+        # Total number of electrons accelerated into the targe
+        N_E = f*E_laser/T_p    
+
+        I_m = I*10000                    # Convert intensity from W/cm2 to W/m2
+        r0 = np.sqrt(P_L/(I_m*np.pi))    # Radius of the laser spot [m]
+
+        # Area over which electrons are accelerated and spread [m^2]
+        theta = mth.radians(theta_degrees)  # Half-angle divergence [radians] 
+        B = r0 + (d * np.tan(theta))
+        s_sheath = np.pi*(B)**2 
+
+        ne_0 = N_E/(c*t_laser*s_sheath)      # Hot electron density [pp/m^3]
+        c_s = np.sqrt(Z*k_B*T_e/m_i)         # Ion-acoustic velocity [m/s]
+
+        r_e = 2.82e-15              # Electron radius [m]
+        P_R = m_e * (c**3) / r_e    # Relativistic power unit [W]
+
+        # Maximum possible energy without considering the laser pulse
+        # length (infinite acceleration)
+        E_i_inf = Z * 2 * m_e * (c**2) * np.sqrt((f*P_L)/P_R)  # [J]
+
+        # Calculates the ballistic time [s]
+        v_inf = np.sqrt((2*E_i_inf/m_i))
+        t_0 = B/v_inf
+
+        # Defines the function to solve for f(x) = 0
+        def equation(X, t_laser, t_0):
+            return (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
+                (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
+        # Solves the equation numerically for X
+        initial_guess = 0.5  
+        X_solution = fsolve(equation, initial_guess, args=(t_laser, t_0))
+        X = X_solution[0]
+
+        E_max = E_i_inf*(X**2)  # [J]
+
+        return ne_0, c_s, s_sheath, T_e, E_max
+
+
+    # Generates energy values for the distribution
+    def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+
         if not Source.LsrDrvnIni:
             if self.__Debug:
                 print(" BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
-                      " initialise")
+                    " initialise")
             Source.LsrDrvnIni = True
-            E_min = self._Param[3]
-            E_max = self._Param[4]
-            N_stp = self._Param[5]
-            E_stp = (E_max - E_min) / float(N_stp)
-            Ei, E_stp1 = np.linspace(E_min, E_max, N_stp, False, True, float)
-            g_E = np.exp(-np.sqrt(Ei)) / np.sqrt(Ei)
-            g_E /= np.sum(g_E)    # normalize the probability distribution
-            G_E  = np.cumsum(g_E) # cumulative probability distribution
-            if self.__Debug:
-                print("     ----> E_min, E_max, N_stp, E_stp, E_stp1:", \
-                      E_min, E_max, N_stp, E_stp, E_stp1)
-            Source.LsrDrvnG_E = G_E
-    
-        #.. Generate random numbers from the distribution using
-        #   inverse transform sampling
 
-        G_E = Source.LsrDrvnG_E
-        iE  = np.searchsorted(G_E, rnd.uniform(0., 1.))
-        E   = self._Param[3] + \
-            float(iE) * (self._Param[4] - self._Param[3]) / \
-            float(self._Param[5])
-        if self.__Debug:
-            print("     ----> iE, E:", iE, E)
+        P_L = self._Param[6]
+        E_laser = self._Param[7]
+        lamda = self._Param[8]
+        t_laser = self._Param[9]
+        d = self._Param[10]
+        I = self._Param[11]
+        theta_degrees = self._Param[12]
+
+        ne_0 = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                        theta_degrees)[0]      # Hot electron density [pp/m^3]
+        c_s = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                         theta_degrees)[1]       # Ion-acoustic velocity [m/s]
+        s_sheath = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+            theta_degrees)[2]  # Area over which electrons are 
+                               # accelerated and spread [m^2]
+        T_e = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                        theta_degrees)[3]       # Hot electron temperature [J]
+        E_max = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
+                                theta_degrees)[4]     # Maximum ion energy [J]
         
+        E_min = 0.00001*1.6e-19*1e6        # [J]
+        E = np.linspace(E_min,E_max,1000)  # [J]
+
+        # Required distribution
+        g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * np.exp(-np.sqrt(2 * E / T_e))
+        g_E /= np.sum(g_E)   # Normalize the probability distribution
+
+        # Generate random numbers from the distribution using inverse \
+        # transform sampling
+        cumulative_prob = np.cumsum(g_E)     # Computes the cumulative \
+                                             # probability distribution
+        random_numbers = np.random.random()  # Generates a random number \
+                                             # between 0 and 1
+        sampled_indices = np.searchsorted(cumulative_prob, random_numbers)
+        # Finds the index in cumulative_prob
+        sampled_data = E[sampled_indices]    # Selects the energy value
+                                             # corresponding to this index
+
+        E = sampled_data/1.6e-19/1e6         # [MeV]
+
         return E
 
     def getTraceSpace(self, x, y, K, cTheta, Phi):
