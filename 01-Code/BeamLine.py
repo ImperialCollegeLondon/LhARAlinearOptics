@@ -542,6 +542,7 @@ class BeamLine(object):
                 nSlnd     = 0
                 nGbrLns   = 0
                 nDpl      = 0
+                nCvty     = 0
 
             if iLine.Element == "Drift":
                 nDrift   += 1
@@ -761,6 +762,41 @@ class BeamLine(object):
                 B       = (1/(speed_of_light*1.E-9))*p0/rho/1000.
                 cls._Element.append(BLE.SectorDipole(Name, \
                                 rStrt, vStrt, drStrt, dvStrt, DplA, B))
+                s += cls._Element[len(cls._Element)-1].getLength()
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+            elif iLine.Element == "Cavity":
+                if NewElement:
+                    if iLine.Type == "Cylindrical":
+                        nLnsCvty = 3
+                        iLnCvty  = 1
+                    else:
+                        raise badParameter(" BeamLine.addbeam: Cavity", \
+                                           " Type=", iLine.Type, \
+                                           " invalid.")
+                if iLine.Parameter == "Gradient":
+                    CylCvtyGrdnt  = float(iLine.Value)
+                elif iLine.Parameter == "Frequency":
+                    CylCvtyFrqncy = float(iLine.Value)
+                elif iLine.Parameter == "Phase":
+                    CylCvtyPhs    = float(iLine.Value)
+                    CylCvtyPhs    = CylCvtyPhs * mth.pi / 180.
+                if iLnCvty < nLnsCvty:
+                    iLnCvty += 1
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                rStrt   = np.array([0.,0.,s])
+                vStrt   = np.array([0.,0.])
+                drStrt  = np.array([0.,0.,0.])
+                dvStrt  = np.array([0.,0.])
+                nCvty   += 1
+                Name    += str(nCvty)
+                cls._Element.append(BLE.CylindricalRFCavity(Name, \
+                                    rStrt, vStrt, drStrt, dvStrt, \
+                                    CylCvtyGrdnt, CylCvtyFrqncy, CylCvtyPhs))
+                s += cls._Element[len(cls._Element)-1].getLength()
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
 

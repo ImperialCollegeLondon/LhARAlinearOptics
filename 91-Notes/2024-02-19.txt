@@ -1,0 +1,46 @@
+--------  --------  --------  --------  --------  --------  --------  20Feb24
+Implemented cylindrical cavity in LhARA laser-driven spread.  Spreadsheets now
+a bit inconsistent.  Need to clean this up.
+
+While doing the update for cylindrical RF cavity, I noticed a bug in
+addBeamLine which meant that s was not updated when a dipole was added.  This
+is now fixed.
+
+Decided to push fixes and let users know.  Need to run through all tests,
+but LhARA scripts seem to work.
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamLineTst.py          - 
+ - BeamLineElementTst.py   - 
+ - CylindricalRFCavityTst  -
+ - DRACOfacilityTst.py     - 	
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DriftTst.py             - 
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         - 
+ - LIONfacilityTst.py      - 
+ - LhARAFacilityTst.py     - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - 
+ - PhysicalConstantsTst.py - 
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestRead.py             - 
+ - TestWrite.py            - 
+
+Scripts:
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotQuadTriplet.py      - 
+ - plotTrajectory.py       - 
+ - LhARAMagnetTable.py     - 
+
