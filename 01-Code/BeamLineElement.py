@@ -2452,7 +2452,7 @@ Derived class CylindricalRFCavity:
 """
 class CylindricalRFCavity(BeamLineElement):
     instances = []
-    __Debug = True
+    __Debug = False
 
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
@@ -2498,12 +2498,11 @@ class CylindricalRFCavity(BeamLineElement):
         iPrev = len(iRefPrtcl.getPrOut()) - 1
         b0        = iRefPrtcl.getb0(iPrev)
         g0b0      = iRefPrtcl.getg0b0(iPrev)
-        print(b0, g0b0)
         
         _Length   = mth.pi*b0*speed_of_light / \
             self.getAngularFrequency()
         self.setLength(_Length)
-        print(sp.special.jn_zeros(0, 1))
+
         _Radius   = sp.special.jn_zeros(0, 1)[0]/self.getWaveNumber()
         self.setRadius(_Radius)
 
@@ -2589,6 +2588,14 @@ class CylindricalRFCavity(BeamLineElement):
             print("     ----> m_rf: \n", self.getmrf())
         BeamLineElement.__str__(self)
         return " <---- CylindricalRFCavity parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "CylindricalCavity: " + BeamLineElement.SummaryStr(self) + \
+            "; Gradient = " + str(self.getGradient())   + \
+            "; Frequency = " + str(self.getFrequency()) + \
+            "; Phase = " + str(self.getPhase())
+        return Str
+
 
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
