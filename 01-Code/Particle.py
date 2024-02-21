@@ -499,8 +499,6 @@ class Particle:
         x_lab = []
         y_lab = []
         z_lab = []
-        print("beamline", BLE.BeamLineElement.getinstances()[1:])
-
         mask = np.array(
             [
                 isinstance(
@@ -535,7 +533,7 @@ class Particle:
             x_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 0]
             y_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 1]
             z_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 2]
-        # print(x_lab)
+
         segmentsYZ = np.dstack((z_lab, y_lab))
         segmentsXZ = np.dstack((z_lab, x_lab))
 
@@ -584,7 +582,6 @@ class Particle:
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
 
-            # print("vline", len(segments_end_YZ[0, :, 0]))
             for z in z_lab_RefPrtcl:
                 axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
 
@@ -598,7 +595,7 @@ class Particle:
 
         x_RPLC = []
         y_RPLC = []
-        z_RPLC = []
+
         mask = np.array(
             [
                 isinstance(
@@ -788,13 +785,7 @@ class Particle:
 
         iRefPrtcl = ReferenceParticle.getParticleInstances()[0]
 
-        p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[0][:3], iRefPrtcl.getPrOut()[0][:3]))
-        E0 = iRefPrtcl.getPrOut()[0][3]
-        b0 = p0 / E0
-
-        # do this iteratively
-
-        rRPLC = np.array([TrcSpc[0], TrcSpc[2], TrcSpc[4] * b0])
+        rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0])
 
         p0 = BL.BeamLine.getElement()[0].getp0()
 
@@ -1586,10 +1577,6 @@ class ReferenceParticle(Particle):
         PrOut = np.zeros(4)
         PrOut[0:3] = Rotation2 @ PrIn[0:3]
 
-        # PrOut[0:3] = (
-        # RotMat_z(thetaZ) @ RotMat_x(theta) @ RotMat_z(thetaZ).T @ PrIn[0:3]
-        # )  # Rotate PrOut
-
         PrOut[3] = PrIn[3]  # Energy unchanged
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1612,7 +1599,6 @@ class ReferenceParticle(Particle):
 
         # .. Now particle position/trace space:
 
-        # WRONG CHANGE!!!
         Success = self.setz(self.getRrOut()[nRcrds][2])
         if not Success:
             raise fail2setReferenceParticle("setz")
@@ -1620,7 +1606,6 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("sets")
 
-        # Not sure about this?
         TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:

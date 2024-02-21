@@ -1811,7 +1811,7 @@ class SectorDipole(BeamLineElement):
                 @ TrRotMat_z(np.pi + np.pi / 2)
             )
 
-        elif dipoleDirection == "D" and dipolePlane == "XZ":
+        elif dipoleDirection == "D" and dipolePlane == "YZ":
             self._TrnsMtrx = TrRotMat_z(-np.pi / 2) @ TrnsMtrx @ TrRotMat_z(np.pi / 2)
 
         elif dipoleDirection == "D" and dipolePlane == "XZ":

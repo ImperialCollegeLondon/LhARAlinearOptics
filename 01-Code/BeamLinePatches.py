@@ -55,8 +55,6 @@ class patchBLE:
         A2D[0:2, 0:2] = Mat
         A2D[0:2, 2] = dR
 
-        print(A2D)
-
         trans = mpl.transforms.Affine2D(A2D)
 
         self.append_Trans(trans)
@@ -75,9 +73,7 @@ class patchBLE:
 
 class dipolePatch(patchBLE):
 
-    def __init__(self, ax, angle, R, w):
-
-        print("patch3:", R)
+    def __init__(self, ax, angle, R, w, orientation):
 
         Patch = patches.Wedge(
             center=[0, 0],
@@ -87,18 +83,20 @@ class dipolePatch(patchBLE):
             width=2 * w,
             facecolor="lightblue",
             label="Dipole",
-            alpha=0.5,
-            zorder=999,
+            alpha=1,
+            zorder=999,  # so is always plotted on top
         )
 
         r = mpl.transforms.Affine2D().rotate_deg(-90)
         t = mpl.transforms.Affine2D().translate(0, R)
         refx = mpl.transforms.Affine2D(np.array([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))
 
-        if angle >= 0:
+        if orientation == "U":
             trans = r + t
-        elif angle < 0:
+        elif orientation == "D":
             trans = r + t + refx
+        else:
+            raise Exception("bad orientation parameter")
 
         self.set_Patch(Patch)
         self.set_ax(ax)

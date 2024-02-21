@@ -96,18 +96,14 @@ print()
 print("========  Plotting: START  ========")
 print()
 
-figRPLC, axRPLC = plt.subplots(
-    nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True
-)
-axRPLC[0].set_ylim(-0.1, 0.1)
-axRPLC[1].set_ylim(-0.1, 0.1)
+figRPLC, axRPLC = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0))
+axRPLC[0].set_ylim(-0.05, 0.05)
+axRPLC[1].set_ylim(-0.05, 0.05)
 
-figLAB, axLAB = plt.subplots(
-    nrows=2, ncols=1, figsize=(11.0, 11.0), constrained_layout=True
-)
+figLAB, axLAB = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0))
 
-axLAB[0].set_ylim(-0.5, 7)
-axLAB[1].set_ylim(-0.5, 7)
+axLAB[0].set_ylim(-0.1, 0.1)
+axLAB[1].set_ylim(-0.5, 6)
 
 print(" ----> Plot progression:")
 
