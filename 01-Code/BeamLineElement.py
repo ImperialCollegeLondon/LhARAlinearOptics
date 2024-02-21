@@ -1797,15 +1797,14 @@ class SectorDipole(BeamLineElement):
                 [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
             ]
         )
-        
 
         dipolePlane = self.getPlane()
         dipoleDirection = self.getDirection()
 
-        if dipoleDirection == "U" and dipolePlane == "YZ":
+        if dipoleDirection == "U" and dipolePlane == "XZ":
             self._TrnsMtrx = TrRotMat_z(-np.pi) @ TrnsMtrx @ TrRotMat_z(np.pi)
 
-        elif dipoleDirection == "U" and dipolePlane == "XZ":
+        elif dipoleDirection == "U" and dipolePlane == "YZ":
             self._TrnsMtrx = (
                 TrRotMat_z(-np.pi - np.pi / 2)
                 @ TrnsMtrx

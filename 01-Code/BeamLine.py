@@ -555,6 +555,7 @@ class BeamLine(object):
 
             if iLine.Element == "Drift":
                 nDrift += 1
+
                 Name = Name + str(nDrift)
                 Length = float(iLine.Value)
                 rStrt = np.array([0.0, 0.0, s])
@@ -565,7 +566,7 @@ class BeamLine(object):
                     print("             ----> Add", Name)
                 iBLE = BLE.Drift(Name, rStrt, vStrt, drStrt, dvStrt, Length)
                 cls._Element.append(iBLE)
-                s += Length
+                s += iBLE.getLength()
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
@@ -616,7 +617,7 @@ class BeamLine(object):
                     print("             ----> Add", Name)
                 iBLE = BLE.FocusQuadrupole(Name, rStrt, vStrt, drStrt, dvStrt, FqL, FqS)
                 cls._Element.append(iBLE)
-                s += FqL
+                s += iBLE.getLength()
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dquad":
@@ -633,7 +634,7 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt = np.array([0.0, 0.0, s ])
+                rStrt = np.array([0.0, 0.0, s])
                 vStrt = np.array([0.0, 0.0])
                 drStrt = np.array([0.0, 0.0, 0.0])
                 dvStrt = np.array([0.0, 0.0])
@@ -645,7 +646,7 @@ class BeamLine(object):
                     Name, rStrt, vStrt, drStrt, dvStrt, DqL, DqS
                 )
                 cls._Element.append(iBLE)
-                s += DqL
+                s += iBLE.getLength()
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Solenoid":
@@ -697,10 +698,9 @@ class BeamLine(object):
                     )
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls._Element.append(
-                    BLE.Solenoid(Name, rStrt, vStrt, drStrt, dvStrt, SlndL, B0)
-                )
-                s += SlndL
+                iBLE = BLE.Solenoid(Name, rStrt, vStrt, drStrt, dvStrt, SlndL, B0)
+                cls._Element.append(iBLE)
+                s += iBLE.getLength()
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Gabor lens":
@@ -757,7 +757,7 @@ class BeamLine(object):
                     B0,
                 )
                 cls._Element.append(iBLE)
-                s += GbrLnsL
+                s += iBLE.getLength()
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dipole":
@@ -801,8 +801,11 @@ class BeamLine(object):
                 Name += str(nDpl)
                 rho = DplL / DplA
                 B = (1 / (speed_of_light * 1.0e-9)) * p0 / rho / 1000.0
-                iBLE = BLE.SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, DplA, B, Plane, Direction)
+                iBLE = BLE.SectorDipole(
+                    Name, rStrt, vStrt, drStrt, dvStrt, DplA, B, Plane, Direction
+                )
                 cls._Element.append(iBLE)
+                s += iBLE.getLength()
                 refPrtcl = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtSectorDipole(iBLE)
 
@@ -909,13 +912,11 @@ class BeamLine(object):
                         print("              ---->", " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd    = -999999.
-                    sEnd    = iBLE.getrStrt()[2] 
-                    print("test",iBLE.getrStrt()[2])
-                    Success = PrtclInst.recordParticle(iBLE.getName(), \
-                                    zEnd, \
-                                    sEnd, \
-                                    TrcSpc)
+                    zEnd = -999999.0
+                    sEnd = iBLE.getrStrt()[2] + iBLE.getLength()
+                    Success = PrtclInst.recordParticle(
+                        iBLE.getName(), zEnd, sEnd, TrcSpc
+                    )
                 TrcSpc_i = TrcSpc
 
             if cls.getDebug():
@@ -940,13 +941,11 @@ class BeamLine(object):
 
         for iLoc, iBLE in enumerate(BLE.BeamLineElement.getinstances()[1:]):
 
-            print("Appending: ", iBLE.getName())
-
             if isinstance(iBLE, BLE.Source):
                 patchBLE = BLP.sourcePatch(ax, 0.1)
             elif isinstance(iBLE, BLE.Aperture):
                 patchBLE = BLP.aperturePatch(ax, 0.1, 0.05, 0.2)
-            elif isinstance(iBLE, BLE.SectorDipole):
+            elif isinstance(iBLE, BLE.SectorDipole) and iBLE.getPlane() == "YZ":
 
                 Mmtm = mth.sqrt(
                     iRefPrtcl.getPrIn()[iLoc][0] ** 2
@@ -960,9 +959,17 @@ class BeamLine(object):
 
                 angle = iBLE.getAngle()
 
-                patchBLE = BLP.dipolePatch(ax, angle, R, 0.2)
+                patchBLE = BLP.dipolePatch(ax, angle, R, 0.2, iBLE.getDirection())
 
-                print("arc length:", R * angle)
+                ax.legend(
+                    *[
+                        *zip(
+                            *{
+                                l: h for h, l in zip(*ax.get_legend_handles_labels())
+                            }.items()
+                        )
+                    ][::-1]
+                )
 
             elif isinstance(iBLE, BLE.DefocusQuadrupole):
                 patchBLE = BLP.fquadPatch(ax, 0.1, 0.2)
