@@ -111,6 +111,7 @@ class sourcePatch(patchBLE):
         Patch = patches.Polygon(
             ((-w / 2, -np.sqrt(3) / 2 * w), (w, 0), (-w / 2, np.sqrt(3) / 2 * w)),
             facecolor="green",
+            label="Source",
             zorder=999,
         )
 
@@ -208,7 +209,7 @@ class solenoidPatch(patchBLE):
             width=w,
             height=h,
             zorder=999,
-            label="DQuad",
+            label="Solenoid",
             facecolor="gold",
         )
 

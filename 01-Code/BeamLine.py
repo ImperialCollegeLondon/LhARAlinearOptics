@@ -555,6 +555,7 @@ class BeamLine(object):
 
             if iLine.Element == "Drift":
                 nDrift += 1
+
                 Name = Name + str(nDrift)
                 Length = float(iLine.Value)
                 rStrt = np.array([0.0, 0.0, s])
@@ -912,7 +913,7 @@ class BeamLine(object):
                     break
                 else:
                     zEnd = -999999.0
-                    sEnd = iBLE.getrStrt()[2]
+                    sEnd = iBLE.getrStrt()[2] + iBLE.getLength()
                     Success = PrtclInst.recordParticle(
                         iBLE.getName(), zEnd, sEnd, TrcSpc
                     )

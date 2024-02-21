@@ -525,8 +525,6 @@ class Particle:
                 z_lab_RefPrtcl = np.array(iPrtcl.getRrIn())[mask][:, 2]
                 continue
 
-            iPrtcl.fillPhaseSpace()
-
             iLabPhaseSpace = np.array(iPrtcl.getLabPhaseSpace())
             maxN = len(iLabPhaseSpace)
 
@@ -545,10 +543,20 @@ class Particle:
             segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:, -1, 1])]
             # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
             line_collection_end = LineCollection(
-                segments_end_XZ, linewidths=0.5, colors="green", linestyle="solid"
+                segments_end_XZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_XZ, linewidths=0.5, color="red", linestyle="solid"
+                segments_terminated_XZ,
+                linewidths=0.5,
+                linestyle="solid",
+                colors="red",
+                alpha=0.35,
+                label="Terminated",
             )
             line_collection_list.append(line_collection_end)
             line_collection_list_term.append(line_collection_terminated)
@@ -557,21 +565,31 @@ class Particle:
             axxz.set_xlabel("z [m]")
             axxz.set_ylabel("x [m]")
             axxz.set_title("Particle Trajectory (Lab; x-z plane)")
+            axxz.legend()
 
             for z in z_lab_RefPrtcl:
-                axxz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+                axxz.axvline(
+                    x=z, color="black", linestyle="--", linewidth=0.1,
+                )
 
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
             segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
             line_collection_2 = LineCollection(
-                segments_end_YZ, linewidths=0.5, colors="blue", linestyle="solid"
+                segments_end_YZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
             )
             line_collection_terminated = LineCollection(
                 segments_terminated_YZ,
                 linewidths=0.5,
-                color="purple",
+                color="red",
                 linestyle="solid",
+                alpha=0.35,
+                label="Terminated",
             )
 
             line_collection_list.append(line_collection_2)
@@ -581,9 +599,12 @@ class Particle:
             axyz.set_xlabel("z [m]")
             axyz.set_ylabel("y [m]")
             axyz.set_title("Particle Trajectory (Lab; y-z plane)")
+            axyz.legend()
 
             for z in z_lab_RefPrtcl:
-                axyz.axvline(x=z, color="black", linestyle="--", linewidth=0.1)
+                axyz.axvline(
+                    x=z, color="black", linestyle="--", linewidth=0.1,
+                )
 
         return line_collection_list
 
@@ -646,10 +667,20 @@ class Particle:
             # print(segments_end_XZ[1])
             # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
             line_collection_end = LineCollection(
-                segments_end_XZ, linewidths=0.5, colors="green", linestyle="solid"
+                segments_end_XZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_XZ, linewidths=0.5, color="red", linestyle="solid"
+                segments_terminated_XZ,
+                linewidths=0.5,
+                color="red",
+                linestyle="solid",
+                alpha=0.35,
+                label="Terminated",
             )
             line_collection_list.append(line_collection_end)
             line_collection_list_term.append(line_collection_terminated)
@@ -658,18 +689,31 @@ class Particle:
             axxz.set_xlabel("s [m]")
             axxz.set_ylabel(r"$x_{\text{RPLC}}$ [m]")
             axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
+            axxz.legend()
 
             for s in s_element_list:
-                axxz.axvline(x=s, color="black", linestyle="--", linewidth=0.1)
+                axxz.axvline(
+                    x=s, color="black", linestyle="--", linewidth=0.1,
+                )
 
         if axyz is not None:
             segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
             segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
             line_collection_2 = LineCollection(
-                segments_end_YZ, linewidths=0.5, colors="green", linestyle="solid"
+                segments_end_YZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
             )
             line_collection_terminated = LineCollection(
-                segments_terminated_YZ, linewidths=0.5, color="red", linestyle="solid"
+                segments_terminated_YZ,
+                linewidths=0.5,
+                color="red",
+                linestyle="solid",
+                alpha=0.35,
+                label="Terminated",
             )
 
             line_collection_list.append(line_collection_2)
@@ -678,11 +722,14 @@ class Particle:
             axyz.add_collection(line_collection_terminated)
             axyz.set_xlabel("s [m]")
             axyz.set_ylabel(r"$y_{\text{RPLC}}$ [m]")
+            axyz.legend()
 
             axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
 
             for s in s_element_list:
-                axyz.axvline(x=s, color="black", linestyle="--", linewidth=0.1)
+                axyz.axvline(
+                    x=s, color="black", linestyle="--", linewidth=0.1,
+                )
 
         return line_collection_list
 
@@ -718,7 +765,7 @@ class Particle:
             if not isinstance(iPrtcl, ReferenceParticle):
                 if Particle.getDebug():
                     print("         ----> Fill phase space for particle:", nPrtcl)
-                    Success = iPrtcl.fillPhaseSpace()
+                Success = iPrtcl.fillPhaseSpace()
 
         if cls.getDebug():
             print(
@@ -744,6 +791,7 @@ class Particle:
 
         nLoc = 0
         for iLoc in self.getLocation():
+
             if self.getDebug():
                 print("         ----> Convert at location:", iLoc)
             PhsSpc = self.calcRPLCPhaseSpace(nLoc)
