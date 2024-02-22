@@ -11,36 +11,27 @@ Tests:
  - DipoleTst.py            - OK
  - DRACOfacilityTst.py     - OK	
  - DriftTst.py             - OK
- - ExpSourceTst.py         -
- - FocusQuadTst.py         - 
- - GaborLensTst.py         -
- - LaTexTst.py             -
- - LhARAFacilityTst.py     - 
- - LIONfacilityTst.py      - 
+ - ExpSourceTst.py         - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LaTexTst.py             - OK
+ - LhARAFacilityTst.py     - OK
+ - LIONfacilityTst.py      - OK
  - OctupoleTst.py          - Fails.
- - ParticleTst.py          -
- - PhysicalConstantsTst.py - 
- - QuadDoubletTst.py       -
- - QuadTripletTst.py       -
- - ReferenceParticleTst.py - 
- - RunSimulationTst.py     - 
- - SimulationTst.py        - 
- - SolenoidTst.py          - 
- - SourceTst.py            - 
- - TestRead.py             - 
- - TestWrite.py            - 
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - QuadDoubletTst.py       - OK
+ - QuadTripletTst.py       - OK
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK -- had to fix the i/p to lsrdrvn source in tst
+ - TestWrite.py            - OK
+ - TestRead.py             - OK
 
 Scripts:
- - LhARAMagnetTable.py     -
- - plotQuadTriplet.py      -
- - plotTrajectory.py       -
- - RunDRACOsimulation.py   - 
- - ReadDRACOsimu.py        - 
- - RunLIONsimulation.py    - 
- - ReadLIONsimu.py         - 
- - RunLhARAsimulation.py   - 
- - ReadLhARAsimu.py        - 
-
+ - All assumed OK since I just made the long set of runs.
 
 
 --------  --------  --------  --------  --------  --------  --------  20Feb24
