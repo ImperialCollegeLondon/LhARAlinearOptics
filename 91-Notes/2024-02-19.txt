@@ -4,13 +4,13 @@ scripts.  Made a few minor mods along the way.  Have pushed, now nede to run
 through all tests to make sure nothing is broken before merging into main.
 
 Tests:
- - BeamLineElementTst.py   - 
- - BeamLineTst.py          - 
- - CylindricalRFCavityTst  -
- - DefocusQuadTst.py       - 
- - DipoleTst.py            - 
- - DRACOfacilityTst.py     - 	
- - DriftTst.py             -
+ - BeamLineElementTst.py   - OK
+ - BeamLineTst.py          - OK
+ - CylindricalRFCavityTst  - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DRACOfacilityTst.py     - OK	
+ - DriftTst.py             - OK
  - ExpSourceTst.py         -
  - FocusQuadTst.py         - 
  - GaborLensTst.py         -
