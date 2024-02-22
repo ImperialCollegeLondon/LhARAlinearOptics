@@ -14,10 +14,11 @@ import sys
 import os
 
 LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
-print(LhARAOpticsPATH)
 filename     = os.path.join(LhARAOpticsPATH, \
-#                        '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-                        '11-Parameters/LhARABeamLine-Params-LsrDrvn.csv')
+                 '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
+#                 '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
+#                 '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
+#                 '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
 
 ##! Start:
 print("========  LhARAFacility: tests start  ========")
