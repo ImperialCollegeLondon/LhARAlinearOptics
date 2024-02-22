@@ -61,7 +61,7 @@ print("     <---- Event loop done, ", iEvt, "events read")
 
 ##! Plot progression:
 print("     ----> Plot progression:")
-
 Prtcl.Particle.plotTraceSpaceProgression()
+Prtcl.Particle.plotLongitudinalTraceSpaceProgression()
 print(" <---- Done.")
 print("========  DRACO event reading: end  ========")

@@ -19,7 +19,7 @@ print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
                          '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(20000, filename, datafiledir, 'DRACOSimulation.dat')
+Smltn = Simu.Simulation(2000000, filename, datafiledir, 'DRACOSimulation.dat')
 print()
 print(Simu.Simulation.getFacility())
 print()

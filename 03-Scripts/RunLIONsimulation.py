@@ -17,10 +17,10 @@ print()
 HOMEPATH = os.getenv('HOMEPATH')
 print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
-#                         '11-Parameters/LIONBeamLine-Params-Flat.csv')
-                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+#                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+                         '11-Parameters/LIONBeamLine-Params-Flat.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(20000, filename, datafiledir, 'LIONsimu.dat')
+Smltn = Simu.Simulation(2000000, filename, datafiledir, 'LIONsimu.dat')
 print()
 print(" <---- Simulation initialised.")
 
