@@ -21,10 +21,10 @@ ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "LhARAsimu.dat")
 ##! Create LhARA instance:
 print("     ----> Create LhARA instance:")
 filename     = os.path.join(HOMEPATH, \
-                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-#                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
 #                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
-#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
+                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
+#                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
+#                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
 print("         ----> Parameters will be read from:", filename)
 LhARAbI  = BL.BeamLine(filename)
 if Debug:
