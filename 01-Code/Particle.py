@@ -440,8 +440,7 @@ class Particle:
         plotFILE = '99-Scratch/ParticleProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
             for iLoc in range(len(xLoc)):
-                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
-                                        layout="constrained")
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.))
                 # add an artist, in this case a nice label in the middle...
                 Ttl = nLoc[iLoc]
                 fig.suptitle(Ttl, fontdict=font)
@@ -537,8 +536,7 @@ class Particle:
         plotFILE = '99-Scratch/ParticleLongiProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
             for iLoc in range(len(zLoc)):
-                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.), \
-                                        layout="constrained")
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.))
                 # add an artist, in this case a nice label in the middle...
                 Ttl = nLoc[iLoc]
                 fig.suptitle(Ttl, fontdict=font)
