@@ -1093,13 +1093,34 @@ class FocusQuadrupole(BeamLineElement):
                   self.getLength(), self.getStrength(), self.getkFQ())
             print("     ----> omegaPrime*L, omegaPrime*D:", a, b)
 
-        TrnsMtrx = np.array([                                             \
-            [   np.cos(a), np.sin(a)/b, 0., 0.,                   0., 0.],\
-            [-b*np.sin(a),   np.cos(a), 0., 0.,                   0., 0.],\
-            [          0.,          0., np.cosh(a), np.sinh(a)/b, 0., 0.],\
-            [          0.,          0., b*np.sinh(a), np.cosh(a), 0., 0.],\
-            [          0.,          0.,           0., 0.,  1., l/b02/g02],\
-            [          0.,          0.,           0., 0.,  0.,        1.]\
+        if abs(b) < 1.E-6:
+            T11 = 1.
+            T12 = l
+            T21 = 0.
+            T22 = 1.
+            
+            T33 = 1.
+            T34 = l
+            T43 = 0.
+            T44 = 1.
+        else:
+            T11 = np.cos(a) 
+            T12 = np.sin(a)/b
+            T21 = -b*np.sin(a)
+            T22 = np.cos(a)
+
+            T33 = np.cosh(a)
+            T34 = np.sinh(a)/b
+            T43 = b*np.sinh(a)
+            T44 = np.cosh(a)
+            
+        TrnsMtrx = np.array([                                          \
+            [         T11,         T12, 0., 0.,                0., 0.],\
+            [         T21,         T22, 0., 0.,                0., 0.],\
+            [          0.,          0.,    T33,    T34, 0.,        0.],\
+            [          0.,          0.,    T43,    T44, 0.,        0.],\
+            [          0.,          0.,     0.,     0., 1., l/b02/g02],\
+            [          0.,          0.,     0.,     0., 0.,        1.] \
                             ])
 
         if self.getDebug():
@@ -1405,14 +1426,35 @@ class DefocusQuadrupole(BeamLineElement):
                   self.getLength(), self.getStrength(), self.getkDQ())
             print("     ----> omegaPrime*L, omegaPrime*D:", a, b)
 
-        TrnsMtrx = np.array([                                               \
-            [  np.cosh(a), np.sinh(a)/b,           0.,          0., 0., 0.],\
-            [b*np.sinh(a),   np.cosh(a),           0.,          0., 0., 0.],\
-            [          0.,           0.,    np.cos(a), np.sin(a)/b, 0., 0.],\
-            [          0.,           0., -b*np.sin(a),   np.cos(a), 0., 0.],\
-            [          0.,           0.,           0.,  0.,  1., l/b02/g02],\
-            [          0.,           0.,           0.,  0.,  0.,        1.]\
-        ])
+        if abs(b) < 1.E-6:
+            T11 = 1.
+            T12 = l
+            T21 = 0.
+            T22 = 1.
+            
+            T33 = 1.
+            T34 = l
+            T43 = 0.
+            T44 = 1.
+        else:
+            T11 = np.cosh(a)
+            T12 = np.sinh(a)/b
+            T21 = b*np.sinh(a)
+            T22 = np.cosh(a)
+            
+            T33 = np.cos(a) 
+            T34 = np.sin(a)/b
+            T43 = -b*np.sin(a)
+            T44 = np.cos(a)
+
+        TrnsMtrx = np.array([                                          \
+            [         T11,         T12, 0., 0.,                0., 0.],\
+            [         T21,         T22, 0., 0.,                0., 0.],\
+            [          0.,          0.,    T33,    T34, 0.,        0.],\
+            [          0.,          0.,    T43,    T44, 0.,        0.],\
+            [          0.,          0.,     0.,     0., 1., l/b02/g02],\
+            [          0.,          0.,     0.,     0., 0.,        1.] \
+                               ])
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
