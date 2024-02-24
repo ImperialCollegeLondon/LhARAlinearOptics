@@ -15,10 +15,10 @@ import os
 
 LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
 filename     = os.path.join(LhARAOpticsPATH, \
-                 '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-#                 '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
-#                 '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
-#                 '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
+#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
+#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
+#                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
+                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
 
 ##! Start:
 print("========  LhARAFacility: tests start  ========")

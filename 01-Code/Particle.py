@@ -145,7 +145,6 @@ Created on Mon 03Jul23: Version history:
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
-
 import struct            as strct
 import numpy             as np
 import math              as mth
@@ -385,7 +384,13 @@ class Particle:
         ELoc   = []
         ELab   = []
         Scl    = []
-        
+
+        iSrc = BLE.Source.getinstances()[0]
+        logE = False
+        if iSrc.getMode() == 0:
+            logE = True
+        print(iSrc, logE)
+                
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
@@ -450,8 +455,12 @@ class Particle:
                 axs[0, 0].set_xlabel('x (m)')
                 axs[0, 0].set_ylabel('y (m)')
             
-                #axs[0, 1].set_title('Energy')
+                #axs[0, 1].set_title('delta')
+                
                 axs[0, 1].hist(ELoc[iLoc], 100)
+                axs[0, 1].set_yscale('linear')
+                if logE:
+                    axs[0, 1].set_yscale('log')
                 axs[0, 1].set_xlabel('delta')
                 axs[0, 1].set_ylabel('Number')
             
@@ -466,10 +475,16 @@ class Particle:
                 axs[1, 1].set_ylabel('yprime (m)')
 
                 axs[2, 0].hist(ELab[iLoc], 100)
+                axs[2, 0].set_yscale('linear')
+                if logE:
+                    axs[2, 0].set_yscale('log')
                 axs[2, 0].set_xlabel('Kinetic energy (MeV)')
                 axs[2, 0].set_ylabel('Number')
 
                 axs[2, 1].hist(Scl[iLoc], 100)
+                axs[2, 1].set_yscale('linear')
+                if logE:
+                    axs[2, 1].set_yscale('log')
                 axs[2, 1].set_xlabel('Epsilon')
                 axs[2, 1].set_ylabel('Number')
 
@@ -500,6 +515,12 @@ class Particle:
         delLoc  = []
         tLoc   = []
         ELoc   = []
+
+        iSrc = BLE.Source.getinstances()[0]
+        logE = False
+        if iSrc.getMode() == 0:
+            logE = True
+        print(iSrc, logE)
         
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
@@ -546,6 +567,9 @@ class Particle:
                 axs[0, 0].set_ylabel('delta')
             
                 axs[0, 1].hist(delLoc[iLoc], 100)
+                axs[0, 1].set_yscale('linear')
+                if logE:
+                    axs[0, 1].set_yscale('log')
                 axs[0, 1].set_xlabel('Delta')
                 axs[0, 1].set_ylabel('Number')
 
@@ -558,6 +582,9 @@ class Particle:
                 axs[1, 1].set_ylabel('Number')
 
                 axs[2, 0].hist(ELoc[iLoc], 100)
+                axs[2, 0].set_yscale('linear')
+                if logE:
+                    axs[2, 0].set_yscale('log')
                 axs[2, 0].set_xlabel('Kinetic energy (MeV)')
                 axs[2, 0].set_ylabel('Number')
 

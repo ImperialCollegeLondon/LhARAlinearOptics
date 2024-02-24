@@ -857,7 +857,7 @@ class BeamLine(object):
     def trackBeam(cls, NEvts=0, ParticleFILE=None):
         if cls.getDebug() or NEvts > 1:
             print(" trackBeam for", NEvts, " events.")
-        Scl  = 1
+        Scl  = 10
         iCnt = 1
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
