@@ -1,4 +1,4 @@
-# LhARAlinearOptics
+# LhARALinearOptics
 Linear optics code for LhARA
 
 The code in this repository provides linear beam-line optics code and implemetations of the DRACO, LION< and LhARA Stage 1 beamlines.  
