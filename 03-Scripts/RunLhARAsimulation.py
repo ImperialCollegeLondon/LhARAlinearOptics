@@ -23,7 +23,7 @@ filename = os.path.join(
     "11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv",
 )
 datafiledir = os.path.join(HOMEPATH, "99-Scratch")
-Smltn = Simu.Simulation(2000000, filename, datafiledir, "LhARAsimu.dat")
+Smltn = Simu.Simulation(1000, filename, datafiledir, "LhARAsimu.dat")
 print()
 print(" <---- Simulation initialised.")
 

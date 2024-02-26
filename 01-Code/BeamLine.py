@@ -562,7 +562,12 @@ class BeamLine(object):
         ]
 
         if pndsBeamline.empty:
-            s = 0.0
+            print(" BeamLine.addBeamline: empty beam line, return.")
+            return
+
+        Section = ""
+        NewElement = True
+        s = 0.0
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
@@ -581,7 +586,7 @@ class BeamLine(object):
                 + ":"
             )
 
-            if iLine.Section != Section:
+            if iLine.Section != "Section":
                 Section = iLine.Section
                 nDrift = 0
                 nAperture = 0

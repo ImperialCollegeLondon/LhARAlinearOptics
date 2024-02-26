@@ -117,6 +117,7 @@ import math
 
 import PhysicalConstants as PhysCnst
 import Particle as Prtcl
+from Utilities import TrRotMat_z
 
 # .. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -3609,6 +3610,7 @@ class Source(BeamLineElement):
             cosTheta, Phi = self.getFlatThetaPhi()
 
             # LION beamline
+            P_L = self.getParameters()[6]
             E_laser = self.getParameters()[7]
             lamda = self.getParameters()[8]
             t_laser = self.getParameters()[9]
@@ -3851,6 +3853,29 @@ class Source(BeamLineElement):
         # corresponding to this index
 
         E = sampled_data / 1.6e-19 / 1e6  # [MeV]
+
+        return E
+
+    def getTraceSpace(self, x, y, K, cTheta, Phi):
+        if self.getDebug():
+            print(" Source(BeamLineElement).getTraceSpace: start.")
+            print("     ----> x, y, K, cTheta, Phi:", x, y, K, cTheta, Phi)
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        p0 = iRefPrtcl.getMomentumIn(0)
+        E0 = mth.sqrt(protonMASS**2 + p0**2)
+        b0 = p0 / E0
+        if self.getDebug():
+            print(
+                "     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, "(", E0 - protonMASS, ")"
+            )
+
+        E = protonMASS + K
+        p = mth.sqrt(E**2 - protonMASS**2)
+        if self.getDebug():
+            print("     ----> K, E, p:", K, E, p)
+
+        sTheta = mth.sqrt(1.0 - cTheta**2)
         xPrime = sTheta * mth.cos(Phi) * p / p0
         yPrime = sTheta * mth.sin(Phi) * p / p0
         """

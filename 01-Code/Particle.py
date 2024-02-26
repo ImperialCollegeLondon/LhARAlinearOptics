@@ -500,6 +500,249 @@ class Particle:
                 pdf.savefig()
                 plt.close()
 
+    @classmethod
+    def plotParticleTrajectory_Lab(cls, axyz=None, axxz=None):
+
+        line_collection_list = []
+        line_collection_list_term = []
+
+        x_lab = []
+        y_lab = []
+        z_lab = []
+        mask = np.array(
+            [
+                isinstance(
+                    element,
+                    (
+                        BLE.Aperture,
+                        BLE.Solenoid,
+                        BLE.DefocusQuadrupole,
+                        BLE.FocusQuadrupole,
+                        BLE.SectorDipole,
+                    ),
+                )
+                for element in BLE.BeamLineElement.getinstances()[1:]
+            ]
+        )
+
+        for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
+            if isinstance(iPrtcl, ReferenceParticle):
+                NInsts = len(cls.getParticleInstances())
+                NLocs = len(iPrtcl.getRrOut())
+                x_lab = np.full((NInsts, NLocs), np.nan)
+                y_lab = np.full((NInsts, NLocs), np.nan)
+                z_lab = np.full((NInsts, NLocs), np.nan)
+                z_lab_RefPrtcl = np.array(iPrtcl.getRrIn())[mask][:, 2]
+                continue
+
+            iLabPhaseSpace = np.array(iPrtcl.getLabPhaseSpace())
+            maxN = len(iLabPhaseSpace)
+
+            x_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 0]
+            y_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 1]
+            z_lab[nPrtcl, :maxN] = iLabPhaseSpace[:, 0, 2]
+
+        segmentsYZ = np.dstack((z_lab, y_lab))
+        segmentsXZ = np.dstack((z_lab, x_lab))
+
+        if axxz is not None:
+
+            # Finding the elements that have nan at end:
+
+            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:, -1, 1])]
+            # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
+            line_collection_end = LineCollection(
+                segments_end_XZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
+            )
+            line_collection_terminated = LineCollection(
+                segments_terminated_XZ,
+                linewidths=0.5,
+                linestyle="solid",
+                colors="red",
+                alpha=0.35,
+                label="Terminated",
+            )
+            line_collection_list.append(line_collection_end)
+            line_collection_list_term.append(line_collection_terminated)
+            axxz.add_collection(line_collection_end)
+            axxz.add_collection(line_collection_terminated)
+            axxz.set_xlabel("z [m]")
+            axxz.set_ylabel("x [m]")
+            axxz.set_title("Particle Trajectory (Lab; x-z plane)")
+            axxz.legend()
+
+            for z in z_lab_RefPrtcl:
+                axxz.axvline(
+                    x=z, color="black", linestyle="--", linewidth=0.1,
+                )
+
+        if axyz is not None:
+            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
+            line_collection_2 = LineCollection(
+                segments_end_YZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
+            )
+            line_collection_terminated = LineCollection(
+                segments_terminated_YZ,
+                linewidths=0.5,
+                color="red",
+                linestyle="solid",
+                alpha=0.35,
+                label="Terminated",
+            )
+
+            line_collection_list.append(line_collection_2)
+            line_collection_list_term.append(line_collection_terminated)
+            axyz.add_collection(line_collection_2)
+            axyz.add_collection(line_collection_terminated)
+            axyz.set_xlabel("z [m]")
+            axyz.set_ylabel("y [m]")
+            axyz.set_title("Particle Trajectory (Lab; y-z plane)")
+            axyz.legend()
+
+            for z in z_lab_RefPrtcl:
+                axyz.axvline(
+                    x=z, color="black", linestyle="--", linewidth=0.1,
+                )
+
+        return line_collection_list
+
+    @classmethod
+    def plotParticleTrajectory_RPLC(cls, axyz=None, axxz=None):
+
+        line_collection_list = []
+        line_collection_list_term = []
+
+        x_RPLC = []
+        y_RPLC = []
+
+        mask = np.array(
+            [
+                isinstance(
+                    element,
+                    (
+                        BLE.Aperture,
+                        BLE.Solenoid,
+                        BLE.DefocusQuadrupole,
+                        BLE.FocusQuadrupole,
+                        BLE.SectorDipole,
+                    ),
+                )
+                for element in BLE.BeamLineElement.getinstances()[1:]
+            ]
+        )
+
+        nPrtcl = 0
+
+        for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
+
+            if isinstance(iPrtcl, ReferenceParticle):
+
+                NInsts = len(cls.getParticleInstances())
+                NLocs = len(iPrtcl.getRrOut())
+                x_RPLC = np.full((NInsts, NLocs), np.nan)
+                y_RPLC = np.full((NInsts, NLocs), np.nan)
+                s = np.full((NInsts, NLocs), np.nan)
+                s_element_list = np.array(iPrtcl.gets())[mask]
+                continue
+
+            iTraceSpace = np.array(iPrtcl.getTraceSpace())
+            s_Records = np.array(iPrtcl.gets())
+
+            maxN = len(iTraceSpace)
+
+            x_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 0]
+            y_RPLC[nPrtcl, :maxN] = iTraceSpace[:, 2]
+            s[nPrtcl, :maxN] = s_Records
+
+        segmentsYZ = np.dstack((s, y_RPLC))
+        segmentsXZ = np.dstack((s, x_RPLC))
+
+        if axxz is not None:
+
+            # Finding the elements that have nan at end:
+            segments_terminated_XZ = segmentsXZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_XZ = segmentsXZ[~np.isnan(segmentsXZ[:, -1, 1])]
+            # print(segments_end_XZ[1])
+            # as it is not the same length for all, need a different method to see which one gets deleted, or need to put nan values in.
+            line_collection_end = LineCollection(
+                segments_end_XZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
+            )
+            line_collection_terminated = LineCollection(
+                segments_terminated_XZ,
+                linewidths=0.5,
+                color="red",
+                linestyle="solid",
+                alpha=0.35,
+                label="Terminated",
+            )
+            line_collection_list.append(line_collection_end)
+            line_collection_list_term.append(line_collection_terminated)
+            axxz.add_collection(line_collection_end)
+            axxz.add_collection(line_collection_terminated)
+            axxz.set_xlabel("s [m]")
+            axxz.set_ylabel(r"$x_{\text{RPLC}}$ [m]")
+            axxz.set_title("Particle Trajectory (RPLC; x-z plane)")
+            axxz.legend()
+
+            for s in s_element_list:
+                axxz.axvline(
+                    x=s, color="black", linestyle="--", linewidth=0.1,
+                )
+
+        if axyz is not None:
+            segments_terminated_YZ = segmentsYZ[np.isnan(segmentsXZ[:, -1, 1])]
+            segments_end_YZ = segmentsYZ[~np.isnan(segmentsXZ[:, -1, 1])]
+            line_collection_2 = LineCollection(
+                segments_end_YZ,
+                linewidths=0.5,
+                colors="gray",
+                linestyle="solid",
+                alpha=0.5,
+                label="Trajectories",
+            )
+            line_collection_terminated = LineCollection(
+                segments_terminated_YZ,
+                linewidths=0.5,
+                color="red",
+                linestyle="solid",
+                alpha=0.35,
+                label="Terminated",
+            )
+
+            line_collection_list.append(line_collection_2)
+            line_collection_list_term.append(line_collection_terminated)
+            axyz.add_collection(line_collection_2)
+            axyz.add_collection(line_collection_terminated)
+            axyz.set_xlabel("s [m]")
+            axyz.set_ylabel(r"$y_{\text{RPLC}}$ [m]")
+            axyz.legend()
+
+            axyz.set_title("Particle Trajectory (RPLC; y-z plane)")
+
+            for s in s_element_list:
+                axyz.axvline(
+                    x=s, color="black", linestyle="--", linewidth=0.1,
+                )
+
+        return line_collection_list
+
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500, precision=5, suppress=True):

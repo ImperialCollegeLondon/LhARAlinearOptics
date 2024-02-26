@@ -42,7 +42,9 @@ print("----> Initialising with HOMEPATH:", HOMEPATH)
 
 eventFILE = "LhARAsimu.dat"
 ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", eventFILE)
-filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss.csv")
+filename = os.path.join(
+    HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv"
+)
 figDIRECTORY = "99-Scratch/"
 
 # --------------------------------------------------------------------------------------
