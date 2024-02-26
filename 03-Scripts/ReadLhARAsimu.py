@@ -2,49 +2,80 @@
 # -*- coding: utf-8 -*-
 
 import os
-import struct
-import math as mth
+
+# --------------------------------------------------------------------------------------
+# Import Libraries
+# --------------------------------------------------------------------------------------
 
 import Particle as Prtcl
 import BeamLine as BL
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
-##! Start:
-print("========  Read and plot: start  ========")
+# --------------------------------------------------------------------------------------
+# Import Functions
+# --------------------------------------------------------------------------------------
 
-HOMEPATH    = os.getenv('HOMEPATH')
-print(" ----> Initialising with HOMEPATH:", HOMEPATH)
+from Utilities import save_all_figs
+
+# --------------------------------------------------------------------------------------
+# Global Plotting Settings
+# --------------------------------------------------------------------------------------
+
+mpl.rcParams["figure.dpi"] = 300
+
+
+print("========  Initialisation: START  ========")
 print()
-Debug = False
 
-ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "LhARAsimu.dat")
+# --------------------------------------------------------------------------------------
+# HOMEPATH
+# --------------------------------------------------------------------------------------
 
-##! Create LhARA instance:
-print("     ----> Create LhARA instance:")
-filename     = os.path.join(HOMEPATH, \
-#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
-#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
-#                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
-print("         ----> Parameters will be read from:", filename)
-LhARAbI  = BL.BeamLine(filename)
-if Debug:
-    print(LhARAbI)
+HOMEPATH = os.getenv("HOMEPATH")
 
-print("     <---- LhARA instance created.")
+print("----> Initialising with HOMEPATH:", HOMEPATH)
 
-print("     ----> Read events from:", ParticleFILE)
+# --------------------------------------------------------------------------------------
+# Data and Plot Files
+# --------------------------------------------------------------------------------------
 
+eventFILE = "LhARAsimu.dat"
+ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", eventFILE)
+filename = os.path.join(
+    HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv"
+)
+figDIRECTORY = "99-Scratch/"
+
+# --------------------------------------------------------------------------------------
+# Intiialise the BeamLine
+# --------------------------------------------------------------------------------------
+
+LhARAbI = BL.BeamLine(filename)
+
+print("----> Create LhARA instance:")
+print("     ----> Parameters will be read from:", filename)
+
+print("========  Initialisation: END  ========")
 print()
-print(" <---- Initialisation done.")
 
-##! Create LhARA instance:
-print(" ----> Read event file:")
+
+# --------------------------------------------------------------------------------------
+# Read Events
+# --------------------------------------------------------------------------------------
+
+print("========  Read: START  ========")
 print()
+
+print(
+    "----> Read event file:",
+    eventFILE,
+)
 
 EndOfFile = False
 iEvt = 0
 iCnt = 0
-Scl  = 10
+Scl = 10
 while not EndOfFile:
     EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     if not EndOfFile:
@@ -54,16 +85,55 @@ while not EndOfFile:
             iCnt += 1
             if iCnt == 10:
                 iCnt = 1
-                Scl  = Scl * 10
+                Scl = Scl * 10
 
-print(" <----", iEvt, "events read")
+print("<----", iEvt, "events read")
 
+print("========  Read: STOP  ========")
 print()
+
+# --------------------------------------------------------------------------------------
+# Fill the various PhaseSpaces
+# --------------------------------------------------------------------------------------
+
+Prtcl.Particle.fillPhaseSpaceAll()
+
+# --------------------------------------------------------------------------------------
+# Plotting
+# --------------------------------------------------------------------------------------
+
+print("========  Plotting: START  ========")
+print()
+
+figRPLC, axRPLC = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0))
+axRPLC[0].set_ylim(-0.05, 0.05)
+axRPLC[1].set_ylim(-0.05, 0.05)
+
+figLAB, axLAB = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0))
+
+axLAB[0].set_ylim(-0.1, 0.1)
+axLAB[1].set_ylim(-0.5, 6)
+
 print(" ----> Plot progression:")
-Prtcl.Particle.plotTraceSpaceProgression()
-Prtcl.Particle.plotLongitudinalTraceSpaceProgression()
-print(" <---- Done.")
 
-##! Complete:
+print("     ----> Plot LAB:")
+linesLAB = Prtcl.Particle.plotParticleTrajectory_Lab(axyz=axLAB[1], axxz=axLAB[0])
+print("     <---- Done.")
+
+print("     ----> Plot LAB YZ BeamLineElements:")
+patches = BL.BeamLine.plotBeamLineYZ(axLAB[1])
+print("     <---- Done.")
+
+print("     ----> Plot RPLC:")
+linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLC[1], axxz=axRPLC[0])
+print("     <---- Done.")
+
+
+print("========  Plotting: END  ========")
 print()
-print("========  Read and plot: complete  ========")
+
+save_all_figs(
+    prefix="ReadLhARAsimu",
+    loc=figDIRECTORY,
+    dpi=300,
+)
