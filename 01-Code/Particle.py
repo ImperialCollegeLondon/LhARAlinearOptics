@@ -400,6 +400,9 @@ class Particle:
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
+                """
+                   Why this if block!
+                """
                 if iLoc > (len(xLoc)-1):
                     nLoc.append(iPrtcl.getLocation()[iLoc])
                     xLoc.append([])
