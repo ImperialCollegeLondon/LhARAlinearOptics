@@ -599,14 +599,6 @@ class Particle:
                 plt.close()
             
 
-    def printProgression(self):
-        for iLoc in range(len(self.getLocation())):
-            with np.printoptions(linewidth=500,precision=5,suppress=True):
-                print(self.getLocation()[iLoc], ": z, s, trace space:", \
-                      self.getz()[iLoc], self.gets()[iLoc], \
-                      self.getTraceSpace()[iLoc])
-
-
 #--------  Processing methods:
     @classmethod
     def fillPhaseSpaceAll(cls):
