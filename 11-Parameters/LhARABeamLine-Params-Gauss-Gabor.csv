@@ -21,8 +21,8 @@
 1,Capture,Gabor lens,"Length, strength",Strength,1.018747261,rad/m,ks
 1,Capture,Drift,,Length,0.15,m,Drift out of Gabor lens
 1,Energy selection,Drift,,Length,0.183783273,m,Drift before first cavity
-1,Energy selection,Cavity,Cylindrical,Gradient,5,MV/m,Gradient
-1,Energy selection,Cavity,Cylindrical,Frequency,200,MHz,Frequency
+1,Energy selection,Cavity,Cylindrical,Gradient,0.001,MV/m,Gradient
+1,Energy selection,Cavity,Cylindrical,Frequency,10000,MHz,Frequency
 1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
 1,Energy selection,Drift,,Length,0.183783273,m,Drift after first cavity
 1,Energy selection,Drift,,Length,0.15,m,Drift to next Gabor lens

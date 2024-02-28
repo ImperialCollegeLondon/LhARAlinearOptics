@@ -1,0 +1,16 @@
+Stage,Section,Element,Type,Parameter,Value,Unit,Comment
+0,Facility,Global,Name,Name,LhARA,,
+0,Facility,Global,Reference particle,Kinetic energy,15,MeV,
+0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
+1,Source,Source,Parameterised TNSA,SourceMode,1,,Gaussian kinetic energy
+1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
+1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y"
+1,Source,Source,Parameterised TNSA,MeanEnergy,15,MeV,Mean of guassian kinetic energy
+1,Source,Source,Parameterised TNSA,SigmaEnergy,0.3,MeV,Sigma of guassian kinetic energy
+1,Source,Source,Parameterised TNSA,MinCTheta,1,,Minimum theta for flat cos theta
+1,Interface,Drift,,Length,0.05,m,"Length of first, compensated, drift"
+1,Energy selection,Drift,,Length,0.5,m,Drift before first cavity
+1,Energy selection,Cavity,Cylindrical,Gradient,100000,MV/m,Gradient
+1,Energy selection,Cavity,Cylindrical,Frequency,8,MHz,Frequency
+1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
+1,Energy selection,Drift,,Length,0.5,m,Drift after first cavity
