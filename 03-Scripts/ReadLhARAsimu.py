@@ -117,19 +117,24 @@ axLAB[1].set_ylim(-0.5, 6)
 print(" ----> Plot progression:")
 
 print("     ----> Plot LAB:")
-linesLAB = Prtcl.Particle.plotParticleTrajectory_Lab(axyz=axLAB[1], axxz=axLAB[0])
+# linesLAB = Prtcl.Particle.plotParticleTrajectory_Lab(axyz=axLAB[1], axxz=axLAB[0])
 print("     <---- Done.")
 
 print("     ----> Plot LAB YZ BeamLineElements:")
-patches = BL.BeamLine.plotBeamLineYZ(axLAB[1])
+# patches = BL.BeamLine.plotBeamLineYZ(axLAB[1])
 print("     <---- Done.")
 
 print("     ----> Plot RPLC:")
-linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLC[1], axxz=axRPLC[0])
+# linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLC[1], axxz=axRPLC[0])
 print("     <---- Done.")
 
 figXY, axXY = Prtcl.Particle.plotTraceSpaceXY(0)
 
+figXY2, axXY2 = Prtcl.Particle.plotTraceSpaceXY(8)
+
+figXY3, axXY3 = Prtcl.Particle.plotTraceSpaceXY(-1)
+
+Prtcl.Particle.plotTraceSpaceProgression()
 
 print("========  Plotting: END  ========")
 print()

@@ -395,6 +395,11 @@ class Particle:
         ELab = []
         Scl = []
 
+        iSrc = BLE.Source.getinstances()[0]
+        logE = False
+        if iSrc.getMode() == 0:
+            logE = True
+
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
@@ -503,17 +508,27 @@ class Particle:
         NYbins=100,
     ):
 
-        # rewrite to exclude those particles that get deleted!
+        for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
+            if isinstance(iPrtcl, ReferenceParticle):
+                NInsts = len(cls.getParticleInstances())
+                NLocs = len(iPrtcl.getRrOut())
+                xlist = np.full((NInsts, NLocs), np.nan)
+                ylist = np.full((NInsts, NLocs), np.nan)
+                continue
+            iTraceSpace = np.array(iPrtcl.getTraceSpace())
+            maxN = len(iTraceSpace)
 
-        xlist = np.array(
-            [iPrtcl.getTraceSpace()[iLoc][0] for iPrtcl in cls.getParticleInstances()]
-        )
-        ylist = np.array(
-            [iPrtcl.getTraceSpace()[iLoc][2] for iPrtcl in cls.getParticleInstances()]
-        )
+            xlist[nPrtcl, :maxN] = iTraceSpace[:, 0]
+            ylist[nPrtcl, :maxN] = iTraceSpace[:, 2]
+
+        xlist = xlist[:, iLoc]
+        ylist = ylist[:, iLoc]
 
         xlist *= 1e6
         ylist *= 1e6
+
+        xlist = xlist[~np.isnan(xlist)]
+        ylist = ylist[~np.isnan(ylist)]
 
         figXY, axXY = plt.subplots(figsize=(6, 6))
 
