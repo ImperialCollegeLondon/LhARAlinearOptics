@@ -146,6 +146,7 @@ Created on Mon 03Jul23: Version history:
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.collections import LineCollection
 import matplotlib.ticker as ticker
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import struct as strct
 import numpy as np
@@ -413,12 +414,6 @@ class Particle:
                     ELab.append([])
                     Scl.append([])
 
-                """
-                print(" Here:", iLoc)
-                print("     ---->", iPrtcl.getTraceSpace()[iLoc])
-                print("     ---->", iRefPrtcl.getPrOut()[iLoc])
-                """
-
                 p0 = mth.sqrt(
                     np.dot(
                         iRefPrtcl.getPrOut()[iLoc][:3], iRefPrtcl.getPrOut()[iLoc][:3]
@@ -501,6 +496,66 @@ class Particle:
                 plt.close()
 
     @classmethod
+    def plotTraceSpaceXY(
+        cls,
+        iLoc,
+        NXbins=100,
+        NYbins=100,
+    ):
+
+        # rewrite to exclude those particles that get deleted!
+
+        xlist = np.array(
+            [iPrtcl.getTraceSpace()[iLoc][0] for iPrtcl in cls.getParticleInstances()]
+        )
+        ylist = np.array(
+            [iPrtcl.getTraceSpace()[iLoc][2] for iPrtcl in cls.getParticleInstances()]
+        )
+
+        xlist *= 1e6
+        ylist *= 1e6
+
+        figXY, axXY = plt.subplots(figsize=(6, 6))
+
+        # Find the min/max of the data
+        xmin = min(xlist)
+        xmax = max(xlist)
+        ymin = min(ylist)
+        ymax = max(ylist)
+
+        xbins = np.linspace(start=xmin, stop=xmax, num=NXbins)
+        ybins = np.linspace(start=ymin, stop=ymax, num=NYbins)
+        xcenter = (xbins[0:-1] + xbins[1:]) / 2.0
+        ycenter = (ybins[0:-1] + ybins[1:]) / 2.0
+        aspectratio = 1.0 * (xmax - 0) / (1.0 * ymax - 0)
+
+        H, _, _ = np.histogram2d(ylist, xlist, bins=(ybins, xbins))
+        X = xcenter
+        Y = ycenter
+        Z = H
+
+        im = axXY.imshow(
+            H,
+            extent=[xmin, xmax, ymin, ymax],
+            interpolation="nearest",
+            origin="lower",
+            aspect=aspectratio,
+            cmap="plasma",
+        )
+
+        divider = make_axes_locatable(axXY)
+        cax = divider.append_axes("right", size="5%", pad=-0.2)
+
+        cax.set_xlabel("N")
+
+        axXY.set_xlabel(r"$x_{\text{RPLC}}$ [$\mu$m]")
+        axXY.set_ylabel(r"$y_{\text{RPLC}}$ [$\mu$m]")
+
+        figXY.colorbar(im, cax=cax)
+
+        return figXY, axXY
+
+    @classmethod
     def plotParticleTrajectory_Lab(cls, axyz=None, axxz=None):
 
         line_collection_list = []
@@ -579,7 +634,10 @@ class Particle:
 
             for z in z_lab_RefPrtcl:
                 axxz.axvline(
-                    x=z, color="black", linestyle="--", linewidth=0.1,
+                    x=z,
+                    color="black",
+                    linestyle="--",
+                    linewidth=0.1,
                 )
 
         if axyz is not None:
@@ -613,7 +671,10 @@ class Particle:
 
             for z in z_lab_RefPrtcl:
                 axyz.axvline(
-                    x=z, color="black", linestyle="--", linewidth=0.1,
+                    x=z,
+                    color="black",
+                    linestyle="--",
+                    linewidth=0.1,
                 )
 
         return line_collection_list
@@ -703,7 +764,10 @@ class Particle:
 
             for s in s_element_list:
                 axxz.axvline(
-                    x=s, color="black", linestyle="--", linewidth=0.1,
+                    x=s,
+                    color="black",
+                    linestyle="--",
+                    linewidth=0.1,
                 )
 
         if axyz is not None:
@@ -738,7 +802,10 @@ class Particle:
 
             for s in s_element_list:
                 axyz.axvline(
-                    x=s, color="black", linestyle="--", linewidth=0.1,
+                    x=s,
+                    color="black",
+                    linestyle="--",
+                    linewidth=0.1,
                 )
 
         return line_collection_list

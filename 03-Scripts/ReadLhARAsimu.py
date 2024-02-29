@@ -128,6 +128,8 @@ print("     ----> Plot RPLC:")
 linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLC[1], axxz=axRPLC[0])
 print("     <---- Done.")
 
+figXY, axXY = Prtcl.Particle.plotTraceSpaceXY(0)
+
 
 print("========  Plotting: END  ========")
 print()
