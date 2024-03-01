@@ -146,50 +146,49 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
 
-import struct            as strct
-import numpy             as np
-import math              as mth
+import struct as strct
+import numpy as np
+import math as mth
 import os
 import io
 
-import BeamLine          as BL
-import BeamLineElement   as BLE
+import BeamLine as BL
+import BeamLineElement as BLE
 
-#-------- Physical Constants Instances and Methods ----------------
+# -------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
+
 constants_instance = PhysicalConstants()
-speed_of_light     = constants_instance.SoL()
-protonMASS         = constants_instance.mp()
+speed_of_light = constants_instance.SoL()
+protonMASS = constants_instance.mp()
 
 
 class Particle:
-    instances  = []
-    __Debug    = False
+    instances = []
+    __Debug = False
 
-
-#--------  "Built-in methods":
+    # --------  "Built-in methods":
     def __init__(self):
         if self.__Debug:
-            print(' Particle.__init__: ', \
-                  'creating the Particle object')
+            print(" Particle.__init__: ", "creating the Particle object")
 
-        #.. Must have reference particle as first in the instance list,
+        # .. Must have reference particle as first in the instance list,
         #   ... so ...
-        if not isinstance(ReferenceParticle.getinstance(),ReferenceParticle):
-            raise noReferenceParticle(" Reference particle, ", \
-                                      "not first in particle list.")
+        if not isinstance(ReferenceParticle.getinstance(), ReferenceParticle):
+            raise noReferenceParticle(
+                " Reference particle, ", "not first in particle list."
+            )
 
         Particle.instances.append(self)
 
-        #.. Particle instance created with phase-space at each
+        # .. Particle instance created with phase-space at each
         #   interface being recorded as None
         self.setAll2None()
 
         if self.__Debug:
-            print("     ----> New Particle instance: \n", \
-                  Particle.__str__(self))
+            print("     ----> New Particle instance: \n", Particle.__str__(self))
             print(" <---- Particle instance created.")
-            
+
     def __repr__(self):
         return "Particle()"
 
@@ -201,43 +200,49 @@ class Particle:
         print("\n Particle:")
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
-        print("     ----> Number of phase-space records:", \
-              len(self.getLocation()))
+        print("     ----> Number of phase-space records:", len(self.getLocation()))
         if len(self.getLocation()) > 0:
             print("     ----> Record of trace space:")
         for iLctn in range(len(self.getLocation())):
             print("         ---->", self.getLocation()[iLctn], ":")
-            print("             ----> z, s", self.getz()[iLctn], \
-                                             self.gets()[iLctn])
+            print("             ----> z, s", self.getz()[iLctn], self.gets()[iLctn])
             try:
-                print("             ----> ", \
-              BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
-                      "; length ", \
-              BLE.BeamLineElement.getinstances()[iLctn+1].getLength())
+                print(
+                    "             ----> ",
+                    BLE.BeamLineElement.getinstances()[iLctn + 1].getName(),
+                    "; length ",
+                    BLE.BeamLineElement.getinstances()[iLctn + 1].getLength(),
+                )
             except:
-                print("             ----> ", \
-                      BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
-                      "; has no length ")
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("             ---->     trace space:", \
-                      self.getTraceSpace()[iLctn])
+                print(
+                    "             ----> ",
+                    BLE.BeamLineElement.getinstances()[iLctn + 1].getName(),
+                    "; has no length ",
+                )
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
+                print(
+                    "             ---->     trace space:", self.getTraceSpace()[iLctn]
+                )
             if len(self.getRPLCPhaseSpace()) == 0:
                 print("             ---->     phase space: not yet filled")
             else:
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("             ---->     phase space:", \
-                          self.getRPLCPhaseSpace()[iLctn])
+                with np.printoptions(linewidth=500, precision=7, suppress=True):
+                    print(
+                        "             ---->     phase space:",
+                        self.getRPLCPhaseSpace()[iLctn],
+                    )
             if len(self.getLabPhaseSpace()) == 0:
                 print("             ----> Lab phase space: not yet filled")
             else:
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("             ----> Lab phase space:", \
-                          self.getLabPhaseSpace()[iLctn])
+                with np.printoptions(linewidth=500, precision=7, suppress=True):
+                    print(
+                        "             ----> Lab phase space:",
+                        self.getLabPhaseSpace()[iLctn],
+                    )
         return " <---- Particle parameter dump complete."
 
-    
-#--------  "Set method" only Debug
-#.. Method believed to be self documenting(!)
+    # --------  "Set method" only Debug
+    # .. Method believed to be self documenting(!)
 
     @classmethod
     def setDebug(cls, Debug=False):
@@ -248,18 +253,18 @@ class Particle:
     @classmethod
     def resetParticleInstances(cls):
         if len(cls.instances) > 0:
-            iRefPrtcl     = cls.instances[0]
+            iRefPrtcl = cls.instances[0]
             cls.instances = []
             cls.instances.append(iRefPrtcl)
-        
+
     def setAll2None(self):
-        self._Location  = []
-        self._z         = []
-        self._s         = []
-        self._TrcSpc    = []
-        self._PhsSpc    = []
+        self._Location = []
+        self._z = []
+        self._s = []
+        self._TrcSpc = []
+        self._PhsSpc = []
         self._LabPhsSpc = []
-        
+
     def setLocation(self, Location):
         Success = False
         if isinstance(Location, str):
@@ -315,16 +320,15 @@ class Particle:
     def setSourceTraceSpace(self, TraceSpace):
         Success = self.setLocation("Source")
         if Success:
-            Success = self.setz(0.)
+            Success = self.setz(0.0)
         if Success:
-            Success = self.sets(0.)
+            Success = self.sets(0.0)
         if Success:
             Success = self.setTraceSpace(TraceSpace)
         return Success
 
-    
-#--------  "Get methods" only; version, reference, and constants
-#.. Methods believed to be self documenting(!)
+    # --------  "Get methods" only; version, reference, and constants
+    # .. Methods believed to be self documenting(!)
 
     @classmethod
     def getDebug(cls):
@@ -336,61 +340,91 @@ class Particle:
 
     def getLocation(self):
         return self._Location
-    
+
     def getz(self):
         return self._z
-    
+
     def gets(self):
         return self._s
-    
+
     def getTraceSpace(self):
         return self._TrcSpc
-    
+
     def getRPLCPhaseSpace(self):
         return self._PhsSpc
-    
+
     def getLabPhaseSpace(self):
         return self._LabPhsSpc
 
-            
-#--------  Utilities:
+    # --------  Utilities:
     @classmethod
-    def timespread(cls):
-        element_list = BL.BeamLine.getElement()
-        print(element_list)
+    def calcLongitudinalSpread(cls, iLoc):
+
+        for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
+            if isinstance(iPrtcl, ReferenceParticle):
+                NInsts = len(cls.getParticleInstances())
+                NLocs = len(iPrtcl.getRrOut())
+                zlist = np.full((NInsts, NLocs), np.nan)
+                deltalist = np.full((NInsts, NLocs), np.nan)
+                p0iLoc = mth.sqrt(
+                    np.dot(iPrtcl.getPrOut()[iLoc][:3], iPrtcl.getPrOut()[iLoc][:3])
+                )
+                E0iLoc = iPrtcl.getPrOut()[iLoc][3]
+                continue
+            iTraceSpace = np.array(iPrtcl.getTraceSpace())
+            maxN = len(iTraceSpace)
+
+            zlist[nPrtcl, :maxN] = iTraceSpace[:, 4]
+            deltalist[nPrtcl, :maxN] = iTraceSpace[:, 5]
+
+        zlist = zlist[:, iLoc]
+        deltalist = deltalist[:, iLoc]
+
+        zlist = zlist[~np.isnan(zlist)]
+        deltalist = deltalist[~np.isnan(deltalist)]
+
+        b0 = p0iLoc / E0iLoc
+        E = E0iLoc + deltalist * p0iLoc
+        p = np.sqrt(E**2 - protonMASS**2)
+        b = p / E
+        E -= protonMASS
+
+        t = zlist * b0 / (b * speed_of_light)
+        return sum(t**2), sum((E-E0iLoc)**2)
 
     @classmethod
     def cleanParticles(cls):
         DoneOK = False
-        
+
         for iPrtcl in cls.getParticleInstances():
             if not isinstance(iPrtcl, ReferenceParticle):
                 del iPrtcl
-            
+
         cls.resetParticleInstances()
         DoneOK = True
 
         return DoneOK
-    
+
     @classmethod
     def plotTraceSpaceProgression(cls):
 
-        font = {'family': 'serif', \
-                'color':  'darkred', \
-                'weight': 'normal', \
-                'size': 16, \
-                }
-        plt.rcParams["figure.figsize"] = (7.5, 10.)
-        
-        nLoc   = []
-        xLoc   = []
-        xpLoc  = []
-        yLoc   = []
-        ypLoc  = []
-        ELoc   = []
-        ELab   = []
-        Scl    = []
-        
+        font = {
+            "family": "serif",
+            "color": "darkred",
+            "weight": "normal",
+            "size": 16,
+        }
+        plt.rcParams["figure.figsize"] = (7.5, 10.0)
+
+        nLoc = []
+        xLoc = []
+        xpLoc = []
+        yLoc = []
+        ypLoc = []
+        ELoc = []
+        ELab = []
+        Scl = []
+
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
@@ -400,7 +434,7 @@ class Particle:
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
-                if iLoc > (len(xLoc)-1):
+                if iLoc > (len(xLoc) - 1):
                     nLoc.append(iPrtcl.getLocation()[iLoc])
                     xLoc.append([])
                     xpLoc.append([])
@@ -416,24 +450,30 @@ class Particle:
                 print("     ---->", iRefPrtcl.getPrOut()[iLoc])
                 """
 
-                p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc][:3], \
-                                     iRefPrtcl.getPrOut()[iLoc][:3]))
-                E0  = iRefPrtcl.getPrOut()[iLoc][3]
-                b0  = p0/E0
-                E   = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
-                p   = mth.sqrt(E**2 - protonMASS**2)
-                E  -= protonMASS
-                D   = mth.sqrt(1. + \
-                               2.*iPrtcl.getTraceSpace()[iLoc][5]/b0 +
-                               iPrtcl.getTraceSpace()[iLoc][5]**2)
+                p0 = mth.sqrt(
+                    np.dot(
+                        iRefPrtcl.getPrOut()[iLoc][:3], iRefPrtcl.getPrOut()[iLoc][:3]
+                    )
+                )
+                E0 = iRefPrtcl.getPrOut()[iLoc][3]
+                b0 = p0 / E0
+                E = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
+                p = mth.sqrt(E**2 - protonMASS**2)
+                E -= protonMASS
+                D = mth.sqrt(
+                    1.0
+                    + 2.0 * iPrtcl.getTraceSpace()[iLoc][5] / b0
+                    + iPrtcl.getTraceSpace()[iLoc][5] ** 2
+                )
 
-                eps = ( iPrtcl.getTraceSpace()[iLoc][1]**2 +    \
-                        iPrtcl.getTraceSpace()[iLoc][3]**2  ) / \
-                        (2.*D**2)
+                eps = (
+                    iPrtcl.getTraceSpace()[iLoc][1] ** 2
+                    + iPrtcl.getTraceSpace()[iLoc][3] ** 2
+                ) / (2.0 * D**2)
                 """
                 eps = (p - p0) / p0
                 """
-                
+
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
                 yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
@@ -441,71 +481,74 @@ class Particle:
                 ELoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
                 ELab[iLoc].append(E)
                 Scl[iLoc].append(eps)
-                
-        plotFILE = '99-Scratch/ParticleProgressionPlot.pdf'
+
+        plotFILE = "99-Scratch/ParticleProgressionPlot.pdf"
         with PdfPages(plotFILE) as pdf:
             for iLoc in range(len(xLoc)):
-                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.))
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6.0, 6.0))
                 # add an artist, in this case a nice label in the middle...
                 Ttl = nLoc[iLoc]
                 fig.suptitle(Ttl, fontdict=font)
 
-                #axs[0, 0].set_title('x,y')
+                # axs[0, 0].set_title('x,y')
                 axs[0, 0].hist2d(xLoc[iLoc], yLoc[iLoc], bins=100)
-                axs[0, 0].set_xlabel('x (m)')
-                axs[0, 0].set_ylabel('y (m)')
-            
-                #axs[0, 1].set_title('Energy')
-                axs[0, 1].hist(ELoc[iLoc], 100)
-                axs[0, 1].set_xlabel('delta')
-                axs[0, 1].set_ylabel('Number')
-            
-                #axs[1, 0].set_title('x, xprime')
-                axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
-                axs[1, 0].set_xlabel('x (m)')
-                axs[1, 0].set_ylabel('xprime (m)')
+                axs[0, 0].set_xlabel("x (m)")
+                axs[0, 0].set_ylabel("y (m)")
 
-                #axs[1, 1].set_title('y, yprime')
+                # axs[0, 1].set_title('Energy')
+                axs[0, 1].hist(ELoc[iLoc], 100)
+                axs[0, 1].set_xlabel("delta")
+                axs[0, 1].set_ylabel("Number")
+
+                # axs[1, 0].set_title('x, xprime')
+                axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
+                axs[1, 0].set_xlabel("x (m)")
+                axs[1, 0].set_ylabel("xprime (m)")
+
+                # axs[1, 1].set_title('y, yprime')
                 axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
-                axs[1, 1].set_xlabel('y (m)')
-                axs[1, 1].set_ylabel('yprime (m)')
+                axs[1, 1].set_xlabel("y (m)")
+                axs[1, 1].set_ylabel("yprime (m)")
 
                 axs[2, 0].hist(ELab[iLoc], 100)
-                axs[2, 0].set_xlabel('Kinetic energy (MeV)')
-                axs[2, 0].set_ylabel('Number')
+                axs[2, 0].set_xlabel("Kinetic energy (MeV)")
+                axs[2, 0].set_ylabel("Number")
 
                 axs[2, 1].hist(Scl[iLoc], 100)
-                axs[2, 1].set_xlabel('Epsilon')
-                axs[2, 1].set_ylabel('Number')
+                axs[2, 1].set_xlabel("Epsilon")
+                axs[2, 1].set_ylabel("Number")
 
-        
                 pdf.savefig()
                 plt.close()
-            
 
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
-            with np.printoptions(linewidth=500,precision=5,suppress=True):
-                print(self.getLocation()[iLoc], ": z, s, trace space:", \
-                      self.getz()[iLoc], self.gets()[iLoc], \
-                      self.getTraceSpace()[iLoc])
+            with np.printoptions(linewidth=500, precision=5, suppress=True):
+                print(
+                    self.getLocation()[iLoc],
+                    ": z, s, trace space:",
+                    self.getz()[iLoc],
+                    self.gets()[iLoc],
+                    self.getTraceSpace()[iLoc],
+                )
 
     @classmethod
     def plotLongitudinalTraceSpaceProgression(cls):
-        print("test")        
-        font = {'family': 'serif', \
-                'color':  'darkred', \
-                'weight': 'normal', \
-                'size': 16, \
-                }
-        plt.rcParams["figure.figsize"] = (7.5, 10.)
-        
-        nLoc   = []
-        zLoc   = []
-        delLoc  = []
-        tLoc   = []
-        ELoc   = []
-        
+        print("test")
+        font = {
+            "family": "serif",
+            "color": "darkred",
+            "weight": "normal",
+            "size": 16,
+        }
+        plt.rcParams["figure.figsize"] = (7.5, 10.0)
+
+        nLoc = []
+        zLoc = []
+        delLoc = []
+        tLoc = []
+        ELoc = []
+
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
@@ -515,206 +558,204 @@ class Particle:
             iLoc = -1
             for iTrcSpc in iPrtcl.getTraceSpace():
                 iLoc += 1
-                if iLoc > (len(zLoc)-1):
+                if iLoc > (len(zLoc) - 1):
                     nLoc.append(iPrtcl.getLocation()[iLoc])
                     zLoc.append([])
                     delLoc.append([])
                     tLoc.append([])
                     ELoc.append([])
 
-                p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc][:3], \
-                                     iRefPrtcl.getPrOut()[iLoc][:3]))
-                E0  = iRefPrtcl.getPrOut()[iLoc][3]
-                b0  = p0/E0
-                E   = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
-                p   = mth.sqrt(E**2 - protonMASS**2)
-                b   = p/E
-                E  -= protonMASS
+                p0 = mth.sqrt(
+                    np.dot(
+                        iRefPrtcl.getPrOut()[iLoc][:3], iRefPrtcl.getPrOut()[iLoc][:3]
+                    )
+                )
+                E0 = iRefPrtcl.getPrOut()[iLoc][3]
+                b0 = p0 / E0
+                E = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
+                p = mth.sqrt(E**2 - protonMASS**2)
+                b = p / E
+                E -= protonMASS
 
-                t = iPrtcl.getTraceSpace()[iLoc][4]*b0 / (b*speed_of_light)
-                
-                zLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][4]*b0)
+                t = iPrtcl.getTraceSpace()[iLoc][4] * b0 / (b * speed_of_light)
+
+                zLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][4] * b0)
                 delLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][5])
                 tLoc[iLoc].append(t)
                 ELoc[iLoc].append(E)
-                
-        plotFILE = '99-Scratch/ParticleLongiProgressionPlot.pdf'
+
+        plotFILE = "99-Scratch/ParticleLongiProgressionPlot.pdf"
         with PdfPages(plotFILE) as pdf:
             for iLoc in range(len(zLoc)):
-                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6., 6.))
+                fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(6.0, 6.0))
                 # add an artist, in this case a nice label in the middle...
                 Ttl = nLoc[iLoc]
                 fig.suptitle(Ttl, fontdict=font)
 
                 axs[0, 0].hist2d(zLoc[iLoc], delLoc[iLoc], bins=100)
-                axs[0, 0].set_xlabel('z (m)')
-                axs[0, 0].set_ylabel('delta')
-            
+                axs[0, 0].set_xlabel("z (m)")
+                axs[0, 0].set_ylabel("delta")
+
                 axs[0, 1].hist(delLoc[iLoc], 100)
-                axs[0, 1].set_xlabel('Delta')
-                axs[0, 1].set_ylabel('Number')
+                axs[0, 1].set_xlabel("Delta")
+                axs[0, 1].set_ylabel("Number")
 
                 axs[1, 0].hist(zLoc[iLoc], 100)
-                axs[1, 0].set_xlabel('z (m)')
-                axs[1, 0].set_ylabel('Number')
-            
+                axs[1, 0].set_xlabel("z (m)")
+                axs[1, 0].set_ylabel("Number")
+
                 axs[1, 1].hist(tLoc[iLoc], 100)
-                axs[1, 1].set_xlabel('t (s)')
-                axs[1, 1].set_ylabel('Number')
+                axs[1, 1].set_xlabel("t (s)")
+                axs[1, 1].set_ylabel("Number")
 
                 axs[2, 0].hist(ELoc[iLoc], 100)
-                axs[2, 0].set_xlabel('Kinetic energy (MeV)')
-                axs[2, 0].set_ylabel('Number')
+                axs[2, 0].set_xlabel("Kinetic energy (MeV)")
+                axs[2, 0].set_ylabel("Number")
 
                 axs[2, 1].hist2d(tLoc[iLoc], ELoc[iLoc], bins=100)
-                axs[2, 1].set_xlabel('t (s)')
-                axs[2, 1].set_ylabel('Kinetic energy (MeV)')
+                axs[2, 1].set_xlabel("t (s)")
+                axs[2, 1].set_ylabel("Kinetic energy (MeV)")
 
-        
                 pdf.savefig()
                 plt.close()
-
-
-    
-        
-            
 
     def printProgression(self):
 
         for iLoc in range(len(self.getLocation())):
-            with np.printoptions(linewidth=500,precision=5,suppress=True):
-                print(self.getLocation()[iLoc], ": z, s, trace space:", \
-                      self.getz()[iLoc], self.gets()[iLoc], \
-                      self.getTraceSpace()[iLoc])
+            with np.printoptions(linewidth=500, precision=5, suppress=True):
+                print(
+                    self.getLocation()[iLoc],
+                    ": z, s, trace space:",
+                    self.getz()[iLoc],
+                    self.gets()[iLoc],
+                    self.getTraceSpace()[iLoc],
+                )
 
-
-#--------  Processing methods:
+    # --------  Processing methods:
     @classmethod
     def fillPhaseSpaceAll(cls):
         Success = False
         if cls.getDebug():
             print(" Particle.fillPhaseSpaceAll, start:")
-            print("     ----> fill phase space for", \
-                  len(cls.getParticleInstances()), \
-                  "particle instances.")
+            print(
+                "     ----> fill phase space for",
+                len(cls.getParticleInstances()),
+                "particle instances.",
+            )
 
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1
             if cls.getDebug():
                 print("     ----> Particle:", nPrtcl)
-            
+
             if not isinstance(iPrtcl, ReferenceParticle):
                 if Particle.getDebug():
-                    print("         ----> Fill phase space for particle:", \
-                          nPrtcl)
+                    print("         ----> Fill phase space for particle:", nPrtcl)
                     Success = iPrtcl.fillPhaseSpace()
 
         if cls.getDebug():
-            print("     ----> Particle.fillPhaseSpaceAll:", \
-                  "fill phase space Success =", Success)
+            print(
+                "     ----> Particle.fillPhaseSpaceAll:",
+                "fill phase space Success =",
+                Success,
+            )
             print(" <----  Particle.fillPhaseSpaceAll, compete.")
-            
+
         return Success
-    
+
     def fillPhaseSpace(self):
         Success = False
         if self.getDebug():
             print(" Particle.fillPhaseSpace, start:")
-            print("     ----> fill phase space for particle with", \
-                  len(self.getLocation()), "records.")
+            print(
+                "     ----> fill phase space for particle with",
+                len(self.getLocation()),
+                "records.",
+            )
 
         iRefPrtcl = ReferenceParticle.getinstance()
 
         nLoc = 0
         for iLoc in self.getLocation():
             if self.getDebug():
-                print("         ----> Convert at location:", \
-                      iLoc)
-            PhsSpc  = self.calcRPLCPhaseSpace(nLoc)
+                print("         ----> Convert at location:", iLoc)
+            PhsSpc = self.calcRPLCPhaseSpace(nLoc)
             Success = self.setRPLCPhaseSpace(PhsSpc)
 
             RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
-            drLab   = np.matmul(RotMtrx, PhsSpc[0])
-            pLab    = np.matmul(RotMtrx, PhsSpc[1])
+            drLab = np.matmul(RotMtrx, PhsSpc[0])
+            pLab = np.matmul(RotMtrx, PhsSpc[1])
 
-            rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
+            rLab = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
 
             LabPhsSpc = [rLab, pLab]
-            Success   = self.setLabPhaseSpace(LabPhsSpc)
+            Success = self.setLabPhaseSpace(LabPhsSpc)
 
-            nLoc  += 1
+            nLoc += 1
 
         if nLoc == len(self.getLocation()):
             Success = True
-        
+
         if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Particle.fillPhaseSpace: RPLC phase space:", \
-                      PhsSpc)
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Particle.fillPhaseSpace:  Lab phase space:", \
-                      LabPhsSpc)
-            print(" <----  Particle.fillPhaseSpace, compete.", \
-                  "Success:", Success)
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
+                print("     ----> Particle.fillPhaseSpace: RPLC phase space:", PhsSpc)
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
+                print(
+                    "     ----> Particle.fillPhaseSpace:  Lab phase space:", LabPhsSpc
+                )
+            print(" <----  Particle.fillPhaseSpace, compete.", "Success:", Success)
 
         return Success
 
     def calcRPLCPhaseSpace(self, nLoc=None):
         if self.getDebug():
-            print(" Particle.calcRPLCPhaseSpace for nLoc:", \
-                  nLoc, "start:")
-            
+            print(" Particle.calcRPLCPhaseSpace for nLoc:", nLoc, "start:")
+
         TrcSpc = self.getTraceSpace()[nLoc]
         if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print("     ----> trace space:", TrcSpc)
 
-        rRPLC  = np.array([TrcSpc[0], TrcSpc[2], 0.])
+        rRPLC = np.array([TrcSpc[0], TrcSpc[2], 0.0])
 
-        p0     = BL.BeamLine.getElement()[0].getp0()
-        E      = np.sprt(protonMASS**2 + p0**2)
-        Enrgy  = protonMASS + TrcSpc[5]*p0
-        
-        Mmtm   = mth.sqrt(Enrgy**2 - protonMASS**2)
-        zPrm   = mth.sqrt(1.-TrcSpc[1]**2-TrcSpc[3]**2)
-        pRPLC  = np.array([TrcSpc[1]*Mmtm, \
-                           TrcSpc[3]*Mmtm, \
-                           zPrm*Mmtm])
-                
+        p0 = BL.BeamLine.getElement()[0].getp0()
+        E = np.sprt(protonMASS**2 + p0**2)
+        Enrgy = protonMASS + TrcSpc[5] * p0
+
+        Mmtm = mth.sqrt(Enrgy**2 - protonMASS**2)
+        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)
+        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])
+
         if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print("     ----> position:", rRPLC)
                 print("     ----> Mmtm    :", pRPLC)
 
         PhsSpc = [rRPLC, pRPLC]
 
         if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
+            with np.printoptions(linewidth=500, precision=7, suppress=True):
                 print(" <---- Return phase space:", PhsSpc)
 
         return PhsSpc
 
-
-#--------  I/o methods:
-#                     ----> Write instances:
+    # --------  I/o methods:
+    #                     ----> Write instances:
     @classmethod
     def createParticleFile(cls, datafilePATH=None, datafileNAME=None):
         if cls.getDebug():
             print("Particle.createParticleFile:", datafilePATH, datafileNAME)
-            
+
         if datafilePATH == None:
-            raise noPATH( \
-                         " Particle.createParticleFile: no path given.")
-        
+            raise noPATH(" Particle.createParticleFile: no path given.")
+
         if datafileNAME == None:
-            raise noNAME( \
-                    " Particle.createParticleFile: no file name given.")
+            raise noNAME(" Particle.createParticleFile: no file name given.")
 
         if not os.path.exists(datafilePATH):
-            raise noPATH( \
-                    " Particle.createParticleFile: path does not exist.")
-        
+            raise noPATH(" Particle.createParticleFile: path does not exist.")
+
         ParticleFILE = open(os.path.join(datafilePATH, datafileNAME), "wb")
 
         if cls.getDebug():
@@ -727,75 +768,71 @@ class Particle:
             print("Particle.writeParticle starts.")
 
         if not isinstance(ParticleFILE, io.BufferedWriter):
-            raise noFILE( \
-                    " Particle.writeParticle: file does not exist.")
+            raise noFILE(" Particle.writeParticle: file does not exist.")
 
         nLoc = len(self.getLocation())
         if self.getDebug():
             print("     ----> Number of locations to store:", nLoc)
         record = strct.pack(">i", nLoc)
         ParticleFILE.write(record)
-        
+
         for iLoc in range(len(self.getLocation())):
-            bLocation = bytes(self.getLocation()[iLoc], 'utf-8')
-            
-            record    = strct.pack(">i", len(bLocation))
+            bLocation = bytes(self.getLocation()[iLoc], "utf-8")
+
+            record = strct.pack(">i", len(bLocation))
             ParticleFILE.write(record)
             if self.getDebug():
-                print("         ----> Length of bLocation:", \
-                      strct.unpack(">i", record))
-            
+                print("         ----> Length of bLocation:", strct.unpack(">i", record))
+
             record = bLocation
             ParticleFILE.write(record)
-            
-            if self.getDebug():
-                print("         ----> Location:", bLocation.decode('utf-8'))
 
-            record = strct.pack(">8d",                           \
-                                self.getz()[iLoc],               \
-                                self.gets()[iLoc],               \
-                                self.getTraceSpace()[iLoc][0],   \
-                                self.getTraceSpace()[iLoc][1],   \
-                                self.getTraceSpace()[iLoc][2],   \
-                                self.getTraceSpace()[iLoc][3],   \
-                                self.getTraceSpace()[iLoc][4],   \
-                                self.getTraceSpace()[iLoc][5])
+            if self.getDebug():
+                print("         ----> Location:", bLocation.decode("utf-8"))
+
+            record = strct.pack(
+                ">8d",
+                self.getz()[iLoc],
+                self.gets()[iLoc],
+                self.getTraceSpace()[iLoc][0],
+                self.getTraceSpace()[iLoc][1],
+                self.getTraceSpace()[iLoc][2],
+                self.getTraceSpace()[iLoc][3],
+                self.getTraceSpace()[iLoc][4],
+                self.getTraceSpace()[iLoc][5],
+            )
             ParticleFILE.write(record)
             if self.getDebug():
-                print("         ----> z, s, trace space:", \
-                      strct.unpack(">8d",record))
-        
+                print("         ----> z, s, trace space:", strct.unpack(">8d", record))
+
         Cleaned = self.cleanParticles()
-        
+
     @classmethod
     def flushNcloseParticleFile(cls, ParticleFILE=None):
         if cls.getDebug():
             print("Particle.flushNcloseParticleFile starts")
 
         if not isinstance(ParticleFILE, io.BufferedWriter):
-            raise noFILE( \
-                    " Particle.flushNcloseParticle: file does not exist.")
+            raise noFILE(" Particle.flushNcloseParticle: file does not exist.")
 
         ParticleFILE.flush()
         ParticleFILE.close()
-#                     ----> Write instances:
+
+    #                     ----> Write instances:
     @classmethod
     def openParticleFile(cls, datafilePATH=None, datafileNAME=None):
         if cls.getDebug():
             print("Particle.openParticleFile:", datafilePATH, datafileNAME)
-            
+
         if datafilePATH == None:
-            raise noPATH( \
-                         " Particle.openParticleFile: no path given.")
-        
+            raise noPATH(" Particle.openParticleFile: no path given.")
+
         if datafileNAME == None:
-            raise noNAME( \
-                    " Particle.openParticleFile: no file name given.")
+            raise noNAME(" Particle.openParticleFile: no file name given.")
 
         if not os.path.exists(datafilePATH):
-            raise noPATH( \
-                    " Particle.openParticleFile: path does not exist.")
-        
+            raise noPATH(" Particle.openParticleFile: path does not exist.")
+
         ParticleFILE = open(os.path.join(datafilePATH, datafileNAME), "rb")
 
         if cls.getDebug():
@@ -809,17 +846,16 @@ class Particle:
             print("Particle.readParticle starts.")
 
         if not isinstance(ParticleFILE, io.BufferedReader):
-            raise noFILE( \
-                    " Particle.writeParticle: file does not exist.")
+            raise noFILE(" Particle.writeParticle: file does not exist.")
 
         brecord = ParticleFILE.read(4)
-        if brecord == b'':
+        if brecord == b"":
             if cls.getDebug():
                 print(" <---- end of file, return.")
             return True
-        
-        record  = strct.unpack(">i", brecord)
-        nLoc    = record[0]
+
+        record = strct.unpack(">i", brecord)
+        nLoc = record[0]
         if cls.getDebug():
             print("     ----> Number of locations to read:", nLoc)
         if nLoc > 0:
@@ -827,27 +863,30 @@ class Particle:
 
         for iLoc in range(nLoc):
             brecord = ParticleFILE.read(4)
-            record  = strct.unpack(">i", brecord)
-            len     = record[0]
+            record = strct.unpack(">i", brecord)
+            len = record[0]
             if cls.getDebug():
                 print("         ----> Length of bLocation:", len)
-            
-            brecord  = ParticleFILE.read(len)
-            Location = brecord.decode('utf-8')
+
+            brecord = ParticleFILE.read(len)
+            Location = brecord.decode("utf-8")
             if cls.getDebug():
                 print("         ----> Location:", Location)
 
-            brecord = ParticleFILE.read((8*8))
-            record  = strct.unpack(">8d", brecord)
-            z       = float(record[0])
-            s       = float(record[1])
-            TrcSpc = np.array([                  \
-                               float(record[2]), \
-                               float(record[3]), \
-                               float(record[4]), \
-                               float(record[5]), \
-                               float(record[6]), \
-                               float(record[7])] )
+            brecord = ParticleFILE.read((8 * 8))
+            record = strct.unpack(">8d", brecord)
+            z = float(record[0])
+            s = float(record[1])
+            TrcSpc = np.array(
+                [
+                    float(record[2]),
+                    float(record[3]),
+                    float(record[4]),
+                    float(record[5]),
+                    float(record[6]),
+                    float(record[7]),
+                ]
+            )
             if cls.getDebug():
                 print("         ----> z, s, trace space:", z, s, TrcSpc)
 
@@ -857,18 +896,17 @@ class Particle:
             print("     <---- Particle instsance")
             print(iPrtcl)
             print(" <---- readParticle done.")
-            
+
         cls.setDebug(False)
-        return False        
-        
+        return False
+
     @classmethod
     def closeParticleFile(cls, ParticleFILE=None):
         if cls.getDebug():
             print("Particle.closeParticleFile starts")
 
         if not isinstance(ParticleFILE, io.BufferedReader):
-            raise noFILE( \
-                    " Particle.closeParticle: file does not exist.")
+            raise noFILE(" Particle.closeParticle: file does not exist.")
 
         ParticleFILE.close()
 
@@ -978,32 +1016,38 @@ Created on Mon 15Nov23: Version history:
 
 @author: kennethlong
 """
+
+
 class ReferenceParticle(Particle):
     __instance = None
-    __RPDebug  = False
+    __RPDebug = False
 
-#--------  "Built-in methods":
+    # --------  "Built-in methods":
     def __init__(self):
         if ReferenceParticle.getinstance() is None:
             if self.__RPDebug:
-                print(' ReferenceParticle(Particle).__init__: ', \
-                      'creating the ReferenceParticle object')
+                print(
+                    " ReferenceParticle(Particle).__init__: ",
+                    "creating the ReferenceParticle object",
+                )
             ReferenceParticle.setinstance(self)
 
-            #.. Set ReferenceParticle attributes to None:
+            # .. Set ReferenceParticle attributes to None:
             self.setAllRP2None()
 
-            #.. Particle class initialisation:
+            # .. Particle class initialisation:
             Particle.__init__(self)
-        
+
             # Only constants; print values that will be used:
             if self.getRPDebug():
                 print(self)
-                
+
         else:
-            print(' ReferenceParticle(Particle).__init__: ',       \
-                  " attempt to create second reference particle.", \
-                  " Abort!")
+            print(
+                " ReferenceParticle(Particle).__init__: ",
+                " attempt to create second reference particle.",
+                " Abort!",
+            )
             raise secondReferenceParticle(" Second call not allowed.")
 
         return
@@ -1030,64 +1074,58 @@ class ReferenceParticle(Particle):
         print(self.print())
         return " <---- ReferenceParticle __str__ done."
 
-    
-#--------  "Get methods" only; version, reference, and constants
-#.. Methods believed to be self documenting(!)
+    # --------  "Get methods" only; version, reference, and constants
+    # .. Methods believed to be self documenting(!)
 
     @classmethod
     def getinstance(cls):
         return cls.__instance
-        
+
     def getRPDebug(self):
         return self.__RPDebug
 
     def getsIn(self):
         return self._sIn
-        
+
     def getsOut(self):
         return self._sOut
-        
+
     def getRrIn(self):
         return self._RrIn
-        
+
     def getRrOut(self):
         return self._RrOut
-        
+
     def getPrIn(self):
         return self._PrIn
 
     def getMomentumIn(self, iLoc):
-        return mth.sqrt(np.dot(self.getPrIn()[iLoc][:3], \
-                               self.getPrIn()[iLoc][:3]))
-        
+        return mth.sqrt(np.dot(self.getPrIn()[iLoc][:3], self.getPrIn()[iLoc][:3]))
+
     def getPrOut(self):
         return self._PrOut
-    
+
     def getMomentumOut(self, iLoc):
-        return mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
-                               self.getPrOut()[iLoc][:3]))
-        
+        return mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], self.getPrOut()[iLoc][:3]))
+
     def getRot2LabIn(self):
         return self._Rot2LabIn
-        
+
     def getRot2LabOut(self):
         return self._Rot2LabOut
 
     def getb0(self, iLoc):
-        p0  = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
-                              self.getPrOut()[iLoc][:3]))
-        E0  = self.getPrOut()[iLoc][3]
-        b0 = p0/E0
+        p0 = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], self.getPrOut()[iLoc][:3]))
+        E0 = self.getPrOut()[iLoc][3]
+        b0 = p0 / E0
         return b0
-        
-    def getg0b0(self, iLoc):
-        p0   = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
-                              self.getPrOut()[iLoc][:3]))
-        g0b0 = p0/protonMASS
-        return g0b0
-        
 
-#--------  "Set methods";
+    def getg0b0(self, iLoc):
+        p0 = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], self.getPrOut()[iLoc][:3]))
+        g0b0 = p0 / protonMASS
+        return g0b0
+
+    # --------  "Set methods";
     @classmethod
     def cleaninstance(cls):
         if isinstance(cls.__instance, ReferenceParticle):
@@ -1112,13 +1150,13 @@ class ReferenceParticle(Particle):
             raise badArgument()
 
     def setAllRP2None(self):
-        self._sIn        = []
-        self._sOut       = []
-        self._RrIn       = []
-        self._PrIn       = []
-        self._RrOut      = []
-        self._PrOut      = []
-        self._Rot2LabIn  = []
+        self._sIn = []
+        self._sOut = []
+        self._RrIn = []
+        self._PrIn = []
+        self._RrOut = []
+        self._PrOut = []
+        self._Rot2LabIn = []
         self._Rot2LabOut = []
 
     def setsIn(self, sIn):
@@ -1177,32 +1215,29 @@ class ReferenceParticle(Particle):
             Success = True
         return Success
 
-        
-#--------  Processing methods:
+    # --------  Processing methods:
     def setReferenceParticle(self):
         Success = False
         if self.getRPDebug():
-            print(" ReferenceParticle(Particle).setReferenceParticle", \
-                  "starts.")
+            print(" ReferenceParticle(Particle).setReferenceParticle", "starts.")
 
-        #.. Loop over beam-line elements:
+        # .. Loop over beam-line elements:
         for iBLE in BLE.BeamLineElement.getinstances():
             if isinstance(iBLE, BLE.Facility):
                 continue
             if isinstance(iBLE, BLE.Source):
                 Success = self.setReferenceParticleAtSource()
                 if not Success:
-                    raise fail2setReferenceParticle( \
-                                   "setReferenceParticleAtSource")
-            elif isinstance(iBLE, BLE.Drift)             or \
-                 isinstance(iBLE, BLE.Aperture)          or \
-                 isinstance(iBLE, BLE.FocusQuadrupole)   or \
-                 isinstance(iBLE, BLE.DefocusQuadrupole)    :
+                    raise fail2setReferenceParticle("setReferenceParticleAtSource")
+            elif (
+                isinstance(iBLE, BLE.Drift)
+                or isinstance(iBLE, BLE.Aperture)
+                or isinstance(iBLE, BLE.FocusQuadrupole)
+                or isinstance(iBLE, BLE.DefocusQuadrupole)
+            ):
                 Success = self.setReferenceParticleAtDrift(iBLE)
                 if not Success:
-                    raise fail2setReferenceParticle( \
-                                   "setReferenceParticleAtDrift")
-                
+                    raise fail2setReferenceParticle("setReferenceParticleAtDrift")
 
             Success = self.setLocation(iBLE.getName())
             if not Success:
@@ -1215,22 +1250,23 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtSource(self):
-        nRcrds  = len(self.getsIn())
-        
-        Success = self.setLocation(BLE.BeamLineElement.getinstances()\
-                                   [nRcrds+1].getName())
+        nRcrds = len(self.getsIn())
+
+        Success = self.setLocation(
+            BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
+        )
         if not Success:
             raise fail2setReferenceParticle("Name")
 
-        Success = self.setsIn(0.)
+        Success = self.setsIn(0.0)
         if not Success:
             raise fail2setReferenceParticle("sIn")
-        Success = self.setsOut(0.)
+        Success = self.setsOut(0.0)
         if not Success:
             raise fail2setReferenceParticle("sOut")
 
-        RrIn  = np.array([0., 0., 0., 0.])
-        RrOut = np.array([0., 0., 0., 0.])
+        RrIn = np.array([0.0, 0.0, 0.0, 0.0])
+        RrOut = np.array([0.0, 0.0, 0.0, 0.0])
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1238,11 +1274,10 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        p0       = BL.BeamLine.getElement()[0].getp0()
-        Ref4mmtm = np.array([0., 0., p0,
-                             mth.sqrt(p0**2 + protonMASS**2)])
-        
-        PrIn  = Ref4mmtm
+        p0 = BL.BeamLine.getElement()[0].getp0()
+        Ref4mmtm = np.array([0.0, 0.0, p0, mth.sqrt(p0**2 + protonMASS**2)])
+
+        PrIn = Ref4mmtm
         PrOut = Ref4mmtm
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1251,16 +1286,8 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("PrOut")
 
-        Rot2LabIn  = np.array([                  \
-                               [1., 0., 0.],      \
-                               [0., 1., 0.],      \
-                               [0., 0., 1.]       \
-                                      ])
-        Rot2LabOut = np.array([                   \
-                               [1., 0., 0.],      \
-                               [0., 1., 0.],      \
-                               [0., 0., 1.]       \
-                              ])
+        Rot2LabIn = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        Rot2LabOut = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
@@ -1268,14 +1295,14 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("Rot2LabOut")
 
-        #.. Now particle position/trace space:
+        # .. Now particle position/trace space:
         Success = self.setz(self.getRrOut()[0][3])
         if not Success:
             raise fail2setReferenceParticle("setz")
         Success = self.sets(self.getsOut()[0])
         if not Success:
             raise fail2setReferenceParticle("sets")
-        TrcSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:
             raise fail2setReferenceParticle("setTraceSpace")
@@ -1283,35 +1310,38 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtDrift(self, iBLE=None):
-        nRcrds  = len(self.getsIn())
-        
-        Success = self.setLocation(BLE.BeamLineElement.getinstances()\
-                                   [nRcrds+1].getName())
+        nRcrds = len(self.getsIn())
+
+        Success = self.setLocation(
+            BLE.BeamLineElement.getinstances()[nRcrds + 1].getName()
+        )
         if not Success:
             raise fail2setReferenceParticle("Name")
 
-        Success = self.setsIn(self.getsOut()[nRcrds-1])
+        Success = self.setsIn(self.getsOut()[nRcrds - 1])
         if not Success:
             raise fail2setReferenceParticle("sIn")
-        Success = self.setsOut(self.getsOut()[nRcrds-1] + iBLE.getLength())
+        Success = self.setsOut(self.getsOut()[nRcrds - 1] + iBLE.getLength())
         if not Success:
             raise fail2setReferenceParticle("sOut")
-        
-        RrIn  = self.getRrOut()[nRcrds-1]
-        Mmtm  = mth.sqrt(                             \
-                    self.getPrOut()[nRcrds-1][0]**2 + \
-                    self.getPrOut()[nRcrds-1][1]**2 + \
-                    self.getPrOut()[nRcrds-1][2]**2   \
-                        )
-        cx    = self.getPrOut()[nRcrds-1][0] / Mmtm
-        cy    = self.getPrOut()[nRcrds-1][1] / Mmtm
-        cz    = self.getPrOut()[nRcrds-1][2] / Mmtm
-        RrOut = np.array([ \
-                           RrIn[0] + cx*iBLE.getLength(), \
-                           RrIn[1] + cy*iBLE.getLength(), \
-                           RrIn[2] + cz*iBLE.getLength(), \
-                           0.                             \
-                          ])
+
+        RrIn = self.getRrOut()[nRcrds - 1]
+        Mmtm = mth.sqrt(
+            self.getPrOut()[nRcrds - 1][0] ** 2
+            + self.getPrOut()[nRcrds - 1][1] ** 2
+            + self.getPrOut()[nRcrds - 1][2] ** 2
+        )
+        cx = self.getPrOut()[nRcrds - 1][0] / Mmtm
+        cy = self.getPrOut()[nRcrds - 1][1] / Mmtm
+        cz = self.getPrOut()[nRcrds - 1][2] / Mmtm
+        RrOut = np.array(
+            [
+                RrIn[0] + cx * iBLE.getLength(),
+                RrIn[1] + cy * iBLE.getLength(),
+                RrIn[2] + cz * iBLE.getLength(),
+                0.0,
+            ]
+        )
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1319,7 +1349,7 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        PrIn  = self.getPrOut()[nRcrds-1]
+        PrIn = self.getPrOut()[nRcrds - 1]
         PrOut = PrIn
         Success = self.setPrIn(PrIn)
         if not Success:
@@ -1328,7 +1358,7 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("PrOut")
 
-        Rot2LabIn  = self.getRot2LabOut()[nRcrds-1]
+        Rot2LabIn = self.getRot2LabOut()[nRcrds - 1]
         Rot2LabOut = Rot2LabIn
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
@@ -1336,45 +1366,54 @@ class ReferenceParticle(Particle):
         Success = self.setRot2LabOut(Rot2LabOut)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabOut")
-        
-        #.. Now particle position/trace space:
+
+        # .. Now particle position/trace space:
         Success = self.setz(self.getRrOut()[nRcrds][2])
         if not Success:
             raise fail2setReferenceParticle("setz")
         Success = self.sets(self.getsOut()[nRcrds])
         if not Success:
             raise fail2setReferenceParticle("sets")
-        TrcSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        TrcSpc = np.array([0.0, 0.0, 0.0, 0.0, np.nan, np.nan])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:
             raise fail2setReferenceParticle("setTraceSpace")
-        
+
         return Success
-    
-#--------  Exceptions:
+
+
+# --------  Exceptions:
 class noReferenceParticle(Exception):
     pass
+
 
 class badParticle(Exception):
     pass
 
+
 class badParameter(Exception):
     pass
+
 
 class noPATH(Exception):
     pass
 
+
 class noNAME(Exception):
     pass
+
 
 class noFILE(Exception):
     pass
 
+
 class badArgument(Exception):
     pass
 
+
 class secondReferenceParticle(Exception):
     pass
+
 
 class fail2setReferenceParticle(Exception):
     pass
