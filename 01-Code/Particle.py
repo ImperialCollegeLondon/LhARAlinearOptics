@@ -366,23 +366,36 @@ class Particle:
                 NLocs = len(iPrtcl.getRrOut())
                 zlist = np.full((NInsts, NLocs), np.nan)
                 deltalist = np.full((NInsts, NLocs), np.nan)
+
+                # momentum at iLoc BeamLine element
                 p0iLoc = mth.sqrt(
                     np.dot(iPrtcl.getPrOut()[iLoc][:3], iPrtcl.getPrOut()[iLoc][:3])
                 )
+
+                # energy at iLoc BeamLine element
                 E0iLoc = iPrtcl.getPrOut()[iLoc][3]
+
                 continue
+
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
             maxN = len(iTraceSpace)
 
             zlist[nPrtcl, :maxN] = iTraceSpace[:, 4]
             deltalist[nPrtcl, :maxN] = iTraceSpace[:, 5]
 
+        # trace space z at iLoc BeamLine element
         zlist = zlist[:, iLoc]
+
+        # trace space delta at iLoc BeamLine element
         deltalist = deltalist[:, iLoc]
 
+        # remove nans
         zlist = zlist[~np.isnan(zlist)]
         deltalist = deltalist[~np.isnan(deltalist)]
 
+        # copied from longitudinal phase space plots - possible issue here
+        # check print(E0iLoc) - I don't get what I expect!
+        
         b0 = p0iLoc / E0iLoc
         E = E0iLoc + deltalist * p0iLoc
         p = np.sqrt(E**2 - protonMASS**2)
