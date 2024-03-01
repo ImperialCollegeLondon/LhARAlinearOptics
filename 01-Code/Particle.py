@@ -355,6 +355,11 @@ class Particle:
             
 #--------  Utilities:
     @classmethod
+    def timespread(cls):
+        element_list = BL.BeamLine.getElement()
+        print(element_list)
+
+    @classmethod
     def cleanParticles(cls):
         DoneOK = False
         
@@ -487,7 +492,7 @@ class Particle:
 
     @classmethod
     def plotLongitudinalTraceSpaceProgression(cls):
-
+        print("test")        
         font = {'family': 'serif', \
                 'color':  'darkred', \
                 'weight': 'normal', \
@@ -568,9 +573,14 @@ class Particle:
         
                 pdf.savefig()
                 plt.close()
+
+
+    
+        
             
 
     def printProgression(self):
+
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500,precision=5,suppress=True):
                 print(self.getLocation()[iLoc], ": z, s, trace space:", \
