@@ -2464,6 +2464,7 @@ class CylindricalRFCavity(BeamLineElement):
             print("     ----> Frequency (MHz):", _Frequency)
             print("     ----> Phase     (rad):", _Phase)
 
+        
         CylindricalRFCavity.instances.append(self)
 
         OK = self.setAll2None()
@@ -2486,7 +2487,6 @@ class CylindricalRFCavity(BeamLineElement):
         self.setGradient(_Gradient)
         self.setFrequency(_Frequency)
         self.setPhase(_Phase)
-
         _AngularFrequency  = self.getFrequency()*2.*mth.pi * 10.**6
         self.setAngularFrequency(_AngularFrequency)
         _WaveNumber        = self.getAngularFrequency() / speed_of_light
