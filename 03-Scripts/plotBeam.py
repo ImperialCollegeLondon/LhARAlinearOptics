@@ -113,11 +113,14 @@ def main(argv):
 
     iBm.calcCovarianceMatrix()
     sx, sy = iBm.getsigmaxy()
+    iBm.setDebug(True)
+    ex     = iBm.getEmittance()
+    iBm.setDebug(False)
 
     for iLoc in range(len(sx)):
         print("         ----> iLoc:", iLoc)
-        print("             ----> sigma_x, sigma_y:", \
-              sx[iLoc], sy[iLoc])
+        print("             ---->   sigma_x,   sigma_y:", sx[iLoc], sy[iLoc])
+        print("             ----> epsilon_x, epsilon_y:", ex[iLoc])
 
     print("     <---- colective quantities done.")
         

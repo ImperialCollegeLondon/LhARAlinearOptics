@@ -212,26 +212,69 @@ class Beam:
     def getsigmaxy(self):
         sx = []
         sy = []
-        for iLoc in range(len(self.getCovSums())):
-            sx1 = 0.
-            sy1 = 0.
-            if self.getnParticles()[iLoc] > 0:
-                sx2 = self.getCovSums()[iLoc][0,0] / \
-                         float(self.getnParticles()[iLoc])
-                sy2 = self.getCovSums()[iLoc][2,2] / \
-                         float(self.getnParticles()[iLoc])
-                sx1  = np.sqrt(sx2)
-                sy1  = np.sqrt(sy2)
+        for iLoc in range(len(self.getCovarianceMatrix())):
+            sx1  = np.sqrt(self.getCovarianceMatrix()[iLoc][0,0])
+            sy1  = np.sqrt(self.getCovarianceMatrix()[iLoc][2,2])
                 
             if self.getDebug():
                 print(" Beam.getsigmaxy: iLoc, sx1, sy1:", \
                       iLoc, sx1, sy1)
+                
             sx.append(sx1)
             sy.append(sy1)
 
         return sx, sy
-    
+
+    def getEmittance(self):
+        if self.getDebug():
+            print(" Beam.getEmittance: start")
             
+        eX = []
+        for iLoc in range(len(self.getCovarianceMatrix())):
+            if self.getDebug():
+                print("     ----> iLoc:", iLoc)
+                with np.printoptions(linewidth=500,precision=10,\
+                                     suppress=True):
+                    print("         CovMtrx: \n", \
+                          self.getCovarianceMatrix()[iLoc]) 
+
+            CovX = self.getCovarianceMatrix()[iLoc][0:2,0:2]
+            CovY = self.getCovarianceMatrix()[iLoc][2:4,2:4]
+            CovL = self.getCovarianceMatrix()[iLoc][4:6,4:6]
+            Cov4 = self.getCovarianceMatrix()[iLoc][0:4,0:4]
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=10,\
+                                     suppress=True):
+                    print("                CovMtrx_X: \n", CovX)
+                    print("                CovMtrx_Y: \n", CovY)
+                    print("                CovMtrx_L: \n", CovL)
+                    print("                CovMtrx_4: \n", Cov4)
+
+            e2X  = np.linalg.det(CovX)
+            e2Y  = np.linalg.det(CovY)
+            e2L  = np.linalg.det(CovL)
+            e24  = np.linalg.det(Cov4)
+            e26  = np.linalg.det(self.getCovarianceMatrix()[iLoc])
+            if self.getDebug():
+                print("                e2X:", CovX)
+                print("                e2Y:", CovY)
+                print("                e2L:", CovL)
+                print("                e24:", Cov4)
+
+            eX.append(np.sqrt(e2X))
+            eY   = np.sqrt(e2Y)
+            eL   = np.sqrt(e2L)
+            e4   = np.sqrt(e24)
+            e6   = np.sqrt(e26)
+            
+        if self.getDebug():
+            print(" Beam.getEmittance:")
+            print("     ----> CovX: \n", CovX)
+            print("     <---- eX:", eX[iLoc])
+
+        return eX
+
+    
 #--------  Utilities:
     @classmethod
     def cleanBeams(cls):
