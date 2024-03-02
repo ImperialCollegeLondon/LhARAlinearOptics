@@ -49,20 +49,6 @@ Class Beam:
 
          sets: float : Set s coordinate at which phase-space is stored.
 
-setTraceSpace: np.ndarray(6,) : trace space 6 floats
-
-setRPLCPhaseSpace: [np.ndarray(3,), np.ndarray(3,)]: two three vectors
-
-setLabPhaseSpace: [np.ndarray(3,), np.ndarray(3,)]: two three vectors
-
-recordBeam: i/p: Location, s, z, TraceSpace:
-                calls, setLocation, sets, setTraceSpace in turn
-                to store all variables.
-
-  setSourceTraceSpace: set trace space after source
-           Input: numpy.array(6,); 6D phase to store
-          Return: Success: bool, True if stored OK.
-
 
   Get methods:
       getDebug, getBeamInstances, getLocation, gets, 
@@ -73,6 +59,11 @@ recordBeam: i/p: Location, s, z, TraceSpace:
     cleanBeams : Deletes all Beam instances and resets list of
                  Beams.
          No input; Returns bool flag, True means all good.
+
+    initialiseSums: initiaise sums used to calculate covariance matrix
+
+     incrementSums: increment sums used to calculate covariance matrix
+         Input: Instance of particle class
 
 
   I/o methods:
@@ -88,6 +79,9 @@ Created on Mon 28Feb24: Version history:
 
 @author: kennethlong
 """
+
+from   copy  import deepcopy
+import numpy as np
 
 import Particle          as Prtcl
 import BeamLine          as BL
@@ -116,6 +110,8 @@ class Beam:
         #.. Beam instance created with phase-space at each
         #   interface being recorded as None
         self.setAll2None()
+
+        self.initialiseSums()
 
         if self.__Debug:
             print("     ----> New Beam instance: \n", \
@@ -166,8 +162,11 @@ class Beam:
             cls.instances = []
         
     def setAll2None(self):
-        self._Location  = []
-        self._s         = []
+        self._Location   = []
+        self._s          = []
+        self._CovSums    = []
+        self._nParticles = []
+        self._CovMtrx    = []
         
     def setLocation(self, Location):
         Success = False
@@ -200,6 +199,37 @@ class Beam:
     
     def gets(self):
         return self._s
+
+    def getCovSums(self):
+        return self._CovSums
+    
+    def getnParticles(self):
+        return self._nParticles
+    
+    def getCovarianceMatrix(self):
+        return self._CovMtrx
+    
+    def getsigmaxy(self):
+        sx = []
+        sy = []
+        for iLoc in range(len(self.getCovSums())):
+            sx1 = 0.
+            sy1 = 0.
+            if self.getnParticles()[iLoc] > 0:
+                sx2 = self.getCovSums()[iLoc][0,0] / \
+                         float(self.getnParticles()[iLoc])
+                sy2 = self.getCovSums()[iLoc][2,2] / \
+                         float(self.getnParticles()[iLoc])
+                sx1  = np.sqrt(sx2)
+                sy1  = np.sqrt(sy2)
+                
+            if self.getDebug():
+                print(" Beam.getsigmaxy: iLoc, sx1, sy1:", \
+                      iLoc, sx1, sy1)
+            sx.append(sx1)
+            sy.append(sy1)
+
+        return sx, sy
     
             
 #--------  Utilities:
@@ -218,13 +248,115 @@ class Beam:
 
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
-            with np.printoptions(linewidth=500,precision=5,suppress=True):
-                print(self.getLocation()[iLoc], ": z, s, trace space:", \
+            with np.printoptions(linewidth=500,precision=5, \
+                                 suppress=True):
+                print(self.getLocation()[iLoc], \
+                      ": z, s, trace space:", \
                       self.getz()[iLoc], self.gets()[iLoc])
 
 
-#--------  Processing methods:
+#--------  Covariance matrix calculation:
+    def initialiseSums(self):
+        if self.getDebug():
+            print(" Beam.intialiseSums start:")
+            
+        CovSums = np.zeros((6,6))
 
+        iLoc = -1
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if not isinstance(iBLE, BLE.Facility):
+                if self.getDebug():
+                    print("     ----> BLE name, type:", \
+                          iBLE.getName(), type(iBLE))
+
+                iLoc += 1
+                    
+                self._CovSums.append(deepcopy(CovSums))
+                self._nParticles.append(0.)
+                
+        if self.getDebug():
+            print(" Beam.initialiseSums: n, CovSums:")
+            for i in range(len(self.getnParticles())):
+                with np.printoptions(linewidth=500,precision=7,
+                                     suppress=True):
+                    print("     ----> ", i, "\n", self._CovSums[i])
+            
+    def incrementSums(self, iPrtcl):
+        if self.getDebug():
+            print(" Beam.incrementSums start:")
+            print("     ----> Number of locations:", \
+                  len(self.getCovSums()))
+            print("     ----> Particle trace space:")
+            for iLoc in range(len(iPrtcl.getTraceSpace())):
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("         ----> iLoc, trace space:", \
+                          iLoc, \
+                          iPrtcl.getTraceSpace()[iLoc])
+            
+        CovSumsIncrmnt = np.zeros((6,6))
+        
+        for iLoc in range(len(iPrtcl.getTraceSpace())):
+            if self.getDebug():
+                print("         ----> Location:", iLoc)
+                with np.printoptions(linewidth=500,precision=10,\
+                                     suppress=True):
+                    print("                CovSums_(i): \n", \
+                          self.getCovSums()[iLoc]) 
+            
+            self._nParticles[iLoc] += 1
+
+            for i in range(6):
+                for j in range(i,6):
+                    self._CovSums[iLoc][i,j]     = \
+                        self._CovSums[iLoc][i,j] + \
+                        iPrtcl.getTraceSpace()[iLoc][i] * \
+                        iPrtcl.getTraceSpace()[iLoc][j]
+                    if i != j:
+                        self._CovSums[iLoc][j,i] = \
+                            deepcopy(self._CovSums[iLoc][i,j])
+
+            if self.getDebug():
+                print("         ----> Location:", iLoc)
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("                CovSums_(i+1): \n", \
+                          self.getCovSums()[iLoc]) 
+                                
+        if self.getDebug():
+            print(" <---- Beam.incrementSums: Done")
+
+    def calcCovarianceMatrix(self):
+        if self.getDebug():
+            print(" Beam.calcCovarianceMatrix start:")
+            print("     ----> Number of locations:", \
+                  len(self.getCovSums()))
+
+        for iLoc in range(len(self.getCovSums())):
+            if self.getDebug():
+                print("         ----> Location:", iLoc)
+                print("               Number of particles:", \
+                      self.getnParticles()[iLoc])
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("                CovSums: \n", \
+                          self.getCovSums()[iLoc])
+                    
+            if self.getnParticles()[iLoc] > 0:
+                self._CovMtrx.append(                             \
+                                self.getCovSums()[iLoc] /         \
+                                float(self.getnParticles()[iLoc]) \
+                                     )
+                
+            if self.getDebug():
+                print("     <---- Covariance matrix:")
+                with np.printoptions(linewidth=500,precision=7, \
+                                     suppress=True):
+                    print("                CovMtrx: \n", \
+                          self.getCovarianceMatrix()[iLoc]) 
+
+
+#--------  Covariance matrix calculation:
     
 #--------  Exceptions:
 class noReferenceBeam(Exception):
@@ -234,5 +366,8 @@ class badBeam(Exception):
     pass
 
 class badParameter(Exception):
+    pass
+
+class badTraceSpace(Exception):
     pass
 

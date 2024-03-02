@@ -45,21 +45,21 @@ print("BeamTest:", BeamTest, " check built-in methods.")
 
 #.. __init__
 print("    __init__:")
-BmtInst = Bm.Beam()
+BmInst = Bm.Beam()
 
-BmtInst.setLocation("Place 1")
-BmtInst.sets(1.2)
+BmInst.setLocation("Place 1")
+BmInst.sets(1.2)
 
-BmtInst.setLocation("Place 2")
-BmtInst.sets(2.2)
+BmInst.setLocation("Place 2")
+BmInst.sets(2.2)
 
 #.. __repr__
 print("    __repr__:")
-print("      ---->", repr(BmtInst))
+print("      ---->", repr(BmInst))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-print(BmtInst)
+print(BmInst)
 print("    <---- __str__ done.")
 
 ##! Check get methods:
@@ -67,14 +67,14 @@ BeamTest = 3
 print()
 print("BeamTest:", BeamTest, " check get methods.")
 print("    ----> print(instance); tests all get methods")
-print(BmtInst)
+print(BmInst)
 
 ##! Check remaining set methods:
 BeamTest = 4
 print()
 print("BeamTest:", BeamTest, " check set method.")
 Bm.Beam.setDebug(True)
-print(BmtInst)
+print(BmInst)
 Bm.Beam.setDebug(False)
 
 

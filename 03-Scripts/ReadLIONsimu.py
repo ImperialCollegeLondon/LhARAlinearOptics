@@ -17,8 +17,9 @@ ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "LIONsimu.dat")
 ##! Create LION instance:
 print("     ----> Create LION instance:")
 filename     = os.path.join(HOMEPATH, \
-#                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-                        '11-Parameters/LIONBeamLine-Params-Flat.csv')
+#                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+                         '11-Parameters/LIONBeamLine-Params-Gauss.csv')
+#                         '11-Parameters/LIONBeamLine-Params-Flat.csv')
 print("         ----> Parameters will be read from:", filename)
 LIONbI  = BL.BeamLine(filename)
 if Debug:
