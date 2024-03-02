@@ -81,7 +81,8 @@ Created on Mon 28Feb24: Version history:
 """
 
 from   copy  import deepcopy
-import numpy as np
+import math  as     mth
+import numpy as     np
 
 import Particle          as Prtcl
 import BeamLine          as BL
@@ -213,8 +214,8 @@ class Beam:
         sx = []
         sy = []
         for iLoc in range(len(self.getCovarianceMatrix())):
-            sx1  = np.sqrt(self.getCovarianceMatrix()[iLoc][0,0])
-            sy1  = np.sqrt(self.getCovarianceMatrix()[iLoc][2,2])
+            sx1  = mth.sqrt(self.getCovarianceMatrix()[iLoc][0,0])
+            sy1  = mth.sqrt(self.getCovarianceMatrix()[iLoc][2,2])
                 
             if self.getDebug():
                 print(" Beam.getsigmaxy: iLoc, sx1, sy1:", \
@@ -230,6 +231,10 @@ class Beam:
             print(" Beam.getEmittance: start")
             
         eX = []
+        eY = []
+        eL = []
+        e4 = []
+        e6 = []
         for iLoc in range(len(self.getCovarianceMatrix())):
             if self.getDebug():
                 print("     ----> iLoc:", iLoc)
@@ -256,23 +261,33 @@ class Beam:
             e24  = np.linalg.det(Cov4)
             e26  = np.linalg.det(self.getCovarianceMatrix()[iLoc])
             if self.getDebug():
-                print("                e2X:", CovX)
-                print("                e2Y:", CovY)
-                print("                e2L:", CovL)
-                print("                e24:", Cov4)
+                print("                e2X:", e2X)
+                print("                e2Y:", e2Y)
+                print("                e2L:", e2L)
+                print("                e24:", e24)
+                print("                e24:", e26)
 
-            eX.append(np.sqrt(e2X))
-            eY   = np.sqrt(e2Y)
-            eL   = np.sqrt(e2L)
-            e4   = np.sqrt(e24)
-            e6   = np.sqrt(e26)
+            if e2X < 0. and abs(e2X) < 0.01: e2X = 0.
+            if e2Y < 0. and abs(e2Y) < 0.01: e2Y = 0.
+            if e2L < 0. and abs(e2L) < 0.01: e2L = 0.
+            if e24 < 0. and abs(e24) < 0.01: e24 = 0.
+            if e26 < 0. and abs(e26) < 0.01: e26 = 0.
+            eX.append(mth.sqrt(e2X))
+            eY.append(mth.sqrt(e2Y))
+            eL.append(mth.sqrt(e2L))
+            e4.append(mth.sqrt(e24))
+            e6.append(mth.sqrt(e26))
             
         if self.getDebug():
             print(" Beam.getEmittance:")
             print("     ----> CovX: \n", CovX)
             print("     <---- eX:", eX[iLoc])
+            print("     <---- eY:", ey[iLoc])
+            print("     <---- eL:", eL[iLoc])
+            print("     <---- e4:", e4[iLoc])
+            print("     <---- e6:", e6[iLoc])
 
-        return eX
+        return eX, eY, eL, e4, e6
 
     
 #--------  Utilities:
