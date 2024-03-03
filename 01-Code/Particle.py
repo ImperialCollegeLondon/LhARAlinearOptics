@@ -547,6 +547,7 @@ class Particle:
 
     @classmethod
     def plotLongitudinalTraceSpaceProgression(cls):
+        
         print("test")
         font = {
             "family": "serif",

@@ -10,7 +10,7 @@ Stage,Section,Element,Type,Parameter,Value,Unit,Comment
 1,Source,Source,Parameterised TNSA,MinCTheta,1,,Minimum theta for flat cos theta
 1,Interface,Drift,,Length,0.05,m,"Length of first, compensated, drift"
 1,Energy selection,Drift,,Length,0.5,m,Drift before first cavity
-1,Energy selection,Cavity,Cylindrical,Gradient,100,MV/m,Gradient
+1,Energy selection,Cavity,Cylindrical,Gradient,5,MV/m,Gradient
 1,Energy selection,Cavity,Cylindrical,Frequency,200,MHz,Frequency
 1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
 1,Energy selection,Drift,,Length,0.5,m,Drift after first cavity
