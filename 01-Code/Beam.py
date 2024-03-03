@@ -168,6 +168,8 @@ class Beam:
         self._CovSums    = []
         self._nParticles = []
         self._CovMtrx    = []
+        self._sigmaxy    = []
+        self._emittance  = []
         
     def setLocation(self, Location):
         Success = False
@@ -183,36 +185,7 @@ class Beam:
             Success = True
         return Success
 
-    
-#--------  "Get methods" only; version, reference, and constants
-#.. Methods believed to be self documenting(!)
-
-    @classmethod
-    def getDebug(cls):
-        return cls.__Debug
-
-    @classmethod
-    def getBeamInstances(cls):
-        return cls.instances
-
-    def getLocation(self):
-        return self._Location
-    
-    def gets(self):
-        return self._s
-
-    def getCovSums(self):
-        return self._CovSums
-    
-    def getnParticles(self):
-        return self._nParticles
-    
-    def getCovarianceMatrix(self):
-        return self._CovMtrx
-    
-    def getsigmaxy(self):
-        sx = []
-        sy = []
+    def setsigmaxy(self):
         for iLoc in range(len(self.getCovarianceMatrix())):
             sx1  = mth.sqrt(self.getCovarianceMatrix()[iLoc][0,0])
             sy1  = mth.sqrt(self.getCovarianceMatrix()[iLoc][2,2])
@@ -221,20 +194,13 @@ class Beam:
                 print(" Beam.getsigmaxy: iLoc, sx1, sy1:", \
                       iLoc, sx1, sy1)
                 
-            sx.append(sx1)
-            sy.append(sy1)
+            self._sigmaxy.append([sx1, sy1])
 
-        return sx, sy
 
-    def getEmittance(self):
+    def setEmittance(self):
         if self.getDebug():
             print(" Beam.getEmittance: start")
             
-        eX = []
-        eY = []
-        eL = []
-        e4 = []
-        e6 = []
         for iLoc in range(len(self.getCovarianceMatrix())):
             if self.getDebug():
                 print("     ----> iLoc:", iLoc)
@@ -272,22 +238,54 @@ class Beam:
             if e2L < 0. and abs(e2L) < 0.01: e2L = 0.
             if e24 < 0. and abs(e24) < 0.01: e24 = 0.
             if e26 < 0. and abs(e26) < 0.01: e26 = 0.
-            eX.append(mth.sqrt(e2X))
-            eY.append(mth.sqrt(e2Y))
-            eL.append(mth.sqrt(e2L))
-            e4.append(mth.sqrt(e24))
-            e6.append(mth.sqrt(e26))
+            self._emittance.append([                \
+                                     mth.sqrt(e2X), \
+                                     mth.sqrt(e2Y), \
+                                     mth.sqrt(e2L), \
+                                     mth.sqrt(e24), \
+                                     mth.sqrt(e26)])
             
         if self.getDebug():
             print(" Beam.getEmittance:")
             print("     ----> CovX: \n", CovX)
-            print("     <---- eX:", eX[iLoc])
-            print("     <---- eY:", ey[iLoc])
-            print("     <---- eL:", eL[iLoc])
-            print("     <---- e4:", e4[iLoc])
-            print("     <---- e6:", e6[iLoc])
+            print("     <---- eX:", self.getemittance()[iLoc][0])
+            print("     <---- eY:", self.getemittance()[iLoc][1])
+            print("     <---- eL:", self.getemittance()[iLoc][2])
+            print("     <---- e4:", self.getemittance()[iLoc][3])
+            print("     <---- e6:", self.getemittance()[iLoc][4])
 
-        return eX, eY, eL, e4, e6
+    
+#--------  "Get methods" only; version, reference, and constants
+#.. Methods believed to be self documenting(!)
+
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
+    @classmethod
+    def getBeamInstances(cls):
+        return cls.instances
+
+    def getLocation(self):
+        return self._Location
+    
+    def gets(self):
+        return self._s
+
+    def getCovSums(self):
+        return self._CovSums
+    
+    def getnParticles(self):
+        return self._nParticles
+    
+    def getCovarianceMatrix(self):
+        return self._CovMtrx
+
+    def getsigmaxy(self):
+        return self._sigmaxy
+
+    def getemittance(self):
+        return self._emittance
 
     
 #--------  Utilities:
