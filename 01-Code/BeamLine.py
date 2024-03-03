@@ -137,7 +137,7 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> Debug flag: ", cls.getDebug())
 
-                #.. Check and load parameter file
+            #.. Check and load parameter file
             if _BeamLineSpecificationCVSfile == None:
                 raise Exception( \
                             " BeamLine.__new__: no parameter file given.")

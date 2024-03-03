@@ -34,9 +34,57 @@ Bm.Beam.cleanBeams()
 ##! Now create reference beam:
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-BLI  = BL.BeamLine(filename)
-print(BLI)
+                        '11-Parameters/LIONBeamLine-Params-Gauss.csv')
+
+##! Now create pointer to input data file:
+inputdatafile = os.path.join(HOMEPATH, \
+                        '99-Scratch/LIONsimu.dat')
+
+##! Test input arguments:
+BeamTest += 1
+print()
+print("BeamTest:", BeamTest, " check trap no beam specification file!")
+try:
+    BmInst = Bm.Beam()
+except:
+    print("     ----> Successfully trapped no beam specigication file")
+else:
+    print("     ----> Failed successfully to trap no beam specification file", \
+          " abort")
+    raise Exception()
+Bm.Beam.cleanBeams()
+
+BeamTest += 1
+print()
+print("BeamTest:", BeamTest, " check trap no input data file!")
+try:
+    BmInst = Bm.Beam(filename)
+except:
+    print("     ----> Successfully trapped no input data file")
+else:
+    print("     ----> Failed successfully to trap no input data file", \
+          " abort")
+    raise Exception()
+Bm.Beam.cleanBeams()
+
+##! Create valid instance
+BeamTest += 1
+print()
+print("BeamTest:", BeamTest, " create valid instance:")
+BmInst = Bm.Beam(filename, inputdatafile, 1000)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##! Test built-in methods:
 BeamTest = 1

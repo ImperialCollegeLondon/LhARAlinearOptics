@@ -80,9 +80,10 @@ Created on Mon 28Feb24: Version history:
 @author: kennethlong
 """
 
-from   copy  import deepcopy
-import math  as     mth
-import numpy as     np
+from   copy   import deepcopy
+import math   as     mth
+import numpy  as     np
+import pandas as     pnds
 
 import Particle          as Prtcl
 import BeamLine          as BL
@@ -95,16 +96,45 @@ class Beam:
 
 
 #--------  "Built-in methods":
-    def __init__(self):
+    def __init__(self, _BeamLineSpecificationCVSfile=None, \
+                 _InputDataFile=None, \
+                 _nEvtMax=None, \
+                 _OutputDataFile=None, \
+                 ):
         if self.__Debug:
             print(' Beam.__init__: ', \
                   'creating the Beam object')
+
+        #.. Check and load parameter file
+        if _BeamLineSpecificationCVSfile == None:
+            raise Exception( \
+                        " Beam.__init__: no parameter file given.")
+
+        self._BeamLineSpecificationCVSfile = \
+                           _BeamLineSpecificationCVSfile
+        self._BeamLineParamPandas = BLE.BeamLine.csv2pandas( \
+                           _BeamLineSpecificationCVSfile)
+        if not isinstance(self._BeamLineParamPandas, pnds.DataFrame):
+            raise Exception( \
+                    " Beam.__init__: pandas data frame invalid.")
+
+        #.. Check and open input data file
+        if _InputDataFile == None:
+            raise Exception( \
+                        " Beam.__init__: no input data file given.")
 
         #.. Must have reference particle:
         if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
                           Prtcl.ReferenceParticle):
             raise noReferenceBeam(" Reference particle, ", \
                                       "not first in particle list.")
+
+        if _nEvtMax == None:
+            pass
+        elif isinstance(_nEvtMax, int):
+            self.setnEvtMax(_nEvtMax)
+        else:
+            raise Exception(" Bad maximum number of events to read")
 
         Beam.instances.append(self)
 
@@ -117,6 +147,8 @@ class Beam:
         if self.__Debug:
             print("     ----> New Beam instance: \n", \
                   Beam.__str__(self))
+            print(" Beam.__init__: no maximum number of events requested,", \
+                  " will read 'em all!")
             print(" <---- Beam instance created.")
             
     def __repr__(self):
@@ -171,6 +203,12 @@ class Beam:
         self._sigmaxy    = []
         self._emittance  = []
         self._Twiss      = []
+
+    def setnEvtMax(self, _nEvtMax):
+        if isinstance(_nEvtMax, int):
+            self._nEvtMax = _nEvtMax
+        else:
+            raise Exception(" Bad maximum number of events to read")
         
     def setLocation(self, Location):
         Success = False
