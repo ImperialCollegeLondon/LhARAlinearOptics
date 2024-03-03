@@ -121,10 +121,6 @@ class Beam:
         if _InputDataFile == None:
             raise Exception( \
                         " Beam.__init__: no input data file given.")
-        self.setInputDataFile(_InputDataFile)
-        if  not os.path.isfile(self.getInputDataFile()):
-            raise Exception( \
-                    " Beam.__init__: input data file invalid.")
 
         if _nEvtMax == None:
             pass
@@ -139,27 +135,33 @@ class Beam:
         #   interface being recorded as None
         self.setAll2None()
 
-        self.initialiseSums()
-
 #--------  <---- Check and initialise all inputs done.:  --------  --------
 
 #--------  Load specification file, i.e. initialise geometry:  --------
 #          (and load reference particle)
 
         iBm = BL.BeamLine(self.getBeamLineSpecificationCVSfile())
+        self.initialiseSums()
+
 
 #--------  <---- Load specification file, i.e. initialise geometry: done. -
 
 #--------  Open input data file:  --------  --------  --------  --------
 
         ParticleFILE = Prtcl.Particle.openParticleFile("", \
-                                            self.getInputDataFile())
+                                                       _InputDataFile)
+        self.setInputDataFile(ParticleFILE)
         #.. Must have reference particle:
         if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
                           Prtcl.ReferenceParticle):
             raise noReferenceBeam(" Reference particle, ", \
                                       "not first in particle list.")
 
+#--------  <---- Open input data file and load reference particle: done.  --
+
+#--------  Loop over particles, form summs: --------  --------  --------
+
+        self.evaluateBeam()
 
 #--------  <---- Open input data file and load reference particle: done.  --
 
@@ -228,7 +230,7 @@ class Beam:
                         _BeamLineSpecificationCVSfile
 
     def setInputDataFile(self, _InputDataFile):
-        self.__InputDataFile = _InputDataFile
+        self._InputDataFile = _InputDataFile
 
     def setnEvtMax(self, _nEvtMax):
         if isinstance(_nEvtMax, int):
@@ -375,7 +377,7 @@ class Beam:
         return self._BeamLineSpecificationCVSfile
 
     def getInputDataFile(self):
-        return self.__InputDataFile
+        return self._InputDataFile
         
     @classmethod
     def getBeamInstances(cls):
@@ -386,6 +388,9 @@ class Beam:
     
     def gets(self):
         return self._s
+
+    def getnEvtMax(self):
+        return self._nEvtMax
 
     def getCovSums(self):
         return self._CovSums
@@ -519,15 +524,55 @@ class Beam:
                                 float(self.getnParticles()[iLoc]) \
                                      )
                 
-            if self.getDebug():
-                print("     <---- Covariance matrix:")
-                with np.printoptions(linewidth=500,precision=7, \
-                                     suppress=True):
-                    print("                CovMtrx: \n", \
-                          self.getCovarianceMatrix()[iLoc]) 
+                if self.getDebug():
+                    print("     <---- Covariance matrix:")
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("                CovMtrx: \n", \
+                              self.getCovarianceMatrix()[iLoc]) 
 
 
 #--------  Covariance matrix calculation:
+
+    def evaluateBeam(self):
+        print(" Beam.evaluateBeam: perform sums to get covariance matrices")
+        
+        EndOfFile = False
+        iEvt = 0
+        iCnt = 0
+        Scl  = 10
+
+        ParticleFILE = self.getInputDataFile()
+        print(ParticleFILE)
+        while not EndOfFile:
+            EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+            if not EndOfFile:
+                iEvt += 1
+                if (iEvt % Scl) == 0:
+                    print("     ----> Read event ", iEvt)
+                    iCnt += 1
+                    if iCnt == 10:
+                        iCnt = 1
+                        Scl  = Scl * 10
+
+            iPrtcl = Prtcl.Particle.getParticleInstances()[1]
+            self.incrementSums(iPrtcl)
+
+            Cleaned = Prtcl.Particle.cleanParticles()
+            
+            if self.getDebug():
+                print("     ----> Cleaned:", Cleaned)
+
+            if self.getnEvtMax() > 0 and iEvt >= self.getnEvtMax():
+                break
+            
+        print(" <----", iEvt, "events read")
+
+        self.calcCovarianceMatrix()
+        self.setsigmaxy()
+        self.setEmittance()
+        self.setTwiss()
+        
     
 #--------  Exceptions:
 class noReferenceBeam(Exception):
