@@ -170,6 +170,7 @@ class Beam:
         self._CovMtrx    = []
         self._sigmaxy    = []
         self._emittance  = []
+        self._Twiss      = []
         
     def setLocation(self, Location):
         Success = False
@@ -186,6 +187,9 @@ class Beam:
         return Success
 
     def setsigmaxy(self):
+        if self.getDebug():
+            print(" Beam.setsigmaxy: start")
+
         for iLoc in range(len(self.getCovarianceMatrix())):
             sx1  = mth.sqrt(self.getCovarianceMatrix()[iLoc][0,0])
             sy1  = mth.sqrt(self.getCovarianceMatrix()[iLoc][2,2])
@@ -195,11 +199,13 @@ class Beam:
                       iLoc, sx1, sy1)
                 
             self._sigmaxy.append([sx1, sy1])
-
+        
+        if self.getDebug():
+            print(" <---- Beam.setsigmaxy: done.")
 
     def setEmittance(self):
         if self.getDebug():
-            print(" Beam.getEmittance: start")
+            print(" Beam.setEmittance: start")
             
         for iLoc in range(len(self.getCovarianceMatrix())):
             if self.getDebug():
@@ -254,7 +260,46 @@ class Beam:
             print("     <---- e4:", self.getemittance()[iLoc][3])
             print("     <---- e6:", self.getemittance()[iLoc][4])
 
-    
+        if self.getDebug():
+            print(" <---- Beam.setEmittance: done.")
+
+    def setTwiss(self):
+        if self.getDebug():
+            print(" Beam.setTwiss: start")
+ 
+        for iLoc in range(len(self.getCovarianceMatrix())):
+            if self.getDebug():
+                print("     ----> iLoc:", iLoc)
+                with np.printoptions(linewidth=500,precision=10,\
+                                     suppress=True):
+                    print("         CovMtrx: \n", \
+                          self.getCovarianceMatrix()[iLoc])
+                print("     ----> ex, ey:", self.getemittance()[iLoc][0], \
+                                            self.getemittance()[iLoc][1])
+        
+            emX = self.getCovarianceMatrix()[iLoc][0:2,0:2] / \
+                                       self.getemittance()[iLoc][0]
+            emY = self.getCovarianceMatrix()[iLoc][2:4,2:4] / \
+                                       self.getemittance()[iLoc][1]
+
+            ax = -emX[0,1]
+            bx =  emX[0,0]
+            gx =  emX[1,1]
+
+            ay = -emX[0,1]
+            by =  emX[0,0]
+            gy =  emX[1,1]
+
+            self._Twiss.append([[ax, bx, gx], [ay, by, gy]])
+
+            if self.getDebug():
+                print("         ----> Twiss paramters, x, y:", \
+                      self._Twiss[iLoc])
+
+        if self.getDebug():
+            print(" <---- Beam.setTwiss: done.")
+
+                      
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 

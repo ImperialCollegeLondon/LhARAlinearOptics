@@ -114,10 +114,11 @@ def main(argv):
     iBm.calcCovarianceMatrix()
     iBm.setsigmaxy()
     iBm.setEmittance()
-    """
-        iBm.setDebug(True)
-        iBm.setDebug(False)
-    """
+
+    iBm.setDebug(True)
+    iBm.setTwiss()
+    iBm.setDebug(False)
+
 
     for iLoc in range(len(iBm.getsigmaxy())):
         print("         ----> iLoc:", iLoc)
