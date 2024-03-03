@@ -83,7 +83,7 @@ Created on Mon 28Feb24: Version history:
 from   copy   import deepcopy
 import math   as     mth
 import numpy  as     np
-import pandas as     pnds
+import os
 
 import Particle          as Prtcl
 import BeamLine          as BL
@@ -104,17 +104,16 @@ class Beam:
         if self.__Debug:
             print(' Beam.__init__: ', \
                   'creating the Beam object')
+            
+#--------  Check and initialise all inputs:  --------  --------  --------
 
         #.. Check and load parameter file
         if _BeamLineSpecificationCVSfile == None:
             raise Exception( \
                         " Beam.__init__: no parameter file given.")
-
-        self._BeamLineSpecificationCVSfile = \
-                           _BeamLineSpecificationCVSfile
-        self._BeamLineParamPandas = BLE.BeamLine.csv2pandas( \
+        self.setBeamLineSpecificationCVSfile( \
                            _BeamLineSpecificationCVSfile)
-        if not isinstance(self._BeamLineParamPandas, pnds.DataFrame):
+        if  not os.path.isfile(self.getBeamLineSpecificationCVSfile()):
             raise Exception( \
                     " Beam.__init__: pandas data frame invalid.")
 
@@ -122,12 +121,10 @@ class Beam:
         if _InputDataFile == None:
             raise Exception( \
                         " Beam.__init__: no input data file given.")
-
-        #.. Must have reference particle:
-        if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
-                          Prtcl.ReferenceParticle):
-            raise noReferenceBeam(" Reference particle, ", \
-                                      "not first in particle list.")
+        self.setInputDataFile(_InputDataFile)
+        if  not os.path.isfile(self.getInputDataFile()):
+            raise Exception( \
+                    " Beam.__init__: input data file invalid.")
 
         if _nEvtMax == None:
             pass
@@ -143,6 +140,28 @@ class Beam:
         self.setAll2None()
 
         self.initialiseSums()
+
+#--------  <---- Check and initialise all inputs done.:  --------  --------
+
+#--------  Load specification file, i.e. initialise geometry:  --------
+#          (and load reference particle)
+
+        iBm = BL.BeamLine(self.getBeamLineSpecificationCVSfile())
+
+#--------  <---- Load specification file, i.e. initialise geometry: done. -
+
+#--------  Open input data file:  --------  --------  --------  --------
+
+        ParticleFILE = Prtcl.Particle.openParticleFile("", \
+                                            self.getInputDataFile())
+        #.. Must have reference particle:
+        if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
+                          Prtcl.ReferenceParticle):
+            raise noReferenceBeam(" Reference particle, ", \
+                                      "not first in particle list.")
+
+
+#--------  <---- Open input data file and load reference particle: done.  --
 
         if self.__Debug:
             print("     ----> New Beam instance: \n", \
@@ -203,6 +222,13 @@ class Beam:
         self._sigmaxy    = []
         self._emittance  = []
         self._Twiss      = []
+
+    def setBeamLineSpecificationCVSfile(self, _BeamLineSpecificationCVSfile):
+        self._BeamLineSpecificationCVSfile = \
+                        _BeamLineSpecificationCVSfile
+
+    def setInputDataFile(self, _InputDataFile):
+        self.__InputDataFile = _InputDataFile
 
     def setnEvtMax(self, _nEvtMax):
         if isinstance(_nEvtMax, int):
@@ -345,6 +371,12 @@ class Beam:
     def getDebug(cls):
         return cls.__Debug
 
+    def getBeamLineSpecificationCVSfile(self):
+        return self._BeamLineSpecificationCVSfile
+
+    def getInputDataFile(self):
+        return self.__InputDataFile
+        
     @classmethod
     def getBeamInstances(cls):
         return cls.instances

@@ -86,20 +86,6 @@ BmInst = Bm.Beam(filename, inputdatafile, 1000)
 
 
 
-##! Test built-in methods:
-BeamTest = 1
-print()
-print("BeamTest:", BeamTest, " check built-in methods.")
-
-#.. __init__
-print("    __init__:")
-BmInst = Bm.Beam()
-
-BmInst.setLocation("Place 1")
-BmInst.sets(1.2)
-
-BmInst.setLocation("Place 2")
-BmInst.sets(2.2)
 
 #.. __repr__
 print("    __repr__:")

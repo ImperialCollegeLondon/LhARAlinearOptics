@@ -792,23 +792,27 @@ class Particle:
 #                     ----> Write instances:
     @classmethod
     def openParticleFile(cls, datafilePATH=None, datafileNAME=None):
-        if cls.getDebug():
-            print("Particle.openParticleFile:", datafilePATH, datafileNAME)
+        cls.setDebug(True)
+        if os.path.exists(datafilePATH):
+            if cls.getDebug():
+                print("Particle.openParticleFile:", \
+                      datafilePATH, datafileNAME)
             
-        if datafilePATH == None:
-            raise noPATH( \
+            if datafilePATH == None:
+                raise noPATH( \
                          " Particle.openParticleFile: no path given.")
-        
-        if datafileNAME == None:
-            raise noNAME( \
+            if datafileNAME == None:
+                raise noNAME( \
                     " Particle.openParticleFile: no file name given.")
 
-        if not os.path.exists(datafilePATH):
-            raise noPATH( \
-                    " Particle.openParticleFile: path does not exist.")
-        
-        ParticleFILE = open(os.path.join(datafilePATH, datafileNAME), "rb")
+            ParticleFILE = open(os.path.join(datafilePATH, datafileNAME), "rb")
+        else:
+            ParticleFILE = os.path.normpath(datafilePATH)
 
+        if not os.path.exists(ParticleFILE):
+            raise noPATH( \
+                    " Particle.openParticleFile: data file does not exist.")
+        
         if cls.getDebug():
             print("     ----> File opened:", ParticleFILE)
 
