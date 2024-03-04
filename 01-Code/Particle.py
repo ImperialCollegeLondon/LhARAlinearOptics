@@ -375,6 +375,24 @@ class Particle:
         DoneOK = True
 
         return DoneOK
+    @classmethod
+    def end_station_rate(cls):
+        iLoc = -1
+        for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
+            if isinstance(iPrtcl, ReferenceParticle):
+                NInsts = len(cls.getParticleInstances())
+                NLocs = len(iPrtcl.getRrOut())
+                zlist = np.full((NInsts, NLocs), np.nan)
+
+            iTraceSpace = np.array(iPrtcl.getTraceSpace())
+            maxN = len(iTraceSpace)
+
+            zlist[nPrtcl, :maxN] = iTraceSpace[:, 4]
+            zlist = zlist[:, iLoc]
+            zlist = zlist[~np.isnan(zlist)]
+        
+        return len(zlist)
+
 
     @classmethod
     def plotTraceSpaceProgression(cls):
