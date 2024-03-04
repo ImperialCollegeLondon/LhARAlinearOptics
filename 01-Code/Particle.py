@@ -375,6 +375,7 @@ class Particle:
         DoneOK = True
 
         return DoneOK
+
     @classmethod
     def end_station_rate(cls):
         iLoc = -1
@@ -390,9 +391,8 @@ class Particle:
             zlist[nPrtcl, :maxN] = iTraceSpace[:, 4]
             zlist = zlist[:, iLoc]
             zlist = zlist[~np.isnan(zlist)]
-        
-        return len(zlist)
 
+        return len(zlist)
 
     @classmethod
     def plotTraceSpaceProgression(cls):
