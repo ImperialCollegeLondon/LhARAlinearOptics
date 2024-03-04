@@ -42,9 +42,7 @@ print("----> Initialising with HOMEPATH:", HOMEPATH)
 
 eventFILE = "LhARAsimu.dat"
 ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", eventFILE)
-filename = os.path.join(
-    HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv"
-)
+filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-LsrDrvn.csv")
 figDIRECTORY = "99-Scratch/"
 
 # --------------------------------------------------------------------------------------
@@ -133,8 +131,6 @@ figXY, axXY = Prtcl.Particle.plotTraceSpaceXY(0)
 figXY2, axXY2 = Prtcl.Particle.plotTraceSpaceXY(8)
 
 figXY3, axXY3 = Prtcl.Particle.plotTraceSpaceXY(-1)
-
-# Prtcl.Particle.plotTraceSpaceProgression()
 
 print("========  Plotting: END  ========")
 print()
