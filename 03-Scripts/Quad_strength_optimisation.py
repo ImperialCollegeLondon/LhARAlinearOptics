@@ -2,29 +2,48 @@
 # -*- coding: utf-8 -*-
 
 import os
-import Simulation   as Simu
-import Particle     as Prtcl
+import Simulation            as Simu
+import Particle              as Prtcl
 import csv
-import numpy        as np
-import random       as __Rnd
-import scipy        as sp
+import numpy                 as np
+import random                as __Rnd
+import scipy                 as sp
 import scipy.constants
+import matplotlib.pyplot     as plt
 
 
-def quad_strength_rate_end(voltage, num_of_events, iLoc=-1):
+def quad_strength_rate_end(element, parameter,values, elements_to_change, num_of_events, iLoc=-1):
+    """_summary_
+
+    Args:
+        element (string): Element to be modified in parameter file
+        parameter (string): Parameter corresponding to element to be changed 
+        values (list): List of values to be changed corresponding to parameter
+        elements_to_change(list): list of which index of type element to modify
+        num_of_events(int): number of events to simulate
+        iLoc (int, optional): _description_. Defaults to -1.
+
+    Returns:
+        _type_: _description_
+    """
 
     HOMEPATH = os.getenv("HOMEPATH")
     # Original filename
     filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv")
     # Open the original CSV file and read its contents
-    """
+    
     with open(filename, "r", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         rows = list(reader)
-    # Modify the "Value" of "Gradient" only in rows where "Element" is "Cavity"
-    for row in rows:
-        if row["Element"] == "Cavity" and row["Parameter"] == "Gradient":
-            row["Value"] = voltage  # Modify the value to 5
+    
+    #Modify parameters
+    for i, row in enumerate(rows):
+        if row["Element"] == element and row["Parameter"] == parameter:
+        
+            if i in elements_to_change:
+                row["Value"] = values[i]  
+            else:            
+                print("Parameter for", element, i, "is unchanged")
 
     # Write the modified data back to the original CSV file
     with open(filename, "w", newline="") as csvfile:
@@ -32,7 +51,7 @@ def quad_strength_rate_end(voltage, num_of_events, iLoc=-1):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
-    """
+    
 
     datafiledir = os.path.join(HOMEPATH, "99-Scratch")
 
@@ -49,10 +68,15 @@ def quad_strength_rate_end(voltage, num_of_events, iLoc=-1):
     return end_station_rate
 
 
-voltage_list = [5, 6, 100]
+d_quad_kq = np.linspace(10,40, 150)
+index_to_change = [0]
+rate = []
 
-for voltage in voltage_list:
-    print(quad_strength_rate_end(voltage, 2000))
+for kq in d_quad_kq:
+    rate.append(quad_strength_rate_end("Dquad","kq", [kq], index_to_change, 10000))
+
+plt.plot(d_quad_kq, rate)
+plt.savefig("99-Scratch/Quad_optimisation.png")
 
 
 def proposal_distribution(voltage, sigma):
