@@ -93,54 +93,15 @@ print("========  Read: STOP  ========")
 print()
 
 # --------------------------------------------------------------------------------------
-# Fill the various PhaseSpaces
+# Particle Losses
 # --------------------------------------------------------------------------------------
 
-Prtcl.Particle.fillPhaseSpaceAll()
+fig, ax = plt.subplots()
 
-# --------------------------------------------------------------------------------------
-# Plotting
-# --------------------------------------------------------------------------------------
-
-print("========  Plotting: START  ========")
-print()
-
-figRPLC, axRPLC = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0))
-axRPLC[0].set_ylim(-0.05, 0.05)
-axRPLC[1].set_ylim(-0.05, 0.05)
-
-figLAB, axLAB = plt.subplots(nrows=2, ncols=1, figsize=(11.0, 11.0))
-
-axLAB[0].set_ylim(-0.1, 0.1)
-axLAB[1].set_ylim(-0.5, 6)
-
-print(" ----> Plot progression:")
-
-print("     ----> Plot LAB:")
-linesLAB = Prtcl.Particle.plotParticleTrajectory_Lab(axyz=axLAB[1], axxz=axLAB[0])
-print("     <---- Done.")
-
-print("     ----> Plot LAB YZ BeamLineElements:")
-patches = BL.BeamLine.plotBeamLineYZ(axLAB[1])
-print("     <---- Done.")
-
-print("     ----> Plot RPLC:")
-linesRPLC = Prtcl.Particle.plotParticleTrajectory_RPLC(axyz=axRPLC[1], axxz=axRPLC[0])
-print("     <---- Done.")
-
-figXY, axXY = Prtcl.Particle.plotTraceSpaceXY(0)
-
-figXY2, axXY2 = Prtcl.Particle.plotTraceSpaceXY(8)
-
-figXY3, axXY3 = Prtcl.Particle.plotTraceSpaceXY(-1)
-
-# Prtcl.Particle.plotTraceSpaceProgression()
-
-print("========  Plotting: END  ========")
-print()
+Prtcl.Particle.plotParticleLosses(ax)
 
 save_all_figs(
-    prefix="ReadLhARAsimu",
+    prefix="ParticleLosses",
     loc=figDIRECTORY,
     dpi=300,
 )

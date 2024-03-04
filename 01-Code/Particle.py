@@ -377,22 +377,48 @@ class Particle:
         return DoneOK
 
     @classmethod
-    def end_station_rate(cls):
-        iLoc = -1
+    def getNumberParticles(cls):
+        return len(cls.getParticleInstances()) - 1  # no need for reference particle
+
+    @classmethod
+    def getParticleLoss(cls, iLoc):
+
+        Ntotal = cls.getNumberParticles()
+
         for nPrtcl, iPrtcl in enumerate(cls.getParticleInstances()):
             if isinstance(iPrtcl, ReferenceParticle):
                 NInsts = len(cls.getParticleInstances())
                 NLocs = len(iPrtcl.getRrOut())
                 zlist = np.full((NInsts, NLocs), np.nan)
+                continue
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())
             maxN = len(iTraceSpace)
 
             zlist[nPrtcl, :maxN] = iTraceSpace[:, 4]
-            zlist = zlist[:, iLoc]
-            zlist = zlist[~np.isnan(zlist)]
 
-        return len(zlist)
+        zlist = zlist[:, iLoc]
+        zlist = zlist[~np.isnan(zlist)]
+
+        return Ntotal - len(zlist)
+
+    @classmethod
+    def plotParticleLosses(cls, ax):
+
+        Ntotal = cls.getNumberParticles()
+
+        iRefPrtcl = ReferenceParticle.getinstance()
+
+        s_list = np.array(iRefPrtcl.gets())
+
+        loss_list = np.array(
+            [cls.getParticleLoss(iLoc) for iLoc, s in enumerate(s_list)]
+        )
+        ax.axhline(y=Ntotal, linestyle='--', color='gray', label=r'$N_{\text{Source}}$')
+        ax.set_ylabel('Lost Particles')
+        ax.set_xlabel(r'$s$ [m]')
+        ax.plot(s_list, loss_list, '-', color='black',)
+        ax.legend()
 
     @classmethod
     def plotTraceSpaceProgression(cls):
