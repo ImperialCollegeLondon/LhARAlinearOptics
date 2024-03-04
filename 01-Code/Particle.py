@@ -554,7 +554,6 @@ class Particle:
             extent=[xmin, xmax, ymin, ymax],
             interpolation="nearest",
             origin="lower",
-            aspect=aspectratio,
             cmap="plasma",
         )
 
