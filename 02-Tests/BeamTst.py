@@ -101,8 +101,8 @@ print(BmInst)
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " creation of pandas report.")
-BmInst.createReport()
 Bm.Beam.setDebug(True)
+BmInst.createReport()
 Bm.Beam.setDebug(False)
 
 

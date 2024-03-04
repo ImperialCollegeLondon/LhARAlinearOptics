@@ -130,6 +130,8 @@ def main(argv):
               iBm.getemittance()[iLoc][2], iBm.getemittance()[iLoc][3])
         print("             ---->            epsilon_6:", \
               iBm.getemittance()[iLoc][4])
+        print("             ---->      Twiss paramters:", \
+              iBm.getTwiss()[iLoc][4])
 
     print("     <---- colective quantities done.")
         

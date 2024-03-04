@@ -207,18 +207,20 @@ class Beam:
               self.getnEvtMax())
         print("     ----> Output data fole:", \
               self.getOutputDataFile())
-        print("     ----> Beam parameters by location: \n", \
-              "           Name          \t\t No. cov sums, particls, ", \
-              "covmtrx, sxy, emit, Twiss")
+        print("     ----> Beam parameters by location:")
         for iLoc in range(len(self.getLocation())):
-            print("           ", \
-                  self.getLocation()[iLoc],     "\t\t", \
-                  len(self.getCovSums()[iLoc]), "  ", \
-                  self.getnParticles()[iLoc], "  ", \
-                  len(self.getCovarianceMatrix()[iLoc]),    "  ", \
-                  len(self.getsigmaxy()[iLoc]),    "  ", \
-                  len(self.getemittance()[iLoc]),  "  ", \
-                  len(self.getTwiss()[iLoc]),      "  ")
+            print("         ----> iLoc:", iLoc, self.getLocation()[iLoc], \
+                  " nParticles:", self.getnParticles()[iLoc])
+            print("             ---->   sigma_x,   sigma_y:", \
+                  self.getsigmaxy()[iLoc][0], self.getsigmaxy()[iLoc][1])
+            print("             ----> epsilon_x, epsilon_y:", \
+                  self.getemittance()[iLoc][0], self.getemittance()[iLoc][1])
+            print("             ----> epsilon_4, epsilon_l:", \
+                  self.getemittance()[iLoc][2], self.getemittance()[iLoc][3])
+            print("             ---->            epsilon_6:", \
+                  self.getemittance()[iLoc][4])
+            print("             ---->      Twiss paramters:", \
+                  self.getTwiss()[iLoc])
         return " <---- Beam parameter dump complete."
 
     
@@ -365,19 +367,32 @@ class Beam:
                           self.getCovarianceMatrix()[iLoc])
                 print("     ----> ex, ey:", self.getemittance()[iLoc][0], \
                                             self.getemittance()[iLoc][1])
-        
-            emX = self.getCovarianceMatrix()[iLoc][0:2,0:2] / \
+            emX = None
+            emY = None
+            if self.getemittance()[iLoc][0] > 0.:
+                emX = self.getCovarianceMatrix()[iLoc][0:2,0:2] / \
                                        self.getemittance()[iLoc][0]
-            emY = self.getCovarianceMatrix()[iLoc][2:4,2:4] / \
+            if self.getemittance()[iLoc][1] > 0.:
+                emY = self.getCovarianceMatrix()[iLoc][2:4,2:4] / \
                                        self.getemittance()[iLoc][1]
 
-            ax = -emX[0,1]
-            bx =  emX[0,0]
-            gx =  emX[1,1]
+            if self.getemittance()[iLoc][0] > 0.:
+                ax = -emX[0,1]
+                bx =  emX[0,0]
+                gx =  emX[1,1]
+            else:
+                ax = None
+                bx = None
+                gx = None
 
-            ay = -emX[0,1]
-            by =  emX[0,0]
-            gy =  emX[1,1]
+            if self.getemittance()[iLoc][1] > 0.:
+                ay = -emX[0,1]
+                by =  emX[0,0]
+                gy =  emX[1,1]
+            else:
+                ay = None
+                by = None
+                gy = None
 
             self._Twiss.append([[ax, bx, gx], [ay, by, gy]])
 
@@ -431,7 +446,7 @@ class Beam:
         return self._emittance
 
     def getTwiss(self):
-        return self._emittance
+        return self._Twiss
 
     
 #--------  Utilities:
