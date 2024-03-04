@@ -38,7 +38,11 @@ filename = os.path.join(HOMEPATH, \
 
 ##! Now create pointer to input data file:
 inputdatafile = os.path.join(HOMEPATH, \
-                        '99-Scratch/LIONsimu.dat')
+                       '11-Parameters/Data4Tests.dat')
+
+##! Now create pointer to output data file:
+outputdatafile = os.path.join(HOMEPATH, \
+                       '99-Scratch/BeamParamteres.csv')
 
 ##! Test input arguments:
 BeamTest += 1
@@ -71,22 +75,12 @@ Bm.Beam.cleanBeams()
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " create valid instance:")
-BmInst = Bm.Beam(filename, inputdatafile, 1000)
+BmInst = Bm.Beam(filename, inputdatafile, 1000, outputdatafile)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##! Create valid instance
+BeamTest += 1
+print()
+print("BeamTest:", BeamTest, " test built-in methods:")
 #.. __repr__
 print("    __repr__:")
 print("      ---->", repr(BmInst))
@@ -97,18 +91,18 @@ print(BmInst)
 print("    <---- __str__ done.")
 
 ##! Check get methods:
-BeamTest = 3
+BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " check get methods.")
 print("    ----> print(instance); tests all get methods")
 print(BmInst)
 
-##! Check remaining set methods:
-BeamTest = 4
+##! Check creation of report:
+BeamTest += 1
 print()
-print("BeamTest:", BeamTest, " check set method.")
+print("BeamTest:", BeamTest, " creation of pandas report.")
+BmInst.createReport()
 Bm.Beam.setDebug(True)
-print(BmInst)
 Bm.Beam.setDebug(False)
 
 

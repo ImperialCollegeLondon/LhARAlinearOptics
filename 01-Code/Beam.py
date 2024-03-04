@@ -88,6 +88,7 @@ import os
 import Particle          as Prtcl
 import BeamLine          as BL
 import BeamLineElement   as BLE
+import Report            as Rprt
 
 
 class Beam:
@@ -129,6 +130,18 @@ class Beam:
         else:
             raise Exception(" Bad maximum number of events to read")
 
+        #.. Check and output data file
+        if _OutputDataFile == None:
+            raise Exception( \
+                        " Beam.__init__: no output data file given.")
+        self.setOutputDataFile(_OutputDataFile)
+        print(self.getOutputDataFile())
+        dirname, filename = os.path.split(self.getOutputDataFile())
+        print(dirname, filename)
+        if not os.path.isdir(dirname):
+            raise Exception( \
+                    " Beam.__init__: output data frame invalid.")
+
         Beam.instances.append(self)
 
         #.. Beam instance created with phase-space at each
@@ -141,8 +154,10 @@ class Beam:
 #          (and load reference particle)
 
         iBm = BL.BeamLine(self.getBeamLineSpecificationCVSfile())
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if not isinstance(iBLE, BLE.Facility):
+                self.setLocation(iBLE.getName())
         self.initialiseSums()
-
 
 #--------  <---- Load specification file, i.e. initialise geometry: done. -
 
@@ -173,7 +188,8 @@ class Beam:
             print(" <---- Beam instance created.")
             
     def __repr__(self):
-        return "Beam()"
+        return "Beam(<BeamLineSpecCSV>, <InputDataFile>, " + \
+               "nEvtMax=None, <OutputFile>=None)"
 
     def __str__(self):
         self.print()
@@ -183,21 +199,26 @@ class Beam:
         print("\n Beam:")
         print(" -----")
         print("     ----> Debug flag:", self.getDebug())
-        print("     ----> Number of records:", \
-              len(self.getLocation()))
-        if len(self.getLocation()) > 0:
-            print("     ----> Record of trace space:")
-        for iLctn in range(len(self.getLocation())):
-            print("         ---->", self.getLocation()[iLctn], ":")
-            print("             ----> s", self.gets()[iLctn])
-            try:
-                print("             ----> ", \
-              BLE.BeamLineElement.getinstances()[iLctn+1].getName(), \
-                      "; length ", \
-              BLE.BeamLineElement.getinstances()[iLctn+1].getLength())
-            except:
-                print("             ----> ", \
-                      BLE.BeamLineElement.getinstances()[iLctn+1].getName())
+        print("     ----> Beam specification file:", \
+              self.getBeamLineSpecificationCVSfile())
+        print("     ----> Input data fole:", \
+              self.getInputDataFile())
+        print("     ----> Number of events to read:", \
+              self.getnEvtMax())
+        print("     ----> Output data fole:", \
+              self.getOutputDataFile())
+        print("     ----> Beam parameters by location: \n", \
+              "           Name          \t\t No. cov sums, particls, ", \
+              "covmtrx, sxy, emit, Twiss")
+        for iLoc in range(len(self.getLocation())):
+            print("           ", \
+                  self.getLocation()[iLoc],     "\t\t", \
+                  len(self.getCovSums()[iLoc]), "  ", \
+                  self.getnParticles()[iLoc], "  ", \
+                  len(self.getCovarianceMatrix()[iLoc]),    "  ", \
+                  len(self.getsigmaxy()[iLoc]),    "  ", \
+                  len(self.getemittance()[iLoc]),  "  ", \
+                  len(self.getTwiss()[iLoc]),      "  ")
         return " <---- Beam parameter dump complete."
 
     
@@ -217,7 +238,6 @@ class Beam:
         
     def setAll2None(self):
         self._Location   = []
-        self._s          = []
         self._CovSums    = []
         self._nParticles = []
         self._CovMtrx    = []
@@ -231,6 +251,9 @@ class Beam:
 
     def setInputDataFile(self, _InputDataFile):
         self._InputDataFile = _InputDataFile
+
+    def setOutputDataFile(self, _OutputDataFile):
+        self._OutputDataFile = _OutputDataFile
 
     def setnEvtMax(self, _nEvtMax):
         if isinstance(_nEvtMax, int):
@@ -379,6 +402,9 @@ class Beam:
     def getInputDataFile(self):
         return self._InputDataFile
         
+    def getOutputDataFile(self):
+        return self._OutputDataFile
+        
     @classmethod
     def getBeamInstances(cls):
         return cls.instances
@@ -386,9 +412,6 @@ class Beam:
     def getLocation(self):
         return self._Location
     
-    def gets(self):
-        return self._s
-
     def getnEvtMax(self):
         return self._nEvtMax
 
@@ -407,6 +430,9 @@ class Beam:
     def getemittance(self):
         return self._emittance
 
+    def getTwiss(self):
+        return self._emittance
+
     
 #--------  Utilities:
     @classmethod
@@ -421,7 +447,6 @@ class Beam:
 
         return DoneOK
     
-
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
             with np.printoptions(linewidth=500,precision=5, \
@@ -429,6 +454,33 @@ class Beam:
                 print(self.getLocation()[iLoc], \
                       ": z, s, trace space:", \
                       self.getz()[iLoc], self.gets()[iLoc])
+
+    def getHeader(self):
+        HeaderList = ["Name", "nPrtcls", "sigmaxy", "emittance", "Twiss"]
+        return HeaderList
+
+    def getLines(self):
+        DataList = []
+        for iLoc in range(len(self.getLocation())):
+            DataList.append([  \
+                               self.getLocation()[iLoc], \
+                               self.getnParticles()[iLoc], \
+                               self.getsigmaxy()[iLoc], \
+                               self.getemittance()[iLoc], \
+                               self.getTwiss()[iLoc] \
+                               ])
+        return DataList
+    
+    def createReport(self):
+
+        Name   = BLE.BeamLineElement.getinstances()[0].getName()
+        iRprt  = Rprt.Report(Name, None, self.getOutputDataFile(),
+                             self.getHeader(), self.getLines())
+        if self.getDebug():
+            print("Beam.createReport:")
+            print(iRprt)
+
+        iRprt.asCSV()
 
 
 #--------  Covariance matrix calculation:
