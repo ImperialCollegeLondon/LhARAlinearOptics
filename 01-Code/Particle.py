@@ -414,10 +414,15 @@ class Particle:
         loss_list = np.array(
             [cls.getParticleLoss(iLoc) for iLoc, s in enumerate(s_list)]
         )
-        ax.axhline(y=Ntotal, linestyle='--', color='gray', label=r'$N_{\text{Source}}$')
-        ax.set_ylabel('Lost Particles')
-        ax.set_xlabel(r'$s$ [m]')
-        ax.plot(s_list, loss_list, '-', color='black',)
+        ax.axhline(y=Ntotal, linestyle="--", color="gray", label=r"$N_{\text{Source}}$")
+        ax.set_ylabel("Lost Particles")
+        ax.set_xlabel(r"$s$ [m]")
+        ax.plot(
+            s_list,
+            loss_list,
+            "-",
+            color="black",
+        )
         ax.legend()
 
     @classmethod
@@ -1084,14 +1089,9 @@ class Particle:
 
         E0 = np.sqrt(protonMASS**2 + p0**2)
         Enrgy = E0 + (TrcSpc[5] * p0)
-        # print(Enrgy, protonMASS)
-
-        Enrgy = protonMASS**2 + (TrcSpc[5] * p0) ** 2  # what?
-        # print(Enrgy, protonMASS)
 
         Mmtm = mth.sqrt(Enrgy**2 - protonMASS**2)
-        zPrm = mth.sqrt(1.0 - TrcSpc[1] ** 2 - TrcSpc[3] ** 2)  #:)
-        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm, zPrm * Mmtm])  #:)
+        pRPLC = np.array([TrcSpc[1] * Mmtm, TrcSpc[3] * Mmtm,0])  #:)
 
         if self.getDebug():
             with np.printoptions(linewidth=500, precision=7, suppress=True):

@@ -18,7 +18,7 @@ HOMEPATH = os.getenv("HOMEPATH")
 print("HOMEPATH", HOMEPATH)
 filename = os.path.join(
     HOMEPATH,
-    "11-Parameters/LhARABeamLine-Params-LsrDrvn.csv",
+    "11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv",
 )
 datafiledir = os.path.join(HOMEPATH, "99-Scratch")
 Smltn = Simu.Simulation(1000, filename, datafiledir, "LhARAsimu.dat")
