@@ -631,15 +631,15 @@ class Beam:
                         iCnt = 1
                         Scl  = Scl * 10
 
-            iPrtcl = Prtcl.Particle.getParticleInstances()[1]
-            self.incrementSums(iPrtcl)
+                iPrtcl = Prtcl.Particle.getParticleInstances()[1]
+                self.incrementSums(iPrtcl)
 
-            Cleaned = Prtcl.Particle.cleanParticles()
+                Cleaned = Prtcl.Particle.cleanParticles()
             
             if self.getDebug():
                 print("     ----> Cleaned:", Cleaned)
 
-            if self.getnEvtMax() > 0 and iEvt >= self.getnEvtMax():
+            if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
                 break
             
         print("     <----", iEvt, "events read")

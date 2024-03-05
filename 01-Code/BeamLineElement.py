@@ -2287,7 +2287,7 @@ class GaborLens(BeamLineElement):
             g0    = mth.sqrt(g02)
             
             Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-            B0 = self.getStrength() * 2.*Brho
+            B0 = self.getStrength() * 2.*Brho <---- remove 2.*Brho ..
             ne = epsilon0SI * B0**2 / (2.*protonMASSSI*g0)
 
             ne_trans = ne
@@ -2411,6 +2411,8 @@ class GaborLens(BeamLineElement):
 """
 Derived class CylindricalRFCavity:
 ====================
+
+** Note; KL; 05Mar24: Linac convention is phase relative to crest.
 
   CylindricalRFCavity class derived from BeamLineElement to contain
   paramters for a cylindrical RF cavity operated in the TM(010) mode.
@@ -3245,7 +3247,10 @@ class Source(BeamLineElement):
         if self._Mode == 0:
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
-            cosTheta, Phi = self.getFlatThetaPhi()
+            cosTheta, Phi = self.getGaussianThetaPhi()
+            """
+               Replace, self.getFlatThetaPhi(), KL: 05Mar24
+            """
 
             # LION beamline
             P_L = self.getParameters()[6]
@@ -3256,7 +3261,8 @@ class Source(BeamLineElement):
             I = self.getParameters()[11]
             theta_degrees = self.getParameters()[12]
 
-            KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)  # [MeV]
+            KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, \
+                                lamda, t_laser, d, I, theta_degrees)  # [MeV]
 
         elif self._Mode == 1:
             X             = rnd.gauss(0., self.getParameters()[0])
@@ -3286,7 +3292,6 @@ class Source(BeamLineElement):
         Phi      = rnd.uniform( 0., 2.*mth.pi)
         return cosTheta, Phi
     
-
 
     ### Gaussian Angular Distribution ### 
     # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
