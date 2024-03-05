@@ -779,6 +779,9 @@ class Particle:
                 y_RPLC = np.full((NInsts, NLocs), np.nan)
                 s = np.full((NInsts, NLocs), np.nan)
                 s_element_list = np.array(iPrtcl.gets())[mask]
+                print(iPrtcl.gets())
+                print(BLE.BeamLineElement.getinstances()[1:])
+                print(s_element_list)
                 continue
 
             iTraceSpace = np.array(iPrtcl.getTraceSpace())

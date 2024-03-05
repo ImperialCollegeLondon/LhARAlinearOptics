@@ -955,8 +955,8 @@ class BeamLine(object):
                         print("              ---->", " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd = -999999.0
-                    sEnd = iBLE.getrStrt()[2] + iBLE.getLength()
+                    zEnd = np.nan
+                    sEnd = iBLE.getrStrt()[2]
                     Success = PrtclInst.recordParticle(
                         iBLE.getName(), zEnd, sEnd, TrcSpc
                     )
