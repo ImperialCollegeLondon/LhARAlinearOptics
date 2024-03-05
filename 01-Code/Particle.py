@@ -792,11 +792,11 @@ class Particle:
 #                     ----> Write instances:
     @classmethod
     def openParticleFile(cls, datafilePATH=None, datafileNAME=None):
-        if os.path.exists(datafilePATH):
-            if cls.getDebug():
-                print("Particle.openParticleFile:", \
-                      datafilePATH, datafileNAME)
+        if cls.getDebug():
+            print("Particle.openParticleFile: dir: ", \
+                  datafilePATH, " name: ", datafileNAME)
             
+        if os.path.exists(datafilePATH):
             if datafilePATH == None:
                 raise noPATH( \
                          " Particle.openParticleFile: no path given.")
@@ -873,7 +873,6 @@ class Particle:
             print(iPrtcl)
             print(" <---- readParticle done.")
             
-        cls.setDebug(False)
         return False        
         
     @classmethod

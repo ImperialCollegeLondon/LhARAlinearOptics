@@ -80,6 +80,9 @@ Created on Mon 28Feb24: Version history:
 @author: kennethlong
 """
 
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.ticker as ticker
+import matplotlib.pyplot as plt
 from   copy   import deepcopy
 import math   as     mth
 import numpy  as     np
@@ -106,6 +109,8 @@ class Beam:
             print(' Beam.__init__: ', \
                   'creating the Beam object')
             
+        self.setAll2None()
+
 #--------  Check and initialise all inputs:  --------  --------  --------
 
         #.. Check and load parameter file
@@ -132,21 +137,17 @@ class Beam:
 
         #.. Check and output data file
         if _OutputDataFile == None:
-            raise Exception( \
-                        " Beam.__init__: no output data file given.")
-        self.setOutputDataFile(_OutputDataFile)
-        print(self.getOutputDataFile())
-        dirname, filename = os.path.split(self.getOutputDataFile())
-        print(dirname, filename)
-        if not os.path.isdir(dirname):
-            raise Exception( \
-                    " Beam.__init__: output data frame invalid.")
+            pass
+        else:
+            self.setOutputDataFile(_OutputDataFile)
+            print(self.getOutputDataFile())
+            dirname, filename = os.path.split(self.getOutputDataFile())
+            print(dirname, filename)
+            if not os.path.isdir(dirname):
+                raise Exception( \
+                        " Beam.__init__: output data frame invalid.")
 
         Beam.instances.append(self)
-
-        #.. Beam instance created with phase-space at each
-        #   interface being recorded as None
-        self.setAll2None()
 
 #--------  <---- Check and initialise all inputs done.:  --------  --------
 
@@ -239,6 +240,11 @@ class Beam:
             cls.instances = []
         
     def setAll2None(self):
+        self._BeamLineSpecificationCVSfile = None
+        self._InputDataFile                = None
+        self._nEvtMax                      = None
+        self._OutputDataFile               = None
+
         self._Location   = []
         self._CovSums    = []
         self._nParticles = []
@@ -488,14 +494,17 @@ class Beam:
     
     def createReport(self):
 
-        Name   = BLE.BeamLineElement.getinstances()[0].getName()
-        iRprt  = Rprt.Report(Name, None, self.getOutputDataFile(),
+        if self.getOutputDataFile() == None:
+            print(" Beam.createReport: no data file given, skip.")
+        else:
+            Name   = BLE.BeamLineElement.getinstances()[0].getName()
+            iRprt  = Rprt.Report(Name, None, self.getOutputDataFile(),
                              self.getHeader(), self.getLines())
-        if self.getDebug():
-            print("Beam.createReport:")
-            print(iRprt)
+            if self.getDebug():
+                print("Beam.createReport:")
+                print(iRprt)
 
-        iRprt.asCSV()
+            iRprt.asCSV()
 
 
 #--------  Covariance matrix calculation:
@@ -610,13 +619,13 @@ class Beam:
         Scl  = 10
 
         ParticleFILE = self.getInputDataFile()
-        print(ParticleFILE)
+        print("     ----: event loop")
         while not EndOfFile:
             EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
             if not EndOfFile:
                 iEvt += 1
                 if (iEvt % Scl) == 0:
-                    print("     ----> Read event ", iEvt)
+                    print("         ----> Read event ", iEvt)
                     iCnt += 1
                     if iCnt == 10:
                         iCnt = 1
@@ -633,14 +642,127 @@ class Beam:
             if self.getnEvtMax() > 0 and iEvt >= self.getnEvtMax():
                 break
             
-        print(" <----", iEvt, "events read")
+        print("     <----", iEvt, "events read")
 
+        print("     ----> calculate covariance matrix:")
         self.calcCovarianceMatrix()
+        print("     <---- done.")
+        print("     ----> calculate sigma x, y:")
         self.setsigmaxy()
+        print("     <---- done.")
+        print("     ----> calculate emittances:")
         self.setEmittance()
+        print("     <---- done.")
+        print("     ----> Twiss paramters:")
         self.setTwiss()
+        print("     <---- done.")
         
-    
+    def plotBeamProgression(self):
+        if self.getDebug():
+            print(" Beam.plotBeamProgression: start")
+
+        font = {'family': 'serif', \
+                'color':  'darkred', \
+                'weight': 'normal', \
+                'size': 16, \
+                }
+        plt.rcParams["figure.figsize"] = (10., 7.5)
+        
+        s     = []
+        sx    = []
+        sy    = []
+        ex    = []
+        ey    = []
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+        print(BL.BeamLine.getinstance())
+        
+        for iLoc in range(len(self.getLocation())):
+            s.append(iRefPrtcl.getsOut()[iLoc])
+            sx.append(self.getsigmaxy()[iLoc][0])
+            sy.append(self.getsigmaxy()[iLoc][1])
+            ex.append(self.getemittance()[iLoc][0])
+            ey.append(self.getemittance()[iLoc][1])
+            
+            if self.getDebug():
+                print("     ----> iLoc, s, sx, sy:", \
+                      iLoc, s[iLoc], sx[iLoc], sy[iLoc])
+
+        plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
+        with PdfPages(plotFILE) as pdf:
+            fig, axs = plt.subplots(nrows=3, ncols=1, \
+                                    layout="constrained")
+            # add an artist, in this case a nice label in the middle...
+            Ttl = "Test"
+            fig.suptitle(Ttl, fontdict=font)
+        
+            axs[1].plot(s, sx, color='b', marker='o', markersize=4, \
+                        label='s_x')
+            axs[1].plot(s, sy, color='r', marker='s', markersize=4, \
+                        label='s_y')
+            axs[1].legend()
+            axs[1].set_xlabel('s (m)')
+            axs[1].set_ylabel('s_{xy} (m)')
+
+            axs[2].plot(s, ex, color='b', marker='o', markersize=4, \
+                        label='e_x')
+            axs[2].plot(s, ey, color='r', marker='s', markersize=4, 
+                        label='e_y')
+            axs[2].legend()
+            axs[2].set_xlabel('s (m)')
+            axs[2].set_ylabel('e_{xy} (m)')
+
+            
+            pdf.savefig()
+            plt.close()
+        """
+            for iLoc in range(len(xLoc)):
+
+                #axs[0, 0].set_title('x,y')
+                axs[0, 0].hist2d(xLoc[iLoc], yLoc[iLoc], bins=100)
+                axs[0, 0].set_xlabel('x (m)')
+                axs[0, 0].set_ylabel('y (m)')
+            
+                #axs[0, 1].set_title('delta')
+                
+                axs[0, 1].hist(ELoc[iLoc], 100)
+                axs[0, 1].set_yscale('linear')
+                if logE:
+                    axs[0, 1].set_yscale('log')
+                axs[0, 1].set_xlabel('delta')
+                axs[0, 1].set_ylabel('Number')
+            
+                #axs[1, 0].set_title('x, xprime')
+                axs[1, 0].hist2d(xLoc[iLoc], xpLoc[iLoc], bins=100)
+                axs[1, 0].set_xlabel('x (m)')
+                axs[1, 0].set_ylabel('xprime (m)')
+
+                #axs[1, 1].set_title('y, yprime')
+                axs[1, 1].hist2d(yLoc[iLoc], ypLoc[iLoc], bins=100)
+                axs[1, 1].set_xlabel('y (m)')
+                axs[1, 1].set_ylabel('yprime (m)')
+
+                axs[2, 0].hist(ELab[iLoc], 100)
+                axs[2, 0].set_yscale('linear')
+                if logE:
+                    axs[2, 0].set_yscale('log')
+                axs[2, 0].set_xlabel('Kinetic energy (MeV)')
+                axs[2, 0].set_ylabel('Number')
+
+                axs[2, 1].hist(Scl[iLoc], 100)
+                axs[2, 1].set_yscale('linear')
+                if logE:
+                    axs[2, 1].set_yscale('log')
+                axs[2, 1].set_xlabel('Epsilon')
+                axs[2, 1].set_ylabel('Number')
+
+        
+        """
+        if self.getDebug():
+            print(" <----  Beam.plotBeamProgression done.")
+
+                
 #--------  Exceptions:
 class noReferenceBeam(Exception):
     pass

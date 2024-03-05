@@ -17,11 +17,11 @@ def main(argv):
     opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
                                ["ifile=","ofile=","bfile", "nEvts"])
 
-    beamlinefile = ""
-    inputfile    = ""
-    outputfile   = ""
+    beamlinefile = None
+    inputfile    = None
+    outputfile   = None
     Debug        = False
-    nEvts        = -1
+    nEvts        = None
     for opt, arg in opts:
         if opt == '-h':
             print ( \
@@ -40,8 +40,8 @@ def main(argv):
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
 
-    if inputfile    == "" or \
-       beamlinefile == "":
+    if inputfile    == None or \
+       beamlinefile == None:
         print ( \
                 'plotBeam.py -b <beamlinefile>'  + \
                 ' -i <inputfile> -o <outputfile>' + \
@@ -55,90 +55,38 @@ def main(argv):
     HOMEPATH    = os.getenv('HOMEPATH')
     print("         ----> HOMEPATH:", HOMEPATH)
         
-    #.. Create beam line instance:
-    print("         ----> Create beam line instance:")
+    #.. Create beam instance:
+    print("         ----> Create beam instance:")
     filename     = os.path.join(HOMEPATH, beamlinefile)
-    print("             ----> Parameters will be read from:", filename)
+    print("             ----> Beamline parameters will be read from:", \
+          filename)
+    particlefile  = os.path.join(HOMEPATH, inputfile)
+    print("             ----> Particles will be read from:", \
+          particlefile)
     
-    iBL  = BL.BeamLine(filename)
-    if Debug:
-        print(iBL)
+    CSVoutputFILE = None
+    if outputfile != None:
+        CSVoutputFILE = os.path.join(HOMEPATH, outputfile)
+        print("         ----> Write beamline summary file to:", CSVoutputFILE)
     
-    ParticleFILE = Prtcl.Particle.openParticleFile(HOMEPATH, inputfile)
-    print("         ----> Read events from:", ParticleFILE)
-    
-    #print (' O/p plot file:', outputfile)
+    iBm = Bm.Beam(filename, particlefile, nEvts, CSVoutputFILE)
 
-    iBm = Bm.Beam()
+    print("     <---- Beam instance initialised.")
 
-    print("         ----> Beam instance initialised.")
+    print("     ----> Create report:")
 
-    print("     <---- Initialisation done.")
+    iBm.createReport()
 
-    """
-       Read particle file:
-    """
-    print("     ----> Event loop:")
-    EndOfFile = False
-    iEvt = 0
-    iCnt = 0
-    Scl  = 10
-    while not EndOfFile:
-        EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
-        if not EndOfFile:
-            iEvt += 1
-            if (iEvt % Scl) == 0:
-                print("         ----> Read event ", iEvt)
-                iCnt += 1
-                if iCnt == 10:
-                    iCnt = 1
-                    Scl  = Scl * 10
-
-            iPrtcl = Prtcl.Particle.getParticleInstances()[1]
-            iBm.incrementSums(iPrtcl)
-
-            Cleaned = Prtcl.Particle.cleanParticles()
-            if Debug:
-                print("         ----> Cleaned:", Cleaned)
-
-        if nEvts > 0 and iEvt >= nEvts:
-            break
-            
-    print("     <----", iEvt, "events read")
-    
-    """
-       Calculate collective quantities:
-    """
-    print("     ----> Calculate collective quantities:")
-
-    iBm.calcCovarianceMatrix()
-    iBm.setsigmaxy()
-    iBm.setEmittance()
+    print("     <---- Create report:")
+        
+    print("     ----> Plot beam progression:")
 
     iBm.setDebug(True)
-    iBm.setTwiss()
-    iBm.setDebug(False)
+    iBm.plotBeamProgression()
 
-
-    for iLoc in range(len(iBm.getsigmaxy())):
-        print("         ----> iLoc:", iLoc)
-        print("             ---->   sigma_x,   sigma_y:", \
-              iBm.getsigmaxy()[iLoc][0], iBm.getsigmaxy()[iLoc][1])
-        print("             ----> epsilon_x, epsilon_y:", \
-              iBm.getemittance()[iLoc][0], iBm.getemittance()[iLoc][1])
-        print("             ----> epsilon_4, epsilon_l:", \
-              iBm.getemittance()[iLoc][2], iBm.getemittance()[iLoc][3])
-        print("             ---->            epsilon_6:", \
-              iBm.getemittance()[iLoc][4])
-        print("             ---->      Twiss paramters:", \
-              iBm.getTwiss()[iLoc][4])
-
-    print("     <---- colective quantities done.")
+    print("     <---- Beam progression plot done.")
         
     print(" plotBEAM: ends")
-    
-
-
     
 """
    Execute main"
