@@ -28,7 +28,7 @@
 1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
 1,Capture,Solenoid,"Length, strength",Strength,1.018747261,rad/m,ks
 1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
-1,Energy selection,Drift,,Length,0.5,m,Space for first cavity modelled as drift
+1,Energy selection,Drift,,Length,0.5,m,"Space for first cavity, modelled as drift"
 1,Energy selection,Drift,,Length,0.15,m,Drift to next solenoid
 1,Energy selection,Solenoid,"Length, strength",Length,0.857,m,
 1,Energy selection,Solenoid,"Length, strength",Strength,1.448564633,rad/m,
@@ -41,7 +41,7 @@
 1,Energy selection,Drift,,Length,0.13539,m,
 1,Energy selection,Drift,,Length,0.01,m,Space for energy-selection collimator?
 1,Energy selection,Drift,,Length,0.0546,m,
-1,Energy selection,Drift,,Length,0.5,m,Space for second cavity modelled as drift
+1,Energy selection,Drift,,Length,0.5,m,"Space for second cavity, modelled as drift"
 1,Matching,Drift,,Length,0.15,m,Drift to next solenoid
 1,Matching,Solenoid,"Length, strength",Length,0.857,m,
 1,Matching,Solenoid,"Length, strength",Strength,1.788858966,rad/m,

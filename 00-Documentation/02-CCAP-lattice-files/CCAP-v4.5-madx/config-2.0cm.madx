@@ -1,9 +1,0 @@
-// CCAP-v4.5 - 2.0cm spot size configuration (2 sigma diameter)
-
-
-LHA_LEL_MAG_SOL_02: solenoid, l=0.857, ks=1.7888589662779655;  // 2.0cm (diam, 2 sigma)
-LHA_LEL_MAG_SOL_03: solenoid, l=0.857, ks=1.4669369637145793;  // 2.0cm (diam, 2 sigma)
-LHA_LEL_MAG_SOL_04: solenoid, l=0.857, ks=1.4144319401407135;  // 2.0cm (diam, 2 sigma)
-LHA_LEL_MAG_SOL_05: solenoid, l=0.857, ks=1.4210173159787916;  // 2.0cm (diam, 2 sigma)
-
-

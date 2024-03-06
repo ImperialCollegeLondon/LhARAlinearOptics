@@ -1,4 +1,4 @@
-﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
+Stage,Section,Element,Type,Parameter,Value,Unit,Comment
 0,Facility,Global,Name,Name,LhARA,,
 0,Facility,Global,Reference particle,Kinetic energy,15,MeV,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.035,m,
@@ -20,11 +20,7 @@
 1,Capture,Gabor lens,"Length, strength",Length,0.857,m,Length of Gabor lens
 1,Capture,Gabor lens,"Length, strength",Strength,1.018747261,rad/m,ks
 1,Capture,Drift,,Length,0.15,m,Drift out of Gabor lens
-1,Energy selection,Drift,,Length,0.183783273,m,Drift before first cavity
-1,Energy selection,Cavity,Cylindrical,Gradient,5,MV/m,Gradient
-1,Energy selection,Cavity,Cylindrical,Frequency,200,MHz,Frequency
-1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
-1,Energy selection,Drift,,Length,0.183783273,m,Drift after first cavity
+1,Energy selection,Drift,,Length,0.5,m,Space for first cavity modelled as drift
 1,Energy selection,Drift,,Length,0.15,m,Drift to next Gabor lens
 1,Energy selection,Gabor lens,"Length, strength",Length,0.857,m,
 1,Energy selection,Gabor lens,"Length, strength",Strength,1.448564633,rad/m,
@@ -37,11 +33,7 @@
 1,Energy selection,Drift,,Length,0.13539,m,
 1,Energy selection,Drift,,Length,0.01,m,Space for energy-selection collimator?
 1,Energy selection,Drift,,Length,0.0546,m,
-1,Energy selection,Drift,,Length,0.183783273,m,Drift before second cavity
-1,Energy selection,Cavity,Cylindrical,Gradient,5,MV/m,Gradient
-1,Energy selection,Cavity,Cylindrical,Frequency,200,MHz,Frequency
-1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
-1,Energy selection,Drift,,Length,0.183783273,m,Drift after second cavity
+1,Energy selection,Drift,,Length,0.5,m,Space for second cavity modelled as drift
 1,Matching,Drift,,Length,0.15,m,Drift to next Gabor lens
 1,Matching,Gabor lens,"Length, strength",Length,0.857,m,
 1,Matching,Gabor lens,"Length, strength",Strength,1.788858966,rad/m,
@@ -62,30 +54,34 @@
 1,Matching,Gabor lens,"Length, strength",Strength,1.16596749,rad/m,
 1,Matching,Drift,,Length,0.15,m,Drift out of Gabor lens
 1,Arc,Drift,,Length,0.2,m,
-1,Arc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,Arc,Dipole,"Sector (Length, angle)",Angle,45,degrees,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Length,0.8,m,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Angle,45,degrees,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Plane,YZ,,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Direction,U,,
 1,Arc,Drift,,Length,0.2,m,
 1,Arc,Dquad,,Length,0.1,m,
-1,Arc,Dquad,,kq,22.544,m-2,
+1,Arc,Dquad,,kq,30.0,m-2,
 1,Arc,Drift,,Length,0.4,m,
 1,Arc,Fquad,,Length,0.1,m,
 1,Arc,Fquad,,kq,31.3768,m-2,
 1,Arc,Drift,,Length,0.2,m,
 1,Arc,Dquad,,Length,0.1,m,
-1,Arc,Dquad,,kq,31.5123,m-2,
+1,Arc,Dquad,,kq,30.0,m-2,
 1,Arc,Drift,,Length,0.195,m,
 1,Arc,Drift,,Length,0.01,m,
 1,Arc,Drift,,Length,0.195,m,
 1,Arc,Dquad,,Length,0.1,m,
-1,Arc,Dquad,,kq,31.5123,m-2,
+1,Arc,Dquad,,kq,30.0,m-2,
 1,Arc,Drift,,Length,0.2,m,
 1,Arc,Fquad,,Length,0.1,m,
 1,Arc,Fquad,,kq,31.3768,m-2,
 1,Arc,Drift,,Length,0.4,m,
 1,Arc,Dquad,,Length,0.1,m,
-1,Arc,Dquad,,kq,22.544,m-2,
+1,Arc,Dquad,,kq,30.0,m-2,
 1,Arc,Drift,,Length,0.2,m,
-1,Arc,Dipole,"Sector (Length, angle)",Length,0.8,m,
-1,Arc,Dipole,"Sector (Length, angle)",Angle,45,degrees,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Length,0.8,m,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Angle,45,degrees,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Plane,YZ,,
+1,Arc,Dipole,"Sector (Length, Angle, Plane, Direction)",Direction,U,,
 1,Arc,Drift,,Length,0.2,m,
 1,Arc,Drift,,Length,2,m,
