@@ -37,17 +37,24 @@ def quad_strength_rate_end(element, parameter,values, elements_to_change, num_of
     with open(filename, "r", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         rows = list(reader)
-    counter = 0
+    element_counter = 0
+    aperture_counter = 0
+    valuescounter = 0
     #Modify parameters
     for i, row in enumerate(rows):
         if row["Element"] == element and row["Parameter"] == parameter:  
-            counter += 1      
-            if counter-1 in elements_to_change:
-                print(counter)
-                row["Value"] = values[counter-1]  
-            else:            
-                print("Parameter for", element, i, "is unchanged")
+            element_counter += 1      
+            if element_counter-1 in elements_to_change: 
+                valuescounter += 1             
+                row["Value"] = values[valuescounter-1] 
 
+        elif row["Element"] == "Aperture" and row["Parameter"] == "Radius":
+            aperture_counter +=1
+            if aperture_counter == 2:
+                iLoc = i
+
+        
+    print(iLoc)
     # Write the modified data back to the original CSV file
     with open(filename, "w", newline="") as csvfile:
         fieldnames = reader.fieldnames
@@ -64,15 +71,14 @@ def quad_strength_rate_end(element, parameter,values, elements_to_change, num_of
 
     Smltn.RunSim()
 
-    end_station_rate = Prtcl.Particle.getParticleLoss(iLoc = -1)
+    end_station_rate = Prtcl.Particle.getParticleLoss(iLoc = iLoc)
 
     Prtcl.Particle.cleanParticles()
 
     return end_station_rate
 
-
-strength_list = np.linspace(0.1,7, 50)
-index_to_change = [0]
+strength_list = np.full(20, 1.08)
+index_to_change = [1]
 rate = []
 
 for strength in strength_list:
@@ -83,7 +89,7 @@ plt.savefig("99-Scratch/Quad_optimisation.png")
 
 
 def proposal_distribution(voltage, sigma):
-    return voltage + __Rnd.random.gaus(0, sigma)
+    return voltage + random.gaus(0, sigma)
 
 #Implementing the simulated annealing
     
