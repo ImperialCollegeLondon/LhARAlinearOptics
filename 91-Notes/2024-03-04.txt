@@ -1,0 +1,138 @@
+--------  --------  --------  --------  --------  --------  --------  06Mar24
+Tried to merge--seemed to cause an infinite loop in resolving issues in the
+merge. Eventually, recloned repo and put my changes on top.  So now have to
+re-run all tests and scripts.  Here goes:
+
+Tests:
+ - BeamLineElementTst.py   - OK
+ - BeamLineTst.py          - OK
+ - BeamTst.py              - OK
+ - CylindricalRFCavityTst  - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DRACOfacilityTst.py     - OK	
+ - DriftTst.py             - OK
+ - ExpSourceTst.py         - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LaTexTst.py             - OK
+ - LhARAFacilityTst.py     - OK
+ - LIONfacilityTst.py      - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - QuadDoubletTst.py       - OK
+ - QuadTripletTst.py       - OK
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Scripts:
+ - LhARAMagnetTable.py     - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - plotTrajectory.py       -
+ - plotQuadTriplet.py      -
+
+
+Restored BeamLineElement and recorrected the bug Will S spotted, so, now back
+to the tests etc.
+
+Tests:
+ - BeamLineElementTst.py   - OK
+ - BeamLineTst.py          - OK
+ - BeamTst.py              - OK
+ - CylindricalRFCavityTst  - OK 
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK 
+ - DRACOfacilityTst.py     - OK (after roll-back to flat)
+ - DriftTst.py             - OK
+ - ExpSourceTst.py         - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LaTexTst.py             - OK
+ - LhARAFacilityTst.py     - OK
+ - LIONfacilityTst.py      - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - QuadDoubletTst.py       - OK
+ - QuadTripletTst.py       - OK
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Scripts:
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - plotTrajectory.py       - OK
+
+--------  --------  --------  --------  --------  --------  --------  05Mar24
+Made first implementation of Beam.py.  This is to handle the beam type
+parameters such as covariance, emittance, etc.  Need now to check tests
+etc.
+
+Tests failed -- too many mistakes in Maria's new Lsdrvn angular distribution.
+Resore previous vcersion and restart.
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamLineElementTst.py   - 
+ - BeamLineTst.py          - 
+ - BeamTst.py              -
+ - CylindricalRFCavityTst  -
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DRACOfacilityTst.py     - 	
+ - DriftTst.py             -
+ - ExpSourceTst.py         -
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         -
+ - LaTexTst.py             -
+ - LhARAFacilityTst.py     - 
+ - LIONfacilityTst.py      - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          -
+ - PhysicalConstantsTst.py - 
+ - QuadDoubletTst.py       -
+ - QuadTripletTst.py       -
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestRead.py             - 
+ - TestWrite.py            - 
+
+Scripts:
+ - LhARAMagnetTable.py     -
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotBeam.py             - 
+ - plotTrajectory.py       -
+ - plotQuadTriplet.py      -

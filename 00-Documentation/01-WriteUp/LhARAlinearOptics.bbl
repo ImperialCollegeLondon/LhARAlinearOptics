@@ -1,0 +1,14 @@
+\providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
+
+\bibitem{Wolski:2014}
+A.~Wolski, {\em Beam dynamics in high energy particle accelerators}.
+\newblock Imperial College Press, 57 Shelton Street, Covent Garden, London WC2H
+  9HE, 2014.
+
+\bibitem{PhysRevLett.90.185002}
+P.~Mora, ``Plasma Expansion into a Vacuum,''
+  \href{https://dx.doi.org/10.1103/PhysRevLett.90.185002}{{\em Phys. Rev.
+  Lett.} {\bfseries 90} (May, 2003) 185002}.
+  \url{https://link.aps.org/doi/10.1103/PhysRevLett.90.185002}.
+
+\end{thebibliography}\endgroup

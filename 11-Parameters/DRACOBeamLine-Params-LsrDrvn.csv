@@ -1,0 +1,36 @@
+﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment,
+0,Facility,Global,Name,Name,DRACO,,,
+0,Facility,Global,Reference particle,Kinetic energy,20,MeV,,
+0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,,
+1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy,
+1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x",
+1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y",
+1,Source,Source,Parameterised TNSA,Emin,1,MeV,Minimum of energy distribution,
+1,Source,Source,Parameterised TNSA,Emax,25,MeV,Maximum of energy distribution,
+1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF,
+1,Source,Source,Parameterised TNSA,MinCTheta,0.999691155,,Maximum theta for flat cos theta,
+1,Source,Source,Parameterised TNSA,Power,2.5E+15,W,Laser power,
+1,Source,Source,Parameterised TNSA,Energy,70,J,Laser energy,
+1,Source,Source,Parameterised TNSA,Wavelength,0.8,um,Laser wavelength,
+1,Source,Source,Parameterised TNSA,Duration,2.8E-14,s,Laser pulse duration,
+1,Source,Source,Parameterised TNSA,Thickness,0.0000004,m,Target thickness,
+1,Source,Source,Parameterised TNSA,Intensity,4E+20,W/cm2,Laser intensity,
+1,Source,Source,Parameterised TNSA,DivAngle,25,degrees,Electron divergence angle,
+1,Capture,Drift,,Length,0.08,m,Length of drift from target to first solenoid,0.08000
+1,Capture,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,
+1,Capture,Solenoid,"Length, layers and turns",Length,0.12,m,Length of solenoid,0.20000
+1,Capture,Solenoid,"Length, layers and turns",Current,1.16E+04,A,,11607.64331
+1,Capture,Solenoid,"Length, layers and turns",Layers,4,,,
+1,Capture,Solenoid,"Length, layers and turns",Turns,28,,Turns per layer,
+1,Capture,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,0.20000
+1,Capture,Drift,,Length,0.545,m,,0.74500
+1,Capture,Aperture,Circular,Radius,0.0075,m,,
+1,Delivery,Drift,,Length,0.355,m,,1.10000
+1,Delivery,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,
+1,Delivery,Solenoid,"Length, layers and turns",Length,0.12,m,Length of solenoid,1.22000
+1,Delivery,Solenoid,"Length, layers and turns",Current,2.98E+03,A,,2981.92771
+1,Delivery,Solenoid,"Length, layers and turns",Layers,4,,,
+1,Delivery,Solenoid,"Length, layers and turns",Turns,28,,Turns per layer,
+1,Delivery,Aperture,Circular,Radius,0.02,m,Radius of solenoid bore,
+1,Delivery,Drift,,Length,0.915,m,,2.13500
+1,Delivery,Aperture,Circular,Radius,0.0035,m,Colimator,

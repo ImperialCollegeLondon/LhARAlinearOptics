@@ -98,8 +98,7 @@ class Simulation(object):
     import random as __Rnd
     import time as __T
     
-    #__RandomSeed = __T.time()
-    __RandomSeed = 1234567
+    __RandomSeed = __T.time()
 
     __Debug     = False
     __instance  = None

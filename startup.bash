@@ -35,15 +35,15 @@ export LhARAOpticsPATH
 
 add="/01-Code"
 dir="$LhARAOpticsPATH$add"
-
-# Set PYTHONPATH to the desired directory
-PYTHONPATH="$dir"
-
+if [ -z ${PYTHONPATH+x} ]; then
+    PYTHONPATH=":$dir"
+else
+    PYTHONPATH="${PYTHONPATH}:$dir"
+fi
 if [ $debug == "true" ]; then
     echo "Python path set:"
     echo "    " $PYTHONPATH
 fi
-
 export PYTHONPATH
 
 add="/99-Scratch"

@@ -1,0 +1,32 @@
+\documentclass{99-Styles/nuSTORM}
+
+\input 99-Styles/GetPackages
+\usepackage{afterpage}
+
+\begin{document}
+
+\input 00-Top-matter/00-Top-matter
+
+\makeatletter
+%\linenumbers
+%\modulolinenumbers[5]
+
+\input 99-Styles/Definitions
+
+\parindent 10pt
+\pagenumbering{arabic}                   
+\setcounter{page}{1}
+
+\pagestyle{plain}
+
+\noindent{\color{DarkYellow} \rule[0mm]{\textwidth}{0.43pt}}
+\vskip 1.0cm
+\input 01-Body/01-Body
+\vskip 1.0cm
+\noindent{\color{DarkYellow} \rule[0mm]{\textwidth}{0.43pt}}
+
+\bibliographystyle{99-Styles/utcaps}
+\bibliography{Concatenated-bibliography}
+
+\end{document}
+

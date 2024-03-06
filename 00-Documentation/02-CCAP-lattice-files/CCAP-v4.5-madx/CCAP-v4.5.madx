@@ -1,0 +1,126 @@
+// CCAP-v4.5
+
+call, file=config-3.0cm.madx;       // solenoid settings for GL4 - GL7
+
+//nozzle
+LHA_TR_VAC_DRI_00: drift, l=0.05;   // drift at the target-capture interface
+LHA_TR_DIA_COL_01: drift, l=0.05;   // vacuum nozzle collimator
+
+//capture
+LHA_TR_VAC_DRI_01: drift, l=0.15;
+LHA_TR_MAG_SOL_01: solenoid, l=0.857, ks=2.491694908754503;
+LHA_TR_VAC_DRI_02: drift, l=0.15;
+LHA_TR_VAC_DRI_03: drift, l=0.15;
+LHA_TR_MAG_SOL_02: solenoid, l=0.857, ks=1.0187472612650557;
+LHA_TR_VAC_DRI_04: drift, l=0.15;
+CAPTURE: line=(LHA_TR_VAC_DRI_01, LHA_TR_MAG_SOL_01, LHA_TR_VAC_DRI_02, LHA_TR_VAC_DRI_03, LHA_TR_MAG_SOL_02,
+    LHA_TR_VAC_DRI_04);
+
+//energy selection
+LHA_LEL_HRF_CAV_01: drift, l=0.5;   // drift for the first RF cavity
+LHA_LEL_VAC_DRI_01: drift, l=0.15;
+LHA_LEL_MAG_SOL_01: solenoid, l=0.857, ks=1.4485646330252073;
+LHA_LEL_VAC_DRI_02: drift, l=0.15;
+LHA_LEL_VAC_DRI_03: drift, l=1.771;
+LHA_LEL_DIA_COL_01: drift, l=0.01;  // stage 1 & 2 energy selection collimator
+LHA_LEL_VAC_DRI_04: drift, l=0.06461;
+LHA_LEL_VAC_DRI_05: drift, l=0.13539;
+LHA_LEL_DIA_COL_02: drift, l=0.01;
+LHA_LEL_VAC_DRI_06: drift, l=0.0546;
+LHA_LEL_HRF_CAV_02: drift, l=0.5;   // drift for the second RF cavity
+ENERGY_COL_S1: line=(LHA_LEL_VAC_DRI_03, LHA_LEL_DIA_COL_01, LHA_LEL_VAC_DRI_04);
+ENERGY_COL_S2: line=(LHA_LEL_VAC_DRI_05, LHA_LEL_DIA_COL_02, LHA_LEL_VAC_DRI_06);
+ENESELECT: line=(LHA_LEL_HRF_CAV_01, LHA_LEL_VAC_DRI_01, LHA_LEL_MAG_SOL_01, LHA_LEL_VAC_DRI_02,
+    ENERGY_COL_S1, ENERGY_COL_S2, LHA_LEL_HRF_CAV_02);
+
+// matching
+LHA_LEL_VAC_DRI_07: drift, l=0.15;
+//LHA_LEL_MAG_SOL_02
+LHA_LEL_VAC_DRI_08: drift, l=0.15;
+LHA_LEL_VAC_DRI_09: drift, l=0.3;   // geometry mod: increased from 0.1 to 0.3m
+LHA_LEL_VAC_DRI_10: drift, l=0.15;
+//LHA_LEL_MAG_SOL_03
+LHA_LEL_VAC_DRI_11: drift, l=0.15;
+LHA_LEL_VAC_DRI_12: drift, l=2.5;   //  geometry mod: add 2.5m
+
+//  geometry mod: GL6 & GL7 added in same configuration as GL4 & GL5
+LHA_LEL_VAC_DRI_13: drift, l=0.15;
+//LHA_LEL_MAG_SOL_04
+LHA_LEL_VAC_DRI_14: drift, l=0.15;
+LHA_LEL_VAC_DRI_15: drift, l=0.3;
+LHA_LEL_VAC_DRI_16: drift, l=0.15;
+//LHA_LEL_MAG_SOL_05
+LHA_LEL_VAC_DRI_17: drift, l=0.15;
+
+MATCHING: line=(LHA_LEL_VAC_DRI_07, LHA_LEL_MAG_SOL_02, LHA_LEL_VAC_DRI_08, LHA_LEL_VAC_DRI_09,
+    LHA_LEL_VAC_DRI_10, LHA_LEL_MAG_SOL_03, LHA_LEL_VAC_DRI_11, LHA_LEL_VAC_DRI_12,
+    LHA_LEL_VAC_DRI_13, LHA_LEL_MAG_SOL_04, LHA_LEL_VAC_DRI_14, LHA_LEL_VAC_DRI_15,
+    LHA_LEL_VAC_DRI_16, LHA_LEL_MAG_SOL_05, LHA_LEL_VAC_DRI_17);
+
+// extraction
+LHA_LEL_MAG_OCT_01: drift, l=0.1;  // Octupole for uniform beam.
+LHA_LEL_VAC_DRI_18: drift, l=0.3;  // drift after which the extraction dipole is positioned
+LHA_LEL_MAG_DIP_01_DR: drift, l=0.7;  // drift where the extraction dipole is positioned
+LHA_LEL_VAC_DRI_19: drift, l=0.5;
+LHA_LEL_DIA_COL_03: drift, l=0.02;    ! collimator
+EXTRACT: line=(LHA_LEL_MAG_OCT_01, LHA_LEL_VAC_DRI_18, LHA_LEL_MAG_DIP_01_DR, LHA_LEL_VAC_DRI_19, LHA_LEL_DIA_COL_03);  ! switching dipole drift & collimation
+MATCHFULL: line=(MATCHING, EXTRACT);
+
+preArc:   line=(CAPTURE, ENESELECT, MATCHFULL);          ! stage 1 pre in-vitro arc
+
+LHA_LEL_VAC_DRI_20: drift, l=0.2;
+LHA_LEL_MAG_DIP_01: sbend, l=0.8, angle=pi/4, tilt=pi/2;
+LHA_LEL_VAC_DRI_21: drift, l=0.2;
+LHA_LEL_MAG_QUAD_01: quadrupole, l=0.1, k1=-22.544, tilt=pi/2;
+LHA_LEL_VAC_DRI_22: drift, l=0.4;
+LHA_LEL_MAG_QUAD_02: quadrupole, l=0.1, k1=31.3768, tilt=pi/2;
+LHA_LEL_VAC_DRI_23: drift, l=0.2;
+LHA_LEL_MAG_QUAD_03: quadrupole, l=0.1, k1=-31.5123, tilt=pi/2;
+LHA_LEL_VAC_DRI_24: drift, l=0.2-0.005;
+LHA_LEL_DIA_COL_04: drift, l=0.01;
+LHA_LEL_VAC_DRI_25: drift, l=0.2-0.005;
+LHA_LEL_MAG_QUAD_04: quadrupole, l=0.1, k1=-31.5123, tilt=pi/2;
+LHA_LEL_VAC_DRI_26: drift, l=0.2;
+LHA_LEL_MAG_QUAD_05: quadrupole, l=0.1, k1=31.3768, tilt=pi/2;
+LHA_LEL_VAC_DRI_27: drift, l=0.4;
+LHA_LEL_MAG_QUAD_06: quadrupole, l=0.1, k1=-22.544, tilt=pi/2;
+LHA_LEL_VAC_DRI_28: drift, l=0.2;
+LHA_LEL_MAG_DIP_02: sbend, l=0.8, angle=pi/4, tilt=pi/2;
+LHA_LEL_VAC_DRI_29: drift, l=0.2;
+
+LHA_LEL_VAC_DRI_30: drift, l=2.0;  ! drift to end station
+
+arc:  line=(LHA_LEL_VAC_DRI_20, LHA_LEL_MAG_DIP_01, LHA_LEL_VAC_DRI_21, LHA_LEL_MAG_QUAD_01, LHA_LEL_VAC_DRI_22,
+    LHA_LEL_MAG_QUAD_02, LHA_LEL_VAC_DRI_23, LHA_LEL_MAG_QUAD_03, LHA_LEL_VAC_DRI_24, LHA_LEL_DIA_COL_04,
+    LHA_LEL_VAC_DRI_25, LHA_LEL_MAG_QUAD_04, LHA_LEL_VAC_DRI_26, LHA_LEL_MAG_QUAD_05, LHA_LEL_VAC_DRI_27,
+    LHA_LEL_MAG_QUAD_06, LHA_LEL_VAC_DRI_28, LHA_LEL_MAG_DIP_02, LHA_LEL_VAC_DRI_29, LHA_LEL_VAC_DRI_30);
+
+// full stage 1 beam line
+lhara: line=(preArc, arc);
+
+// Initial Parameters: +/- 2% - nominal design - JP
+//init_alfx := -129.79;
+//init_alfy := -129.79;
+//init_betx := 12.82;
+//init_bety := 12.82;
+//init_ex := 1.26e-7;
+//init_ey := 1.26e-7;
+
+// Initial Parameters: +/- 2% - GPT simulation
+init_alfx := -199.986;
+init_alfy := -209.997;
+init_betx := 19.754;
+init_bety := 20.733;
+init_ex := 8.420e-08;
+init_ey := 8.097e-08;
+
+beam, particle=proton, sequence=lhara, energy = 0.95327231, NPART=1.05E11, sige=0.0002, ex=init_ex, ey=init_ey;
+
+use, sequence = lhara;
+
+select, flag = twiss;
+twiss, sequence=lhara, betx=init_betx,bety=init_bety, alfx=init_alfx,alfy=init_alfy, save, file=nominal-3.0cm.tfs;
+
+plot,file=nominal-3.0cm, haxis=s, vaxis=betx,bety, colour=100;
+plot,file=nominal-3.0cm, haxis=s, vaxis=alfx,alfy, colour=100;
+

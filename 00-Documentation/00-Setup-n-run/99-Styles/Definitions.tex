@@ -1,0 +1,62 @@
+% Quantum mechanical notation
+\newcommand{\bra}[1]{\ensuremath{\langle #1 |}}   % Bra vector
+\newcommand{\ket}[1]{\ensuremath{| #1 \rangle}}   % Ket vector
+\newcommand{\bigbra}[1]{\ensuremath{\big\langle #1 \big|}}   % Bra vector
+\newcommand{\bigket}[1]{\ensuremath{\big| #1 \big\rangle}}   % Ket vector
+\newcommand{\amp}[3]{\ensuremath{\left\langle #1 \,\left|\, #2%
+                     \,\right|\, #3 \right\rangle}}  % QM amplitude
+\newcommand{\sprod}[2]{\ensuremath{\left\langle #1 |%
+                     #2 \right\rangle}}  % QM scalar product
+\newcommand{\ev}[1]{\ensuremath{\left\langle #1 %
+                     \right\rangle}} % Expectation value
+\newcommand{\ds}[1]{\ensuremath{\! \frac{d^3#1}{(2\pi)^3 %
+                     \sqrt{2 E_\vec{#1}}} \,}} % Spatial integral
+\newcommand{\dst}[1]{\ensuremath{\! %
+                     \frac{d^4#1}{(2\pi)^4} \,}} % Space-time integral
+\newcommand{\tr}{\text{tr}}
+\newcommand{\sgn}{\text{sgn}}
+\newcommand{\diag}{\text{diag}}
+\newcommand{\BR}{\text{BR}}
+\newcommand\brabar{\raisebox{-2.0pt}{\scalebox{.2}{\,\,
+\textbf{(}}}\raisebox{-3.25pt}{\scalebox{.8}{{\textendash}}}\raisebox{-2.0pt}{\scalebox{.2}{\textbf{)
+}}}}
+\newcommand{\gsim}      {\mbox{\raisebox{-0.4ex}{$\;\stackrel{>}{\scriptstyle \sim}\;$}}}
+\newcommand{\lsim}      {\mbox{\raisebox{-0.4ex}{$\;\stackrel{<}{\scriptstyle \sim}\;$}}}
+
+% Miscellaneous commands
+\renewcommand{\vec}[1]{{\mathbf{#1}}}
+\renewcommand{\Re}{{\text{Re}}}
+\renewcommand{\Im}{{\text{Im}}}
+\newcommand{\iso}[2]{{\ensuremath{{}^{#2}}\ensuremath{\rm #1}}}
+\newcommand{\eps}{{\ensuremath{\epsilon}}}
+\newcommand{\draftnote}[1]{{\bf\color{red} \MakeUppercase{#1}}}
+\newcommand{\panm}[1]{{\color{blue} #1}}
+\providecommand{\abs}[1]{\lvert#1\rvert}
+\providecommand{\norm}[1]{\lVert#1\rVert}
+
+\def\parenbar{\mathpalette\p@renb@r}
+\def\p@renb@r#1#2{\vbox{%
+  \ifx#1\scriptscriptstyle \dimen@.7em\dimen@ii.2em\else
+  \ifx#1\scriptstyle \dimen@.8em\dimen@ii.25em\else
+  \dimen@1em\dimen@ii.4em\fi\fi \offinterlineskip
+  \ialign{\hfill##\hfill\cr
+    \vbox{\hrule width\dimen@ii}\cr
+    \noalign{\vskip-.3ex}%
+    \hbox to\dimen@{$\mathchar300\hfil\mathchar301$}\cr
+    \noalign{\vskip-.3ex}%
+    $#1#2$\cr}}}
+
+%
+%.. Sanjib's commands:
+\providecommand{\anmne}{\mbox{$\bar\nu_{\mu} \rightarrow \bar\nu_e$}} 
+\providecommand{\nmne}{\mbox{$\nu_{\mu}\rightarrow\nu_e$}} 
+\providecommand{\anm}{\mbox{$\bar\nu_\mu$}} 
+\providecommand{\nm}{\mbox{$\nu_\mu$}}
+\providecommand{\nue}{\mbox{$\nu_e$}} 
+\providecommand{\ane}{\mbox{$\bar\nu_e$}} 
+\providecommand{\enu}{\mbox{$E_\nu$}}
+\providecommand{\piz}{\mbox{$\pi^0 $}}
+\providecommand{\pip}{\mbox{$\pi^+$}} 
+\providecommand{\pim}{\mbox{$\pi^-$}} 
+
+\setlength{\LTcapwidth}{\linewidth}
