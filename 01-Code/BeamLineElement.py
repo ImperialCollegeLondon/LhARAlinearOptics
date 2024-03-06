@@ -2287,7 +2287,8 @@ class GaborLens(BeamLineElement):
             g0    = mth.sqrt(g02)
             
             Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-            B0 = self.getStrength() * 2.*Brho <---- remove 2.*Brho ..
+            B0 = self.getStrength()
+            # Bug: Will Shields; remove * 2.*Brho <---- 06Mar24
             ne = epsilon0SI * B0**2 / (2.*protonMASSSI*g0)
 
             ne_trans = ne
@@ -3247,9 +3248,10 @@ class Source(BeamLineElement):
         if self._Mode == 0:
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
-            cosTheta, Phi = self.getGaussianThetaPhi()
+            cosTheta, Phi = self.getFlatThetaPhi()
             """
-               Replace, self.getFlatThetaPhi(), KL: 05Mar24
+               Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
+               Replace, self.getFlatThetaPhi(),            KL: 05Mar24
             """
 
             # LION beamline
