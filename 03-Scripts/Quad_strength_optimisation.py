@@ -11,6 +11,8 @@ import scipy                 as sp
 import scipy.constants
 import matplotlib.pyplot     as plt
 
+print(f"{Prtcl.__name__} imported from directory: {os.path.dirname(Prtcl.__file__)}")
+
 
 def quad_strength_rate_end(element, parameter,values, elements_to_change, num_of_events, iLoc=-1):
     """_summary_
@@ -29,19 +31,20 @@ def quad_strength_rate_end(element, parameter,values, elements_to_change, num_of
 
     HOMEPATH = os.getenv("HOMEPATH")
     # Original filename
-    filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv")
+    filename = os.path.join(HOMEPATH, "11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv")
     # Open the original CSV file and read its contents
     
     with open(filename, "r", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         rows = list(reader)
-    
+    counter = 0
     #Modify parameters
     for i, row in enumerate(rows):
-        if row["Element"] == element and row["Parameter"] == parameter:
-        
-            if i in elements_to_change:
-                row["Value"] = values[i]  
+        if row["Element"] == element and row["Parameter"] == parameter:  
+            counter += 1      
+            if counter-1 in elements_to_change:
+                print(counter)
+                row["Value"] = values[counter-1]  
             else:            
                 print("Parameter for", element, i, "is unchanged")
 
@@ -61,26 +64,26 @@ def quad_strength_rate_end(element, parameter,values, elements_to_change, num_of
 
     Smltn.RunSim()
 
-    end_station_rate = Prtcl.Particle.end_station_rate()
+    end_station_rate = Prtcl.Particle.getParticleLoss(iLoc = -1)
 
     Prtcl.Particle.cleanParticles()
 
     return end_station_rate
 
 
-d_quad_kq = np.linspace(10,40, 150)
+strength_list = np.linspace(0.1,7, 50)
 index_to_change = [0]
 rate = []
 
-for kq in d_quad_kq:
-    rate.append(quad_strength_rate_end("Dquad","kq", [kq], index_to_change, 10000))
+for strength in strength_list:
+    rate.append(quad_strength_rate_end("Solenoid","Strength", [strength], index_to_change, 10000))
 
-plt.plot(d_quad_kq, rate)
+plt.plot(strength_list, rate, "x")
 plt.savefig("99-Scratch/Quad_optimisation.png")
 
 
 def proposal_distribution(voltage, sigma):
-    return voltage + random.gaus(0, sigma)
+    return voltage + __Rnd.random.gaus(0, sigma)
 
 #Implementing the simulated annealing
     

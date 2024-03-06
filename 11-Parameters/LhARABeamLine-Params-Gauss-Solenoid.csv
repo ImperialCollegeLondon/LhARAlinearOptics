@@ -14,7 +14,7 @@
 1,Interface,Aperture,Circular,Radius,0.00287,m,Inner bore of exit from nozzle
 1,Capture,Drift,,Length,0.15,m,Drift to solenoid
 1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
-1,Capture,Solenoid,"Length, strength",Strength,2.491694909,rad/m,ks
+1,Capture,Solenoid,"Length, strength",Strength,3.5,rad/m,ks
 1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
 1,Capture,Drift,,Length,0.15,m,Drift to next solenoid
 1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
