@@ -6,10 +6,10 @@
 
 The origin of the LhARA coordinate system, the ``laboratory coordinate
 system'' or ``laboratory reference frame'', is at the position of the
-laser focus at the position of the laser-target interaction.
+laser focus at the laser-target interaction point.
 The $z$ axis is horizontal and parallel to the nominal capture axis,
 pointing in the downstream direction.
-The $y$ axis points vertically upwards, and the $x$ axis completes a
+The $y$ axis points vertically upwards and the $x$ axis completes a
 right-handed orthogonal coordinate system. 
 
 Unit vectors along the $x$, $y$ and $z$ axes are $\bm{i}$, $\bm{j}$
@@ -17,9 +17,9 @@ and $\bm{k}$ respectively.
 The position of the reference particle, its momentum and energy are
 described as functions of the distance it has travelled from the origin
 of coordinates to its current position.
-The distance travelled is defined to be $s$, making the position,
-$\bm{r}_0$, momentum, $\bm{p}_0$, and energy, $E_0$, of the
-reference particle at position $s$:
+The distance the reference particle has travelled is defined to be
+$s$, making the position, $\bm{r}_0$, momentum, $\bm{p}_0$, and
+energy, $E_0$, of the reference particle at position $s$:
 \begin{eqnarray}
   \bm{r}_0 & = & \bm{r}_0(s)\, ;           \nonumber \\
   \bm{p}_0 & = & \bm{p}_0(s)\, {\rm ; and}           \\
@@ -49,18 +49,18 @@ travelling.
 The position of the particle defines the origin of the RPLC system,
 see figure~\ref{fig:RPLC}.
 The tangent to the reference particle trajectory at $s$ defines the
-$z_{\rm RPLC}$ axis with unit vector $\bm{k}_{\rm RPLC}$.
+$z_r$ axis with unit vector $\bm{k}_r$.
 In the laboratory frame, the presence of local electric or magnetic
 fields may cause the reference particle's trajectory to change.
 In the neighbourhood of the particle, the curved trajectory may be
 described in terms of an arc of a circle.
-The $x_{\rm RPLC}$ axis (with unit vector $\bm{i}_{\rm RPLC}$) is then
+The $x_r$ axis (with unit vector $\bm{i}_r$) is then
 taken to be in the direction pointing away from the centre of the
 circle. 
-The third coordinate axis, $y_{\rm RPLC}$, is defined to complete the
+The third coordinate axis, $y_r$, is defined to complete the
 right-handed orthogonal coordinate system; the unit vector along the
-$y_{\rm RPLC}$ axis being given by
-$\bm{j}_{\rm RPLC} = \bm{k}_{\rm RPLC} \times \bm{i}_{\rm RPLC}$.
+$y_r$ axis being given by
+$\bm{j}_r = \bm{k}_r \times \bm{i}_r$.
 \begin{figure}
   \begin{center}
     \includegraphics[width=0.55\linewidth]{RPLC.pdf}
@@ -71,23 +71,30 @@ $\bm{j}_{\rm RPLC} = \bm{k}_{\rm RPLC} \times \bm{i}_{\rm RPLC}$.
     The distance the reference particle has travelled, measured from
     the origin of coordinates in the laboratory frame, is labelled
     $s$.
-    The origin of the RPLCs is coincident with the position of the
-    reference particle.
+    The origin of the ``reference paricle local coordiante (RPLC)
+    system is coincident with the position of the reference particle.
     The directions of unit vectors along each of three righthanded,
     orthogonal coordinate axes are shown as black arrows labelled
-    $\bm{i}_0$, $\bm{j}_0$, and $\bm{j}_0$. 
+    $\bm{i}_r$, $\bm{j}_r$, and $\bm{j}_r$. 
   }
   \label{fig:RPLC}
 \end{figure}
 
-The trajectory of the reference particle will be a straight line as it
-traverses a drift space or when the particle's energy is increased (or
-decreased) through an electric field applied parallel to its direction
-of motion.
-In such cases the RPLC axes are taken to coincide with either the
-laboratory coordinate system or the RPLC system defined at the exit of
-the beam-line element that preceded the drift space or accelerating
-element.
+The trajectory of the reference particle is a straight line as it
+traverses a drift space and a variety of beam-line elements.
+Examples of such beam-line elements include solenoids, quadrupoles,
+etc.
+The reference trajectory is also undeviated by passage through an
+accelerating cavity placed such that the accelerating field is 
+parallel to the reference-particle trajectory.
+
+The RPLC coordinate system at $s=0$ is taken to coincide with the
+laboratory coordinate system.
+Beam-line elements are placed sequentially along the trajectory of the
+reference particle.
+The RPLC system at the entrance to a particular beam-line element is
+taken to coincide with the RPLC system defined at the exit of the
+beam-line element after which it is placed.
 
 \subsection{Transforming to and from reference particle local
             coordinates to laboratory coordinates}
@@ -110,19 +117,19 @@ where:
 $\underline{\underline{R}}(s)$ is a rotation matrix that takes
 the RPLCs at $s$ to the laboratory frame coordinates.
 
-In the laboratory frame, the unit vectors $\bm{i}_{\rm RPLC}$,
-$\bm{j}_{\rm RPLC}$ and $\bm{k}_{\rm RPLC}$ are given by:
+In the laboratory frame, the unit vectors $\bm{i}_r$,
+$\bm{j}_r$ and $\bm{k}_r$ are given by:
 \begin{eqnarray}
-  \bm{i}_{\rm RPLC} & = & \begin{pmatrix} i_{rx} \\ i_{ry} \\  i_{rz} \\ \end{pmatrix} \,;           \nonumber \\
-  \bm{j}_{\rm RPLC} & = & \begin{pmatrix} j_{rx} \\ j_{ry} \\  j_{rz} \\ \end{pmatrix} \,{\rm ; and}           \\
-  \bm{k}_{\rm RPLC} & = & \begin{pmatrix} k_{rx} \\ k_{ry} \\  k_{rz} \\ \end{pmatrix} \,.           \nonumber
+  \bm{i}_r & = & \begin{pmatrix} i_{rx} \\ i_{ry} \\  i_{rz} \\ \end{pmatrix} \,;           \nonumber \\
+  \bm{j}_r & = & \begin{pmatrix} j_{rx} \\ j_{ry} \\  j_{rz} \\ \end{pmatrix} \,{\rm ; and}           \\
+  \bm{k}_r & = & \begin{pmatrix} k_{rx} \\ k_{ry} \\  k_{rz} \\ \end{pmatrix} \,.           \nonumber
 \end{eqnarray}
 The rotation matrix, $\underline{\underline{R}}$, may now be written:
 \begin{equation}
   \underline{\underline{R}}(s) =
     \begin{bmatrix}
-      i_{{\rm RPLC}x} & j_{{\rm RPLC}x} & k_{{\rm RPLC}x} \\
-      i_{{\rm RPLC}y} & j_{{\rm RPLC}y} & k_{{\rm RPLC}y} \\
-      i_{{\rm RPLC}z} & j_{{\rm RPLC}z} & k_{{\rm RPLC}z}
+      i_{rx} & j_{rx} & k_{rx} \\
+      i_{ry} & j_{ry} & k_{ry} \\
+      i_{rz} & j_{rz} & k_{rz}
     \end{bmatrix} \,.
 \end{equation}
