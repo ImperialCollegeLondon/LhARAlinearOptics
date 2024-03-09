@@ -2,30 +2,32 @@
 
 \section{Transfer matrices}
 
-Description of beam transport often carried out by:
-\begin{itemize}
-  \item Breaking lattice down into a series of ``elements'',
-    e.g. drift, quadrupole, dipole, solenoid, etc.;
-  \item Transport of particle between the start and end of a
-    particular element of the lattice linearised such that the trace
-    space at the end of the element, $\bm{\phi}_f$, is written in
-    terms of the trace space at the start of the element,
-    $\bm{\phi}_i$:
-    \begin{equation}
-      \bm{\phi}_f = \underline{\underline{T}} ~ \bm{\phi}_i \,
-      {\rm ; and}
-    \end{equation}
-  \item The distance along the reference particle trajectory is
-    increased by $\delta s$, where:
-    \begin{equation}
-      s_{\rm end} = s_{\rm start} + \delta s \, ;
-    \end{equation}
-    and $s_{\rm start}$ and $s_{\rm end}$ are the length of the
-    reference particle trajectory at the start and end of the 
-    beam-line element respectively.
-\end{itemize}
-Many excellent descriptions of derivation of transfer matrices,
-$\underline{\underline{T}}$, so only quote results here.
+A beam line may be described as a series of beam-line elements
+arranged one after the other.
+The problem of transporting a particle through the beam line may then
+carried out as a series of steps through each of the elements of which
+the beam line is made up.
+Taking advantage of the trace space defined above, the transport of
+a particle across a particular beam-line element may be described in
+terms of a linear transformation:
+\begin{equation}
+  \bm{\phi}_f = \underline{\underline{T}} ~ \bm{\phi}_i \, ;
+\end{equation}
+where $\bm{\phi}_i$ is the trace-space vector at the start of the
+beam-line element and $\bm{\phi}_f$ is the transformed trace-space
+vector at the end.
+The step across the beam-line element implies an increment, $\delta s$
+to $s$-coordinate given by:
+\begin{equation}
+  s_{\rm end} = s_{\rm start} + \delta s \, ;
+\end{equation}
+where $s_{\rm start}$ and $s_{\rm end}$ are the coordiante along the
+reference particle trajectory at the start and end of the beam-line
+element respectively.
+There are many excellent descriptions of derivation of the transfer
+matrices, $\underline{\underline{T}}$, so only quote results here.
+The notation used below is developed from that used
+in~\cite{Wolslki}.
 
 \subsection{Drift}
 
