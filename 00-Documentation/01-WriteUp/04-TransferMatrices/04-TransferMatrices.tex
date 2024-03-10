@@ -5,29 +5,29 @@
 A beam line may be described as a series of beam-line elements
 arranged one after the other.
 The problem of transporting a particle through the beam line may then
-carried out as a series of steps through each of the elements of which
-the beam line is made up.
+carried out as a series of steps through each of the elements in turn.
 Taking advantage of the trace space defined above, the transport of
 a particle across a particular beam-line element may be described in
 terms of a linear transformation:
 \begin{equation}
-  \bm{\phi}_f = \underline{\underline{T}} ~ \bm{\phi}_i \, ;
+  \bm{\phi}_{\rm end} = \underline{\underline{T}} ~ \bm{\phi}_{\rm start} \, ;
 \end{equation}
-where $\bm{\phi}_i$ is the trace-space vector at the start of the
-beam-line element and $\bm{\phi}_f$ is the transformed trace-space
-vector at the end.
-The step across the beam-line element implies an increment, $\delta s$
-to $s$-coordinate given by:
+where $\bm{\phi}_{\rm start}$ is the trace-space vector at the start
+of the beam-line element and $\bm{\phi}_{\rm end}$ is the transformed
+trace-space vector at the end.
+The step across the beam-line element implies an increment, $\delta s$,
+to teh $s$-coordinate given by:
 \begin{equation}
   s_{\rm end} = s_{\rm start} + \delta s \, ;
 \end{equation}
-where $s_{\rm start}$ and $s_{\rm end}$ are the coordiante along the
+where $s_{\rm start}$ and $s_{\rm end}$ are the coordinate along the
 reference particle trajectory at the start and end of the beam-line
 element respectively.
-There are many excellent descriptions of derivation of the transfer
-matrices, $\underline{\underline{T}}$, so only quote results here.
+There are many excellent descriptions of the derivation of the
+transfer matrices, $\underline{\underline{T}}$, so only the results
+are quoted here.
 The notation used below is developed from that used
-in~\cite{Wolslki}.
+in~\cite{Wolski:2014}.
 
 \subsection{Drift}
 
@@ -89,9 +89,9 @@ where:
 \begin{equation}
   k_q = \frac{gc}{p} \times 10^{-3} \, ,  \label{Eq:Effectivekq}
 \end{equation}
-and $c$ is the speed of light in metres per second, p is the magnitude
-of the momentum of the particle in MeV/c, and the field gradient, $g$,
-is given in T/m.
+and $c$ is the speed of light in metres per second, $p$ is the
+magnitude of the momentum of the particle in MeV/c, and the field
+gradient, $g$, is given in T/m.
 As before, $\beta_0$ is the relativistic velocity of the reference
 particle and $\gamma_0=(1-\beta_0^2)^{-\frac{1}{2}}$.
 The increment in the reference particle trajectory is:
@@ -100,14 +100,14 @@ The increment in the reference particle trajectory is:
 \end{equation}
 
 It is important to include a description of the effect of dispersion
-on focusing in the LhARA beam line since the laser-driven proton and
-ion source provides a broad energy spectrum.
+on beam transport through the LhARA beam line since the laser-driven
+proton and ion source provides a broad energy spectrum. 
 Reference \cite{Wolski:2014} provides two methods for the description of
 dispersion in a linear approximation.
 The first is to use the reference momentum to calculate the quadrupole
 focusing strength ($k_{0q} = \frac{gc}{p_0} \times 10^{-3}$) and to
 include terms in the expressions for $x$, $x^\prime$, $y$, and
-$y^\prime$ dependent on $\delta$.
+$y^\prime$ dependent on $\delta$.    
 The second is to use equation~\ref{Eq:Effectivekq} to calculate the
 effective quadrupole focusing strength.
 The second approach has been adopted here.
@@ -128,10 +128,10 @@ the $yz$ plane (a ``defocusing quadrupole'') may be written:
 
 \subsection{Solenoid}
 
-The passage of a beam particle through a solenoid is determined by
+The trajectory of a beam particle through a solenoid is determined by
 the magnetic field strength, $\bm{B}_s$, within the solenoid and the
-length of the solenoid, $l$, measured along its axis.
-As the particle enters the solenoid, the fringe fields impart momentum
+length of the solenoid, $l_s$, measured along its axis.
+As the particle enters the solenoid, the fringe field imparts momentum
 transverse to the axis of the magnet.
 This results in the particle executing a helical trajectory, the axis
 of the helix being parallel to the solenoid axis.
@@ -156,23 +156,27 @@ may may be written:
 \begin{equation}
   \underline{\underline{T}}_{\rm~Sol} =
     \begin{pmatrix}
-                             \cos^2(\sqrt{k_s} l) &   \frac{1}{2\sqrt{k_s}} \sin(\sqrt{k_s} l) &         \frac{1}{2} \sin(2\sqrt{k_s} l) & \frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l) & 0 & 0 \\
-          -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l) &                     \cos^2(\sqrt{k_s} l) &           -\sqrt{k_s}\sin^2(\sqrt{k_s} l) &         \frac{1}{2} \sin(2\sqrt{k_s} l) & 0 & 0 \\
-                 -\frac{1}{2} \sin(2\sqrt{k_s} l) & -\frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l) &                    \cos^2(\sqrt{k_s} l) & \frac{1}{2\sqrt{k_s}} \sin(2\sqrt{k_s} l) & 0 & 0 \\
-                    \sqrt{k_s} \sin^2(\sqrt{k_s} l) &         -\frac{1}{2} \sin(2\sqrt{k_s} l) & -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l) &                    \cos^2(\sqrt{k_s} l) & 0 & 0 \\
+                           \cos^2(\sqrt{k_s} l_s) &   \frac{1}{2\sqrt{k_s}} \sin(\sqrt{k_s} l_s) &           \frac{1}{2} \sin(2\sqrt{k_s} l_s) & \frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l_s) & 0 & 0 \\
+      -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l_s) &                       \cos^2(\sqrt{k_s} l_s) &           -\sqrt{k_s}\sin^2(\sqrt{k_s} l_s) &           \frac{1}{2} \sin(2\sqrt{k_s} l_s) & 0 & 0 \\
+               -\frac{1}{2} \sin(2\sqrt{k_s} l_s) & -\frac{1}{\sqrt{k_s}} \sin^2(\sqrt{k_s} l_s) &                      \cos^2(\sqrt{k_s} l_s) & \frac{1}{2\sqrt{k_s}} \sin(2\sqrt{k_s} l_s) & 0 & 0 \\
+                \sqrt{k_s} \sin^2(\sqrt{k_s} l_s) &           -\frac{1}{2} \sin(2\sqrt{k_s} l_s) & -\frac{\sqrt{k_s}}{2} \sin(2\sqrt{k_s} l_s) &                      \cos^2(\sqrt{k_s} l_s) & 0 & 0 \\
           0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
 As in the case of the quadrupoles, dispersion is accounted for using
 equation~\ref{Eq:Effectiveks}.
+The increment in the reference particle trajectory is:
+\begin{equation}
+  \delta s = l_s \, .
+\end{equation}
 
 \subsection{Non-neutral (electron) plasma (Gabor) lens}
 
 A dense gas of electrons confined in a Penning-Malmberg trap provides
 an electric field that can be used to focus a positive ion beam.
 The electron gas is confined axially in the lens by an electostatic
-potential created using a central anode of length $l$.
+potential created using a central anode of length $l_G$.
 The gas is confined radially using the uniform field of a solenoid.
 Assuming a uniform electron density, $n_e$, the focusing parameter,
 $k_G$, may be written:
@@ -200,22 +204,26 @@ lens may be written:
 \begin{equation}
   \underline{\underline{T}}_{G} =
     \begin{pmatrix}
-                    \cos(\sqrt{k_G} l) & \frac{\sin(\sqrt{k_G} l)}{\sqrt{k_G}} &  0 & 0 & 0 & 0 \\
-        -\sqrt{k_G} \sin(\sqrt{k_G} l) &                    \cos(\sqrt{k_G} l) &  0 & 0 & 0 & 0 \\
-                                     0 &                                     0 &              \cos(\sqrt{k_G} l) & \frac{\sin(\sqrt{k_G} l)}{\sqrt{k_G}}  & 0 & 0 \\
-                                     0 &                                     0 &  -\sqrt{k_G} \sin(\sqrt{k_G} l) &                     \cos(\sqrt{k_G} l) & 0 & 0 \\
+                    \cos(\sqrt{k_G} l_G) & \frac{\sin(\sqrt{k_G} l_G)}{\sqrt{k_G}} &  0 & 0 & 0 & 0 \\
+        -\sqrt{k_G} \sin(\sqrt{k_G} l_G) &                    \cos(\sqrt{k_G} l_G) &  0 & 0 & 0 & 0 \\
+                                     0 &                                     0 &              \cos(\sqrt{k_G} l_G) & \frac{\sin(\sqrt{k_G} l_G)}{\sqrt{k_G}}  & 0 & 0 \\
+                                     0 &                                     0 &  -\sqrt{k_G} \sin(\sqrt{k_G} l_G) &                     \cos(\sqrt{k_G} l_G) & 0 & 0 \\
           0 & 0 & 0 & 0 & 1 & \frac{l}{\beta_0^2 \gamma_0^2} \\
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
+The increment in the reference particle trajectory is:
+\begin{equation}
+  \delta s = l_G \, .
+\end{equation}
 
 \subsection{Dipole}
 
-The reference particle trajectory in the beam elements described above
-passes along the axis of the element.
+The reference particle trajectory in the beam-line elements described
+above passes along the axis of the element.
 In contrast, a dipole bends the reference trajectory so that it
 describes the arc of a circle (see figure~\ref{fig:Dipole}).
-The codes provides for transport through a ``sector dipole'' in the
+The code provides for the transport through a ``sector dipole'' in the
 hard-edge approximation.
 In this case, the field within the magnet is taken to be constant and
 parallel to $\bm{j}_{\rm RPLC}$, i.e. $\bm{B}_D = (0, B_{D0}, 0)$. 
@@ -273,4 +281,8 @@ dipole may be written:
    -\frac{\sin(\phi)}{\beta_0} &  -\frac{\rho}{\beta_0}\left(1 -\cos(\phi)\right) & 0 & 0 & 1 & \frac{l}{\beta^2 \gamma^2} - \frac{l - \rho\sin(\phi)}{\beta_0^2} \\
                              0 &                                                0 & 0 & 0 & 0 &                                                                1
         \end{pmatrix} \, .
+\end{equation}
+The increment in the reference particle trajectory is:
+\begin{equation}
+  \delta s = l_D \, .
 \end{equation}
