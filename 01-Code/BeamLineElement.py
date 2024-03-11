@@ -3246,15 +3246,6 @@ class Source(BeamLineElement):
                   self.getMode(), self.getParameters())
 
         if self._Mode == 0:
-            X             = rnd.gauss(0., self.getParameters()[0])
-            Y             = rnd.gauss(0., self.getParameters()[1])
-            cosTheta, Phi = self.getFlatThetaPhi()
-            """
-               Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
-               Replace, self.getFlatThetaPhi(),            KL: 05Mar24
-            """
-
-            # LION beamline
             P_L = self.getParameters()[6]
             E_laser = self.getParameters()[7]
             lamda = self.getParameters()[8]
@@ -3265,6 +3256,15 @@ class Source(BeamLineElement):
 
             KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, \
                                 lamda, t_laser, d, I, theta_degrees)  # [MeV]
+
+            X             = rnd.gauss(0., self.getParameters()[0])
+            Y             = rnd.gauss(0., self.getParameters()[1])
+            cosTheta, Phi = self.getGaussianThetaPhi(KE)
+            """
+              Rolled back to: self.getGaussianThetaPhi(), KL: 08Mar24
+              Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
+              Replace, self.getFlatThetaPhi(),            KL: 05Mar24
+            """
 
         elif self._Mode == 1:
             X             = rnd.gauss(0., self.getParameters()[0])
@@ -3295,6 +3295,16 @@ class Source(BeamLineElement):
         return cosTheta, Phi
     
 
+    #.. 2D Gaussian distribution
+    def g_xy(self, x, y, sigma_x, sigma_y):  
+        g = (1. / (2.*np.pi*sigma_x*sigma_y)) * \
+            np.exp(-0.5*((x/sigma_x)**2 + (y/sigma_y)**2))
+       
+        # normalize the probability distribution
+        g /= np.sum(g)
+
+        return g    
+
     ### Gaussian Angular Distribution ### 
     # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
     def g_theta(self,energy):
@@ -3302,31 +3312,35 @@ class Source(BeamLineElement):
         return theta
     
     # Single angle generator with acceptance-rejection
-    def angle_generator(self,E_MeV):
+    def angle_generator(self, E_MeV):
 
+        iCnt = 0
         while True:
 
             theta_E = self.g_theta(E_MeV)         # [degrees]
             theta_E = np.radians(theta_E)         # [rad]
-            phi = random.uniform(0, 2 * math.pi)  # [rad]
+            phi = random.uniform(0., 2. * math.pi)  # [rad]
 
-            sigma_x = 10e-6
-            sigma_y = 10e-6
+            sigma_x = 10.e-6
+            sigma_y = 10.e-6
 
             # Generate x, y as per Gaussian distribution
-            x = np.random.normal(0, sigma_x)
-            y = np.random.normal(0, sigma_y)
+            x = np.random.normal(0., sigma_x)
+            y = np.random.normal(0., sigma_y)
 
             # Check acceptance based on Gaussian probability density function
             acceptance_prob = self.g_xy(x, y, sigma_x, sigma_y)
             if np.random.random() < acceptance_prob:
 
-                theta = np.random.normal(0, theta_E)
+                theta = np.random.normal(0., theta_E)
 
                 return theta, phi
 
+            iCnt += 1
+            if iCnt > 10**12:
+                raise KillInfiniteLoop()
 
-    def getGaussianThetaPhi(self):
+    def getGaussianThetaPhi(self, E_MeV):
 
         P_L = self._Param[6]
         E_laser = self._Param[7]
@@ -3336,53 +3350,19 @@ class Source(BeamLineElement):
         I = self._Param[11]
         theta_degrees = self._Param[12]
 
-        E_MeV = self.getLaserDrivenProtonEnergy(self, \
+        """
+           E_MeV = self.getLaserDrivenProtonEnergy(self, \
                     P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
+        """
 
-        theta = self.angle_generator(self,E_MeV)[0]
+        theta = self.angle_generator(E_MeV)[0]
         cosTheta = np.cos(theta)
-        Phi = self.angle_generator(self,E_MeV)[1]
+        Phi = self.angle_generator(E_MeV)[1]
 
         return cosTheta, Phi
 
-
-
-
-    #def getLaserDrivenProtonEnergy(self):
-    #    if not Source.LsrDrvnIni:
-    #        if self.__Debug:
-    #            print(" BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
-    #                  " initialise")
-    #        Source.LsrDrvnIni = True
-    #        E_min = self._Param[3]
-    #        E_max = self._Param[4]
-    #        N_stp = self._Param[5]
-    #        E_stp = (E_max - E_min) / float(N_stp)
-    #        Ei, E_stp1 = np.linspace(E_min, E_max, N_stp, False, True, float)
-    #        g_E = np.exp(-np.sqrt(Ei)) / np.sqrt(Ei)
-    #        g_E /= np.sum(g_E)    # normalize the probability distribution
-    #        G_E  = np.cumsum(g_E) # cumulative probability distribution
-    #        if self.__Debug:
-    #            print("     ----> E_min, E_max, N_stp, E_stp, E_stp1:", \
-    #                  E_min, E_max, N_stp, E_stp, E_stp1)
-    #        Source.LsrDrvnG_E = G_E
-    #
-    #    #.. Generate random numbers from the distribution using
-    #    #   inverse transform sampling
-#
-    #    G_E = Source.LsrDrvnG_E
-    #    iE  = np.searchsorted(G_E, rnd.uniform(0., 1.))
-    #    E   = self._Param[3] + \
-    #        float(iE) * (self._Param[4] - self._Param[3]) / \
-    #        float(self._Param[5])
-    #    if self.__Debug:
-    #        print("     ----> iE, E:", iE, E)
-#
-    #    return E
-
-
     # Calculates the rest of the parameters needed for the parametrisation
-    def parameters(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+    def parameters(self, P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
 
         c = 3e8               # Speed of light in vacuum [m/s]
         m_e = 9.11e-31        # Electron mass [Kg]
@@ -3442,7 +3422,8 @@ class Source(BeamLineElement):
 
 
     # Generates energy values for the distribution
-    def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+    def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, \
+                                   d, I, theta_degrees):
 
         if not Source.LsrDrvnIni:
             if self.__Debug:
@@ -4293,3 +4274,5 @@ class ReferenceParticleNotSpecified(Exception):
 class FailToCreateTraceSpaceAtSource(Exception):
     pass
 
+class KillInfiniteLoop(Exception):
+    pass
