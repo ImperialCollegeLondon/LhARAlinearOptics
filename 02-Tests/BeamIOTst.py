@@ -14,21 +14,34 @@ import BeamIO as bmIO
 ##! Start:
 print("========  BeamIO: tests start  ========")
 
-LhARAOpticsPATH = os.getenv('LhARAOpticsPATH')
-filename        = os.path.join(LhARAOpticsPATH, \
-                        '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-rootfilename    = os.path.join(LhARAOpticsPATH, \
-                            '99-Scratch/LhARA-BeamIO-tst.dat')
-
 ##! Test checks for bad input ...
 BeamIOTest = 1
 print()
 print("BeamIOTest:", BeamIOTest, " checks for vetoing bad i/p arguments.")
 
-ibmIO  = bmIO.BeamIO()
+try:
+    ibmIO  = bmIO.BeamIO()
+except:
+    print("     ----> Successfully trapped no input arguments")
+
+try:
+    ibmIO  = bmIO.BeamIO("99-Scratch")
+except:
+    print("     ----> Successfully trapped path but no file")
+    
+try:
+    ibmIO  = bmIO.BeamIO("Dummy", "Dummy")
+except:
+    print("     ----> Successfully trapped bad path")
+    
+try:
+    ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat", "Test")
+except:
+    print("     ----> Successfully trapped bad create flag")
 
 print(" <---- Bad input argument tests done.")
 
+bmIO.BeamIO.cleanBeamIOfiles
 
 ##! Test built-in methods:
 BeamIOTest += 1
@@ -38,15 +51,19 @@ print("BeamIOTTest:", BeamIOTest, \
 
 #.. __init__:
 print("     __init__:")
-ibmIO = bmIO.BeamIO()
-print("         ---> ibmIO: id:", id(ibmIO), "\n")
+ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat")
+print("         ---> ibmIOr: id, file:", id(ibmIOr), ibmIOr.getdataFILE())
+ibmIOw = bmIO.BeamIO("99-Scratch", "Data4Tests.dat", True)
+print("         ---> ibmIOw: id, file:", id(ibmIOw), ibmIOw.getdataFILE(), "\n")
+#bmIO.BeamIO.setDebug(True)
+#bmIO.BeamIO.setDebug(False)
 
 #.. __str__:
 print("     __str__:")
-print(ibmIO)
+print(ibmIOw)
 
 #.. __str__:
-print("     __repr__:", repr(ibmIO), "\n")
+print("     __repr__:", repr(ibmIOw), "\n")
 
 print(" <---- Built in method tests done.")
 
