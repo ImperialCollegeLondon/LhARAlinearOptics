@@ -16,7 +16,8 @@ class BeamIO:
     __Debug   = False
 
 #--------  "Built-in methods":
-    def __init__(self, _datafilePATH=None, _datafileNAME=None, _create=False):
+    def __init__(self, _datafilePATH=None, _datafileNAME=None, \
+                 _create=False):
         if self.getDebug():
             print(' BeamIO.__init__: ', \
                   'creating BeamIO object')

@@ -88,6 +88,9 @@ getBeamLineParamPandas:
 
           trackBeam: Tracks through the beam line.
 
+  I/o methods:
+To be added ...
+
 Created on Mon 02Oct23: Version history:
 ----------------------------------------
  2.0: 11Dec23: Refactor to make code generate beamline based on input
@@ -105,6 +108,7 @@ import io
 import math   as mth
 import numpy  as np
 import pandas as pnds
+import struct as strct
 
 import Particle        as Prtcl
 import BeamLineElement as BLE
@@ -122,7 +126,6 @@ class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
     __SrcTrcSpc    = None
-    __BeamLineInst = None
 
 
 #--------  "Built-in methods":
@@ -949,6 +952,30 @@ class BeamLine(object):
                   " events generated")
 
 
+#--------  I/o methods:
+    def writeBeamLine(self, beamlineFILE=None):
+        if self.getDebug():
+            print(" BeamLine.writeBeamLine starts.")
+
+        if not isinstance(beamlineFILE, io.BufferedWriter):
+            raise noFILE( \
+                    " BeamLine.writeBeamLine: file does not exist.")
+
+        nBLE = len(BLE.BeamLineElement.getinstances())
+        if self.getDebug():
+            print("     ----> Number of locations to store:", nBLE)
+        record = strct.pack(">i", nBLE)
+        beamlineFILE.write(record)
+        
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if self.getDebug():
+                print("         ----> Write element:", iBLE.getName())
+            
+        
+        if self.getDebug():
+            print(" <---- BeamLine.writeBeamLine done.")
+            
+
 #--------  Exceptions:
 class badParameter(Exception):
     pass
@@ -956,3 +983,6 @@ class badParameter(Exception):
 class badTraceSpaceVector(Exception):
     pass
                 
+class noFILE(Exception):
+    pass
+
