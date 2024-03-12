@@ -10,6 +10,7 @@ Class BeamIO:
 """
 
 import os
+import struct as strct
 
 class BeamIO:
     instances = []
@@ -58,6 +59,26 @@ class BeamIO:
             dataFILE = open(pathFILE, "wb")
             if self.getDebug():
                 print("         ----> File opened for write.")
+                
+            record = strct.pack(">i", 9999)
+            dataFILE.write(record)
+            if self.getDebug():
+                print("         ----> First word:", \
+                        strct.unpack(">i", record), \
+                      " is a large integer to distinguish v2 from v1")
+                
+            version  = "BeamIO v2"
+            bversion = bytes(version, 'utf-8')
+            record   = strct.pack(">i", len(version))
+            dataFILE.write(record)
+            if self.getDebug():
+                print("         ----> Length of version record:", \
+                      strct.unpack(">i", record))
+            record   = bversion
+            dataFILE.write(record)
+            if self.getDebug():
+                print("         ----> Version:", bversion.decode('utf-8'))
+
         else:
             dataFILE = open(pathFILE, "rb")
             if self.getDebug():

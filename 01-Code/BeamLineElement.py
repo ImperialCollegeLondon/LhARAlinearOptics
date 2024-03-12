@@ -322,9 +322,6 @@ class BeamLineElement:
         if self.getDebug():
             print("     ----> Location:", bLocation.decode('utf-8'))
 
-        if self.getDebug():
-            print(" <---- BeamLineElement.writeElement done.")
-
         record = strct.pack(">5d", \
                             self.getrStrt()[0], \
                             self.getrStrt()[1], \
@@ -337,9 +334,10 @@ class BeamLineElement:
             print("         ----> rStrt, vStrt:", \
                       strct.unpack(">5d",record))
         
+        if self.getDebug():
+            print(" <---- BeamLineElement.writeElement done.")
+
     """
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
   _drStrt : "error", displacement of start from nominal position (rad).
   _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
     """
@@ -550,6 +548,33 @@ class Facility(BeamLineElement):
     def getVCMVr(self):
         return self._VCMVr
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Facility(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Facility"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">2d", self.getp0(), self.getVCMVr())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> p0, VCMVr:", strct.unpack(">2d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Facility(BeamLineElement).writeElement done.")
+
         
 """
 Derived class Drift:
@@ -3497,7 +3522,8 @@ class Source(BeamLineElement):
         E = np.linspace(E_min,E_max,1000)  # [J]
 
         # Required distribution
-        g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * np.exp(-np.sqrt(2 * E / T_e))
+        g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * \
+            np.exp(-np.sqrt(2 * E / T_e))
         g_E /= np.sum(g_E)   # Normalize the probability distribution
 
         # Generate random numbers from the distribution using inverse \
@@ -3559,6 +3585,55 @@ class Source(BeamLineElement):
 
         return TrcSpc
 
+    
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Source(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Source"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">i", self.getMode())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Mode:", strct.unpack(">i", record))
+
+
+        iPrm = 0
+        if self.getDebug():
+            print("     ----> Write parameters:")
+        for typePrm in self.ParamList[self.getMode()]:
+            if typePrm == float:
+                record = strct.pack(">d", self.getParameters()[iPrm])
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> iPrm, value:", \
+                          iPrm, strct.unpack(">d", record))
+            else:
+                record = strct.pack(">i", self.getParameters()[iPrm])
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> iPrm, value:", \
+                          iPrm, strct.unpack(">i", record))
+            iPrm += 1
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Source(BeamLineElement).writeElement done.")
+    
     
 """
 To do:
