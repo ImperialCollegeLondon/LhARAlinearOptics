@@ -970,7 +970,7 @@ class BeamLine(object):
         for iBLE in BLE.BeamLineElement.getinstances():
             if self.getDebug():
                 print("         ----> Write element:", iBLE.getName())
-            
+            iBLE.writeElement(beamlineFILE)
         
         if self.getDebug():
             print(" <---- BeamLine.writeBeamLine done.")

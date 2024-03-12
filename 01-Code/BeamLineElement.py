@@ -113,6 +113,7 @@ import random as rnd
 import scipy
 from scipy.optimize import fsolve
 import random as random
+import struct as strct
 import math
 
 import PhysicalConstants as PhysCnst
@@ -301,6 +302,47 @@ class BeamLineElement:
         if Rad >= Facility.getInstance().getVCMVr():
             Outside = True
         return Outside
+
+
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" BeamLineElement.writeElement starts.")
+
+        bLocation = bytes(self.getName(), 'utf-8')
+        record    = strct.pack(">i", len(bLocation))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of element name:", \
+                  strct.unpack(">i", record))
+        
+        record = bLocation
+        dataFILE.write(record)
+            
+        if self.getDebug():
+            print("     ----> Location:", bLocation.decode('utf-8'))
+
+        if self.getDebug():
+            print(" <---- BeamLineElement.writeElement done.")
+
+        record = strct.pack(">5d", \
+                            self.getrStrt()[0], \
+                            self.getrStrt()[1], \
+                            self.getrStrt()[2], \
+                            self.getvStrt()[0], \
+                            self.getvStrt()[1]
+                            )
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> rStrt, vStrt:", \
+                      strct.unpack(">5d",record))
+        
+    """
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of principal axis of element.
+  _drStrt : "error", displacement of start from nominal position (rad).
+  _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
+    """
 
 #--------  Utilities:
     def Transport(self, _R):
