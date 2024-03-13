@@ -878,6 +878,10 @@ class Aperture(BeamLineElement):
     
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
     def setApertureParameters(self, _Param):
         if self.getDebug():
             print(" Apperture.setApertureParamters; Parameters:", _Param)
@@ -965,6 +969,48 @@ class Aperture(BeamLineElement):
             
         return _Rprime
 
+    
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        self.setDebug(True)
+        if self.getDebug():
+            print(" Aperture(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Aperture"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">i", self.getType())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Type:", strct.unpack(">i", record))
+
+
+        if self.getDebug():
+            print("     ----> Write parameters:")
+        for iPrm in range(len(self.getParams())):
+            record = strct.pack(">d", self.getParams()[iPrm])
+            dataFILE.write(record)
+            if self.getDebug():
+                print("         ----> iPrm, value:", \
+                      iPrm, strct.unpack(">d", record))
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Aperture(BeamLineElement).writeElement done.")
+        self.setDebug(False)
+    
     
 """
 Derived class FocusQuadrupole:
