@@ -83,6 +83,7 @@ filename     = os.path.join(LhARAOpticsPATH, \
 #                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
                 '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
 LhARAFclty  = BL.BeamLine(filename)
+#print(LhARAFclty)
 
 BL.BeamLine.setDebug(True)
 LhARAFclty.writeBeamLine(ibmIOw.getdataFILE())

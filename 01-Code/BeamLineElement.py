@@ -725,6 +725,38 @@ class Drift(BeamLineElement):
         return self._Length
     
         
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Drift(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Drift"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        if self.getDebug():
+            print("     ----> Write parameter:")
+        record = strct.pack(">d", self.getLength())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length:", strct.unpack(">d", record))
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Drift(BeamLineElement).writeElement done.")
+    
+    
 """
 Derived class Aperture:
 =======================
