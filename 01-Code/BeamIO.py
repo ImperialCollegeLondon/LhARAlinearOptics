@@ -9,6 +9,7 @@ Class BeamIO:
 
 """
 
+import io
 import os
 import struct as strct
 
@@ -102,10 +103,25 @@ class BeamIO:
         return " <---- BeamIO __str__ done. \n"
 
     def print(self):
+        self.setDebug()
         print("\n BeamIO:")
         print(" -------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Data file:", self.getdataFILE())
+
+        
+#.. Method believed to be self documenting(!)
+    def flushNclosedataFile(self, dataFILE=None):
+        if self.getDebug():
+            print(" BeamIO.flushNclosedataFile starts")
+            print("     ----> File:", dataFILE)
+
+        if not isinstance(dataFILE, io.BufferedWriter):
+            raise noFILE( \
+                    " BeamIO.flushNcloseParticle: file does not exist.")
+
+        dataFILE.flush()
+        dataFILE.close()
 
         
 #--------  "Set method" only Debug

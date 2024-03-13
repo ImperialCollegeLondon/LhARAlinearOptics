@@ -972,7 +972,6 @@ class Aperture(BeamLineElement):
     
 #--------  I/o methods:
     def writeElement(self, dataFILE):
-        self.setDebug(True)
         if self.getDebug():
             print(" Aperture(BeamLineElement).writeElement starts.")
 
@@ -1009,7 +1008,6 @@ class Aperture(BeamLineElement):
         
         if self.getDebug():
             print(" <---- Aperture(BeamLineElement).writeElement done.")
-        self.setDebug(False)
     
     
 """
@@ -1327,6 +1325,43 @@ class FocusQuadrupole(BeamLineElement):
         return Strn
     
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " FocusQuadrupole(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "FocusQuadrupole"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getLength(), \
+                            self.getStrength(), \
+                            self.getkFQ())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length, strength, kFQ:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- FocusQuadrupole(BeamLineElement).writeElement done.")
+
+        return
+
+    
 """
 Derived class DefocusQuadrupole:
 ================================
@@ -1639,6 +1674,43 @@ class DefocusQuadrupole(BeamLineElement):
         return Strn
 
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " DefocusQuadrupole(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "DefocusQuadrupole"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getLength(), \
+                            self.getStrength(), \
+                            self.getkDQ())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length, strength, kDQ:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- DefocusQuadrupole(BeamLineElement).writeElement done.")
+
+        return
+
+    
 """
 Derived class SectorDipole:
 ===========================
@@ -1855,6 +1927,42 @@ class SectorDipole(BeamLineElement):
         return self._Length
 
 
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " Dipole(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Dipole"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">2d", \
+                            self.getAngle(), \
+                            self.getB())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Angle, B:", \
+                  strct.unpack(">2d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- Dipole(BeamLineElement).writeElement done.")
+
+        return
+
+    
 class Octupole(BeamLineElement):
     instances = []
     __Debug = False
@@ -2216,6 +2324,41 @@ class Solenoid(BeamLineElement):
         return Strn
 
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Solenoid(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Solenoid"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getLength(), \
+                            self.getStrength(), \
+                            self.getksol())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length, strength, k_sol:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Solenoid(BeamLineElement).writeElement done.")
+
+        return self._ksol
+
+    
 """
 Derived class GaborLens:
 ========================
@@ -2554,6 +2697,70 @@ class GaborLens(BeamLineElement):
         return self._ElectronDensity
     
 
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " GaborLens(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "GaborLens"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        if self.getBz() == None:
+            Bz = -1.
+        else:
+            Bz = self.getBz()
+            
+        if self.getVA() == None:
+            VA = -1.
+        else:
+            VA = self.getVA()
+
+        if self.getRA() == None:
+            RA = -1.
+        else:
+            RA = self.getRA()
+
+        if self.getRp() == None:
+            Rp = -1.
+        else:
+            Rp = self.getRp()
+
+        if self.getLength() == None:
+            Ln = -1.
+        else:
+            Ln = self.getLength()
+
+        if self.getStrength() == None:
+            St = -1.
+        else:
+            St = self.getStrength()
+        
+        record = strct.pack(">6d", Bz, VA, RA, Rp, Ln, St)
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Bz, VA, RA, Rp, Ln, St:", \
+                  strct.unpack(">6d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- GaborLens(BeamLineElement).writeElement done.")
+
+        return
+
+    
 """
 Derived class CylindricalRFCavity:
 ====================
@@ -2939,6 +3146,7 @@ class CylindricalRFCavity(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
+        
 # -------- "Get methods"
 # Methods believed to be self-documenting(!)
     @classmethod
@@ -3012,9 +3220,8 @@ class CylindricalRFCavity(BeamLineElement):
                                 _R)
 
         if self.getDebug():
-            print(" BeamLineElement.Transport:", \
-                  Facility.getInstance().getName(), \
-                  Facility.getInstance().getVCMVr())
+            print(" CylindricalRFCavity(BeamLineElement).Transport:", \
+                  "     ---->", self.SummaryStr())
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
@@ -3032,6 +3239,42 @@ class CylindricalRFCavity(BeamLineElement):
             pass
 
         return _Rprime
+
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " CylindricalRFCavity(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "CylindricalRFCavity"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getGradient(), \
+                            self.getFrequency(), \
+                            self.getPhase())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Gradient, frequency, phase:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- CylindricalRFCavity(BeamLineElement).writeElement done.")
+
+        return
 
     
 """

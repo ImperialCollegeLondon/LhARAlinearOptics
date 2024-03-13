@@ -789,6 +789,7 @@ class Particle:
 
         ParticleFILE.flush()
         ParticleFILE.close()
+        
 #                     ----> Write instances:
     @classmethod
     def openParticleFile(cls, datafilePATH=None, datafileNAME=None):

@@ -56,6 +56,9 @@ print("BeamIOTTest:", BeamIOTest, \
 print("     __init__:")
 ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat")
 print("         ---> ibmIOr: id, file:", id(ibmIOr), ibmIOr.getdataFILE())
+
+bmIO.BeamIO.cleanBeamIOfiles
+
 ibmIOw = bmIO.BeamIO("99-Scratch", "Data4Tests.dat", True)
 print("         ---> ibmIOw: id, file:", id(ibmIOw), ibmIOw.getdataFILE(), \
       "\n")
@@ -80,16 +83,18 @@ LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
 filename     = os.path.join(LhARAOpticsPATH, \
 #                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
 #                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
-#                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
+                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
+#                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
 LhARAFclty  = BL.BeamLine(filename)
 #print(LhARAFclty)
 
-BL.BeamLine.setDebug(True)
 LhARAFclty.writeBeamLine(ibmIOw.getdataFILE())
-BL.BeamLine.setDebug(False)
 #bmIO.BeamIO.setDebug(True)
 #bmIO.BeamIO.setDebug(False)
+
+LhARAFclty.trackBeam(100, ibmIOw.getdataFILE())
+
+ibmIOw.flushNclosedataFile(ibmIOw.getdataFILE())
 
 print(" <---- Writing and reading of beam-line setup tests done.")
 
