@@ -13,6 +13,8 @@ import io
 import os
 import struct as strct
 
+import Particle as Prtcl
+
 class BeamIO:
     instances = []
     __Debug   = False
@@ -110,7 +112,7 @@ class BeamIO:
         print("     ----> Data file:", self.getdataFILE())
 
         
-#.. Method believed to be self documenting(!)
+#.. Flush and close
     def flushNclosedataFile(self, dataFILE=None):
         if self.getDebug():
             print(" BeamIO.flushNclosedataFile starts")
@@ -123,6 +125,54 @@ class BeamIO:
         dataFILE.flush()
         dataFILE.close()
 
+#.. Manage read:
+    def readBeamDataRecord(self):
+        #self.setDebug(True)
+        if self.getDebug():
+            print(" BeamIO.readBeamDataRecord starts.")
+            print("     ----> Read first record:", \
+                  self.getReadFirstRecord())
+
+        if not isinstance(self.getdataFILE(), io.BufferedReader):
+            raise noFILE( \
+                    " BeamIO.readBeamDataRecord: file does not exist.")
+
+        EoF = False
+
+        #.. First record identifies first version of data format:
+        if not self.getReadFirstRecord():
+            brecord = self.getdataFILE().read(4)
+            if brecord == b'':
+                if self.getDebug():
+                    print(" <---- end of file, return.")
+                return True
+            
+            self.setReadFirstRecord(True)
+            record = strct.unpack(">i", brecord)
+            nId    = record[0]
+            if self.getDebug():
+                print("     ----> Id number:", nId)
+                
+            self.setdataFILEversion(1)
+            if nId == 9999:
+                if self.getDebug():
+                    print("           Not version 1!")
+                    sys.exit()
+            else:
+                if self.getDebug():
+                    print("           Handle version 1!")
+                self.getdataFILE().seek(0)
+                EoF = Prtcl.Particle.readParticle(self.getdataFILE())
+                
+            if self.getDebug():
+                print("     <---- Data file format version:", \
+                      self.getdataFILEversion())
+        else:
+            EoF = Prtcl.Particle.readParticle(self.getdataFILE())
+            
+        #self.setDebug(False)
+        return EoF
+
         
 #--------  "Set method" only Debug
 #.. Method believed to be self documenting(!)
@@ -130,11 +180,13 @@ class BeamIO:
     @classmethod
     def setDebug(cls, Debug=False):
         if cls.__Debug:
-            print(" Particle.setdebug: ", Debug)
+            print(" BeamIO.setdebug: ", Debug)
         cls.__Debug = Debug
         
     def setAll2None(self):
-        self._dataFile = None
+        self._dataFile        = None
+        self._Rd1stRcrd       = False
+        self._dataFILEversion = None
 
     @classmethod
     def resetinstances(cls):
@@ -142,6 +194,16 @@ class BeamIO:
         
     def setdataFILE(self, _dataFILE):
         self._dataFILE = _dataFILE
+
+    def setReadFirstRecord(self, _Rd1stRcrd):
+        if not isinstance(_Rd1stRcrd, bool):
+            raise badArgument()
+        self._Rd1stRcrd = _Rd1stRcrd 
+
+    def setdataFILEversion(self, dataFILEversion):
+        if not isinstance(dataFILEversion, int):
+            raise badArgument()
+        self._dataFILEversion = dataFILEversion
 
         
 #--------  "Get methods" only; version, reference, and constants
@@ -157,6 +219,13 @@ class BeamIO:
     def getdataFILE(self):
         return self._dataFILE
 
+    def getReadFirstRecord(self):
+        return self._Rd1stRcrd
+
+    def getdataFILEversion(self):
+        return self._dataFILEversion
+
+
 #--------  Utilities:
     @classmethod
     def cleanBeamIOfiles(cls):
@@ -169,6 +238,7 @@ class BeamIO:
         DoneOK = True
 
         return DoneOK
+
     
 #--------  Exceptions:
 class noPATH(Exception):
@@ -181,5 +251,8 @@ class noFILE(Exception):
     pass
         
 class badCreate(Exception):
+    pass
+
+class badArgument(Exception):
     pass
         

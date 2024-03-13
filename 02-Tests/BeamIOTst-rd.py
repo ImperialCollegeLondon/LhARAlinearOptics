@@ -4,48 +4,68 @@
 Test script for "BeamIO" class
 ==============================
 
-  BeamIO.py -- set "relative" path to code.
+  BeamIO.py -- set "relative" path to code
 
-  Testing Write functionality.
+  Testing Read functionality.
 
 """
 
 import os
+import sys
 
-import BeamIO   as bmIO
-import BeamLine as BL
+import BeamIO          as bmIO
+import BeamLine        as BL
+import BeamLineElement as BLE
+import Particle        as Prtcl
 
 ##! Start:
-print("========  BeamIO (write): tests start  ========")
+print("========  BeamIO (read): tests start  ========")
 
-##! Test checks for bad input ...
+##! First check can read data format version 1:
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+BLI  = BL.BeamLine(filename)
+
 BeamIOTest = 1
 print()
-print("BeamIOTest:", BeamIOTest, " checks for vetoing bad i/p arguments.")
+print("BeamIOTest:", BeamIOTest, " check data format v1 can be read OK.")
 
-try:
-    ibmIO  = bmIO.BeamIO()
-except:
-    print("     ----> Successfully trapped no input arguments")
+ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat")
 
-try:
-    ibmIO  = bmIO.BeamIO("99-Scratch")
-except:
-    print("     ----> Successfully trapped path but no file")
-    
-try:
-    ibmIO  = bmIO.BeamIO("Dummy", "Dummy")
-except:
-    print("     ----> Successfully trapped bad path")
-    
-try:
-    ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat", "Test")
-except:
-    print("     ----> Successfully trapped bad create flag")
+EndOfFile = False
+iEvt = 0
+iCnt = 0
+nEvt = 100
+Scl  = 10
+print("     ----> Read data format 1 file:")
+while not EndOfFile:
+    EndOfFile = ibmIOr.readBeamDataRecord()
+    if not EndOfFile:
+        iEvt += 1
+        if (iEvt % Scl) == 0:
+            print("         ----> Read event ", iEvt)
+            iCnt += 1
+            if iCnt == 10:
+                iCnt = 1
+                Scl  = Scl * 10
+    if iEvt <0:
+        print(Prtcl.Particle.getParticleInstances()[iEvt])
+    if iEvt == nEvt:
+        break
 
-print(" <---- Bad input argument tests done.")
+print("     <----", iEvt, "events read")
 
-bmIO.BeamIO.cleanBeamIOfiles
+Prtcl.Particle.cleanParticles()
+Prtcl.ReferenceParticle.cleaninstance()
+BLE.BeamLineElement.cleanInstances()
+bmIO.BeamIO.cleanBeamIOfiles()
+
+print(" <---- Version 1 data format read check done!")
+
+sys.exit()
+
+
 
 
 ##! Test built-in methods:
@@ -103,4 +123,4 @@ print(" <---- Writing and reading of beam-line setup tests done.")
 
 ##! Complete:
 print()
-print("========  BeamIO (write): tests complete  ========")
+print("========  BeamIO (read): tests complete  ========")
