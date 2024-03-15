@@ -63,63 +63,39 @@ bmIO.BeamIO.cleanBeamIOfiles()
 
 print(" <---- Version 1 data format read check done!")
 
-sys.exit()
-
-
-
-
-##! Test built-in methods:
-BeamIOTest += 1
-print()
-print("BeamIOTTest:", BeamIOTest, \
-      " check built-in methods.")
-
-#.. __init__:
-print("     __init__:")
-ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat")
-print("         ---> ibmIOr: id, file:", id(ibmIOr), ibmIOr.getdataFILE())
-
-bmIO.BeamIO.cleanBeamIOfiles
-
-ibmIOw = bmIO.BeamIO("99-Scratch", "Data4Tests.dat", True)
-print("         ---> ibmIOw: id, file:", id(ibmIOw), ibmIOw.getdataFILE(), \
-      "\n")
-
-#.. __str__:
-print("     __str__:")
-print(ibmIOw)
-
-#.. __str__:
-print("     __repr__:", repr(ibmIOw), "\n")
-
-print(" <---- Built in method tests done.")
-
 
 ##! Test writing and reading of beam-line setup:
 BeamIOTest += 1
 print()
 print("BeamIOTTest:", BeamIOTest, \
-      " check writing and reading of beam-line setup.")
+      " check reading of beam-line and particles.")
 
-LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
-filename     = os.path.join(LhARAOpticsPATH, \
-#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
-#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
-                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-#                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
-LhARAFclty  = BL.BeamLine(filename)
-#print(LhARAFclty)
+ibmIOr = bmIO.BeamIO("99-Scratch", "Data4Tests.dat")
 
-LhARAFclty.writeBeamLine(ibmIOw.getdataFILE())
-#bmIO.BeamIO.setDebug(True)
-#bmIO.BeamIO.setDebug(False)
+EndOfFile = False
+iEvt = 0
+iCnt = 0
+nEvt = 100
+Scl  = 10
+print("     ----> Read data format >1 file:")
+while not EndOfFile:
+    EndOfFile = ibmIOr.readBeamDataRecord()
+    if not EndOfFile:
+        iEvt += 1
+        if (iEvt % Scl) == 0:
+            print("         ----> Read event ", iEvt)
+            iCnt += 1
+            if iCnt == 10:
+                iCnt = 1
+                Scl  = Scl * 10
+    if iEvt <0:
+        print(Prtcl.Particle.getParticleInstances()[iEvt])
+    if iEvt == nEvt:
+        break
 
-LhARAFclty.trackBeam(100, ibmIOw.getdataFILE())
+print("     <----", iEvt, "events read")
 
-ibmIOw.flushNclosedataFile(ibmIOw.getdataFILE())
-
-print(" <---- Writing and reading of beam-line setup tests done.")
-
+print(" <---- Version 2 data format read check done!")
 
 ##! Complete:
 print()

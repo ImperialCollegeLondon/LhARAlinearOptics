@@ -203,6 +203,10 @@ class BeamLineElement:
     @classmethod
     def cleanInstances(cls):
         for inst in cls.instances:
+            if cls.getDebug():
+                print(" Kill:", inst.getName())
+            if isinstance(inst, Facility):
+                Facility.instance = None
             del inst
         cls.instances = []
         if cls.getDebug():
@@ -341,7 +345,44 @@ class BeamLineElement:
   _drStrt : "error", displacement of start from nominal position (rad).
   _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
     """
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" BeamLineElement.readElement starts.")
 
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nChr   = record[0]
+        if cls.getDebug():
+            print("     ----> Number of characters:", nChr)
+                
+        brecord  = dataFILE.read(nChr)
+        Location = brecord.decode('utf-8')
+        if cls.getDebug():
+            print("                   Location:", Location)
+
+        brecord = dataFILE.read((5*8))
+        if brecord == b'':
+            return True, None, None
+        
+        record  = strct.unpack(">5d", brecord)
+        r      = np.array([float(record[0]), float(record[1]), \
+                           float(record[2])])
+        v      = np.array([float(record[3]), float(record[4])])
+        
+        if cls.getDebug():
+            print("     ----> r, v:", r, v)
+
+        return EoF, Location, r, v
+
+    
 #--------  Utilities:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
@@ -575,6 +616,26 @@ class Facility(BeamLineElement):
         if self.getDebug():
             print(" <---- Facility(BeamLineElement).writeElement done.")
 
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Facility(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((2*8))
+        if brecord == b'':
+            return True, None, None
+        
+        record  = strct.unpack(">2d", brecord)
+        p0      = float(record[0])
+        VCMVr   = float(record[1])
+        
+        if cls.getDebug():
+            print("     ----> p0, VCMVr:", p0, VCMVr)
+
+        return EoF, p0, VCMVr
+        
         
 """
 Derived class Drift:
@@ -655,6 +716,9 @@ class Drift(BeamLineElement):
         return "Drift()"
 
     def __str__(self):
+        x=1.
+        y=0.
+        z=x/y
         print(" Drift:")
         print(" ------")
         print("     ----> Debug flag:", Drift.getDebug())
@@ -757,6 +821,27 @@ class Drift(BeamLineElement):
             print(" <---- Drift(BeamLineElement).writeElement done.")
     
     
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Drift(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((1*8))
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record  = strct.unpack(">d", brecord)
+        Length  = float(record[0])
+        if cls.getDebug():
+            print("     ----> Length:", Length)
+            
+        return EoF, Length
+
+
 """
 Derived class Aperture:
 =======================
@@ -992,6 +1077,11 @@ class Aperture(BeamLineElement):
         if self.getDebug():
             print("     ----> Type:", strct.unpack(">i", record))
 
+        record = strct.pack(">i", len(self.getParams()))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Number of paramters:", \
+                  strct.unpack(">i", record))
 
         if self.getDebug():
             print("     ----> Write parameters:")
@@ -1008,8 +1098,51 @@ class Aperture(BeamLineElement):
         
         if self.getDebug():
             print(" <---- Aperture(BeamLineElement).writeElement done.")
-    
-    
+        
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Aperture(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        Type = record[0]
+        if cls.getDebug():
+            print("     ----> Type:", Type)
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nPrm = record[0]
+        if cls.getDebug():
+            print("     ----> Number of parameters:", nPrm)
+
+        Params = []
+        for iPrm in range(nPrm):
+            brecord = dataFILE.read((1*8))
+            if brecord == b'':
+                return True
+        
+            record  = strct.unpack(">d", brecord)
+            var     = float(record[0])
+            Params.append(var)
+        if cls.getDebug():
+            print("     ----> Parameters:", Params)
+                        
+        return EoF, Type, Params
+
+
 """
 Derived class FocusQuadrupole:
 ==============================
@@ -1361,6 +1494,35 @@ class FocusQuadrupole(BeamLineElement):
 
         return
 
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" FocusQuadrupole(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">3d", brecord)
+
+        Ln  = None
+        St  = None
+        kFQ = None
+
+        if float(record[0]) != -1.:
+            Ln     = float(record[0])
+        if float(record[1]) != -1.:
+            St     = float(record[1])
+        if float(record[2]) != -1.:
+            kFQ   = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Ln, St, kDQ:", Ln, St, kFQ)
+            
+        return EoF, Ln, St, kFQ
+
     
 """
 Derived class DefocusQuadrupole:
@@ -1710,6 +1872,35 @@ class DefocusQuadrupole(BeamLineElement):
 
         return
 
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" DefocusQuadrupole(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">3d", brecord)
+
+        Ln  = None
+        St  = None
+        kDQ = None
+
+        if float(record[0]) != -1.:
+            Ln     = float(record[0])
+        if float(record[1]) != -1.:
+            St     = float(record[1])
+        if float(record[2]) != -1.:
+            kDQ   = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Ln, St, kDQ:", Ln, St, kDQ)
+            
+        return EoF, Ln, St, kDQ
+
     
 """
 Derived class SectorDipole:
@@ -1933,7 +2124,7 @@ class SectorDipole(BeamLineElement):
             print( \
                 " Dipole(BeamLineElement).writeElement starts.")
 
-        derivedCLASS = "Dipole"
+        derivedCLASS = "SectorDipole"
         bversion = bytes(derivedCLASS, 'utf-8')
         record   = strct.pack(">i", len(derivedCLASS))
         dataFILE.write(record)
@@ -1961,6 +2152,27 @@ class SectorDipole(BeamLineElement):
              " <---- Dipole(BeamLineElement).writeElement done.")
 
         return
+
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" SectorDipole(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((2*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">2d", brecord)
+
+        Angl = float(record[0])
+        B    = float(record[1])
+
+        if cls.getDebug():
+            print("     ----> Angl, B:", Angl, B)
+            
+        return EoF, Angl, B
 
     
 class Octupole(BeamLineElement):
@@ -2357,8 +2569,37 @@ class Solenoid(BeamLineElement):
             print(" <---- Solenoid(BeamLineElement).writeElement done.")
 
         return self._ksol
-
     
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Solenoid(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">3d", brecord)
+
+        Ln     = None
+        St     = None
+        kSol   = None
+
+        if float(record[0]) != -1.:
+            Ln     = float(record[0])
+        if float(record[1]) != -1.:
+            St     = float(record[1])
+        if float(record[2]) != -1.:
+            kSol   = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Ln, St, kSol:", Ln, St, kSol)
+            
+        return EoF, Ln, St, kSol
+
+
 """
 Derived class GaborLens:
 ========================
@@ -2761,6 +3002,46 @@ class GaborLens(BeamLineElement):
         return
 
     
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" GaborLens(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((6*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">6d", brecord)
+
+        Bz     = None
+        VA     = None
+        RA     = None
+        Rp     = None
+        Ln     = None
+        St     = None
+
+        if float(record[0]) != -1.:
+            Bz     = float(record[0])
+        if float(record[1]) != -1.:
+            VA     = float(record[1])
+        if float(record[2]) != -1.:
+            RA     = float(record[2])
+        if float(record[3]) != -1.:
+            Rp     = float(record[3])
+        if float(record[4]) != -1.:
+            Ln     = float(record[4])
+        if float(record[5]) != -1.:
+            St     = float(record[5])
+
+        if cls.getDebug():
+            print("     ----> Bz, VA, RA, Rp, Ln, St:", \
+                  Bz, VA, RA, Rp, Ln, St)
+            
+        return EoF, Bz, VA, RA, Rp, Ln, St
+
+
 """
 Derived class CylindricalRFCavity:
 ====================
@@ -3276,6 +3557,27 @@ class CylindricalRFCavity(BeamLineElement):
 
         return
 
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Source(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record  = strct.unpack(">3d", brecord)
+        Grdnt   = float(record[0])
+        Frqncy  = float(record[1])
+        Phs     = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Grdnt, Frqncy, Phs:", Grdnt, Frqncy, Phs)
+            
+        return EoF, Grdnt, Frqncy, Phs
+        
     
 """
 Derived class Source:
@@ -3929,6 +4231,11 @@ class Source(BeamLineElement):
         if self.getDebug():
             print("     ----> Mode:", strct.unpack(">i", record))
 
+        record = strct.pack(">i", len(self.getParameters()))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Number of paramters:", \
+                  strct.unpack(">i", record))
 
         iPrm = 0
         if self.getDebug():
@@ -3955,6 +4262,50 @@ class Source(BeamLineElement):
         if self.getDebug():
             print(" <---- Source(BeamLineElement).writeElement done.")
     
+                            
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Source(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        Mode = record[0]
+        if cls.getDebug():
+            print("     ----> Mode:", Mode)
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nPrm = record[0]
+        if cls.getDebug():
+            print("     ----> Number of parameters:", nPrm)
+
+        Params = []
+        for iPrm in range(nPrm):
+            brecord = dataFILE.read((1*8))
+            if brecord == b'':
+                return True
+        
+            record  = strct.unpack(">d", brecord)
+            var     = float(record[0])
+            Params.append(var)
+        if cls.getDebug():
+            print("     ----> Parameters:", Params)
+            
+        return EoF, Mode, Params
+        
     
 """
 To do:

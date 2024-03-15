@@ -13,6 +13,7 @@ import io
 import os
 import struct as strct
 
+import BeamLine as BL
 import Particle as Prtcl
 
 class BeamIO:
@@ -57,7 +58,7 @@ class BeamIO:
         if self.getDebug():
             print("     ----> Proced with data file:", pathFILE)
 
-        #.. Open file; if file doesnt exist or _create is true, create it:
+        #.. open file; if file doesnt exist or _create is true, create it:
         if not os.path.isfile(pathFILE) or _create:
             dataFILE = open(pathFILE, "wb")
             if self.getDebug():
@@ -127,7 +128,6 @@ class BeamIO:
 
 #.. Manage read:
     def readBeamDataRecord(self):
-        #self.setDebug(True)
         if self.getDebug():
             print(" BeamIO.readBeamDataRecord starts.")
             print("     ----> Read first record:", \
@@ -157,7 +157,13 @@ class BeamIO:
             if nId == 9999:
                 if self.getDebug():
                     print("           Not version 1!")
-                    sys.exit()
+                Version = self.readVersion()
+                self.setdataFILEversion(int(Version[-1]))
+                if self.getDebug():
+                    print("           Version:", \
+                          self.getdataFILEversion())
+                    
+                BL.BeamLine.readBeamLine(self.getdataFILE())
             else:
                 if self.getDebug():
                     print("           Handle version 1!")
@@ -169,10 +175,31 @@ class BeamIO:
                       self.getdataFILEversion())
         else:
             EoF = Prtcl.Particle.readParticle(self.getdataFILE())
+            if self.getDebug():
+                print("     <---- BeamIO.readBeamDataRecord particle read.")
             
-        #self.setDebug(False)
+        if self.getDebug():
+            print(" <---- BeamIO.readBeamDataRecord Done.")
+
         return EoF
 
+    def readVersion(self):
+        if self.getDebug():
+            print(" BeamIO.readVersion start.")
+
+        brecord = self.getdataFILE().read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("         ----> Length of version:", len)
+            
+        brecord  = self.getdataFILE().read(len)
+        Version = brecord.decode('utf-8')
+        if self.getDebug():
+            print(" <---- Version:", Version)
+
+        return Version
+        
         
 #--------  "Set method" only Debug
 #.. Method believed to be self documenting(!)
