@@ -187,8 +187,6 @@ class Simulation(object):
         runNumber =  26                   # set run number
         
         #.. Open file to store events:
-        print(" Here:", self.getdataFileDir())
-        print("      ", self.getdataFileName())
         ParticleFILE = None
         if self.getdataFileDir()  != None and \
            self.getdataFileName() != None:

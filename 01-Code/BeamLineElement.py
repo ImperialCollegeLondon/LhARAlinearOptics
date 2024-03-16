@@ -716,9 +716,6 @@ class Drift(BeamLineElement):
         return "Drift()"
 
     def __str__(self):
-        x=1.
-        y=0.
-        z=x/y
         print(" Drift:")
         print(" ------")
         print("     ----> Debug flag:", Drift.getDebug())
