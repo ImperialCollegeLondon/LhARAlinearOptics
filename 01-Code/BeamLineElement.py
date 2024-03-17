@@ -3943,7 +3943,7 @@ class Source(BeamLineElement):
 
             KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, \
                                 lamda, t_laser, d, I, theta_degrees)  # [MeV]
-
+            
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
             cosTheta, Phi = self.getGaussianThetaPhi(KE)

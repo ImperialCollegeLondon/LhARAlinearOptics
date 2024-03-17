@@ -147,7 +147,7 @@ class BeamLine(object):
             if readDataFile:
                 print(" <---- return after init.")
                 return cls.getinstance()
-
+              
             #.. Check and load parameter file
             if _BeamLineSpecificationCVSfile == None:
                 raise Exception( \
