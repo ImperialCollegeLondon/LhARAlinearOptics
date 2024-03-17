@@ -347,6 +347,7 @@ class BeamLineElement:
     """
     @classmethod
     def readElement(cls, dataFILE):
+        cls.setDebug(True)
         if cls.getDebug():
             print(" BeamLineElement.readElement starts.")
 

@@ -128,6 +128,7 @@ class BeamIO:
 
 #.. Manage read:
     def readBeamDataRecord(self):
+        self.setDebug(True)
         if self.getDebug():
             print(" BeamIO.readBeamDataRecord starts.")
             print("     ----> Read first record:", \
