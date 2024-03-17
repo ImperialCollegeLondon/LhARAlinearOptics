@@ -6,6 +6,7 @@ import sys, getopt
 import struct
 import math as mth
 
+import Simulation as Simu
 import Particle as Prtcl
 import BeamLine as BL
 import Beam     as Bm
@@ -21,13 +22,14 @@ def main(argv):
     inputfile    = None
     outputfile   = None
     Debug        = False
-    nEvts        = None
+    nEvts        = 10000
     for opt, arg in opts:
         if opt == '-h':
             print ( \
                     'runBEAMsim.py -b <beamlinefile>'  + \
                     ' -i <inputfile> -o <outputfile>' + \
                     ' -n <nEvts>')
+            print("     ----> <input file> not yet implemented.>")
             sys.exit()
         if opt == '-d':
             Debug = True
@@ -40,12 +42,13 @@ def main(argv):
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
 
-    if inputfile    == None or \
-       beamlinefile == None:
+    if beamlinefile == None or \
+       outputfile    == None:
         print ( \
                 'runBEAMsim.py -b <beamlinefile>'  + \
                 ' -i <inputfile> -o <outputfile>' + \
                 ' -n <nEvts>')
+        print("     ----> <input file> not yet implemented.>")
         sys.exit()
 
     print(" runBEAMsim: start")
@@ -56,43 +59,52 @@ def main(argv):
     print("         ----> HOMEPATH:", HOMEPATH)
         
     #.. File handling:
+    print("         ----> Check input and output files:")
     #.. ----> Beam line specitication file:
-    print("         ----> Check beam line specification file:")
     if not os.path.isfile(beamlinefile):
         beamlinefile = os.path.join(HOMEPATH, beamlinefile)
+    if not os.path.isfile(beamlinefile):
+        print("             ----> Beam line parameter file does not exist.")
+        print("                   Exit.")
+        sys.exit(1)
+        
     print("             ----> Beamline parameters will be read from:", \
           beamlinefile)
-    
+
     #.. ----> Input file, if specified:
     if inputfile != None and not os.path.isfile(inputfile):
         inputfile = os.path.join(HOMEPATH, inputfile)
-    print("             ----> Input file:", inputfile)
+    if inputfile != None and not os.path.isfile(inputfile): 
+        print("             ----> Input file does not exist.")
+        print("                   Exit.")
+        sys.exit(1)
+
+    if inputfile != None:
+        if os.path.isfile(inputfile): 
+            print("             ----> Input file not implemented.")
+            print("                   Exit.")
+            sys.exit(1)
+    #print("             ----> Input file:", inputfile)
     
-    particlefile  = os.path.join(HOMEPATH, inputfile)
-    print("             ----> Particles will be read from:", \
-          particlefile)
+    if not os.path.isabs(outputfile): 
+        outputfile = os.path.join(HOMEPATH, outputfile)
+    if not os.path.isdir(os.path.dirname(outputfile)):
+        print("                 ----> Directory for output file", \
+              os.path.dirname(outputfile), "does not exist.")
+        print("                   Exit.")
+        sys.exit(1)
+
+    print("             ----> Write beamline summary file to:", outputfile)
     
-    outputFILE = None
-    if outputfile != None:
-        outputFILE = os.path.join(HOMEPATH, outputfile)
-        print("         ----> Write beamline summary file to:", outputFILE)
-    
-    iBm = Bm.Beam(filename, particlefile, nEvts, outputFILE)
+    Smltn = Simu.Simulation(nEvts, beamlinefile, None, outputfile)
 
-    print("     <---- Beam instance initialised.")
+    print("     <---- Initialisation complete.")
 
-    print("     ----> Create report:")
+    print("     ----> Run simulation:")
 
-    iBm.createReport()
+    Smltn.RunSim()
 
-    print("     <---- Create report:")
-        
-    print("     ----> Plot beam progression:")
-
-    iBm.setDebug(True)
-    iBm.plotBeamProgression()
-
-    print("     <---- Beam progression plot done.")
+    print("     <---- Simulation done.")
         
     print(" runBEAMsim: ends")
     

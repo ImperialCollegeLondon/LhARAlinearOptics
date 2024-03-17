@@ -859,7 +859,7 @@ class BeamLine(object):
     @classmethod
     def trackBeam(cls, NEvts=0, ParticleFILE=None):
         if cls.getDebug() or NEvts > 1:
-            print(" trackBeam for", NEvts, " events.")
+            print("         ----> BeamLine.trackBeam for", NEvts, " events.")
         Scl  = 10
         iCnt = 1
 
@@ -868,7 +868,7 @@ class BeamLine(object):
         for iEvt in range(1, NEvts+1):
             if (iEvt % Scl) == 0:
                 if cls.getDebug() or NEvts > 1:
-                    print("     ----> Generating event ", iEvt)
+                    print("             ----> Generating event ", iEvt)
                 iCnt += 1
                 if iCnt == 10:
                     iCnt = 1
@@ -948,7 +948,7 @@ class BeamLine(object):
                 print("     <---- Finished handling beam line.")
                 
         if cls.getDebug() or NEvts > 1:
-            print(" <---- End of this simulation, ", iEvt, \
+            print("     <---- End of this simulation, ", iEvt, \
                   " events generated")
 
 
@@ -959,7 +959,7 @@ class BeamLine(object):
 
         if not isinstance(beamlineFILE, io.BufferedWriter):
             raise noFILE( \
-                    " BeamLine.writeBeamLine: file does not exist.")
+                    " BeamLine.writeBeamLine: file not BufferedWriter.")
 
         nBLE = len(BLE.BeamLineElement.getinstances())
         if self.getDebug():
