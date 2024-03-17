@@ -18,21 +18,13 @@ Debug = False
 writePATH = HOMEPATH + "/99-Scratch"
 ParticleFILE = Prtcl.Particle.openParticleFile(writePATH, \
                                                "DRACOSimulation.dat")
+ibmIOr = bmIO.BeamIO(writePATH, "LIONsimu.dat")
+
 EndOfFile = False
 iEvt = 0
 iCnt = 0
 Scl  = 10
 iPrt = 0
-print("     ----> Read events from:", ParticleFILE)
-
-##! Create DRACO instance:
-print("     ----> Create DRACO instance:")
-filename     = os.path.join(HOMEPATH, \
-                        '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
-print("         ----> Parameters will be read from:", filename)
-DRACObI  = BL.BeamLine(filename)
-if Debug:
-    print(DRACObI)
 
 print("     <---- Initialisation done.")
 
@@ -41,22 +33,29 @@ print("     ----> Starting to read events:")
 
 while not EndOfFile:
 #while iEvt < 10000:
-    EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
-    if not EndOfFile:
-        iEvt += 1
-        if (iEvt % Scl) == 0:
-            print("         ----> Read event ", iEvt)
-            iCnt += 1
-            if iCnt == 10:
-                iCnt = 1
-                Scl  = Scl * 10
-    iPrtcl  = Prtcl.Particle.getParticleInstances() \
-              [len(Prtcl.Particle.getParticleInstances())-1]
-    nPhsSpc = len(iPrtcl.getTraceSpace())
+    #EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+    EndOfFile = ibmIOr.readBeamDataRecord()
     
-    if Debug and iEvt < 10:
-        print(iPrtcl)
+    if BL.BeamLine.getinstance() == None:
+        ##! Create DRACO instance:
+        print("     ----> Create DRACO instance:")
+        filename     = os.path.join(HOMEPATH, \
+                        '11-Parameters/DRACOBeamLine-Params-LsrDrvn.csv')
+        print("         ----> Parameters will be read from:", filename)
+        DRACObI  = BL.BeamLine(filename)
+        if Debug:
+            print(DRACObI)
 
+        else:
+            if not EndOfFile:
+                iEvt += 1
+                if (iEvt % Scl) == 0:
+                    print("         ----> Read event ", iEvt)
+                    iCnt += 1
+                    if iCnt == 10:
+                        iCnt = 1
+                        Scl  = Scl * 10
+                        
 print("     <---- Event loop done, ", iEvt, "events read")
 
 ##! Plot progression:
