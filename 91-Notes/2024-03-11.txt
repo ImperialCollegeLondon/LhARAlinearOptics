@@ -40,8 +40,8 @@ Scripts:
  - ReadLIONsimu.py         - OK
  - RunLhARAsimulation.py   - OK
  - ReadLhARAsimu.py        - OK
- - plotBeam.py             - OK
- - plotTrajectory.py       - OK
+ - plotBeam.py             - 
+ - plotTrajectory.py       - 
 
 --------  --------  --------  --------  --------  --------  --------  15Mar24
 Completed first draft of BeamIO package.  Run tests, etc.
