@@ -108,6 +108,13 @@ def main(argv):
 
     print(" <---- Data-file reading done.")
         
+    print(" ----> Plot progression:")
+    
+    Prtcl.Particle.plotTraceSpaceProgression()
+    Prtcl.Particle.plotLongitudinalTraceSpaceProgression()
+    
+    print(" <---- Done.")
+
     print(" readBEAMsim: ends")
     
 """
