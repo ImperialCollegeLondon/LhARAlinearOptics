@@ -1,2 +1,3 @@
-.gitignore
 .DS_Store
+99-Scratch
+__pycache__

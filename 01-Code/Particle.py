@@ -410,12 +410,6 @@ class Particle:
                     ELab.append([])
                     Scl.append([])
 
-                """
-                print(" Here:", iLoc)
-                print("     ---->", iPrtcl.getTraceSpace()[iLoc])
-                print("     ---->", iRefPrtcl.getPrOut()[iLoc])
-                """
-
                 p0 = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLoc][:3], \
                                      iRefPrtcl.getPrOut()[iLoc][:3]))
                 E0  = iRefPrtcl.getPrOut()[iLoc][3]
@@ -789,6 +783,7 @@ class Particle:
 
         ParticleFILE.flush()
         ParticleFILE.close()
+        
 #                     ----> Write instances:
     @classmethod
     def openParticleFile(cls, datafilePATH=None, datafileNAME=None):

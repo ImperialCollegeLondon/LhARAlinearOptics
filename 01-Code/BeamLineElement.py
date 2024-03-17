@@ -113,6 +113,7 @@ import random as rnd
 import scipy
 from scipy.optimize import fsolve
 import random as random
+import struct as strct
 import math
 
 import PhysicalConstants as PhysCnst
@@ -202,6 +203,10 @@ class BeamLineElement:
     @classmethod
     def cleanInstances(cls):
         for inst in cls.instances:
+            if cls.getDebug():
+                print(" Kill:", inst.getName())
+            if isinstance(inst, Facility):
+                Facility.instance = None
             del inst
         cls.instances = []
         if cls.getDebug():
@@ -302,6 +307,82 @@ class BeamLineElement:
             Outside = True
         return Outside
 
+
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" BeamLineElement.writeElement starts.")
+
+        bLocation = bytes(self.getName(), 'utf-8')
+        record    = strct.pack(">i", len(bLocation))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of element name:", \
+                  strct.unpack(">i", record))
+        
+        record = bLocation
+        dataFILE.write(record)
+            
+        if self.getDebug():
+            print("     ----> Location:", bLocation.decode('utf-8'))
+
+        record = strct.pack(">5d", \
+                            self.getrStrt()[0], \
+                            self.getrStrt()[1], \
+                            self.getrStrt()[2], \
+                            self.getvStrt()[0], \
+                            self.getvStrt()[1]
+                            )
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> rStrt, vStrt:", \
+                      strct.unpack(">5d",record))
+        
+        if self.getDebug():
+            print(" <---- BeamLineElement.writeElement done.")
+
+    """
+  _drStrt : "error", displacement of start from nominal position (rad).
+  _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
+    """
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" BeamLineElement.readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nChr   = record[0]
+        if cls.getDebug():
+            print("     ----> Number of characters:", nChr)
+                
+        brecord  = dataFILE.read(nChr)
+        Location = brecord.decode('utf-8')
+        if cls.getDebug():
+            print("                   Location:", Location)
+
+        brecord = dataFILE.read((5*8))
+        if brecord == b'':
+            return True, None, None
+        
+        record  = strct.unpack(">5d", brecord)
+        r      = np.array([float(record[0]), float(record[1]), \
+                           float(record[2])])
+        v      = np.array([float(record[3]), float(record[4])])
+        
+        if cls.getDebug():
+            print("     ----> r, v:", r, v)
+
+        return EoF, Location, r, v
+
+    
 #--------  Utilities:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
@@ -508,6 +589,53 @@ class Facility(BeamLineElement):
     def getVCMVr(self):
         return self._VCMVr
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Facility(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Facility"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">2d", self.getp0(), self.getVCMVr())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> p0, VCMVr:", strct.unpack(">2d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Facility(BeamLineElement).writeElement done.")
+
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Facility(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((2*8))
+        if brecord == b'':
+            return True, None, None
+        
+        record  = strct.unpack(">2d", brecord)
+        p0      = float(record[0])
+        VCMVr   = float(record[1])
+        
+        if cls.getDebug():
+            print("     ----> p0, VCMVr:", p0, VCMVr)
+
+        return EoF, p0, VCMVr
+        
         
 """
 Derived class Drift:
@@ -658,6 +786,59 @@ class Drift(BeamLineElement):
         return self._Length
     
         
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Drift(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Drift"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        if self.getDebug():
+            print("     ----> Write parameter:")
+        record = strct.pack(">d", self.getLength())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length:", strct.unpack(">d", record))
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Drift(BeamLineElement).writeElement done.")
+    
+    
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Drift(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((1*8))
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record  = strct.unpack(">d", brecord)
+        Length  = float(record[0])
+        if cls.getDebug():
+            print("     ----> Length:", Length)
+            
+        return EoF, Length
+
+
 """
 Derived class Aperture:
 =======================
@@ -779,6 +960,10 @@ class Aperture(BeamLineElement):
     
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
     def setApertureParameters(self, _Param):
         if self.getDebug():
             print(" Apperture.setApertureParamters; Parameters:", _Param)
@@ -867,6 +1052,94 @@ class Aperture(BeamLineElement):
         return _Rprime
 
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Aperture(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Aperture"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">i", self.getType())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Type:", strct.unpack(">i", record))
+
+        record = strct.pack(">i", len(self.getParams()))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Number of paramters:", \
+                  strct.unpack(">i", record))
+
+        if self.getDebug():
+            print("     ----> Write parameters:")
+        for iPrm in range(len(self.getParams())):
+            record = strct.pack(">d", self.getParams()[iPrm])
+            dataFILE.write(record)
+            if self.getDebug():
+                print("         ----> iPrm, value:", \
+                      iPrm, strct.unpack(">d", record))
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Aperture(BeamLineElement).writeElement done.")
+        
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Aperture(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        Type = record[0]
+        if cls.getDebug():
+            print("     ----> Type:", Type)
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nPrm = record[0]
+        if cls.getDebug():
+            print("     ----> Number of parameters:", nPrm)
+
+        Params = []
+        for iPrm in range(nPrm):
+            brecord = dataFILE.read((1*8))
+            if brecord == b'':
+                return True
+        
+            record  = strct.unpack(">d", brecord)
+            var     = float(record[0])
+            Params.append(var)
+        if cls.getDebug():
+            print("     ----> Parameters:", Params)
+                        
+        return EoF, Type, Params
+
+
 """
 Derived class FocusQuadrupole:
 ==============================
@@ -1182,6 +1455,72 @@ class FocusQuadrupole(BeamLineElement):
         return Strn
     
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " FocusQuadrupole(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "FocusQuadrupole"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getLength(), \
+                            self.getStrength(), \
+                            self.getkFQ())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length, strength, kFQ:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- FocusQuadrupole(BeamLineElement).writeElement done.")
+
+        return
+
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" FocusQuadrupole(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">3d", brecord)
+
+        Ln  = None
+        St  = None
+        kFQ = None
+
+        if float(record[0]) != -1.:
+            Ln     = float(record[0])
+        if float(record[1]) != -1.:
+            St     = float(record[1])
+        if float(record[2]) != -1.:
+            kFQ   = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Ln, St, kDQ:", Ln, St, kFQ)
+            
+        return EoF, Ln, St, kFQ
+
+    
 """
 Derived class DefocusQuadrupole:
 ================================
@@ -1494,6 +1833,72 @@ class DefocusQuadrupole(BeamLineElement):
         return Strn
 
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " DefocusQuadrupole(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "DefocusQuadrupole"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getLength(), \
+                            self.getStrength(), \
+                            self.getkDQ())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length, strength, kDQ:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- DefocusQuadrupole(BeamLineElement).writeElement done.")
+
+        return
+
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" DefocusQuadrupole(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">3d", brecord)
+
+        Ln  = None
+        St  = None
+        kDQ = None
+
+        if float(record[0]) != -1.:
+            Ln     = float(record[0])
+        if float(record[1]) != -1.:
+            St     = float(record[1])
+        if float(record[2]) != -1.:
+            kDQ   = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Ln, St, kDQ:", Ln, St, kDQ)
+            
+        return EoF, Ln, St, kDQ
+
+    
 """
 Derived class SectorDipole:
 ===========================
@@ -1710,6 +2115,63 @@ class SectorDipole(BeamLineElement):
         return self._Length
 
 
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " Dipole(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "SectorDipole"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">2d", \
+                            self.getAngle(), \
+                            self.getB())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Angle, B:", \
+                  strct.unpack(">2d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- Dipole(BeamLineElement).writeElement done.")
+
+        return
+
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" SectorDipole(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((2*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">2d", brecord)
+
+        Angl = float(record[0])
+        B    = float(record[1])
+
+        if cls.getDebug():
+            print("     ----> Angl, B:", Angl, B)
+            
+        return EoF, Angl, B
+
+    
 class Octupole(BeamLineElement):
     instances = []
     __Debug = False
@@ -2071,6 +2533,70 @@ class Solenoid(BeamLineElement):
         return Strn
 
     
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Solenoid(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Solenoid"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getLength(), \
+                            self.getStrength(), \
+                            self.getksol())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length, strength, k_sol:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Solenoid(BeamLineElement).writeElement done.")
+
+        return self._ksol
+    
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Solenoid(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">3d", brecord)
+
+        Ln     = None
+        St     = None
+        kSol   = None
+
+        if float(record[0]) != -1.:
+            Ln     = float(record[0])
+        if float(record[1]) != -1.:
+            St     = float(record[1])
+        if float(record[2]) != -1.:
+            kSol   = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Ln, St, kSol:", Ln, St, kSol)
+            
+        return EoF, Ln, St, kSol
+
+
 """
 Derived class GaborLens:
 ========================
@@ -2408,6 +2934,110 @@ class GaborLens(BeamLineElement):
     def getElectronDensity(self):
         return self._ElectronDensity
     
+
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " GaborLens(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "GaborLens"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        if self.getBz() == None:
+            Bz = -1.
+        else:
+            Bz = self.getBz()
+            
+        if self.getVA() == None:
+            VA = -1.
+        else:
+            VA = self.getVA()
+
+        if self.getRA() == None:
+            RA = -1.
+        else:
+            RA = self.getRA()
+
+        if self.getRp() == None:
+            Rp = -1.
+        else:
+            Rp = self.getRp()
+
+        if self.getLength() == None:
+            Ln = -1.
+        else:
+            Ln = self.getLength()
+
+        if self.getStrength() == None:
+            St = -1.
+        else:
+            St = self.getStrength()
+        
+        record = strct.pack(">6d", Bz, VA, RA, Rp, Ln, St)
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Bz, VA, RA, Rp, Ln, St:", \
+                  strct.unpack(">6d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- GaborLens(BeamLineElement).writeElement done.")
+
+        return
+
+    
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" GaborLens(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((6*8))
+        if brecord == b'':
+            return True
+        
+        record = strct.unpack(">6d", brecord)
+
+        Bz     = None
+        VA     = None
+        RA     = None
+        Rp     = None
+        Ln     = None
+        St     = None
+
+        if float(record[0]) != -1.:
+            Bz     = float(record[0])
+        if float(record[1]) != -1.:
+            VA     = float(record[1])
+        if float(record[2]) != -1.:
+            RA     = float(record[2])
+        if float(record[3]) != -1.:
+            Rp     = float(record[3])
+        if float(record[4]) != -1.:
+            Ln     = float(record[4])
+        if float(record[5]) != -1.:
+            St     = float(record[5])
+
+        if cls.getDebug():
+            print("     ----> Bz, VA, RA, Rp, Ln, St:", \
+                  Bz, VA, RA, Rp, Ln, St)
+            
+        return EoF, Bz, VA, RA, Rp, Ln, St
+
 
 """
 Derived class CylindricalRFCavity:
@@ -2794,6 +3424,7 @@ class CylindricalRFCavity(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
+        
 # -------- "Get methods"
 # Methods believed to be self-documenting(!)
     @classmethod
@@ -2867,9 +3498,8 @@ class CylindricalRFCavity(BeamLineElement):
                                 _R)
 
         if self.getDebug():
-            print(" BeamLineElement.Transport:", \
-                  Facility.getInstance().getName(), \
-                  Facility.getInstance().getVCMVr())
+            print(" CylindricalRFCavity(BeamLineElement).Transport:", \
+                  "     ---->", self.SummaryStr())
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
@@ -2888,6 +3518,63 @@ class CylindricalRFCavity(BeamLineElement):
 
         return _Rprime
 
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print( \
+                " CylindricalRFCavity(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "CylindricalRFCavity"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">3d", \
+                            self.getGradient(), \
+                            self.getFrequency(), \
+                            self.getPhase())
+
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Gradient, frequency, phase:", \
+                  strct.unpack(">3d",record))
+
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print( \
+             " <---- CylindricalRFCavity(BeamLineElement).writeElement done.")
+
+        return
+
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Source(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read((3*8))
+        if brecord == b'':
+            return True
+        
+        record  = strct.unpack(">3d", brecord)
+        Grdnt   = float(record[0])
+        Frqncy  = float(record[1])
+        Phs     = float(record[2])
+
+        if cls.getDebug():
+            print("     ----> Grdnt, Frqncy, Phs:", Grdnt, Frqncy, Phs)
+            
+        return EoF, Grdnt, Frqncy, Phs
+        
     
 """
 Derived class Source:
@@ -3246,15 +3933,6 @@ class Source(BeamLineElement):
                   self.getMode(), self.getParameters())
 
         if self._Mode == 0:
-            X             = rnd.gauss(0., self.getParameters()[0])
-            Y             = rnd.gauss(0., self.getParameters()[1])
-            cosTheta, Phi = self.getFlatThetaPhi()
-            """
-               Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
-               Replace, self.getFlatThetaPhi(),            KL: 05Mar24
-            """
-
-            # LION beamline
             P_L = self.getParameters()[6]
             E_laser = self.getParameters()[7]
             lamda = self.getParameters()[8]
@@ -3265,6 +3943,15 @@ class Source(BeamLineElement):
 
             KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, \
                                 lamda, t_laser, d, I, theta_degrees)  # [MeV]
+            
+            X             = rnd.gauss(0., self.getParameters()[0])
+            Y             = rnd.gauss(0., self.getParameters()[1])
+            cosTheta, Phi = self.getGaussianThetaPhi(KE)
+            """
+              Rolled back to: self.getGaussianThetaPhi(), KL: 08Mar24
+              Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
+              Replace, self.getFlatThetaPhi(),            KL: 05Mar24
+            """
 
         elif self._Mode == 1:
             X             = rnd.gauss(0., self.getParameters()[0])
@@ -3295,6 +3982,16 @@ class Source(BeamLineElement):
         return cosTheta, Phi
     
 
+    #.. 2D Gaussian distribution
+    def g_xy(self, x, y, sigma_x, sigma_y):  
+        g = (1. / (2.*np.pi*sigma_x*sigma_y)) * \
+            np.exp(-0.5*((x/sigma_x)**2 + (y/sigma_y)**2))
+       
+        # normalize the probability distribution
+        g /= np.sum(g)
+
+        return g    
+
     ### Gaussian Angular Distribution ### 
     # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
     def g_theta(self,energy):
@@ -3302,31 +3999,35 @@ class Source(BeamLineElement):
         return theta
     
     # Single angle generator with acceptance-rejection
-    def angle_generator(self,E_MeV):
+    def angle_generator(self, E_MeV):
 
+        iCnt = 0
         while True:
 
             theta_E = self.g_theta(E_MeV)         # [degrees]
             theta_E = np.radians(theta_E)         # [rad]
-            phi = random.uniform(0, 2 * math.pi)  # [rad]
+            phi = random.uniform(0., 2. * math.pi)  # [rad]
 
-            sigma_x = 10e-6
-            sigma_y = 10e-6
+            sigma_x = 10.e-6
+            sigma_y = 10.e-6
 
             # Generate x, y as per Gaussian distribution
-            x = np.random.normal(0, sigma_x)
-            y = np.random.normal(0, sigma_y)
+            x = np.random.normal(0., sigma_x)
+            y = np.random.normal(0., sigma_y)
 
             # Check acceptance based on Gaussian probability density function
             acceptance_prob = self.g_xy(x, y, sigma_x, sigma_y)
             if np.random.random() < acceptance_prob:
 
-                theta = np.random.normal(0, theta_E)
+                theta = np.random.normal(0., theta_E)
 
                 return theta, phi
 
+            iCnt += 1
+            if iCnt > 10**12:
+                raise KillInfiniteLoop()
 
-    def getGaussianThetaPhi(self):
+    def getGaussianThetaPhi(self, E_MeV):
 
         P_L = self._Param[6]
         E_laser = self._Param[7]
@@ -3336,53 +4037,19 @@ class Source(BeamLineElement):
         I = self._Param[11]
         theta_degrees = self._Param[12]
 
-        E_MeV = self.getLaserDrivenProtonEnergy(self, \
+        """
+           E_MeV = self.getLaserDrivenProtonEnergy(self, \
                     P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
+        """
 
-        theta = self.angle_generator(self,E_MeV)[0]
+        theta = self.angle_generator(E_MeV)[0]
         cosTheta = np.cos(theta)
-        Phi = self.angle_generator(self,E_MeV)[1]
+        Phi = self.angle_generator(E_MeV)[1]
 
         return cosTheta, Phi
 
-
-
-
-    #def getLaserDrivenProtonEnergy(self):
-    #    if not Source.LsrDrvnIni:
-    #        if self.__Debug:
-    #            print(" BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
-    #                  " initialise")
-    #        Source.LsrDrvnIni = True
-    #        E_min = self._Param[3]
-    #        E_max = self._Param[4]
-    #        N_stp = self._Param[5]
-    #        E_stp = (E_max - E_min) / float(N_stp)
-    #        Ei, E_stp1 = np.linspace(E_min, E_max, N_stp, False, True, float)
-    #        g_E = np.exp(-np.sqrt(Ei)) / np.sqrt(Ei)
-    #        g_E /= np.sum(g_E)    # normalize the probability distribution
-    #        G_E  = np.cumsum(g_E) # cumulative probability distribution
-    #        if self.__Debug:
-    #            print("     ----> E_min, E_max, N_stp, E_stp, E_stp1:", \
-    #                  E_min, E_max, N_stp, E_stp, E_stp1)
-    #        Source.LsrDrvnG_E = G_E
-    #
-    #    #.. Generate random numbers from the distribution using
-    #    #   inverse transform sampling
-#
-    #    G_E = Source.LsrDrvnG_E
-    #    iE  = np.searchsorted(G_E, rnd.uniform(0., 1.))
-    #    E   = self._Param[3] + \
-    #        float(iE) * (self._Param[4] - self._Param[3]) / \
-    #        float(self._Param[5])
-    #    if self.__Debug:
-    #        print("     ----> iE, E:", iE, E)
-#
-    #    return E
-
-
     # Calculates the rest of the parameters needed for the parametrisation
-    def parameters(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+    def parameters(self, P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
 
         c = 3e8               # Speed of light in vacuum [m/s]
         m_e = 9.11e-31        # Electron mass [Kg]
@@ -3442,7 +4109,8 @@ class Source(BeamLineElement):
 
 
     # Generates energy values for the distribution
-    def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+    def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, \
+                                   d, I, theta_degrees):
 
         if not Source.LsrDrvnIni:
             if self.__Debug:
@@ -3474,7 +4142,8 @@ class Source(BeamLineElement):
         E = np.linspace(E_min,E_max,1000)  # [J]
 
         # Required distribution
-        g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * np.exp(-np.sqrt(2 * E / T_e))
+        g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * \
+            np.exp(-np.sqrt(2 * E / T_e))
         g_E /= np.sum(g_E)   # Normalize the probability distribution
 
         # Generate random numbers from the distribution using inverse \
@@ -3536,6 +4205,106 @@ class Source(BeamLineElement):
 
         return TrcSpc
 
+    
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" Source(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "Source"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        record = strct.pack(">i", self.getMode())
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Mode:", strct.unpack(">i", record))
+
+        record = strct.pack(">i", len(self.getParameters()))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Number of paramters:", \
+                  strct.unpack(">i", record))
+
+        iPrm = 0
+        if self.getDebug():
+            print("     ----> Write parameters:")
+        for typePrm in self.ParamList[self.getMode()]:
+            if typePrm == float:
+                record = strct.pack(">d", self.getParameters()[iPrm])
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> iPrm, value:", \
+                          iPrm, strct.unpack(">d", record))
+            else:
+                record = strct.pack(">d", float(self.getParameters()[iPrm]))
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> iPrm, value:", \
+                          iPrm, strct.unpack(">i", record))
+            iPrm += 1
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- Source(BeamLineElement).writeElement done.")
+    
+                            
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" Source(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        Mode = record[0]
+        if cls.getDebug():
+            print("     ----> Mode:", Mode)
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nPrm = record[0]
+        if cls.getDebug():
+            print("     ----> Number of parameters:", nPrm)
+
+        Params = []
+        for iPrm in range(nPrm):
+            brecord = dataFILE.read((1*8))
+            if brecord == b'':
+                return True
+        
+            record  = strct.unpack(">d", brecord)
+            var     = float(record[0])
+            if cls.ParamList[Mode][iPrm] == int:
+                var = int(var)
+            Params.append(var)
+        if cls.getDebug():
+            print("     ----> Parameters:", Params)
+            
+        return EoF, Mode, Params
+        
     
 """
 To do:
@@ -4293,3 +5062,5 @@ class ReferenceParticleNotSpecified(Exception):
 class FailToCreateTraceSpaceAtSource(Exception):
     pass
 
+class KillInfiniteLoop(Exception):
+    pass
