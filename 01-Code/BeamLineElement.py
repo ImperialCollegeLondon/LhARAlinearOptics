@@ -347,7 +347,6 @@ class BeamLineElement:
     """
     @classmethod
     def readElement(cls, dataFILE):
-        cls.setDebug(True)
         if cls.getDebug():
             print(" BeamLineElement.readElement starts.")
 
@@ -4246,7 +4245,7 @@ class Source(BeamLineElement):
                     print("         ----> iPrm, value:", \
                           iPrm, strct.unpack(">d", record))
             else:
-                record = strct.pack(">i", self.getParameters()[iPrm])
+                record = strct.pack(">d", float(self.getParameters()[iPrm]))
                 dataFILE.write(record)
                 if self.getDebug():
                     print("         ----> iPrm, value:", \
@@ -4298,6 +4297,8 @@ class Source(BeamLineElement):
         
             record  = strct.unpack(">d", brecord)
             var     = float(record[0])
+            if cls.ParamList[Mode][iPrm] == int:
+                var = int(var)
             Params.append(var)
         if cls.getDebug():
             print("     ----> Parameters:", Params)

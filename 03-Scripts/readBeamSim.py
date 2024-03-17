@@ -19,7 +19,6 @@ def main(argv):
     opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
                                ["ifile=","ofile=","bfile", "nEvts"])
 
-    beamlinefile = None
     inputfile    = None
     outputfile   = None
     Debug        = False
@@ -27,15 +26,12 @@ def main(argv):
     for opt, arg in opts:
         if opt == '-h':
             print ( \
-                    'readBEAMsim.py -b <beamlinefile>'  + \
-                    ' -i <inputfile> -o <outputfile>' + \
+                    'readBEAMsim.py -i <inputfile> -o <outputfile>' + \
                     ' -n <nEvts>')
             print("     ----> <output file> not yet implemented.>")
             sys.exit()
         if opt == '-d':
             Debug = True
-        elif opt in ("-b", "--bfile"):
-            beamlinefile = arg
         elif opt in ("-i", "--ifile"):
             inputfile = arg
         elif opt in ("-o", "--ofile"):
@@ -43,11 +39,9 @@ def main(argv):
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
 
-    if beamlinefile == None or \
-       inputfile    == None:
+    if inputfile    == None:
         print ( \
-                'readBEAMsim.py -b <beamlinefile>'  + \
-                ' -i <inputfile> -o <outputfile>' + \
+                'readBEAMsim.py -i <inputfile> -o <outputfile>' + \
                 ' -n <nEvts>')
         print("     ----> <output file> not yet implemented.>")
         sys.exit()
@@ -61,16 +55,6 @@ def main(argv):
         
     #.. File handling:
     print("         ----> Check input and output files:")
-    #.. ----> Beam line specitication file:
-    if not os.path.isfile(beamlinefile):
-        beamlinefile = os.path.join(HOMEPATH, beamlinefile)
-    if not os.path.isfile(beamlinefile):
-        print("             ----> Beam line parameter file does not exist.")
-        print("                   Exit.")
-        sys.exit(1)
-        
-    print("             ----> Beamline parameters will be read from:", \
-          beamlinefile)
 
     #.. ----> Input file, if specified:
     if inputfile != None and not os.path.isfile(inputfile):
@@ -80,8 +64,8 @@ def main(argv):
         print("                   Exit.")
         sys.exit(1)
 
-    #ibmIOr = bmIO.BeamIO(None, inputfile)
-    ibmIOr = bmIO.BeamIO("99-Scratch", "Data4Tests.dat")
+    ibmIOr = bmIO.BeamIO(None, inputfile)
+    #ibmIOr = bmIO.BeamIO("99-Scratch", "Data4Tests.dat")
     print("             ----> Input file:", inputfile)
     
     if outputfile != None and not os.path.isabs(outputfile): 
@@ -120,12 +104,9 @@ def main(argv):
         if iEvt == nEvt:
             break
 
-    sys.exit()
-
     print("     <----", iEvt, "events read")
-    Smltn.RunSim()
 
-    print("     <---- Simulation done.")
+    print(" <---- Data-file reading done.")
         
     print(" readBEAMsim: ends")
     
