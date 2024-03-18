@@ -1,0 +1,62 @@
+--------  --------  --------  --------  --------  --------  --------  18Mar24
+Still workkng through scripts in main!  Back to 2x10^6, and check scripts.
+Remove Vince's duff scripts.
+
+Scripts:
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - OK
+ - plotTrajectory.py       - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - 
+ - runBeamSim.py           -
+ - readBeamSim.py          -
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamIOTst-wrt.py        - 
+ - BeamIOTst-rd.py         - 
+ - BeamLineElementTst.py   - 
+ - BeamLineTst.py          - 
+ - BeamTst.py              -
+ - CylindricalRFCavityTst  -
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DRACOfacilityTst.py     - 	
+ - DriftTst.py             -
+ - ExpSourceTst.py         -
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         -
+ - LaTexTst.py             -
+ - LhARAFacilityTst.py     - 
+ - LIONfacilityTst.py      - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          -
+ - PhysicalConstantsTst.py - 
+ - QuadDoubletTst.py       -
+ - QuadTripletTst.py       -
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestWrite.py            - 
+ - TestRead.py             - 
+
+Scripts:
+ - LhARAMagnetTable.py     - 
+ - plotQuadTriplet.py      - 
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotBeam.py             - 
+ - plotTrajectory.py       -
+ - runBeamSim.py           -
+ - readBeamSim.py          -

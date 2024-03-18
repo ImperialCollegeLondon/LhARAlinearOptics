@@ -5,8 +5,9 @@ import os
 import struct
 import math as mth
 
-import Particle  as Prtcl
+import Particle as Prtcl
 import BeamLine as BL
+import BeamIO   as bmIO
 
 ##! Start:
 print("========  DRACO event reading: start  ========")
@@ -16,9 +17,11 @@ print("     ----> Initialising with HOMEPATH:", HOMEPATH)
 Debug = False
 
 writePATH = HOMEPATH + "/99-Scratch"
+"""
 ParticleFILE = Prtcl.Particle.openParticleFile(writePATH, \
                                                "DRACOSimulation.dat")
-ibmIOr = bmIO.BeamIO(writePATH, "LIONsimu.dat")
+"""
+ibmIOr = bmIO.BeamIO(writePATH, "DRACOSimulation.dat")
 
 EndOfFile = False
 iEvt = 0
@@ -32,10 +35,10 @@ print("     <---- Initialisation done.")
 print("     ----> Starting to read events:")
 
 while not EndOfFile:
-#while iEvt < 10000:
+#while iEvt < 10:
     #EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     EndOfFile = ibmIOr.readBeamDataRecord()
-    
+
     if BL.BeamLine.getinstance() == None:
         ##! Create DRACO instance:
         print("     ----> Create DRACO instance:")
@@ -46,15 +49,15 @@ while not EndOfFile:
         if Debug:
             print(DRACObI)
 
-        else:
-            if not EndOfFile:
-                iEvt += 1
-                if (iEvt % Scl) == 0:
-                    print("         ----> Read event ", iEvt)
-                    iCnt += 1
-                    if iCnt == 10:
-                        iCnt = 1
-                        Scl  = Scl * 10
+    else:
+        if not EndOfFile:
+            iEvt += 1
+            if (iEvt % Scl) == 0:
+                print("         ----> Read event ", iEvt)
+                iCnt += 1
+                if iCnt == 10:
+                    iCnt = 1
+                    Scl  = Scl * 10
                         
 print("     <---- Event loop done, ", iEvt, "events read")
 

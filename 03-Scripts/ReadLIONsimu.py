@@ -51,7 +51,7 @@ while not EndOfFile:
 
 print(" <----", iEvt, "events read")
 
-print()`
+print()
 print(" Plot progression:")
 Prtcl.Particle.plotTraceSpaceProgression()
 Prtcl.Particle.plotLongitudinalTraceSpaceProgression()
