@@ -389,7 +389,6 @@ class Particle:
         logE = False
         if iSrc.getMode() == 0:
             logE = True
-        print(iSrc, logE)
                 
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
@@ -515,8 +514,7 @@ class Particle:
         logE = False
         if iSrc.getMode() == 0:
             logE = True
-        print(iSrc, logE)
-        
+       
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             nPrtcl += 1

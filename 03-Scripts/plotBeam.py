@@ -15,7 +15,7 @@ def main(argv):
        Parse input arguments:
     """
     opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
-                               ["ifile=","ofile=","bfile", "nEvts"])
+                               ["ifile=","nEvts", "ofile=","bfile"])
 
     beamlinefile = None
     inputfile    = None
@@ -25,9 +25,9 @@ def main(argv):
     for opt, arg in opts:
         if opt == '-h':
             print ( \
-                    'plotBeam.py -b <beamlinefile>'  + \
-                    ' -i <inputfile> -o <outputfile>' + \
-                    ' -n <nEvts>')
+                    'plotBeam.py '  + \
+                    ' -i <inputfile> -n <nEvts> -o <outputfile>' + \
+                    ' [-b <beamlinefile>]')
             sys.exit()
         if opt == '-d':
             Debug = True
@@ -40,12 +40,11 @@ def main(argv):
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
 
-    if inputfile    == None or \
-       beamlinefile == None:
+    if inputfile    == None:
         print ( \
-                'plotBeam.py -b <beamlinefile>'  + \
-                ' -i <inputfile> -o <outputfile>' + \
-                ' -n <nEvts>')
+                'plotBeam.py '  + \
+                ' -i <inputfile> -n <nEvts> -o <outputfile>' + \
+                ' [-b <beamlinefile>]')
         sys.exit()
 
     print(" plotBEAM: start")
@@ -56,10 +55,12 @@ def main(argv):
     print("         ----> HOMEPATH:", HOMEPATH)
         
     #.. Create beam instance:
-    print("         ----> Create beam instance:")
-    filename     = os.path.join(HOMEPATH, beamlinefile)
-    print("             ----> Beamline parameters will be read from:", \
-          filename)
+    if beamlinefile != None:
+        print("         ----> Create beam instance:")
+        filename     = os.path.join(HOMEPATH, beamlinefile)
+        print("             ----> Beamline parameters will be read from:", \
+              filename)
+        
     particlefile  = os.path.join(HOMEPATH, inputfile)
     print("             ----> Particles will be read from:", \
           particlefile)
@@ -69,7 +70,7 @@ def main(argv):
         CSVoutputFILE = os.path.join(HOMEPATH, outputfile)
         print("         ----> Write beamline summary file to:", CSVoutputFILE)
     
-    iBm = Bm.Beam(filename, particlefile, nEvts, CSVoutputFILE)
+    iBm = Bm.Beam(particlefile, nEvts, CSVoutputFILE)
 
     print("     <---- Beam instance initialised.")
 

@@ -22,7 +22,7 @@ def main(argv):
     inputfile    = None
     outputfile   = None
     Debug        = False
-    nEvts        = 10000
+    nEvts        = None
     for opt, arg in opts:
         if opt == '-h':
             print ( \
@@ -86,7 +86,6 @@ def main(argv):
     EndOfFile = False
     iEvt = 0
     iCnt = 0
-    nEvt = 100
     Scl  = 10
     print("         ----> Read data file:")
     while not EndOfFile:
@@ -101,7 +100,7 @@ def main(argv):
                     Scl  = Scl * 10
         if iEvt <0:
             print(Prtcl.Particle.getParticleInstances()[iEvt])
-        if iEvt == nEvt:
+        if nEvts != None and iEvt == nEvts:
             break
 
     print("     <----", iEvt, "events read")

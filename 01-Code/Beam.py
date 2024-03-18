@@ -92,6 +92,7 @@ import Particle          as Prtcl
 import BeamLine          as BL
 import BeamLineElement   as BLE
 import Report            as Rprt
+import BeamIO            as bmIO
 
 
 class Beam:
@@ -100,11 +101,9 @@ class Beam:
 
 
 #--------  "Built-in methods":
-    def __init__(self, _BeamLineSpecificationCVSfile=None, \
-                 _InputDataFile=None, \
-                 _nEvtMax=None, \
-                 _OutputDataFile=None, \
-                 ):
+    def __init__(self, _InputDataFile=None, _nEvtMax=None, \
+                       _OutputDataFile=None, \
+                       _BeamLineSpecificationCVSfile=None):
         if self.__Debug:
             print(' Beam.__init__: ', \
                   'creating the Beam object')
@@ -113,15 +112,9 @@ class Beam:
 
 #--------  Check and initialise all inputs:  --------  --------  --------
 
-        #.. Check and load parameter file
-        if _BeamLineSpecificationCVSfile == None:
-            raise Exception( \
-                        " Beam.__init__: no parameter file given.")
+        #.. Load parameter file
         self.setBeamLineSpecificationCVSfile( \
                            _BeamLineSpecificationCVSfile)
-        if  not os.path.isfile(self.getBeamLineSpecificationCVSfile()):
-            raise Exception( \
-                    " Beam.__init__: pandas data frame invalid.")
 
         #.. Check and open input data file
         if _InputDataFile == None:
@@ -151,22 +144,23 @@ class Beam:
 
 #--------  <---- Check and initialise all inputs done.:  --------  --------
 
-#--------  Load specification file, i.e. initialise geometry:  --------
-#          (and load reference particle)
+#--------  Open input data file, read first record:      --------  --------
 
-        iBm = BL.BeamLine(self.getBeamLineSpecificationCVSfile())
+        ibmIOr = bmIO.BeamIO(None, _InputDataFile)
+        ParticleFILE = ibmIOr.getdataFILE()
+        self.setInputDataFile(ParticleFILE)
+
+        EndOfFile = False
+        EndOfFile = ibmIOr.readBeamDataRecord()
+
+        if BL.BeamLine.getinstance() == None:
+            iBm = BL.BeamLine(self.getBeamLineSpecificationCVSfile())
+        
         for iBLE in BLE.BeamLineElement.getinstances():
             if not isinstance(iBLE, BLE.Facility):
                 self.setLocation(iBLE.getName())
         self.initialiseSums()
-
-#--------  <---- Load specification file, i.e. initialise geometry: done. -
-
-#--------  Open input data file:  --------  --------  --------  --------
-
-        ParticleFILE = Prtcl.Particle.openParticleFile("", \
-                                                       _InputDataFile)
-        self.setInputDataFile(ParticleFILE)
+        
         #.. Must have reference particle:
         if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
                           Prtcl.ReferenceParticle):

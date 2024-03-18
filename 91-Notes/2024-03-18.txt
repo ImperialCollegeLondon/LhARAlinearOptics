@@ -12,9 +12,9 @@ Scripts:
  - ReadLIONsimu.py         - OK
  - RunLhARAsimulation.py   - OK
  - ReadLhARAsimu.py        - OK
- - plotBeam.py             - 
- - runBeamSim.py           -
- - readBeamSim.py          -
+ - plotBeam.py             - OK
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
 
 --------  --------  --------  --------  --------  --------  --------  --------
 Tests:
