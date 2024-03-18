@@ -14,7 +14,7 @@ print("     ----> Initialising with HOMEPATH:", HOMEPATH)
 Debug = False
 
 #ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "LIONsimu.dat")
-ibmIOr = bmIO.BeamIO("99-Scratch", "DRACOsimulation.dat")
+ibmIOr = bmIO.BeamIO("99-Scratch", "LIONsimu.dat")
 
 print("     <---- Initialisation done.")
 
