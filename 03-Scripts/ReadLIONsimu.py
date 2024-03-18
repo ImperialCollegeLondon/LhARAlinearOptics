@@ -13,8 +13,8 @@ HOMEPATH    = os.getenv('HOMEPATH')
 print("     ----> Initialising with HOMEPATH:", HOMEPATH)
 Debug = False
 
-ibmIOr = bmIO.BeamIO("99-Scratch", "LIONsimu.dat")
 #ParticleFILE = Prtcl.Particle.openParticleFile("99-Scratch", "LIONsimu.dat")
+ibmIOr = bmIO.BeamIO("99-Scratch", "DRACOsimulation.dat")
 
 print("     <---- Initialisation done.")
 

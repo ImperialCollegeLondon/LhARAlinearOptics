@@ -42,7 +42,6 @@ while not EndOfFile:
         LhARAbI  = BL.BeamLine(filename)
         if Debug:
             print(LhARAbI)
-
     else:
         if not EndOfFile:
             iEvt += 1

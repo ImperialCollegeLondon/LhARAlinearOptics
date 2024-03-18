@@ -21,7 +21,11 @@ writePATH = HOMEPATH + "/99-Scratch"
 ParticleFILE = Prtcl.Particle.openParticleFile(writePATH, \
                                                "DRACOSimulation.dat")
 """
+<<<<<<< HEAD
 ibmIOr = bmIO.BeamIO(writePATH, "DRACOSimulation.dat")
+=======
+ibmIOr = bmIO.BeamIO(writePATH, "DRACOsimulation.dat")
+>>>>>>> 353812e1b9aee4eb15e2d44ae05619ec5150b9de
 
 EndOfFile = False
 iEvt = 0
