@@ -50,6 +50,7 @@ Tests:
 Scripts:
  - LhARAMagnetTable.py     - 
  - plotQuadTriplet.py      - 
+ - plotTrajectory.py       - 
  - RunDRACOsimulation.py   - 
  - ReadDRACOsimu.py        - 
  - RunLIONsimulation.py    - 
@@ -57,6 +58,5 @@ Scripts:
  - RunLhARAsimulation.py   - 
  - ReadLhARAsimu.py        - 
  - plotBeam.py             - 
- - plotTrajectory.py       -
  - runBeamSim.py           -
  - readBeamSim.py          -
