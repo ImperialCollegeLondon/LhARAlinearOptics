@@ -1,3 +1,48 @@
+--------  --------  --------  --------  --------  --------  --------  17Mar24
+Completed roll out of BeamIO -- redo tests etc from main!
+
+Tests:
+ - BeamIOTst-wrt.py        - OK
+ - BeamIOTst-rd.py         - OK
+ - BeamLineElementTst.py   - OK
+ - BeamLineTst.py          - OK
+ - BeamTst.py              - OK
+ - CylindricalRFCavityTst  - OK 
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK 
+ - DRACOfacilityTst.py     - OK
+ - DriftTst.py             - OK
+ - ExpSourceTst.py         - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LaTexTst.py             - OK
+ - LhARAFacilityTst.py     - OK
+ - LIONfacilityTst.py      - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - QuadDoubletTst.py       - OK
+ - QuadTripletTst.py       - OK
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestWrite.py            - OK
+ - TestRead.py             - OK
+
+Scripts:
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - 
+ - plotTrajectory.py       - 
+
 --------  --------  --------  --------  --------  --------  --------  15Mar24
 Completed first draft of BeamIO package.  Run tests, etc.
 

@@ -3,14 +3,12 @@
 
 import os
 import sys, getopt
-import struct
-import math as mth
 
-import Simulation as Simu
 import Particle as Prtcl
 import BeamLine as BL
 import BeamIO   as bmIO
-import Beam     as Bm
+import UserAnal as UsrAnl
+
 
 def main(argv):
     """
@@ -65,7 +63,6 @@ def main(argv):
         sys.exit(1)
 
     ibmIOr = bmIO.BeamIO(None, inputfile)
-    #ibmIOr = bmIO.BeamIO("99-Scratch", "Data4Tests.dat")
     print("             ----> Input file:", inputfile)
     
     if outputfile != None and not os.path.isabs(outputfile): 
@@ -74,9 +71,6 @@ def main(argv):
         print("                 ----> Directory for output file", \
               os.path.dirname(outputfile), "does not exist.")
     else:
-        print("             ----> Write beamline summary file to:", outputfile)
-    #    print("                   Exit.")
-    #    sys.exit(1)
         print("                   Output file not implemented.")
     
     print("     <---- Initialisation complete.")
@@ -107,13 +101,10 @@ def main(argv):
 
     print(" <---- Data-file reading done.")
         
-    print(" ----> Plot progression:")
-    
-    Prtcl.Particle.plotTraceSpaceProgression()
-    Prtcl.Particle.plotLongitudinalTraceSpaceProgression()
-    
+    print(" User analysis:")
+    UsrAnl.UserAnal.plotSomething()
     print(" <---- Done.")
-
+    
     print(" readBEAMsim: ends")
     
 """
@@ -123,3 +114,15 @@ if __name__ == "__main__":
    main(sys.argv[1:])
 
 sys.exit(1)
+
+
+
+
+
+
+
+
+
+
+
+

@@ -871,7 +871,7 @@ class BeamLine(object):
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-        for iEvt in range(1, NEvts+1):
+        for iEvt in range(1, NEvts):
             if (iEvt % Scl) == 0:
                 if cls.getDebug() or NEvts > 1:
                     print("             ----> Generating event ", iEvt)
@@ -954,7 +954,7 @@ class BeamLine(object):
                 print("     <---- Finished handling beam line.")
                 
         if cls.getDebug() or NEvts > 1:
-            print("     <---- End of this simulation, ", iEvt, \
+            print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
 
 

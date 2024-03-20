@@ -1,51 +1,145 @@
-\graphicspath{ {03-Source/Figures/} }
+\graphicspath{ {05-Source/Figures/} }
 
 \section{Source}
 
-Para 1:
-\begin{itemize}
-  \item A variety of options for generating the particle distribution
-    at source are included in the package;
-  \item The principle (default) option is the model of the TNSA
-    mechanism presented in \cite{PhysRevLett.90.185002}.
-\end{itemize}
+A variety of options for the generation of the particle distribution
+at source are included in the package (see
+section \ref{SourceOptions}.
+The principal, and the default, option is the target-normal sheath
+acceleration (TNSA) model presented in~\cite{10.1038/nphys199}.
+This model is summarised in this section.
 
-Para 2:
-\begin{itemize}
-  \item The energy spectrum of the protons per unit energy and unit
-    solid angle is given by:
-    \begin{equation}
-      \frac{dN}{dE} = \frac{n_{i0}c_st}{(2EE_0)^{\frac{1}{2}}}
-                         \exp\left[
-                   -\left( \frac{2E}{E_0} \right)^{\frac{1}{2}} \right]\, ;
-      \label{Eq:Spct:0}
-    \end{equation}
-    where $n_{i0}$ is the ion number density at $t=0$, the instant the
-    laser pulse strikes the target; $c_s$ is given by:
-    \begin{equation}
-      c_s = \left[ \frac{Z k_{\rm B} T_e}{m_i} \right]^{\frac{1}{2}} \, ;
-    \end{equation}
-    where $Z$ is the ion charge number, $k_{\rm B}$ is the Boltzmann
-    constant; $T_e$ is the electron temperature; $m_i$ is the ion mass;
-    $t$ is the instant in time at which the spectrum is evaluated; and
-    \begin{equation}
-      E_0 = \left[ \frac{n_{e0} k_{\rm B} T_e}{\epsilon_0} \right]^{\frac{1}{2}}
-    \end{equation}
-\end{itemize}
+\subsection{Energy distribution}
 
-Para 3:
-\begin{itemize}
-  \item To generate the proton spectrum at the source, a practical
-    approach is taken.
-    The leading behaviour of equation \ref{Eq:Spct:0} is taken to be:
-    \begin{equation}
-      \frac{dN}{dE} = \Gamma
-        \frac{\exp\left[ -E^{\frac{1}{2}} \right]}{E^{\frac{1}{2}}}\, ;
-      \label{Eq:Spct:1}
-    \end{equation}
-  \item Normalisation of equation~\ref{Eq:Spct:1} between a minimum
-    energy ($E_{\rm min}$) and a maximum energy ($E_{\rm max}$) is
-    used to determine the constant $\Gamma$.
-    Both $E_{\rm min}$ and $E_{\rm max}$ are user defined and set at
-    the initialisation stage.
-\end{itemize}
+The typical kinetic energy spectrum produced in target-normal sheath
+acceleration falls rapidly with kinetic energy before dropping rapidly
+to zero above a maximum ``cut off'' energy $\varepsilon_{\rm max}$.
+The model kinetic-energy spectrum of the TNSA model presented
+in~\cite{10.1038/nphys199} is given by:
+\begin{equation}
+  \frac{dN}{d\varepsilon} = \frac{n_{e0} c_{s} t_{laser} S_{sheath}}
+                                 {\sqrt{2\varepsilon T_{e}}}
+                                 exp(- \sqrt{\frac{2\varepsilon}{T_{e}}})\,;
+  \label{Eq:Spct:0}
+\end{equation}
+where $N$ is the number of protons or ions produced per unit solid
+angle, $\varepsilon$ is the ion kinetic energy in Joules, $n_{e0}$ and
+$T_e$ are the hot electron density and temperature respectively, $c_s$
+is the ion-acoustic velocity, $t_{\rm laser}$ is the duration of the
+laser pulse, and $S_{\rm sheath}$ is the effective area over which the
+TNSA mechanism takes place.
+The variables and the units in which they are expressed are presented
+in table~\ref{table:EnergySpectrumParameters}.
+\begin{table} 
+  \caption{
+    Parameters present in the TNSA analytical
+    equation \ref{Eq:Spct:0}.
+  }
+  \label{table:EnergySpectrumParameters}
+  \begin{center}
+    \begin{tabular}{c c c c}
+      \hline
+      \textbf{Parameter} & \textbf{Definition} & \textbf{Value} & \textbf{Unit} \\ [1ex] 
+      \hline \hline
+      $N$ & Ion number & - & - \\ 
+      $\varepsilon$ & Ion kinetic energy & - & J \\  
+      $n_{e0}$ & Hot electron density & $\frac{N_{E}}{c t_{laser} S_{sheath}}$ & $pp/m^3$ \\ 
+      $N_{e}$ & Accelerated electron number & $\frac{f E_{laser}}{T_e}$ & - \\ 
+      $E_{laser}$ & Laser energy & $70$ & J \\  
+      $f$ & Energy conversion efficiency & $1.2 \times 10^{-15} I^{0.75}$, max=0.5  & - \\   % valid only for I < 3.1x10^19 W/cm2
+      $I$ & Laser intensity & $4 \times 10^{20}$ & $W/cm^{2}$ \\ 
+      $T_{e}$ & Hot electron temperature & $m_{e} c^{2} [\sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}} -1} ]$ & J \\ 
+      $m_{e}$ & Electron mass & $9.11 \times 10^{-31}$ & Kg \\ 
+      $c$ & Speed of light & $3 \times 10^{8}$ & m/s \\ 
+      $\lambda$ & Laser wavelength & 0.8 & $\mu$m \\  
+      $t_{laser}$ & Laser pulse duration & $28 \times 10^{-15}$  & s \\  
+      $B$ & Radius of electron bunch & $B=r_{0} + d tan(\theta)$ & $m$ \\ 
+      $S_{sheath}$ & Electron acceleration area & $\pi B^{2}$ & $m^{2}$ \\ 
+      $r_{0}$ & Laser spot radius & $\sqrt{\frac{P_{laser}}{I \pi}}$, I in $W/m^{2}$ & m \\  
+      $d$ & Target thickness & $400-600 \times 10^{-9}$ & m \\  
+      $\theta$ & Electron half angle divergence & 0.436 & rad \\  
+      $P_{laser}$ & Laser power & $2.5 \times 10^{15}$, $P_{laser}=\frac{E_{laser}}{t_{laser}}$ & W \\  
+      $c_{s}$ & Ion-acoustic velocity & $(\frac{Z k_{B} T_{e}}{m_{i}})^{\frac{1}{2}}$ & m/s \\  
+      $Z$ & Ion charge number & 1 & - \\  
+      $k_{B}$ & Boltzmann constant & $1.380649 \times 10^{-23}$ & $m^{2} kg s^{-2} K^{-1}$ \\  
+      $m_{i}$ & Proton mass & $1.67 \times 10^{-27}$ & Kg \\ 
+      $P_{R}$ & Relativistic power unit & $\frac{m_{e} c^{2}}{r_{e}} = 8.71 \times 10^{9}$ & W \\  
+      $r_{e}$ & Electron radius & $2.82 \times 10^{-15}$ & m \\  
+      $\varepsilon_{i,\infty}$ & Maximum ion kinetic energy & $2 Z m_{e} c^{2} \sqrt{\frac{f P_{laser}}{P_{R}}}$ & MeV \\  
+      $t_{0}$ & Ballistic time & $\frac{B}{v(\infty)}$ & s \\  
+      $v(\infty)$ & Ballistic velocity & $\sqrt{\frac{2 \varepsilon_{i,\infty}}{m_{i}}}$ & m/s \\  
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+Equation~\ref{Eq:Spct:0} is based on time-limited fluid models which
+are unable to predict the cut-off kinetic energy, $\varepsilon_{\rm max}$,
+accurately.
+The cut-off kinetic energy is taken to be that given by the model
+described in~\cite{10.1103/PhysRevLett.97.045005} where the time over
+which the laser pulse creates the conditions necessary for
+acceleration. 
+The kinetic energy cut-off is given by:
+\begin{equation}
+  \varepsilon_{max} = X^{2} \varepsilon_{i,\infty} \, ;
+  \label{eq:Eq:Spct:2}
+\end{equation}
+where $X$ is obtained by solving:
+\begin{equation}
+  \frac{t_{laser}}{t_{0}} = X \left( 1 + \frac{1}{2}
+                           \frac{1}{1 - X^{2}} \right) +
+                           \frac{1}{4} \ln \left( \frac{1+X}{1-X} \right) \, ;
+  \label{eq:Eq:Spct:1}
+\end{equation}
+where $t_0$ is the time over which the ion acceleration may be treated
+as ballistic and $\varepsilon_{i,\infty}$ is given in
+table~\ref{table:EnergySpectrumParameters}.
+
+To generate the kinetic energy spectrum, a practical approach is
+taken.
+First, the cumulative probability $\Gamma(\varepsilon)$ is obtained by
+integrating equation~\ref{Eq:Spct:0} over $\varepsilon$ and normalising
+the resulting cumulative probability such that
+$\Gamma(\varepsilon_{max}) = 1$.
+A value for the kinetic energy, $\varepsilon$, is chosen using a 
+probability distribution uniform over the range
+$0 < \varepsilon < \varepsilon_{max}$.
+A second random number, $\eta$, uniformly distributed on the range
+$0 < \eta < 1$ is then chosen.
+If $\eta$ is greater than $\Gamma(\varepsilon)$ then a new value for
+$\varepsilon$ is chosen and the process repeats.
+Alternatively, if $\eta$ is less than $\Gamma(\varepsilon)$ then the
+value of $\varepsilon$ is accepted.
+
+\subsection{Angular Distribution}
+
+The angular distribution of the flux of protons and ions produced by
+the TNSA mechanism may be described as a cone centred on the normal to
+the foil surface.
+The opening angle of the cone decreases as the ion energy considered
+increases.
+
+The angular distribution of the particles at the laser-driven source
+has been approximated using a Gaussian
+distribution~\cite{10.1038/s41598-019-41705-0}.  
+At low kinetic energy ($\varepsilon = 0$), the sigma
+($\sigma(\varepsilon)$) of the gaussian distribution is taken to be
+$20^\circ$.
+$\sigma(\varepsilon)$ is assumed to decrease linearly with energy such
+that
+\begin{equation}
+  \sigma(\varepsilon) = 20^\circ - (\varepsilon_{max}
+                           - \varepsilon)\times15 \, ;
+  \label{Eq:sigVeps}
+\end{equation}
+i.e. $\sigma(\varepsilon)$ decreases from $20^\circ$ at
+$\varepsilon=0$ to $5^\circ$ at $\varepsilon_{max}$.
+The polar angle, $\theta$, is then chosen from the gaussian
+distribution with sigma given by equation~\ref{Eq:sigVeps}.
+
+Finally, the azimuthal angle, $\phi$, is chose from a distribution
+uniform over the range $0 < \phi < 2\pi$.
+
+{\color{red} Maria, not sure what this means: A beam diameter of 10
+microns has been used.}

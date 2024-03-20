@@ -168,7 +168,7 @@ class BeamIO:
                 if self.getDebug():
                     print("           Handle version 1!")
                 self.getdataFILE().seek(0)
-                EoF = Prtcl.Particle.readParticle(self.getdataFILE())
+                #EoF = Prtcl.Particle.readParticle(self.getdataFILE())
                 
             if self.getDebug():
                 print("     <---- Data file format version:", \

@@ -125,7 +125,9 @@ class Simulation(object):
             cls._Facility = BL.BeamLine(filename)
 
             # Open file for write:
-            cls._iBmIOw   = BmIO.BeamIO(_dataFileDir, _dataFileName, True)
+            cls._iBmIOw = None
+            if _dataFileDir != None or _dataFileName != None:
+                cls._iBmIOw = BmIO.BeamIO(_dataFileDir, _dataFileName, True)
             
             # Summarise initialisation
             if cls.getDebug():
@@ -206,15 +208,19 @@ class Simulation(object):
         """
 
         #.. Write facility:
-        BL.BeamLine.getinstance().writeBeamLine( \
+        if self.getiBmIOw() != None:
+            BL.BeamLine.getinstance().writeBeamLine( \
                                         self.getiBmIOw().getdataFILE())
 
         #.. Transport particles through facility:
-        
-        nEvt = self.getFacility().trackBeam(self.getNEvt(), \
-                                            self.getiBmIOw().getdataFILE())
+
+        dataFILE = None
+        if self.getiBmIOw() != None:
+            dataFILE = self.getiBmIOw().getdataFILE()
+        nEvt = self.getFacility().trackBeam(self.getNEvt(), dataFILE)
 
         #.. Flush and close particle file:
-        self.getiBmIOw().flushNclosedataFile( \
+        if self.getiBmIOw() != None:
+            self.getiBmIOw().flushNclosedataFile( \
                                     self.getiBmIOw().getdataFILE())
         
