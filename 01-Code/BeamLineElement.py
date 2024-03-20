@@ -43,6 +43,8 @@ constants_instance: Instance of PhysicalConstants class
    _vStrt : numpy array; theta, phi of principal axis of element.
   _drStrt : "error", displacement of start from nominal position (rad).
   _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
+  _Rot2Lb : Optional; rotation matrix that takes RPLC axes to Lab axes.
+            3x3 np.ndarray
 
   Instance attributes assigned in BeamLineElement parent class:
   _TrnsMtrx: Transfer matrix (6x6).  Set to Null in __init__, initialised
