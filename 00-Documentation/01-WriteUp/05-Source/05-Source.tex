@@ -5,16 +5,16 @@
 A variety of options for the generation of the particle distribution
 at source are included in the package (see
 section \ref{SourceOptions}.
-The principal, and the default, option ios the target-normal sheath
+The principal, and the default, option is the target-normal sheath
 acceleration (TNSA) model presented in~\cite{10.1038/nphys199}.
 This model is summarised in this section.
 
 \subsection{Energy distribution}
 
-The typical energy spectrum produced in target-normal sheath
-acceleration falls rapidly with energy before dropping rapidly to zero
-above a maximumm ``cut off'' energe $\varepsilon_{\rm max}$.
-The model energy spectrum of the TNSA model presented
+The typical kinetic energy spectrum produced in target-normal sheath
+acceleration falls rapidly with kinetic energy before dropping rapidly
+to zero above a maximum ``cut off'' energy $\varepsilon_{\rm max}$.
+The model kinetic-energy spectrum of the TNSA model presented
 in~\cite{10.1038/nphys199} is given by:
 \begin{equation}
   \frac{dN}{d\varepsilon} = \frac{n_{e0} c_{s} t_{laser} S_{sheath}}
@@ -23,9 +23,9 @@ in~\cite{10.1038/nphys199} is given by:
   \label{Eq:Spct:0}
 \end{equation}
 where $N$ is the number of protons or ions produced per unit solid
-angle, $\varepsilon$ is the ion energy in Joules, $n_{e0}$ and $T_e$
-are the hot electron density and temperature respectively, $c_s$ is
-the ion-acoustic velocity, $t_{\rm laser}$ is the duration of the
+angle, $\varepsilon$ is the ion kinetic energy in Joules, $n_{e0}$ and
+$T_e$ are the hot electron density and temperature respectively, $c_s$
+is the ion-acoustic velocity, $t_{\rm laser}$ is the duration of the
 laser pulse, and $S_{\rm sheath}$ is the effective area over which the
 TNSA mechanism takes place.
 The variables and the units in which they are expressed are presented
@@ -42,7 +42,7 @@ in table~\ref{table:EnergySpectrumParameters}.
       \textbf{Parameter} & \textbf{Definition} & \textbf{Value} & \textbf{Unit} \\ [1ex] 
       \hline \hline
       $N$ & Ion number & - & - \\ 
-      $\varepsilon$ & Ion energy & - & J \\  
+      $\varepsilon$ & Ion kinetic energy & - & J \\  
       $n_{e0}$ & Hot electron density & $\frac{N_{E}}{c t_{laser} S_{sheath}}$ & $pp/m^3$ \\ 
       $N_{e}$ & Accelerated electron number & $\frac{f E_{laser}}{T_e}$ & - \\ 
       $E_{laser}$ & Laser energy & $70$ & J \\  
@@ -65,7 +65,7 @@ in table~\ref{table:EnergySpectrumParameters}.
       $m_{i}$ & Proton mass & $1.67 \times 10^{-27}$ & Kg \\ 
       $P_{R}$ & Relativistic power unit & $\frac{m_{e} c^{2}}{r_{e}} = 8.71 \times 10^{9}$ & W \\  
       $r_{e}$ & Electron radius & $2.82 \times 10^{-15}$ & m \\  
-      $\varepsilon_{i,\infty}$ & Maximum ion energy & $2 Z m_{e} c^{2} \sqrt{\frac{f P_{laser}}{P_{R}}}$ & MeV \\  
+      $\varepsilon_{i,\infty}$ & Maximum ion kinetic energy & $2 Z m_{e} c^{2} \sqrt{\frac{f P_{laser}}{P_{R}}}$ & MeV \\  
       $t_{0}$ & Ballistic time & $\frac{B}{v(\infty)}$ & s \\  
       $v(\infty)$ & Ballistic velocity & $\sqrt{\frac{2 \varepsilon_{i,\infty}}{m_{i}}}$ & m/s \\  
       \hline
@@ -74,12 +74,13 @@ in table~\ref{table:EnergySpectrumParameters}.
 \end{table}
 
 Equation~\ref{Eq:Spct:0} is based on time-limited fluid models which
-are unable to predict the cut-off energy, $\varepsilon_{\rm max}$,
+are unable to predict the cut-off kinetic energy, $\varepsilon_{\rm max}$,
 accurately.
-The cut-off energy is taken to be that given by the model described
-in~\cite{10.1103/PhysRevLett.97.045005} where the time over which the
-laser pulse creates the conditions necessary for acceleration.
-The energy cut-off is given by:
+The cut-off kinetic energy is taken to be that given by the model
+described in~\cite{10.1103/PhysRevLett.97.045005} where the time over
+which the laser pulse creates the conditions necessary for
+acceleration. 
+The kinetic energy cut-off is given by:
 \begin{equation}
   \varepsilon_{max} = X^{2} \varepsilon_{i,\infty} \, ;
   \label{eq:Eq:Spct:2}
@@ -95,27 +96,50 @@ where $t_0$ is the time over which the ion acceleration may be treated
 as ballistic and $\varepsilon_{i,\infty}$ is given in
 table~\ref{table:EnergySpectrumParameters}.
 
-
-  To generate the energy spectrum, a practical approach is taken:
-  \begin{itemize}
-    \item Equation~\ref{Eq:Spct:0} is normalized.
-    \item A random number is generated between 0 and 1 for the y-axis.
-    \item If the number falls below the equation it gets accepted, otherwise the loop is repeated.
-    \item If accepted, the corresponding x-value (energy) is calculated and returned.
-  \end{itemize}
-
-
+To generate the kinetic energy spectrum, a practical approach is
+taken.
+First, the cumulative probability $\Gamma(\varepsilon)$ is obtained by
+integrating equation~\ref{Eq:Spct:0} over $\varepsilon$ and normalising
+the resulting cumulative probability such that
+$\Gamma(\varepsilon_{max}) = 1$.
+A value for the kinetic energy, $\varepsilon$, is chosen using a 
+probability distribution uniform over the range
+$0 < \varepsilon < \varepsilon_{max}$.
+A second random number, $\eta$, uniformly distributed on the range
+$0 < \eta < 1$ is then chosen.
+If $\eta$ is greater than $\Gamma(\varepsilon)$ then a new value for
+$\varepsilon$ is chosen and the process repeats.
+Alternatively, if $\eta$ is less than $\Gamma(\varepsilon)$ then the
+value of $\varepsilon$ is accepted.
 
 \subsection{Angular Distribution}
 
-The angular distribution of the particles at the source has been approximated with a Gaussian distribution \cite{10.1038/s41598-019-41705-0}. 
-The following approach has been used to generate it:
+The angular distribution of the flux of protons and ions produced by
+the TNSA mechanism may be described as a cone centred on the normal to
+the foil surface.
+The opening angle of the cone decreases as the ion energy considered
+increases.
 
-\begin{itemize}
-  \item The maximum divergence angle of the protons has been calculated based on the particle's energy.
-  \item A linear equation has been used that generates a maximum divergence angle of 20 degrees for the low energies, down to 5 degrees for the cut-off.
-  \item A gaussian distribution with a FWHM equal to the divergence angle has been used for each particle. 
-  \item A divergence angle is returned that falls within that distribution.
-\end{itemize}
+The angular distribution of the particles at the laser-driven source
+has been approximated using a Gaussian
+distribution~\cite{10.1038/s41598-019-41705-0}.  
+At low kinetic energy ($\varepsilon = 0$), the sigma
+($\sigma(\varepsilon)$) of the gaussian distribution is taken to be
+$20^\circ$.
+$\sigma(\varepsilon)$ is assumed to decrease linearly with energy such
+that
+\begin{equation}
+  \sigma(\varepsilon) = 20^\circ - (\varepsilon_{max}
+                           - \varepsilon)\times15 \, ;
+  \label{Eq:sigVeps}
+\end{equation}
+i.e. $\sigma(\varepsilon)$ decreases from $20^\circ$ at
+$\varepsilon=0$ to $5^\circ$ at $\varepsilon_{max}$.
+The polar angle, $\theta$, is then chosen from the gaussian
+distribution with sigma given by equation~\ref{Eq:sigVeps}.
 
-A beam diameter of 10 microns has been used.
+Finally, the azimuthal angle, $\phi$, is chose from a distribution
+uniform over the range $0 < \phi < 2\pi$.
+
+{\color{red} Maria, not sure what this means: A beam diameter of 10
+microns has been used.}
