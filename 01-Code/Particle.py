@@ -150,6 +150,7 @@ import numpy             as np
 import math              as mth
 import os
 import io
+import sys
 
 import BeamLine          as BL
 import BeamLineElement   as BLE
@@ -1186,41 +1187,6 @@ class ReferenceParticle(Particle):
 
         
 #--------  Processing methods:
-    def setReferenceParticle(self):
-        Success = False
-        if self.getRPDebug():
-            print(" ReferenceParticle(Particle).setReferenceParticle", \
-                  "starts.")
-
-        #.. Loop over beam-line elements:
-        for iBLE in BLE.BeamLineElement.getinstances():
-            if isinstance(iBLE, BLE.Facility):
-                continue
-            if isinstance(iBLE, BLE.Source):
-                Success = self.setReferenceParticleAtSource()
-                if not Success:
-                    raise fail2setReferenceParticle( \
-                                   "setReferenceParticleAtSource")
-            elif isinstance(iBLE, BLE.Drift)             or \
-                 isinstance(iBLE, BLE.Aperture)          or \
-                 isinstance(iBLE, BLE.FocusQuadrupole)   or \
-                 isinstance(iBLE, BLE.DefocusQuadrupole)    :
-                Success = self.setReferenceParticleAtDrift(iBLE)
-                if not Success:
-                    raise fail2setReferenceParticle( \
-                                   "setReferenceParticleAtDrift")
-                
-
-            Success = self.setLocation(iBLE.getName())
-            if not Success:
-                raise fail2setReferenceParticle("setLocation")
-
-        if self.getRPDebug():
-            print("     ----> Dump refence particle:")
-            print(self)
-
-        return Success
-
     def setReferenceParticleAtSource(self):
         nRcrds  = len(self.getsIn())
         
@@ -1290,12 +1256,23 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtDrift(self, iBLE=None):
+        self.setDebug(True)
         nRcrds  = len(self.getsIn())
+        if self.getDebug():
+            print(" --------  --------  --------  //", \
+                  "  --------  --------  --------")
+            print( \
+            " ReferenceParticle(Particle).setReferenceParticleAtDrift ", \
+                   "starts; \n", \
+                   "    ----> Number of previous records:", nRcrds)
         
         Success = self.setLocation(BLE.BeamLineElement.getinstances()\
                                    [nRcrds+1].getName())
         if not Success:
             raise fail2setReferenceParticle("Name")
+        if self.getDebug():
+            print( \
+                   "     ----> Processing location:", self.getLocation()[-1])
 
         Success = self.setsIn(self.getsOut()[nRcrds-1])
         if not Success:
@@ -1303,7 +1280,10 @@ class ReferenceParticle(Particle):
         Success = self.setsOut(self.getsOut()[nRcrds-1] + iBLE.getLength())
         if not Success:
             raise fail2setReferenceParticle("sOut")
-        
+        if self.getDebug():
+            print( \
+                   "         ---->   sIn:", self.getsIn()[-1])
+                
         RrIn  = self.getRrOut()[nRcrds-1]
         Mmtm  = mth.sqrt(                             \
                     self.getPrOut()[nRcrds-1][0]**2 + \
@@ -1325,7 +1305,12 @@ class ReferenceParticle(Particle):
         Success = self.setRrOut(RrOut)
         if not Success:
             raise fail2setReferenceParticle("RrOut")
-
+        if self.getDebug():
+            print( \
+                   "         ---->  RrIn:", self.getRrIn()[-1])
+            print( \
+                   "         ----> RrOut:", self.getRrOut()[-1])
+        
         PrIn  = self.getPrOut()[nRcrds-1]
         PrOut = PrIn
         Success = self.setPrIn(PrIn)
@@ -1334,7 +1319,12 @@ class ReferenceParticle(Particle):
         Success = self.setPrOut(PrOut)
         if not Success:
             raise fail2setReferenceParticle("PrOut")
-
+        if self.getDebug():
+            print( \
+                   "         ---->  PrIn:", self.getPrIn()[-1])
+            print( \
+                   "         ----> PrOut:", self.getPrOut()[-1])
+        
         Rot2LabIn  = self.getRot2LabOut()[nRcrds-1]
         Rot2LabOut = Rot2LabIn
         Success = self.setRot2LabIn(Rot2LabIn)
@@ -1343,6 +1333,11 @@ class ReferenceParticle(Particle):
         Success = self.setRot2LabOut(Rot2LabOut)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabOut")
+        if self.getDebug():
+            print( \
+                   "         ---->  Rot2LabIn: \n", self.getRot2LabIn()[-1])
+            print( \
+                   "         ----> Rot2LabOut: \n", self.getRot2LabOut()[-1])
         
         #.. Now particle position/trace space:
         Success = self.setz(self.getRrOut()[nRcrds][2])
@@ -1351,11 +1346,22 @@ class ReferenceParticle(Particle):
         Success = self.sets(self.getsOut()[nRcrds])
         if not Success:
             raise fail2setReferenceParticle("sets")
-        TrcSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        TrcSpc  = np.array([0., 0., 0., 0., 0., 0.])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:
             raise fail2setReferenceParticle("setTraceSpace")
         
+        if self.getDebug():
+            print( \
+                   "         ----> particle z:", self.getz()[-1])
+            print( \
+                   "         ----> particle s:", self.gets()[-1])
+            print( \
+                   "         ----> particle TrcSpc:", self.getTraceSpace()[-1])
+            print(" --------  --------  --------  //", \
+                  "  --------  --------  --------")
+        
+        self.setDebug(False)
         return Success
     
 #--------  Exceptions:

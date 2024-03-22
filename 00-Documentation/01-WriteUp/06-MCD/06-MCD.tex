@@ -1,0 +1,121 @@
+\graphicspath{ {06-MCD/Figures/} }
+
+\section{Module, class and data structures}
+
+
+The linear optics package has been written in object-oriented Python
+and is broken down in four principal modules:
+\begin{itemize}
+  \item \underline{\texttt{BeamLineElement}:} provides descriptions
+    of the various beam-line elements required to build a description
+    of the beam line.
+    Each individual element, such as a drift, quadrupole, etc., is
+    described in a class derived from the \texttt{BeamLineElement}
+    parent class.
+  \item \underline{\texttt{BeamLine}:} provides code to assemble the
+    elements into a coherent beam line.
+    \texttt{BeamLine} is a singleton class to ensure that two beam
+    lines can not be simulated in a single run of the package.
+  \item \underline{\texttt{Beam}:} provides code to calculate
+    ensemble properties of the beam such as emittance, etc.
+    The ensemble properties are stored as instance attributes of
+    the \texttt{Beam} class.
+  \item \underline{\texttt{Particle}:} provides code to record beam
+    particles at positions along the beam line.
+    The module provides the singleton \texttt{ReferenceParticle}
+    class derived from the \texttt{Particle} class.
+\end{itemize}
+Other modules: \texttt{BeamIO}, \texttt{LaTeX},
+\texttt{PhysicalConstants}, \texttt{Report}, \texttt{Simulation}
+and \texttt{Utilities} support the principal modules or provide
+services.
+The data structure is implemented as attributes of the instances of the 
+various classes.
+This section describes the implementation of the various modules, the
+classes of which they are composed, and how access to the data is
+provided.
+
+Each class has methods by which to access a list of the class
+instances and a boolean flag by which to generate debug print out (see
+table~\ref{Tab:ClassAttributeAccess}).
+\begin{table}
+  \caption{Methods by which to set and access class attributes.}
+  \label{Tab:ClassAttributeAccess}
+  \begin{center}
+    \begin{tabular}{|l|c|l|l|}
+      \hline
+      \textbf{Method}          & \textbf{Argument} & \textbf{Return}            & \textbf{Comment}                      \\
+      \hline
+      \texttt{getinstances()}  &                   & List of instances of class &                                       \\
+      \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
+      \texttt{getDebug()}      &                   & Boolean debug flag         & If true, generate debug print-out     \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{\texttt{BeamLineElement}}
+
+\subsection{Parent class}
+
+\subsubsection{Instance attributes and access methods}
+Properties common to all beam-line elements are stored as instance
+attributes of the parent \texttt{BeamLineElement} class.
+The instance attributes are defined in table~\ref{Tab:BLE:Attributes}.
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:BLE:Methods}.
+\begin{table}
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{BeamLineElement} class. 
+  }
+  \label{Tab:BLE:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                               \\
+      \hline
+      \texttt{Name}     & String        &     & Name of beam-line element.                                                                \\
+      \texttt{rStrt}    & numpy.ndarray & m   & $[x, y, z]$ position of entrance to element in laboratory coordinate system.              \\
+      \texttt{vStrt}    & numpy.ndarray & rad & $[\theta, \phi]$ (polar and azimutal angles) of principal axis of element in RPLC system. \\
+      \texttt{drStrt}   & numpy.ndarray & m   & ``Error'', displacement of start from nominal position (not yet implemented.              \\
+      \texttt{dvStrt}   & numpy.ndarray & rad & ``Error'', deviation in $\theta$ and $phi$ from nominal axis.                             \\
+      \texttt{Rot2Lb}   & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes.                       \\
+      \texttt{TnrsMtrx} & numpy.ndarray &     & $3\times3$ transfer matrix set in derived class.                                          \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}
+  \caption{
+    Definition of access methods for the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                         \\
+      \hline
+      \texttt{setName(Name)}     & \texttt{getName()}   & Set/get name of beam-line element.                                \\
+      \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}  & Set/get laboratory $[x, y, z]$ position of entrance.              \\
+      \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}  & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
+      \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()} & Set/get ``error'' displacement.                                   \\
+      \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()} & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
+      \texttt{setRot2Lb(Rot2Lb)} & \texttt{getRot2Lb()} & Set/get rotation matrix from RPLC axes to laboratory.             \\
+                         & \texttt{getTransferMatrix()} & Get transfer matrix set in derived class.                         \\
+      \texttt{setAll2None()}     &                      & Set all instance attributes to \texttt{None} at start of instanciation. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods}
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and } \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.

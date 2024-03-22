@@ -39,8 +39,10 @@ constants_instance: Instance of PhysicalConstants class
   --------------------
   Calling arguments:
    _Name : string; name of element, should be identifiable, e.g., Drift1
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
+   _rStrt : numpy array; x, y, z position (in m) of start of element; in
+            laboratory coordinate system.
+   _vStrt : numpy array; theta, phi of principal axis of element; in lab
+            coordinate system.
   _drStrt : "error", displacement of start from nominal position (rad).
   _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
   _Rot2Lb : Optional; rotation matrix that takes RPLC axes to Lab axes.
@@ -215,18 +217,6 @@ class BeamLineElement:
             print(' BeamLineElement.cleanInstance: instances removed.')
 
     @classmethod
-    def removeInstance(cls, inst):
-        if inst in cls.getinstances():
-            if cls.getDebug():
-                print(" BeamLineElement.removeInstance: remove", \
-                      inst.getName(), "from beamline instances list")
-            cls.getinstances().remove(inst)
-        else:
-            if cls.getDebug():
-                print(" BeamLineElement.removeInstance: instance", \
-                      inst.Name, "not in BeamLineElement.Instances!")
-
-    @classmethod
     def setDebug(self, Debug=False):
         if self.__Debug:
             print(" BeamLineElement.setdebug: ", Debug)
@@ -301,13 +291,6 @@ class BeamLineElement:
 
     def getTransferMatrix(self):
         return self._TrnsMtrx
-    
-    def OutsideBeamPipe(self, _R):
-        Outside = False
-        Rad = np.sqrt(_R[0]**2 + _R[2]**2)
-        if Rad >= Facility.getInstance().getVCMVr():
-            Outside = True
-        return Outside
 
 
 #--------  I/o methods:
@@ -385,7 +368,14 @@ class BeamLineElement:
         return EoF, Location, r, v
 
     
-#--------  Utilities:
+ #--------  Utilities:
+     def OutsideBeamPipe(self, _R):
+        Outside = False
+        Rad = np.sqrt(_R[0]**2 + _R[2]**2)
+        if Rad >= Facility.getInstance().getVCMVr():
+            Outside = True
+        return Outside
+
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
@@ -445,6 +435,18 @@ class BeamLineElement:
         _Rprime[2] += self._drStrt[1]
         
         return _Rprime
+
+    @classmethod
+    def removeInstance(cls, inst):
+        if inst in cls.getinstances():
+            if cls.getDebug():
+                print(" BeamLineElement.removeInstance: remove", \
+                      inst.getName(), "from beamline instances list")
+            cls.getinstances().remove(inst)
+        else:
+            if cls.getDebug():
+                print(" BeamLineElement.removeInstance: instance", \
+                      inst.Name, "not in BeamLineElement.Instances!")
 
 
 #--------  Derived classes  --------  --------  --------  --------  --------

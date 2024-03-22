@@ -711,8 +711,9 @@ class BeamLine(object):
                                        " invalid.")
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls.addBeamLineElement(BLE.Solenoid(Name, \
-                                rStrt, vStrt, drStrt, dvStrt, SlndL, B0) )
+                iBLE = BLE.Solenoid(Name, \
+                                rStrt, vStrt, drStrt, dvStrt, SlndL, B0)
+                cls.addBeamLineElement(iBLE)
                 s += SlndL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
@@ -750,9 +751,10 @@ class BeamLine(object):
                                        " invalid.")
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                cls.addBeamLineElement(BLE.GaborLens(Name, \
+                iBLE = BLE.GaborLens(Name, \
                                 rStrt, vStrt, drStrt, dvStrt, \
-                                None, None, None, None, GbrLnsL, B0) )
+                                None, None, None, None, GbrLnsL, B0)
+                cls.addBeamLineElement(iBLE)
                 s += GbrLnsL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
@@ -817,9 +819,10 @@ class BeamLine(object):
                 dvStrt  = np.array([0.,0.])
                 nCvty   += 1
                 Name    += str(nCvty)
-                cls.addBeamLineElement(BLE.CylindricalRFCavity(Name, \
+                iBLE    = BLE.CylindricalRFCavity(Name, \
                                     rStrt, vStrt, drStrt, dvStrt, \
-                                    CylCvtyGrdnt, CylCvtyFrqncy, CylCvtyPhs))
+                                    CylCvtyGrdnt, CylCvtyFrqncy, CylCvtyPhs)
+                cls.addBeamLineElement(iBLE)
                 s += cls._Element[len(cls._Element)-1].getLength()
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
