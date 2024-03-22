@@ -46,6 +46,7 @@ Class PhysicalConstants
 Created on Mon 12Jun23: Version history:
 ----------------------------------------
  1.0: 12Jun23: First implementation
+ 1.1: 21Mar24: Add mass of the pion and mass of the muon
 
 @author: kennethlong
 """
@@ -118,6 +119,12 @@ class PhysicalConstants(object):
 
     def mp(self):
         return 938.27208816
+
+    def mPion(self):
+        return 139.57061
+
+    def mMuon(self):
+        return 105.6583745
 
     def mu0(self):
         return sp.constants.mu_0

@@ -138,6 +138,7 @@ recordParticle: i/p: Location, s, z, TraceSpace:
 Created on Mon 03Jul23: Version history:
 ----------------------------------------
  1.0: 12Jun23: First implementation
+ 1.1: 21Mar24: Add particle species, can be proton, muon or pion. proton is default 
 
 @author: kennethlong
 """
@@ -159,18 +160,29 @@ from PhysicalConstants import PhysicalConstants
 constants_instance = PhysicalConstants()
 speed_of_light     = constants_instance.SoL()
 protonMASS         = constants_instance.mp()
+pionMASS           = constants_instance.mPion()
+muonMASS           = constants_instance.mMuon()
 
 
 class Particle:
     instances  = []
     __Debug    = False
 
-
 #--------  "Built-in methods":
-    def __init__(self):
+    def __init__(self, species="proton"):
+        self.species = species
         if self.__Debug:
             print(' Particle.__init__: ', \
-                  'creating the Particle object')
+                  'creating the Particle object: type ', species)
+
+        if (self.species == "proton"):
+            self.particleMASS = protonMASS
+        elif (self.species == "pion"):
+            self.particleMASS = pionMASS
+        elif (self.species == "muon"):
+            self.particleMASS = muonMASS
+        else:
+            raise unKnownReferenceParticle("Requested Reference particle: ", self.species, "unknown")
 
         #.. Must have reference particle as first in the instance list,
         #   ... so ...
@@ -197,7 +209,7 @@ class Particle:
         return " Partcle __str__ done."
 
     def print(self):
-        print("\n Particle:")
+        print("\n Particle: ", self.species, "  mass: ", self.particleMASS)
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Number of phase-space records:", \
@@ -414,8 +426,8 @@ class Particle:
                 E0  = iRefPrtcl.getPrOut()[iLoc][3]
                 b0  = p0/E0
                 E   = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
-                p   = mth.sqrt(E**2 - protonMASS**2)
-                E  -= protonMASS
+                p   = mth.sqrt(E**2 - particleMASS**2)
+                E  -= particleMASS
                 D   = mth.sqrt(1. + \
                                2.*iPrtcl.getTraceSpace()[iLoc][5]/b0 +
                                iPrtcl.getTraceSpace()[iLoc][5]**2)
@@ -536,9 +548,9 @@ class Particle:
                 E0  = iRefPrtcl.getPrOut()[iLoc][3]
                 b0  = p0/E0
                 E   = E0 + iPrtcl.getTraceSpace()[iLoc][5] * p0
-                p   = mth.sqrt(E**2 - protonMASS**2)
+                p   = mth.sqrt(E**2 - particleMASS**2)
                 b   = p/E
-                E  -= protonMASS
+                E  -= particleMASS
 
                 t = iPrtcl.getTraceSpace()[iLoc][4]*b0 / (b*speed_of_light)
                 
@@ -676,10 +688,10 @@ class Particle:
         rRPLC  = np.array([TrcSpc[0], TrcSpc[2], 0.])
 
         p0     = BL.BeamLine.getElement()[0].getp0()
-        E      = np.sprt(protonMASS**2 + p0**2)
-        Enrgy  = protonMASS + TrcSpc[5]*p0
+        E      = np.sprt(particleMASS**2 + p0**2)
+        Enrgy  = particleMASS + TrcSpc[5]*p0
         
-        Mmtm   = mth.sqrt(Enrgy**2 - protonMASS**2)
+        Mmtm   = mth.sqrt(Enrgy**2 - particleMASS**2)
         zPrm   = mth.sqrt(1.-TrcSpc[1]**2-TrcSpc[3]**2)
         pRPLC  = np.array([TrcSpc[1]*Mmtm, \
                            TrcSpc[3]*Mmtm, \
@@ -1090,7 +1102,7 @@ class ReferenceParticle(Particle):
     def getg0b0(self, iLoc):
         p0   = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
                               self.getPrOut()[iLoc][:3]))
-        g0b0 = p0/protonMASS
+        g0b0 = p0/particleMASS
         return g0b0
         
 
@@ -1247,7 +1259,7 @@ class ReferenceParticle(Particle):
 
         p0       = BL.BeamLine.getElement()[0].getp0()
         Ref4mmtm = np.array([0., 0., p0,
-                             mth.sqrt(p0**2 + protonMASS**2)])
+                             mth.sqrt(p0**2 + self.particleMASS**2)])
         
         PrIn  = Ref4mmtm
         PrOut = Ref4mmtm
@@ -1360,6 +1372,9 @@ class ReferenceParticle(Particle):
     
 #--------  Exceptions:
 class noReferenceParticle(Exception):
+    pass
+
+class unKnownReferenceParticle(Exception):
     pass
 
 class badParticle(Exception):
