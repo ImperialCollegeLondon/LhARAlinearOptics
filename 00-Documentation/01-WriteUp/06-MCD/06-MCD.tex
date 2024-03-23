@@ -116,6 +116,43 @@ using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
 provided.
 The calls are:
 \begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and } \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
 \end{equation}
 where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\subsubsection{Utilities}
+
+Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
+\texttt{BeamLineElement} class.
+\begin{table}
+  \caption{
+    Utilities provided by the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
+                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
+                                                                                    falls outside beam pipe, returns True. \\
+    \texttt{removeInstance(inst)} & Instance of BLE       &                       & Remove instance \texttt{inst} and remove from list of
+                                                                                    instances of \texttt{BeamLineElement}.
+                                                                                    Final trace-space vector returned.       \\
+      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
+                                                                                    to laboratory coordinates.
+                                                                                    Phase-space vector in laboratory frame returned. \\
+      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
+                                                                                    laboratory coordinates to trace-space coordaintes in
+                                                                                    the RPLC frame.
+                                                                                    Trace-space vector in RLPC frame returned. \\
+      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, accross
+                                                                                    element.
+                                                                                    Final trace-space vector returned.       \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
