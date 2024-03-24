@@ -67,21 +67,28 @@ table~\ref{Tab:BLE:Methods}.
 \begin{table}
   \caption{
     Definition of attributes of instances of
-    the \texttt{BeamLineElement} class. 
+    the \texttt{BeamLineElement} class.
+    The attributes marked $^*$ above the dividing line are required in
+    the call to instanciate the element.
+    The attributes marked $^\dagger$ below the dividing line are
+    calculated.
   }
   \label{Tab:BLE:Attributes}
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
-      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                               \\
+      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
       \hline
-      \texttt{Name}     & String        &     & Name of beam-line element.                                                                \\
-      \texttt{rStrt}    & numpy.ndarray & m   & $[x, y, z]$ position of entrance to element in laboratory coordinate system.              \\
-      \texttt{vStrt}    & numpy.ndarray & rad & $[\theta, \phi]$ (polar and azimutal angles) of principal axis of element in RPLC system. \\
-      \texttt{drStrt}   & numpy.ndarray & m   & ``Error'', displacement of start from nominal position (not yet implemented.              \\
-      \texttt{dvStrt}   & numpy.ndarray & rad & ``Error'', deviation in $\theta$ and $phi$ from nominal axis.                             \\
-      \texttt{Rot2Lb}   & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes.                       \\
-      \texttt{TnrsMtrx} & numpy.ndarray &     & $3\times3$ transfer matrix set in derived class.                                          \\
+      \texttt{Name}$^*$     & String        &     & Name of beam-line element.                                                                \\
+      \texttt{rStrt}$^*$    & numpy.ndarray & m   & $[x, y, z]$ position of entrance to element in laboratory coordinate system.              \\
+      \texttt{vStrt}$^*$    & numpy.ndarray & rad & $[[i],[\theta, \phi]]$ (polar and azimutal angles) of RPLC $y$ and $z$ axes ($i=0,1$ respectively) at start. \\
+      \texttt{drStrt}$^*$   & numpy.ndarray & m   & ``Error'', $[x, y, z]$, displacement of start from nominal position (not yet implemented).\\
+      \texttt{dvStrt}$^*$   & numpy.ndarray & rad & ``Error'', $[[i],[\theta, \phi]]$, deviation in $\theta$ and $\phi$ from nominal axis (not yet implemented). \\
+      \hline
+      \texttt{Strt2End}$^\dagger$     & numpy.ndarray &     & $1\times3$ translation from start of element to end; in laboratory coordinates.  Set in derived class. \\
+      \texttt{Rot2LbStrt}$^\dagger$   & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes at start.     \\
+      \texttt{Rot2LbEnd}$^\dagger$    & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes at end.  Set in derived class.      \\
+      \texttt{TnrsMtrx}$^\dagger$     & numpy.ndarray &     & $3\times3$ transfer matrix.  Set in derived class.                               \\
       \hline
     \end{tabular}
   \end{center}
