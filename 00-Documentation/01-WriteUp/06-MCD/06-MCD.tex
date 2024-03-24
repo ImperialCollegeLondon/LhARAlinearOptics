@@ -42,13 +42,14 @@ table~\ref{Tab:ClassAttributeAccess}).
   \caption{Methods by which to set and access class attributes.}
   \label{Tab:ClassAttributeAccess}
   \begin{center}
-    \begin{tabular}{|l|c|l|l|}
+    \begin{tabular}{|l|c|l|p{7cm}|}
       \hline
       \textbf{Method}          & \textbf{Argument} & \textbf{Return}            & \textbf{Comment}                      \\
       \hline
       \texttt{getinstances()}  &                   & List of instances of class &                                       \\
       \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
       \texttt{getDebug()}      &                   & Boolean debug flag         & If true, generate debug print-out     \\
+      \texttt{setAll2None()}   &                   &                            & Set all instance attributes to \texttt{None} at start of instanciation. \\
       \hline
     \end{tabular}
   \end{center}
@@ -104,20 +105,56 @@ table~\ref{Tab:BLE:Methods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                         \\
       \hline
-      \texttt{setName(Name)}     & \texttt{getName()}   & Set/get name of beam-line element.                                \\
-      \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}  & Set/get laboratory $[x, y, z]$ position of entrance.              \\
-      \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}  & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
-      \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()} & Set/get ``error'' displacement.                                   \\
-      \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()} & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
-      \texttt{setRot2Lb(Rot2Lb)} & \texttt{getRot2Lb()} & Set/get rotation matrix from RPLC axes to laboratory.             \\
-                         & \texttt{getTransferMatrix()} & Get transfer matrix set in derived class.                         \\
-      \texttt{setAll2None()}     &                      & Set all instance attributes to \texttt{None} at start of instanciation. \\
+      \texttt{setName(Name)}     & \texttt{getName()}       & Set/get name of beam-line element.                                \\
+      \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}      & Set/get laboratory $[x, y, z]$ position of entrance.              \\
+      \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}      & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
+      \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()}     & Set/get ``error'' displacement.                                   \\
+      \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()}     & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
+      \texttt{setRot2LbStrt()}   & \texttt{getRot2LbStrt()} & Set/get rotation matrix from RPLC axes to laboratory.             \\
+                                 & \texttt{getStrt2End()}   & Get transfer matrix set in derived class.                         \\
+                                & \texttt{getRot2LabStrt()} & Get transfer matrix set in derived class.                         \\
+                                 & \texttt{getRot2LanEnd()} & Get transfer matrix set in derived class.                         \\
+                             & \texttt{getTransferMatrix()} & Get transfer matrix set in derived class.                         \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods}
+
+Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
+in the \texttt{BeamLineElement} class.
+\begin{table}
+  \caption{
+    Processing methodes provided by the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
+                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
+                                                                                    falls outside beam pipe, returns True. \\
+      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, accross
+                                                                                    element.
+                                                                                    Final trace-space vector returned.       \\
+      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
+                                                                                    to laboratory coordinates.
+                                                                                    Phase-space vector in laboratory frame returned. \\
+      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
+                                                                                    laboratory coordinates to trace-space coordaintes in
+                                                                                    the RPLC frame.
+                                                                                    Trace-space vector in RLPC frame returned. \\
       \hline
     \end{tabular}
   \end{center}
 \end{table}
 
 \subsubsection{I/o methods}
+
 Methods to read and write instance attributes to the files defined
 using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
 provided.
@@ -137,28 +174,16 @@ Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
     Utilities provided by the \texttt{BeamLineElement}
     class. 
   }
-  \label{Tab:BLE:Methods}
+  \label{Tab:BLE:Utilities}
   \begin{center}
     \begin{tabular}{|l|c|c|p{7cm}|}
       \hline
       \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
       \hline
-      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
-                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
-                                                                                    falls outside beam pipe, returns True. \\
-    \texttt{removeInstance(inst)} & Instance of BLE       &                       & Remove instance \texttt{inst} and remove from list of
-                                                                                    instances of \texttt{BeamLineElement}.
-                                                                                    Final trace-space vector returned.       \\
-      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
-                                                                                    to laboratory coordinates.
-                                                                                    Phase-space vector in laboratory frame returned. \\
-      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
-                                                                                    laboratory coordinates to trace-space coordaintes in
-                                                                                    the RPLC frame.
-                                                                                    Trace-space vector in RLPC frame returned. \\
-      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, accross
-                                                                                    element.
-                                                                                    Final trace-space vector returned.       \\
+      \texttt{cleanInstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLineElement} class.
+                                                           Reset \texttt{instances} list. \\
+      \texttt{removeInstance(inst)} & Instance of BLE &  & Remove instance \texttt{inst} and remove from list of instances of
+                                                           \texttt{BeamLineElement}. \\
       \hline
     \end{tabular}
   \end{center}
