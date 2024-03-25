@@ -120,7 +120,7 @@ OutsideBeamPipe : Returns true of  particle outside beam pipe defined in
 
 
   Utilities:
-    cleanInstances : Class method: cleans (using "del") instances and resets
+    cleaninstances : Class method: cleans (using "del") instances and resets
                      list.
 
     removeInstance : Class method: remove (using remoce) instance, inst, from
@@ -515,7 +515,7 @@ class BeamLineElement:
     
 #--------  Utilities:
     @classmethod
-    def cleanInstances(cls):
+    def cleaninstances(cls):
         for inst in cls.instances:
             if cls.getDebug():
                 print(" Kill:", inst.getName())
@@ -524,7 +524,7 @@ class BeamLineElement:
             del inst
         cls.instances = []
         if cls.getDebug():
-            print(' BeamLineElement.cleanInstance: instances removed.')
+            print(' BeamLineElement.cleaninstance: instances removed.')
 
     @classmethod
     def removeInstance(cls, inst):
@@ -3741,7 +3741,7 @@ Derived class Source:
         getModeText : Set mode text--string identifying source
 
   Utilities and processing methods:
-     cleanInstances : Deletes source instance(s) and empties list of sources.
+     cleaninstances : Deletes source instance(s) and empties list of sources.
 
     CheckSoureParam : Checks source parameters are self consistent.  Calls
                       CheckMode and CheckParam

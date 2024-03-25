@@ -111,9 +111,9 @@ table~\ref{Tab:BLE:Methods}.
       \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()}     & Set/get ``error'' displacement.                                   \\
       \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()}     & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
       \texttt{setRot2LbStrt()}   & \texttt{getRot2LbStrt()} & Set/get rotation matrix from RPLC axes to laboratory.             \\
-                                 & \texttt{getStrt2End()}   & Get transfer matrix set in derived class.                         \\
-                                & \texttt{getRot2LabStrt()} & Get transfer matrix set in derived class.                         \\
-                                 & \texttt{getRot2LanEnd()} & Get transfer matrix set in derived class.                         \\
+                                 & \texttt{getStrt2End()}   & Get displacement vector start to end in laboratory coordinates.   \\
+                                & \texttt{getRot2LabStrt()} & Get rotation matrix from RPLC to laboratory at start.             \\
+                                 & \texttt{getRot2LanEnd()} & Get rotation matrix from RPLC to laboratory at end.               \\
                              & \texttt{getTransferMatrix()} & Get transfer matrix set in derived class.                         \\
       \hline
     \end{tabular}
@@ -180,7 +180,7 @@ Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
       \hline
       \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
       \hline
-      \texttt{cleanInstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLineElement} class.
+      \texttt{cleaninstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLineElement} class.
                                                            Reset \texttt{instances} list. \\
       \texttt{removeInstance(inst)} & Instance of BLE &  & Remove instance \texttt{inst} and remove from list of instances of
                                                            \texttt{BeamLineElement}. \\
