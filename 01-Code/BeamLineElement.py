@@ -177,8 +177,7 @@ class BeamLineElement:
 
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
-                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
-                 _Trn2LbStrt=None):
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
         if self.__Debug:
             print(' BeamLineElement.__init__: ', \
                   'creating the BeamLineElement object')
@@ -187,7 +186,6 @@ class BeamLineElement:
             print("     ---->        Orientation:", _vStrt)
             print("     ---->    Position offset:", _drStrt)
             print("     ----> Orientation offset:", _dvStrt)
-            print("     ---->   Translate to lab:", _Trn2LbStrt)
 
         BeamLineElement.instances.append(self)
 
@@ -201,9 +199,6 @@ class BeamLineElement:
             raise badBeamLineElement( \
                   " BeamLineElement: no default beamline element!"
                                       )
-
-        if not isinstance(_Trn2LbStrt, np.ndarray):
-            _Trn2LbStrt = np.array([0., 0., 0.])
 
         self.setName(_Name)
         self.setrStrt(_rStrt)
@@ -452,16 +447,17 @@ class BeamLineElement:
         
         record = bLocation
         dataFILE.write(record)
-            
         if self.getDebug():
             print("     ----> Location:", bLocation.decode('utf-8'))
 
-        record = strct.pack(">5d", \
-                            self.getrStrt()[0], \
-                            self.getrStrt()[1], \
-                            self.getrStrt()[2], \
-                            self.getvStrt()[0], \
-                            self.getvStrt()[1]
+        record = strct.pack(">7d", \
+                            self.getrStrt()[0],    \
+                            self.getrStrt()[1],    \
+                            self.getrStrt()[2],    \
+                            self.getvStrt()[0][0], \
+                            self.getvStrt()[0][1], \
+                            self.getvStrt()[1][0], \
+                            self.getvStrt()[1][1]
                             )
         dataFILE.write(record)
         if self.getDebug():
@@ -502,10 +498,11 @@ class BeamLineElement:
         if brecord == b'':
             return True, None, None
         
-        record  = strct.unpack(">5d", brecord)
-        r      = np.array([float(record[0]), float(record[1]), \
+        record  = strct.unpack(">7d", brecord)
+        r      = np.array([float(record[0]), float(record[1]),   \
                            float(record[2])])
-        v      = np.array([float(record[3]), float(record[4])])
+        v      = np.array([[float(record[3]), float(record[4])], \
+                           [float(record[5]), float(record[6])]]  )
         
         if cls.getDebug():
             print("     ----> r, v:", r, v)

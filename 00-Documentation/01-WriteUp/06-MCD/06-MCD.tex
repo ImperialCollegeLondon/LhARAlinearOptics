@@ -38,7 +38,7 @@ provided.
 Each class has methods by which to access a list of the class
 instances and a boolean flag by which to generate debug print out (see
 table~\ref{Tab:ClassAttributeAccess}).
-\begin{table}
+\begin{table}[h]
   \caption{Methods by which to set and access class attributes.}
   \label{Tab:ClassAttributeAccess}
   \begin{center}
@@ -59,13 +59,25 @@ table~\ref{Tab:ClassAttributeAccess}).
 
 \subsection{Parent class}
 
+\subsubsection{Instanciation}
+
+The call to instanciate the \texttt{BeamLineElenent} class is:
+\begin{center}
+  \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt)}
+\end{center}
+The arguments are translated into instance attributes as described in
+section~\ref{SubSubSect:InstAttr} and defined in
+table~\ref{Tab:BLE:Attributes}.
+
 \subsubsection{Instance attributes and access methods}
+\label{SubSubSect:InstAttr}
+
 Properties common to all beam-line elements are stored as instance
 attributes of the parent \texttt{BeamLineElement} class.
 The instance attributes are defined in table~\ref{Tab:BLE:Attributes}.
 The attributes are accessed and set using the methods defined in
 table~\ref{Tab:BLE:Methods}.
-\begin{table}
+\begin{table}[h]
   \caption{
     Definition of attributes of instances of
     the \texttt{BeamLineElement} class.
@@ -94,7 +106,7 @@ table~\ref{Tab:BLE:Methods}.
     \end{tabular}
   \end{center}
 \end{table}
-\begin{table}
+\begin{table}[h]
   \caption{
     Definition of access methods for the \texttt{BeamLineElement}
     class. 
@@ -124,7 +136,7 @@ table~\ref{Tab:BLE:Methods}.
 
 Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
 in the \texttt{BeamLineElement} class.
-\begin{table}
+\begin{table}[h]
   \caption{
     Processing methodes provided by the \texttt{BeamLineElement}
     class. 
@@ -169,7 +181,7 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 
 Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
 \texttt{BeamLineElement} class.
-\begin{table}
+\begin{table}[h]
   \caption{
     Utilities provided by the \texttt{BeamLineElement}
     class. 
