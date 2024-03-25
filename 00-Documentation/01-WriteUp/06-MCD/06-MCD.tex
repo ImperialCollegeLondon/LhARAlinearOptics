@@ -2,7 +2,6 @@
 
 \section{Module, class and data structures}
 
-
 The linear optics package has been written in object-oriented Python
 and is broken down in four principal modules:
 \begin{itemize}
@@ -57,10 +56,10 @@ table~\ref{Tab:ClassAttributeAccess}).
 
 \subsection{\texttt{BeamLineElement}}
 
-\subsection{Parent class}
+\subsubsection{Parent class}
 
-\subsubsection{Instanciation}
-
+\paragraph{Instanciation} ~\newline
+\noindent
 The call to instanciate the \texttt{BeamLineElenent} class is:
 \begin{center}
   \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt)}
@@ -69,9 +68,9 @@ The arguments are translated into instance attributes as described in
 section~\ref{SubSubSect:InstAttr} and defined in
 table~\ref{Tab:BLE:Attributes}.
 
-\subsubsection{Instance attributes and access methods}
+\paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:InstAttr}
-
+\noindent
 Properties common to all beam-line elements are stored as instance
 attributes of the parent \texttt{BeamLineElement} class.
 The instance attributes are defined in table~\ref{Tab:BLE:Attributes}.
@@ -119,7 +118,7 @@ table~\ref{Tab:BLE:Methods}.
       \hline
       \texttt{setName(Name)}     & \texttt{getName()}       & Set/get name of beam-line element.                                \\
       \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}      & Set/get laboratory $[x, y, z]$ position of entrance.              \\
-      \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}      & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
+                                         \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}      & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
       \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()}     & Set/get ``error'' displacement.                                   \\
       \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()}     & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
       \texttt{setRot2LbStrt()}   & \texttt{getRot2LbStrt()} & Set/get rotation matrix from RPLC axes to laboratory.             \\
@@ -132,8 +131,8 @@ table~\ref{Tab:BLE:Methods}.
   \end{center}
 \end{table}
 
-\subsubsection{Processing methods}
-
+\paragraph{Processing methods} ~\newline
+\noindent
 Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
 in the \texttt{BeamLineElement} class.
 \begin{table}[h]
@@ -165,8 +164,8 @@ in the \texttt{BeamLineElement} class.
   \end{center}
 \end{table}
 
-\subsubsection{I/o methods}
-
+\paragraph{I/o methods} ~\newline
+\noindent
 Methods to read and write instance attributes to the files defined
 using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
 provided.
@@ -177,8 +176,8 @@ The calls are:
 \end{equation}
 where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 
-\subsubsection{Utilities}
-
+\paragraph{Utilities} ~\newline
+\noindent
 Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
 \texttt{BeamLineElement} class.
 \begin{table}[h]
