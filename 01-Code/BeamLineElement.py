@@ -323,6 +323,36 @@ class BeamLineElement:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> Rot2LbStrt: \n", Rot2LbStrt)
             print(" <---- BeamLineElement.setRot2LbStrt: done.")
+
+    def setStrt2End(self, t):
+        if not isinstance(t, np.ndarray):
+            raise badParameter(" BeamLineElement.setStrt2End:" + \
+                               " bad translation (RLPC)")
+
+        self._Strt2End = np.matmul(self.getRot2LbStrt(), t)
+        
+        if self.getDebug():
+            print(" BeamLineElement.setStrt2End:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> t: \n", t)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rot2LbStrt: \n", self.getRot2LbStrt())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Strt2End: \n", self.getStrt2End())
+            print(" <---- BeamLineElement.setStrt2End: done.")
+        
+    def setRot2LbEnd(self, _Rot2LbEnd):
+        if not isinstance(_Rot2LbEnd, np.ndarray):
+            raise badParameter(" BeamLineElement.setRot2LbEnd:", \
+                               " bad argument")
+        self._Rot2LbEnd = _Rot2LbEnd
+
+        if self.getDebug():
+            print(" BeamLineElement.setRot2LbEnd:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rot2LbEnd: \n", self.getRot2LbEnd())
+            print(" <---- BeamLineElement.setRot2LbEnd: done.")
+
             
         
 #--------  "Get methods" only; version, reference, and constants
@@ -766,11 +796,18 @@ Derived class Drift:
 
   Parent class attributes:
   ------------------------
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
-  _drStrt : "error", displacement of start from nominal position.
-  _dvStrt : "error", deviation in theta and phy from nominal axis.
-  _TrnsMtrx : Transfer matrix.
+        _Name : str : Name of facility
+       _rStrt : numpy array; x, y, z position (in m) of start of
+                element. 
+       _vStrt : numpy array; theta, phi of principal axis of element.
+      _drStrt : "error", displacement of start from nominal position
+                (rad). 
+      _dvStrt : "error", deviation in theta and phy from nominal axis
+                (rad).
+
+  Calculated and set in derived classes:
+    _Strt2End, _Rot2LbStrt, _Rot2LbEnd, _TrnsMtrx not needed, so not
+    set.  
 
 
   Instance attributes to define drift:
@@ -817,6 +854,10 @@ class Drift(BeamLineElement):
                   " Drift: bad specification for length of drift!"
                                       )
         self.setLength(_Length)
+
+        self.setRot2LbStrt()
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
         
         self.setTransferMatrix()
                 

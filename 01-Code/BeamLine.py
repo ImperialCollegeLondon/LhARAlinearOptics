@@ -342,10 +342,10 @@ class BeamLine(object):
         Name, K0, VCMVr = cls.parseFacility()
 
         #.. Create the Facility beam line element:
-        rStrt  = np.array([0., 0., 0.])
-        vStrt  = np.array([0., 0., 0.])
-        drStrt = np.array([0., 0., 0.])
-        dvStrt = np.array([0., 0., 0.])
+        rStrt = np.array([0.,0.,0.])
+        vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+        drStrt = np.array([0.,0.,0.])
+        dvStrt = np.array([[0.,0.],[0.,0.]])
 
         p0     = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
 
