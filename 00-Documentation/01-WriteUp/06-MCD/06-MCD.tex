@@ -65,11 +65,11 @@ The call to instanciate the \texttt{BeamLineElenent} class is:
   \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt)}
 \end{center}
 The arguments are translated into instance attributes as described in
-section~\ref{SubSubSect:InstAttr} and defined in
+section~\ref{SubSubSect:BLE:InstAttr} and defined in
 table~\ref{Tab:BLE:Attributes}.
 
 \paragraph{Instance attributes and access methods} ~\newline
-\label{SubSubSect:InstAttr}
+\label{SubSubSect:BLE:InstAttr}
 \noindent
 Properties common to all beam-line elements are stored as instance
 attributes of the parent \texttt{BeamLineElement} class.
@@ -101,6 +101,151 @@ table~\ref{Tab:BLE:Methods}.
       \texttt{Rot2LbStrt}$^\dagger$   & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes at start.     \\
       \texttt{Rot2LbEnd}$^\dagger$    & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes at end.  Set in derived class.      \\
       \texttt{TnrsMtrx}$^\dagger$     & numpy.ndarray &     & $3\times3$ transfer matrix.  Set in derived class.                               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                         \\
+      \hline
+      \texttt{setName(Name)}     & \texttt{getName()}       & Set/get name of beam-line element.                                \\
+      \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}      & Set/get laboratory $[x, y, z]$ position of entrance.              \\
+                                         \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}      & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
+      \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()}     & Set/get ``error'' displacement.                                   \\
+      \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()}     & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
+      \texttt{setRot2LbStrt()}   & \texttt{getRot2LbStrt()} & Set/get rotation matrix from RPLC axes to laboratory.             \\
+                                 & \texttt{getStrt2End()}   & Get displacement vector start to end in laboratory coordinates.   \\
+                                & \texttt{getRot2LabStrt()} & Get rotation matrix from RPLC to laboratory at start.             \\
+                                 & \texttt{getRot2LanEnd()} & Get rotation matrix from RPLC to laboratory at end.               \\
+                             & \texttt{getTransferMatrix()} & Get transfer matrix set in derived class.                         \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
+in the \texttt{BeamLineElement} class.
+\begin{table}[h]
+  \caption{
+    Processing methodes provided by the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
+                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
+                                                                                    falls outside beam pipe, returns True. \\
+      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, accross
+                                                                                    element.
+                                                                                    Final trace-space vector returned.       \\
+      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
+                                                                                    to laboratory coordinates.
+                                                                                    Phase-space vector in laboratory frame returned. \\
+      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
+                                                                                    laboratory coordinates to trace-space coordaintes in
+                                                                                    the RPLC frame.
+                                                                                    Trace-space vector in RLPC frame returned. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
+\texttt{BeamLineElement} class.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:Utilities}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{cleaninstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLineElement} class.
+                                                           Reset \texttt{instances} list. \\
+      \texttt{removeInstance(inst)} & Instance of BLE &  & Remove instance \texttt{inst} and remove from list of instances of
+                                                           \texttt{BeamLineElement}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Facility(BeamLineElement)}}
+
+\paragraph{Instanciation} ~\newline
+\noindent
+The call to instanciate the \texttt{Facility} derived class is:
+\begin{center}
+  \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt, dvStrt, p0, VCMV)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Facility} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Fclty:InstAttr} and
+defined in table~\ref{Tab:Fclty:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Fclty:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Fclty:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Fclty:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Facility(BeamLineElement)} derived class.
+    All attributes are required in the call to instanciate the
+    element.
+  }
+  \label{Tab:Fclty:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
+      \hline
+      \texttt{p0}   & float & MeV & Kinetic energy of reference particle. \\
+      \texttt{VCMV} & float & m   & Radius of vacuum-chamber mother
+                                    volume.
+                                    The radius defines edge of the volume
+                                    at which a particle trajectory is
+                                    terminated.
+                                    It may be necessary to introduce a beam
+                                    pipe later.                            \\
       \hline
     \end{tabular}
   \end{center}

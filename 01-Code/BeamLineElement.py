@@ -43,7 +43,7 @@ constants_instance: Instance of PhysicalConstants class
       _dvStrt : "error", deviation in theta and phy from nominal axis
                 (rad).
 
-  Calculated and set in code:
+  Calculated and set in derived classes:
     _Strt2End : Calculated; vector that translates from start to end of
                 element in lab coordinates.  Set in derived class.
   _Rot2LbStrt : Calculated; rotation matrix that takes RPLC axes to Lab
@@ -554,17 +554,27 @@ Derived class Facility:
 
   Parent class attributes:
   ------------------------
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
-  _drStrt : "error", displacement of start from nominal position.
-  _dvStrt : "error", deviation in theta and phy from nominal axis.
-  _TrnsMtrx : Transfer matrix.
+        _Name : str : Name of facility
+       _rStrt : numpy array; x, y, z position (in m) of start of
+                element. 
+       _vStrt : numpy array; theta, phi of principal axis of element.
+      _drStrt : "error", displacement of start from nominal position
+                (rad). 
+      _dvStrt : "error", deviation in theta and phy from nominal axis
+                (rad).
+
+  Calculated and set in derived classes:
+    _Strt2End, _Rot2LbStrt, _Rot2LbEnd, _TrnsMtrx not needed, so not
+    set.  Will remain "None" as set in parent class.
 
 
   Instance attributes to define Facility:
-  ------------------------------------
-  _Name : str   : Name of facility
-  _p0   : float : Reference particle momentum
+  ---------------------------------------
+  _p0   : float : Reference particle momentum; unit MeV
+ _VCMVr : float : Vacuum chamber mother volume; unit m.  Idea here is to
+                  define the radius at which a particle trajectory is
+                  terminated.  It may be necessary to introduce a beam
+                  pipe later.
     
   Methods:
   --------
@@ -574,11 +584,19 @@ Derived class Facility:
       __str__ : Dump of constants
 
   Set methods:
-        setName  : 
-          setp0  : 
+          setp0 : float : e.g. 15 MeV
+       setVCMVr : float : e.g. 0.5 m
 
   Get methods:
-     getName, getp0
+     getp0, getVCMVr
+
+  I/o methods:
+      writeElement : Class method; write element data to "dataFILE"
+          i/p: dataFILE; i.o writer
+
+       readElement : Class method; read element fromd to "dataFILE"
+          i/p: dataFILE; i.o reader
+
 
 """
 class Facility(BeamLineElement):
@@ -591,15 +609,18 @@ class Facility(BeamLineElement):
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _p0=None, _VCMVr=None):
 
+        if self.__Debug:
+            print(' Facility.__init__: ', \
+                      'entering the Facility object creation method:')
+
         if Facility.instance == None:
             Facility.instance = self
             
             if self.__Debug:
-                print(' Facility.__init__: ', \
-                      'creating the Facility object:')
-                print("     ----> Name:", _Name)
-                print("     ----> Reference particle momentum:", _p0)
-                print("     ----> Vacuum chamber mother volume radius", \
+                print('     ----> Creating the Facility object:')
+                print("         ----> Name:", _Name)
+                print("         ----> Reference particle momentum:", _p0)
+                print("         ----> Vacuum chamber mother volume radius", \
                       _VCMVr)
 
             Facility.instance = self
