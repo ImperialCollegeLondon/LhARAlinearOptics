@@ -1081,6 +1081,10 @@ class Aperture(BeamLineElement):
                                       )
         self.setApertureParameters(_Param)
         
+        self.setRot2LbStrt()
+        self.setStrt2End(np.array([0., 0., 0.]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         self.setTransferMatrix()
                 
         if self.getDebug():
@@ -1170,11 +1174,8 @@ class Aperture(BeamLineElement):
     def getParams(self):
         return self._Params
 
-    def getLength(self):
-        return 0.
-
     
-#--------  Utilities:
+#--------  Processing method:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \

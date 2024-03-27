@@ -35,7 +35,7 @@ classes of which they are composed, and how access to the data is
 provided.
 
 Each class has methods by which to access a list of the class
-instances and a boolean flag by which to generate debug print out (see
+instances and a Boolean flag by which to generate debug print out (see
 table~\ref{Tab:ClassAttributeAccess}).
 \begin{table}[h]
   \caption{Methods by which to set and access class attributes.}
@@ -48,7 +48,7 @@ table~\ref{Tab:ClassAttributeAccess}).
       \texttt{getinstances()}  &                   & List of instances of class &                                       \\
       \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
       \texttt{getDebug()}      &                   & Boolean debug flag         & If true, generate debug print-out     \\
-      \texttt{setAll2None()}   &                   &                            & Set all instance attributes to \texttt{None} at start of instanciation. \\
+      \texttt{setAll2None()}   &                   &                            & Set all instance attributes to \texttt{None} at start of instantiation. \\
       \hline
     \end{tabular}
   \end{center}
@@ -58,9 +58,9 @@ table~\ref{Tab:ClassAttributeAccess}).
 
 \subsubsection{Parent class}
 
-\paragraph{Instanciation} ~\newline
+\paragraph{Instantiation} ~\newline
 \noindent
-The call to instanciate the \texttt{BeamLineElenent} class is:
+The call to instantiate the \texttt{BeamLineElenent} class is:
 \begin{center}
   \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt)}
 \end{center}
@@ -81,7 +81,7 @@ table~\ref{Tab:BLE:Methods}.
     Definition of attributes of instances of
     the \texttt{BeamLineElement} class.
     The attributes marked $^*$ above the dividing line are required in
-    the call to instanciate the element.
+    the call to instantiate the element.
     The attributes marked $^\dagger$ below the dividing line are
     calculated.
   }
@@ -93,7 +93,7 @@ table~\ref{Tab:BLE:Methods}.
       \hline
       \texttt{Name}$^*$     & String        &     & Name of beam-line element.                                                                \\
       \texttt{rStrt}$^*$    & numpy.ndarray & m   & $[x, y, z]$ position of entrance to element in laboratory coordinate system.              \\
-      \texttt{vStrt}$^*$    & numpy.ndarray & rad & $[[i],[\theta, \phi]]$ (polar and azimutal angles) of RPLC $y$ and $z$ axes ($i=0,1$ respectively) at start. \\
+      \texttt{vStrt}$^*$    & numpy.ndarray & rad & $[[i],[\theta, \phi]]$ (polar and azimuthal angles) of RPLC $y$ and $z$ axes ($i=0,1$ respectively) at start. \\
       \texttt{drStrt}$^*$   & numpy.ndarray & m   & ``Error'', $[x, y, z]$, displacement of start from nominal position (not yet implemented).\\
       \texttt{dvStrt}$^*$   & numpy.ndarray & rad & ``Error'', $[[i],[\theta, \phi]]$, deviation in $\theta$ and $\phi$ from nominal axis (not yet implemented). \\
       \hline
@@ -141,7 +141,7 @@ Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
 in the \texttt{BeamLineElement} class.
 \begin{table}[h]
   \caption{
-    Processing methodes provided by the \texttt{BeamLineElement}
+    Processing methods provided by the \texttt{BeamLineElement}
     class. 
   }
   \label{Tab:BLE:ProcMethods}
@@ -153,14 +153,14 @@ in the \texttt{BeamLineElement} class.
       \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
                                                                                     If \texttt{R}, radial distance from $z$ axis in RPLC,
                                                                                     falls outside beam pipe, returns True. \\
-      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, accross
+      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, across
                                                                                     element.
                                                                                     Final trace-space vector returned.       \\
       \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
                                                                                     to laboratory coordinates.
                                                                                     Phase-space vector in laboratory frame returned. \\
       \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
-                                                                                    laboratory coordinates to trace-space coordaintes in
+                                                                                    laboratory coordinates to trace-space coordinates in
                                                                                     the RPLC frame.
                                                                                     Trace-space vector in RLPC frame returned. \\
       \hline
@@ -208,9 +208,9 @@ Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
 
 \subsubsection{Derived class: \texttt{Facility(BeamLineElement)}}
 
-\paragraph{Instanciation} ~\newline
+\paragraph{Instantiation} ~\newline
 \noindent
-The call to instanciate the \texttt{Facility} derived class is:
+The call to instantiate the \texttt{Facility} derived class is:
 \begin{center}
   \texttt{FacilityName, rStrt, vStrt, drStrt, dvStrt, p0, VCMV)}
 \end{center}
@@ -233,7 +233,7 @@ table~\ref{Tab:Fclty:Methods}.
   \caption{
     Definition of attributes of instances of
     the \texttt{Facility(BeamLineElement)} derived class.
-    All attributes are required in the call to instanciate the
+    All attributes are required in the call to instantiate the
     element.
   }
   \label{Tab:Fclty:Attributes}
@@ -297,9 +297,9 @@ The \texttt{Facility} derived class has no utilities.
 
 \subsubsection{Derived class: \texttt{Drift(BeamLineElement)}}
 
-\paragraph{Instanciation} ~\newline
+\paragraph{Instantiation} ~\newline
 \noindent
-The call to instanciate the \texttt{Drift} derived class is:
+The call to instantiate the \texttt{Drift} derived class is:
 \begin{center}
   \texttt{Drift(Name, rStrt, vStrt, drStrt, dvStrt, Length)}
 \end{center}
@@ -322,7 +322,7 @@ table~\ref{Tab:Drft:Methods}.
   \caption{
     Definition of attributes of instances of
     the \texttt{Drift(BeamLineElement)} derived class.
-    All attributes are required in the call to instanciate the
+    All attributes are required in the call to instantiate the
     element.
   }
   \label{Tab:Drft:Attributes}
@@ -373,3 +373,119 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 \paragraph{I/o methods} ~\newline
 \noindent
 The \texttt{Facility} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Aperture(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Aperture} derived class is:
+\begin{center}
+  \texttt{Aperture(Name, rStrt, vStrt, drStrt, dvStrt, ParamList)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Aperture} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Aprtr:InstAttr} and
+defined in table~\ref{Tab:Aprtr:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Aprtr:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Aprtr:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Aprtr:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Aperture(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Aprtr:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
+      \hline
+      \texttt{ParamList}   & [] &   & List containing aperture parameters.
+                                    The first parameter is an \texttt{int}
+                                    and defines the aperture ``\texttt{Type}''.
+                                    The remaining elements in the parameter list
+                                    are \texttt{float}s with meanings that depend
+                                    on \texttt{Type}.                             \\
+      \hline
+      \texttt{ParamList[0]} & int   &   & \texttt{Type}$=0$; circular                 \\
+      \texttt{ParamList[1]} & float & m & Radius of circular aperture                 \\
+      \hline
+      \texttt{ParamList[0]} & int   &   & \texttt{Type}$=1$; Elliptical                           \\
+      \texttt{ParamList[1]} & float & m & Radius of elliptical aperture along $x_{\rm RPLC}$ axis \\
+      \texttt{ParamList[2]} & float & m & Radius of elliptical aperture along $y_{\rm RPLC}$ axis \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Facility} derived
+    class. 
+  }
+  \label{Tab:Aprtr:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
+      \hline
+      \texttt{setApertureParameters(ParamList)} &                      & Set aperture paramters.
+                                                                         Sets \texttt{Type} and parameters
+                                                                         depending on \texttt{Type}. \\
+                                                & \texttt{getType()} & Get \texttt{Type} of aperture.\\
+                                                & \texttt{getParams()} & Get aperture parameters.    \\
+      \texttt{setTransferMatrix()}              &                      & Set transfer matrix.        \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Attribute} processing method is defined in
+table~\ref{Tab:Aprtr:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{Aperture} derived
+    class. 
+  }
+  \label{Tab:Aprtr:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{Transport(V)} & \texttt{np.ndarray} & \texttt{np.ndarray} or \texttt{None} &
+                        Transport trace-space vector \texttt{V}.  If \texttt{V} falls outside of the aperture, return \texttt{None}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Aperture} derived class has no utilities.
