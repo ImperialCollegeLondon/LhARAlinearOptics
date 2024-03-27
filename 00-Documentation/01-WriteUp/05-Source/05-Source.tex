@@ -96,21 +96,46 @@ where $t_0$ is the time over which the ion acceleration may be treated
 as ballistic and $\varepsilon_{i,\infty}$ is given in
 table~\ref{table:EnergySpectrumParameters}.
 
-To generate the kinetic energy spectrum, a practical approach is
-taken.
-First, the cumulative probability $\Gamma(\varepsilon)$ is obtained by
-integrating equation~\ref{Eq:Spct:0} over $\varepsilon$ and normalising
-the resulting cumulative probability such that
-$\Gamma(\varepsilon_{max}) = 1$.
-A value for the kinetic energy, $\varepsilon$, is chosen using a 
-probability distribution uniform over the range
-$0 < \varepsilon < \varepsilon_{max}$.
+To generate the kinetic energy spectrum, the probability density
+function, $g(\varepsilon)$, is defined such that the probability,
+$\delta \cal{P}$, of a particle being generated in the interval
+$\varepsilon \rightarrow \varepsilon + \delta \varepsilon$ is given
+by:
+\begin{equation}
+   \delta \cal{P} = g(\varepsilon) \delta \varepsilon \, .
+\end{equation}
+$g(\varepsilon)$ can be written in terms of the differential spectrum
+given in equation~\ref{Eq:Spct:0} through the introduction of a
+normalisation constant $\cal{N}$:
+\begin{equation}
+  g(\varepsilon) = \frac{1}{\cal{N}} \frac{dN}{d\varepsilon} \, .
+\end{equation}
+The cumulative distribution funtion, $G(\varepsilon)$, is given by:
+\begin{equation}
+  G(\varepsilon) = \int_0^{\varepsilon_{\rm max}} g(\varepsilon)
+                                               d\varepsilon \,;
+\end{equation}
+where the normalisation constant, $\cal{N}$, is set so that
+$G(\varepsilon_{\rm max}) = 1$.
+Carrying out the intergration yields:
+\begin{equation}
+  G(\varepsilon) = \frac{2}{\cal{N}}
+                   \frac{n_{e0} c_{s} t_{laser} S_{sheath}} {\sqrt{2T_{e}}}
+                   \sqrt{\frac{T_{e}}{2}}
+                   \left[
+                     1 - \left(exp(- \sqrt{\frac{2\varepsilon}{T_{e}}}\right)
+                   \right] \, .
+\end{equation}
+
+The kinetic energy spectrum may now be obtained by choosing a value
+for $\varepsilon$ using a probability distribution uniform over the
+range $0 < \varepsilon < \varepsilon_{max}$.   
 A second random number, $\eta$, uniformly distributed on the range
 $0 < \eta < 1$ is then chosen.
-If $\eta$ is greater than $\Gamma(\varepsilon)$ then a new value for
+If $\eta$ is greater than $G(\varepsilon)$, a new value for
 $\varepsilon$ is chosen and the process repeats.
-Alternatively, if $\eta$ is less than $\Gamma(\varepsilon)$ then the
-value of $\varepsilon$ is accepted.
+Alternatively, if $\eta$ is less than $G(\varepsilon)$, the value of
+$\varepsilon$ is accepted. 
 
 \subsection{Angular Distribution}
 
