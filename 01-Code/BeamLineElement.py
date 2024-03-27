@@ -1406,7 +1406,11 @@ class FocusQuadrupole(BeamLineElement):
         if isinstance(_kFQ, float):
             self.setkFQ(_kFQ)
             self.setStrength(self.calcStrength())
-                
+
+        self.setRot2LbStrt()
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New FocusQuadrupole instance: \n", self)
             print(" <---- Done.")
