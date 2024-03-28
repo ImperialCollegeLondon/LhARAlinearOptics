@@ -1386,7 +1386,7 @@ class FocusQuadrupole(BeamLineElement):
         #   - FQmode = 0 ==> use particle momentum in calculation of k
         #            = 1 ==> use reference particle momentum and dispersion
         #                    calculation.
-        self._FQmode = 0
+        self.setFQmode(0)
 
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
@@ -1422,6 +1422,7 @@ class FocusQuadrupole(BeamLineElement):
         print(" FocusQuadrupole:")
         print(" ----------------")
         print("     ---->     Debug flag:", FocusQuadrupole.getDebug())
+        print("     ---->         FQMode:", self.getDQMode())
         print("     ---->     Length (m):", self.getLength())
         print("     ----> Strength (T/m):", self.getStrength())
         print("     ---->       kFQ (/m):", self.getkFQ())
@@ -1451,6 +1452,13 @@ class FocusQuadrupole(BeamLineElement):
         self._TrnsMtrx = None
         self._FQmode   = None
         
+    def setFQMode(self, _FQMode):
+        if not isinstance(_FQMode, int):
+            raise badParameter( \
+                            "BeamLineElement.FocusQuadrupole.setFQMode:", \
+                            " bad FQMode:", _FQMode)
+        self._FQMode = _FQMode
+
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
@@ -1765,7 +1773,7 @@ class DefocusQuadrupole(BeamLineElement):
         self.setAll2None()
 
         #.. Hard wired:
-        #   - FQmode = 0 ==> use particle momentum in calculation of k
+        #   - DQmode = 0 ==> use particle momentum in calculation of k
         #            = 1 ==> use reference particle momentum and dispersion
         #                    calculation.
         self._DQmode = 0
@@ -1800,6 +1808,7 @@ class DefocusQuadrupole(BeamLineElement):
         print(" DefocusQuadrupole:")
         print(" -------------------")
         print("     ---->     Debug flag:", DefocusQuadrupole.getDebug())
+        print("     ---->         DQMode:", self.getDQMode())
         print("     ---->     Length (m):", self.getLength())
         print("     ----> Strength (T/m):", self.getStrength())
         print("     ---->       kDQ (/m):", self.getkDQ())
