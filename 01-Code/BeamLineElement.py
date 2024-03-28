@@ -1422,7 +1422,7 @@ class FocusQuadrupole(BeamLineElement):
         print(" FocusQuadrupole:")
         print(" ----------------")
         print("     ---->     Debug flag:", FocusQuadrupole.getDebug())
-        print("     ---->         FQMode:", self.getDQMode())
+        print("     ---->         FQmode:", self.getFQmode())
         print("     ---->     Length (m):", self.getLength())
         print("     ----> Strength (T/m):", self.getStrength())
         print("     ---->       kFQ (/m):", self.getkFQ())
@@ -1452,12 +1452,12 @@ class FocusQuadrupole(BeamLineElement):
         self._TrnsMtrx = None
         self._FQmode   = None
         
-    def setFQMode(self, _FQMode):
-        if not isinstance(_FQMode, int):
+    def setFQmode(self, _FQmode):
+        if not isinstance(_FQmode, int):
             raise badParameter( \
-                            "BeamLineElement.FocusQuadrupole.setFQMode:", \
-                            " bad FQMode:", _FQMode)
-        self._FQMode = _FQMode
+                            "BeamLineElement.FocusQuadrupole.setFQmode:", \
+                            " bad FQmode:", _FQmode)
+        self._FQmode = _FQmode
 
     def setLength(self, _Length):
         if not isinstance(_Length, float):
@@ -1776,7 +1776,7 @@ class DefocusQuadrupole(BeamLineElement):
         #   - DQmode = 0 ==> use particle momentum in calculation of k
         #            = 1 ==> use reference particle momentum and dispersion
         #                    calculation.
-        self._DQmode = 0
+        self.setDQmode(0)
         
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
@@ -1797,6 +1797,10 @@ class DefocusQuadrupole(BeamLineElement):
             self.setkDQ(_kDQ)
             self.setStrength(self.calcStrength())
                 
+        self.setRot2LbStrt()
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New DefocusQuadrupole instance: \n", self)
             print(" <---- Done.")
@@ -1808,7 +1812,7 @@ class DefocusQuadrupole(BeamLineElement):
         print(" DefocusQuadrupole:")
         print(" -------------------")
         print("     ---->     Debug flag:", DefocusQuadrupole.getDebug())
-        print("     ---->         DQMode:", self.getDQMode())
+        print("     ---->         DQmode:", self.getDQmode())
         print("     ---->     Length (m):", self.getLength())
         print("     ----> Strength (T/m):", self.getStrength())
         print("     ---->       kDQ (/m):", self.getkDQ())
@@ -1838,6 +1842,13 @@ class DefocusQuadrupole(BeamLineElement):
         self._TrnsMtrx = None
         self._DQmode   = None
         
+    def setDQmode(self, _DQmode):
+        if not isinstance(_DQmode, int):
+            raise badParameter( \
+                            "BeamLineElement.FocusQuadrupole.setDQmode:", \
+                            " bad DQmode:", _DQmode)
+        self._DQmode = _DQmode
+
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
