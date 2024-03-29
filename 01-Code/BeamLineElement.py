@@ -855,7 +855,6 @@ class Drift(BeamLineElement):
                                       )
         self.setLength(_Length)
 
-        self.setRot2LbStrt()
         self.setStrt2End(np.array([0., 0., self.getLength()]))
         self.setRot2LbEnd(self.getRot2LbStrt())
         
@@ -1081,7 +1080,6 @@ class Aperture(BeamLineElement):
                                       )
         self.setApertureParameters(_Param)
         
-        self.setRot2LbStrt()
         self.setStrt2End(np.array([0., 0., 0.]))
         self.setRot2LbEnd(self.getRot2LbStrt())
         
@@ -1407,7 +1405,6 @@ class FocusQuadrupole(BeamLineElement):
             self.setkFQ(_kFQ)
             self.setStrength(self.calcStrength())
 
-        self.setRot2LbStrt()
         self.setStrt2End(np.array([0., 0., self.getLength()]))
         self.setRot2LbEnd(self.getRot2LbStrt())
         
@@ -1797,7 +1794,6 @@ class DefocusQuadrupole(BeamLineElement):
             self.setkDQ(_kDQ)
             self.setStrength(self.calcStrength())
                 
-        self.setRot2LbStrt()
         self.setStrt2End(np.array([0., 0., self.getLength()]))
         self.setRot2LbEnd(self.getRot2LbStrt())
         
@@ -2140,10 +2136,11 @@ class SectorDipole(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Angle=None, _B=None):
+        self.setDebug(True)
         if self.getDebug():
             print(' SectorDipole(BeamLineElement).__init__: ')
             print('     ----> Angle=', _Angle)
-            print('     ----> Angle=', _B)
+            print('     ---->     B=', _B)
 
         SectorDipole.instances.append(self)
 
@@ -2158,6 +2155,23 @@ class SectorDipole(BeamLineElement):
         self.setB(_B)
         self.setLength()
 
+        ChalfAngle = mth.cos(self.getAngle()/2.)
+        ShalfAngle = mth.sin(self.getAngle()/2.)
+        Radius     = self.getLength()/self.getAngle()
+        Scale      = 2. * Radius * ShalfAngle
+        deltaV     = np.array([-ShalfAngle, 0., ChalfAngle]) * Scale
+        self.setStrt2End(deltaV)
+        
+        CAngle = mth.cos(self.getAngle())
+        SAngle = mth.sin(self.getAngle())
+        Rot2End    = np.array([ \
+                                [CAngle, 0., -SAngle], \
+                                [    0., 1.,      0.], \
+                                [SAngle, 0.,  CAngle]  \
+                                ])
+        Rot2LbEnd  = np.matmul(self.getRot2LbStrt(), Rot2End)
+        self.setRot2LbEnd(Rot2LbEnd)
+        
         if self.getDebug():
             print("     ----> New SectorDipole instance: \n", self)
 
