@@ -552,11 +552,11 @@ table~\ref{Tab:FQuad:Methods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                    \\
       \hline
-      \texttt{setFQmode(FQmode)}   & \texttt{getFQmode(FQmode)}   & Set FQmode.                        \\
-      \texttt{setLength(Length)}   & \texttt{getLength(Length)}   & Set length.                        \\
-      \texttt{setStrength(Length)} & \texttt{getStrength(Length)} & Set strength (field gradient).     \\
-      \texttt{setKFQ(Length)}      & \texttt{getKFQ(Length)}      & Set kFQ, quadrupole $k$ parameter. \\
-      \texttt{setTransferMatrix()} &                              & Set transfer matrix.               \\
+      \texttt{setFQmode(FQmode)}   & \texttt{getFQmode()}   & Set/get FQmode.                        \\
+      \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
+      \texttt{setStrength(Length)} & \texttt{getStrength()} & Set/get strength (field gradient).     \\
+      \texttt{setKFQ(Length)}      & \texttt{getKFQ()}      & Set/get kFQ, quadrupole $k$ parameter. \\
+      \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
       \hline
     \end{tabular}
   \end{center}
@@ -616,20 +616,20 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
 The \texttt{DefocusQuadrupole} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:SDpl:InstAttr} and
-defined in table~\ref{Tab:SDpl:Attributes}.
+attributes as described in section~\ref{SubSubSect:DQuad:InstAttr} and
+defined in table~\ref{Tab:DQuad:Attributes}.
 The quadrupole \texttt{Length} is required together with
 either the field gradient, \texttt{Strength}
 (equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
 parameter, \texttt{kDQ} (equation~\ref{Eq:Effectivekq}).
 
 \paragraph{Instance attributes and access methods} ~\newline
-\label{SubSubSect:SDpl:InstAttr}
+\label{SubSubSect:DQuad:InstAttr}
 \noindent
 The instance attributes are defined in
-table~\ref{Tab:SDpl:Attributes}. 
+table~\ref{Tab:DQuad:Attributes}. 
 The attributes are accessed and set using the methods defined in
-table~\ref{Tab:SDpl:Methods}.
+table~\ref{Tab:DQuad:Methods}.
 \begin{table}[h]
   \caption{
     Definition of attributes of instances of
@@ -637,7 +637,7 @@ table~\ref{Tab:SDpl:Methods}.
     All attributes are required in the call to instantiate the
     element.
   }
-  \label{Tab:SDpl:Attributes}
+  \label{Tab:DQuad:Attributes}
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
@@ -657,17 +657,17 @@ table~\ref{Tab:SDpl:Methods}.
     Definition of access methods for the \texttt{DefocusQuadrupole} derived
     class. 
   }
-  \label{Tab:SDpl:Methods}
+  \label{Tab:DQuad:Methods}
   \begin{center}
     \begin{tabular}{|c|c|p{7cm}|}
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                    \\
       \hline
-      \texttt{setDQmode(DQmode)}   & \texttt{getDQmode(DQmode)}   & Set DQmode.                        \\
-      \texttt{setLength(Length)}   & \texttt{getLength(Length)}   & Set length.                        \\
-      \texttt{setStrength(Length)} & \texttt{getStrength(Length)} & Set strength (field gradient).     \\
-      \texttt{setKDQ(Length)}      & \texttt{getKDQ(Length)}      & Set kDQ, quadrupole $k$ parameter. \\
-      \texttt{setTransferMatrix()} &                              & Set transfer matrix.               \\
+      \texttt{setDQmode(DQmode)}   & \texttt{getDQmode()}   & Set/get DQmode.                        \\
+      \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
+      \texttt{setStrength(Length)} & \texttt{getStrength()} & Set/get strength (field gradient).     \\
+      \texttt{setKDQ(Length)}      & \texttt{getKDQ()}      & Set/get kDQ, quadrupole $k$ parameter. \\
+      \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
       \hline
     \end{tabular}
   \end{center}
@@ -676,13 +676,13 @@ table~\ref{Tab:SDpl:Methods}.
 \paragraph{Processing methods} ~\newline
 \noindent
 The \texttt{Attribute} processing method is defined in
-table~\ref{Tab:SDpl:Methods}.
+table~\ref{Tab:DQuad:Methods}.
 \begin{table}[h]
   \caption{
     Utilities provided by the \texttt{DefocusQuadrupole} derived
     class. 
   }
-  \label{Tab:SDpl:Methods}
+  \label{Tab:DQuad:Methods}
   \begin{center}
     \begin{tabular}{|l|c|c|p{7cm}|}
       \hline
@@ -730,6 +730,48 @@ The \texttt{SectorDipole} arguments are translated into instance
 attributes as described in section~\ref{SubSubSect:SDpl:InstAttr} and
 defined in table~\ref{Tab:SDpl:Attributes}.
 
+The orientation of the RLPC coordinate axes with respect to those of
+the laboratory frame changes from the start of sector dipole to its
+end.
+Referring to figure~\ref{fig:Dipole}, the vector, $\bm{v}_{\rm ES}$,
+that translates the origin of the RLPC coordinate system at the start
+of the sector dipole to the origin of the RLPC coordinate system at
+its end is given by:
+\begin{equation}
+  \bm{v}_{\rm ES} = 2 \rho_0 \sin\left( \frac{\phi}{2} \right)
+                     \begin{pmatrix}
+                       \sin\left( \frac{\phi}{2} \right) \\
+                       0                                 \\
+                       \cos\left( \frac{\phi}{2} \right)
+                     \end{pmatrix} \,;
+\end{equation}
+where $\rho_0$ is the radius of the circular locus of the trajectory
+of the reference particle.
+If the rotation matrix taking the RPLC axes at the start of the sector
+dipole to the laboratory coordinate axes is
+$\underline{\underline{R}}_{\rm S}$, then the vector,
+$\bm{v}^{\rm lab}_{\rm ES}$, that translates from the start 
+of the sector dipole to its end in laboratory coordinates is given by:
+\begin{equation}
+  \bm{v}^{\rm lab}_{\rm ES} = \underline{\underline{R}}_{\rm S} \bm{v}_{\rm ES} \,.
+\end{equation}
+The rotation matrix that transforms from the RPLC system at the end
+of the sector dipole to the laboratory coordinate system,
+$\underline{\underline{R}}_{\rm E}$ is given by:
+\begin{equation}
+  \underline{\underline{R}}_{\rm E} =
+      \underline{\underline{R}}_{\rm S} \underline{\underline{R}} \, ;
+\end{equation}
+where:
+\begin{equation}
+  \underline{\underline{R}} = 
+        \begin{pmatrix}
+          \cos \phi & 0 & -\sin \phi \\
+          0         & 1 &  0         \\
+          \sin \phi & 0 &  \cos \phi 
+        \end{pmatrix} \, .
+\end{equation}
+
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:SDpl:InstAttr}
 \noindent
@@ -748,13 +790,11 @@ table~\ref{Tab:SDpl:Methods}.
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
-      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                      \\
       \hline
-      \texttt{DQmode}   & int   &       & If 0, use particle momentum in calculation of transfer
-                                          matrix; if 1, use reference particle momentum.         \\
-      \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
-      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kDQ is not given. \\
-      \texttt{kDQ}      & float & m$^2$ & Quadrupole $k$ paramter.                               \\
+      \texttt{Angle}   & float & rad & Angle through which sector dipole bends positive reference
+                                 particle.                                                         \\
+      \texttt{B}       & float & T   & Magnetic field.                                             \\
       \hline
     \end{tabular}
   \end{center}
@@ -768,13 +808,14 @@ table~\ref{Tab:SDpl:Methods}.
   \begin{center}
     \begin{tabular}{|c|c|p{7cm}|}
       \hline
-      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                    \\
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}       \\
       \hline
-      \texttt{setDQmode(DQmode)}   & \texttt{getDQmode(DQmode)}   & Set DQmode.                        \\
-      \texttt{setLength(Length)}   & \texttt{getLength(Length)}   & Set length.                        \\
-      \texttt{setStrength(Length)} & \texttt{getStrength(Length)} & Set strength (field gradient).     \\
-      \texttt{setKDQ(Length)}      & \texttt{getKDQ(Length)}      & Set kDQ, quadrupole $k$ parameter. \\
-      \texttt{setTransferMatrix()} &                              & Set transfer matrix.               \\
+      \texttt{setAngle(Angle)}     & \texttt{getAngle()}  & Set/get bending angle.         \\
+      \texttt{setB(B)}             & \texttt{getB()}      & Set/get dipole magnetic field. \\
+      \texttt{setLength()}         & \texttt{getLength()} & Set/get length of reference
+                                                            particle trajectory through
+                                                            sector dipole (arc length).    \\
+      \texttt{setTransferMatrix()} &                      & Set transfer matrix.           \\
       \hline
     \end{tabular}
   \end{center}
@@ -782,25 +823,7 @@ table~\ref{Tab:SDpl:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{Attribute} processing method is defined in
-table~\ref{Tab:SDpl:Methods}.
-\begin{table}[h]
-  \caption{
-    Utilities provided by the \texttt{SectorDipole} derived
-    class. 
-  }
-  \label{Tab:SDpl:Methods}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
-      \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                     \\
-      \hline
-      \texttt{calckDQ()} &  & float & Calculates \texttt{kDQ} if strength is specified.               \\
-      \texttt{calcStrength()} &  & float & Calculates \texttt{Strength} if \texttt{kDQ} is specified. \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
+The \texttt{SectorDipole} derived class has no processing methods.
 
 \paragraph{I/o methods} ~\newline
 \noindent
