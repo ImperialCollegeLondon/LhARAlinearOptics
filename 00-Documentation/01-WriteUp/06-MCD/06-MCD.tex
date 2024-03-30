@@ -616,20 +616,20 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
 The \texttt{DefocusQuadrupole} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:DQuad:InstAttr} and
-defined in table~\ref{Tab:DQuad:Attributes}.
+attributes as described in section~\ref{SubSubSect:SDpl:InstAttr} and
+defined in table~\ref{Tab:SDpl:Attributes}.
 The quadrupole \texttt{Length} is required together with
 either the field gradient, \texttt{Strength}
 (equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
 parameter, \texttt{kDQ} (equation~\ref{Eq:Effectivekq}).
 
 \paragraph{Instance attributes and access methods} ~\newline
-\label{SubSubSect:DQuad:InstAttr}
+\label{SubSubSect:SDpl:InstAttr}
 \noindent
 The instance attributes are defined in
-table~\ref{Tab:DQuad:Attributes}. 
+table~\ref{Tab:SDpl:Attributes}. 
 The attributes are accessed and set using the methods defined in
-table~\ref{Tab:DQuad:Methods}.
+table~\ref{Tab:SDpl:Methods}.
 \begin{table}[h]
   \caption{
     Definition of attributes of instances of
@@ -637,7 +637,7 @@ table~\ref{Tab:DQuad:Methods}.
     All attributes are required in the call to instantiate the
     element.
   }
-  \label{Tab:DQuad:Attributes}
+  \label{Tab:SDpl:Attributes}
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
@@ -657,7 +657,7 @@ table~\ref{Tab:DQuad:Methods}.
     Definition of access methods for the \texttt{DefocusQuadrupole} derived
     class. 
   }
-  \label{Tab:DQuad:Methods}
+  \label{Tab:SDpl:Methods}
   \begin{center}
     \begin{tabular}{|c|c|p{7cm}|}
       \hline
@@ -676,13 +676,13 @@ table~\ref{Tab:DQuad:Methods}.
 \paragraph{Processing methods} ~\newline
 \noindent
 The \texttt{Attribute} processing method is defined in
-table~\ref{Tab:DQuad:Methods}.
+table~\ref{Tab:SDpl:Methods}.
 \begin{table}[h]
   \caption{
     Utilities provided by the \texttt{DefocusQuadrupole} derived
     class. 
   }
-  \label{Tab:DQuad:Methods}
+  \label{Tab:SDpl:Methods}
   \begin{center}
     \begin{tabular}{|l|c|c|p{7cm}|}
       \hline
@@ -710,3 +710,110 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 \paragraph{Utilities} ~\newline
 \noindent
 The \texttt{DefocusQuadrupole} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{SectorDipole(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{SectorDipole} derived class is:
+\begin{center}
+  \texttt{SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, 
+          Angle, B)} 
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{SectorDipole} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:SDpl:InstAttr} and
+defined in table~\ref{Tab:SDpl:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:SDpl:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:SDpl:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:SDpl:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{SectorDipole(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:SDpl:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{DQmode}   & int   &       & If 0, use particle momentum in calculation of transfer
+                                          matrix; if 1, use reference particle momentum.         \\
+      \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kDQ is not given. \\
+      \texttt{kDQ}      & float & m$^2$ & Quadrupole $k$ paramter.                               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{SectorDipole} derived
+    class. 
+  }
+  \label{Tab:SDpl:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                    \\
+      \hline
+      \texttt{setDQmode(DQmode)}   & \texttt{getDQmode(DQmode)}   & Set DQmode.                        \\
+      \texttt{setLength(Length)}   & \texttt{getLength(Length)}   & Set length.                        \\
+      \texttt{setStrength(Length)} & \texttt{getStrength(Length)} & Set strength (field gradient).     \\
+      \texttt{setKDQ(Length)}      & \texttt{getKDQ(Length)}      & Set kDQ, quadrupole $k$ parameter. \\
+      \texttt{setTransferMatrix()} &                              & Set transfer matrix.               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Attribute} processing method is defined in
+table~\ref{Tab:SDpl:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{SectorDipole} derived
+    class. 
+  }
+  \label{Tab:SDpl:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                     \\
+      \hline
+      \texttt{calckDQ()} &  & float & Calculates \texttt{kDQ} if strength is specified.               \\
+      \texttt{calcStrength()} &  & float & Calculates \texttt{Strength} if \texttt{kDQ} is specified. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{SectorDipole} derived class has no utilities.
