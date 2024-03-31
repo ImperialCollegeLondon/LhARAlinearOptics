@@ -536,7 +536,7 @@ table~\ref{Tab:FQuad:Methods}.
                                           matrix; if 1, use reference particle momentum.         \\
       \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
       \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kFQ is not given. \\
-      \texttt{kFQ}      & float & m$^2$ & Quadrupole $k$ paramter.                               \\
+      \texttt{kFQ}      & float & m$^{-2}$ & Quadrupole $k$ paramter.                               \\
       \hline
     \end{tabular}
   \end{center}
@@ -647,7 +647,7 @@ table~\ref{Tab:DQuad:Methods}.
                                           matrix; if 1, use reference particle momentum.         \\
       \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
       \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kDQ is not given. \\
-      \texttt{kDQ}      & float & m$^2$ & Quadrupole $k$ paramter.                               \\
+      \texttt{kDQ}      & float & m$^{-2}$ & Quadrupole $k$ paramter.                               \\
       \hline
     \end{tabular}
   \end{center}
@@ -885,7 +885,8 @@ table~\ref{Tab:Slnd:Methods}.
       \hline
       \texttt{Length}   & float & m     & Effective length of solenoid.                           \\
       \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kSol is not given. \\
-      \texttt{kSol}     & float & m$^2$ & Solenoid $k$ paramter.                                  \\
+      \texttt{kSol}     & float & m$^{-2}$ & GaborLens $k$ paramter required if \texttt{Strength}
+                                          not given.                                              \\
       \hline
     \end{tabular}
   \end{center}
@@ -902,8 +903,9 @@ table~\ref{Tab:Slnd:Methods}.
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
       \hline
       \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
-      \texttt{setStrength(Length)} & \texttt{getStrength()} & Set/get strength (field gradient).     \\
-      \texttt{setKFQ(Length)}      & \texttt{getKFQ()}      & Set/get kSol, solenoid $k$ parameter. \\
+      \texttt{setStrength(B)}      & \texttt{getStrength()} & Set/get strength (solenoid magnetic
+                                                              field).                                \\
+      \texttt{setKSol(Length)}     & \texttt{getKFQ()}      & Set/get kSol, solenoid $k$ parameter.  \\
       \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
       \hline
     \end{tabular}
@@ -947,3 +949,110 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 \paragraph{Utilities} ~\newline
 \noindent
 The \texttt{Solenoid} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{GaborLens(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{GaborLens} derived class is:
+\begin{center}
+  \texttt{GaborLens(Name, rStrt, vStrt, drStrt, dvStrt,
+          Bz, VA, RA, Rp, Length, kSol)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{GaborLens} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:GbrLns:InstAttr} and
+defined in table~\ref{Tab:GbrLns:Attributes}. 
+The Gabor lens \texttt{Length} is required together with either the
+paramters \texttt{Bz}, \texttt{VA}, \texttt{RA}, \texttt{Rp}
+correspond, respectively, to the paramters $B_z$, $V_A$, $V_A$ and
+$R_p$ defined in section~\ref{SubSect:TrnsFrMtrx:GL}, or $kSol$, the
+solenoid strength parameter of the equaivalent solenoid (see
+section~\ref{SubSect:TrnsFrMtrx:GL}).
+The effective electon number density inside the trap is calculated
+using either \texttt{Bz}, \texttt{VA}, \texttt{RA} and \texttt{Rp}
+or \texttt{kSol}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:GbrLns:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:GbrLns:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:GbrLns:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{GaborLens(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:GbrLns:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Bz}   & float & T     & Effective length of Gabor lens.                            \\
+      \texttt{VA}   & float & V     & Effective length of Gabor lens.                            \\
+      \texttt{RA}   & float & m     & Effective length of Gabor lens.                            \\
+      \texttt{RP}   & float & m     & Effective length of Gabor lens.                            \\
+      \texttt{Length}   & float & m     & Effective length of Gabor lens.                         \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kSol is not given. \\
+      \texttt{kSol}     & float & m$^{-2}$ & $k$ parameter of the solenoid with the equivalent
+                                            focusing strength.                                    \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{GaborLens} derived
+    class. 
+  }
+  \label{Tab:GbrLns:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{setBz(Bz)}         & \texttt{getBz()}     & Set/get magnetic field of the Penning-Malmberg trap.      \\
+      \texttt{setVA(VA)}         & \texttt{getVA()}     & Set/get anode voltage of the Penning-Malmberg trap.       \\
+      \texttt{setRA(RA)}         & \texttt{getRA()}     & Set/get radius of the anode of the Penning-Malmberg trap. \\
+      \texttt{setRP(RP)}         & \texttt{getRP()}     & Set/get magnetic effective radiius of the plasma confined 
+                                                          within the Penning-Malmberg trap.                         \\
+      \texttt{setLength(Length)} & \texttt{getLength()} & Set/get effective length of the lens.                     \\
+
+      \texttt{setStrength(Strength)} & \texttt{getStrength()} & Set/get k-parameter of the solenoid with the
+                                                                equivalent focal length.                            \\
+      \texttt{setElectronDenisty()} & \texttt{getElectronDenisty()} & Set/get electron density.                     \\
+      \texttt{setTransferMatrix()} &                    & Set transfer matrix.                                      \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{GaborLens} dericed class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{GaborLens} derived class has no utilities.
