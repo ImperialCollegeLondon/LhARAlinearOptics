@@ -75,7 +75,8 @@ constants_instance: Instance of PhysicalConstants class
          setvStrt  : Set orientation of element, theta, phi (rad)
         setdrStrt  : Set offset of start of element, x, y, z (m)
         setdvStrt  : Set offset orientation of element, theta, phi (rad)
-     setRot2LbStrt : set rotation matrix totransform from RLBC to lab at start.
+     setRot2LbStrt : set rotation matrix totransform from RLBC to lab at
+                     start.
 
   Get methods:
          getDebug  : get debug flag
@@ -86,7 +87,8 @@ constants_instance: Instance of PhysicalConstants class
          getdrStrt : Get offset from nominal start of element, x, y, z (m)
          getdvStrt : Get offset of orientation of element, theta, phi (rad)
        getStrt2End : Get vector to translate from start to end in lab
-     getRot2LbStrt : Get rotation matrix totransform from RLBC to lab at start.
+     getRot2LbStrt : Get rotation matrix totransform from RLBC to lab at
+                     start.
       getRot2LbEnd : Get rotation matrix totransform from RLBC to lab at end.
  getTransferMatrix : Get transfer matrix.
 
@@ -178,7 +180,7 @@ class BeamLineElement:
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
-        if self.__Debug:
+        if self.getDebug():
             print(' BeamLineElement.__init__: ', \
                   'creating the BeamLineElement object')
             print("     ---->               Name:", _Name)
@@ -189,7 +191,7 @@ class BeamLineElement:
 
         BeamLineElement.instances.append(self)
 
-        self.setAll2None()
+        BeamLineElement.setAll2None(self)
         
         if  not isinstance( _Name, str)        or \
             not isinstance( _rStrt, np.ndarray) or \
@@ -207,7 +209,7 @@ class BeamLineElement:
         self.setdvStrt(_dvStrt)
         self.setRot2LbStrt()
         
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> New BeamLineElement instance: \n", \
                   BeamLineElement.__str__(self))
             
@@ -238,7 +240,7 @@ class BeamLineElement:
 #.. Method believed to be self documenting(!)
     @classmethod
     def setDebug(self, Debug=False):
-        if self.__Debug:
+        if self.getDebug():
             print(" BeamLineElement.setdebug: ", Debug)
         self.__Debug = Debug
 
@@ -252,7 +254,7 @@ class BeamLineElement:
         self._Rot2LbStrt = None
         self._Rot2LbEnd  = None
         self._TrnsMtrx   = None
-        
+    
     def setName(self, _Name):
         if not isinstance(_Name, str):
             raise badParameter(" BeamLineElement.setName: bad name:", \
@@ -2517,7 +2519,8 @@ class Solenoid(BeamLineElement):
         self.setAll2None()
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+        BeamLineElement.__init__(self, \
+                                 _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement( \
@@ -2921,6 +2924,9 @@ class GaborLens(BeamLineElement):
             
         self.setElectronDensity()
 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New GaborLens instance: \n", self)
 
