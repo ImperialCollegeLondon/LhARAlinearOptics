@@ -9,33 +9,23 @@ Solenoid.py -- set "relative" path to code
 """
 
 import os
+import math  as mth
 import numpy as np
 
-import BeamLineElement as BLE
-import BeamLine        as BL
-import Particle        as Prtcl
+import PhysicalConstants as PhysCnst
+import BeamLineElement   as BLE
+import BeamLine          as BL
+import Particle          as Prtcl
+
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
 
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-BLI  = BL.BeamLine(filename)
-
-iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
-
+                        '11-Parameters/Dummy4Tests.csv')
 
 ##! Start:
 print("========  Solenoid: tests start  ========")
-
-print("Reference particle:")
-xx    = iRefPrtcl.getPrIn()[0]
-xx[2] = 194.7585262
-iRefPrtcl._PrIn[0] = xx
-p0        = iRefPrtcl.getMomentumIn(0)
-with np.printoptions(linewidth=500,precision=7,suppress=True):
-    print("     ----> Three momentum (in, RPLC):", \
-          iRefPrtcl.getPrIn()[0][0:3])
-    print("                           Magnitude:", p0)
-
 
 ##! Test built in methods:
 SolenoidTest = 1
@@ -50,13 +40,36 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     Sol = BLE.Solenoid("Solenoid1", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no solenoid length exception.')
+
+
+#--------> Clean instances and restart:
+BLE.BeamLineElement.cleaninstances()
+
+BLI  = BL.BeamLine(filename)
+iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+print(" ----> Reference particle:")
+pz = 194.7585262
+E0 = mth.sqrt(protonMASS**2 + pz**2)
+p0 = np.array([0., 0., pz, E0])
+iRefPrtcl.setPrIn(p0)
+iRefPrtcl.setPrOut(p0)
+
+print("     ----> Reference particle set:")
+print("         ----> In:", iRefPrtcl.getPrIn())
+print("              Out:", iRefPrtcl.getPrOut())
+
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("         ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
 Sol  = BLE.Solenoid("ValidSolenoid1", rStrt, vStrt, drStrt, dvStrt, \

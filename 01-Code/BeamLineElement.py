@@ -2535,6 +2535,9 @@ class Solenoid(BeamLineElement):
             self.setksol(_ksol)
             self.setStrength(self.calcStrength())
                 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New Solenoid instance: \n", self)
             print(" <---- Done.")
