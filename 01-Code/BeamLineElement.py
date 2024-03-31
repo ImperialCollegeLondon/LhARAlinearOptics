@@ -3242,7 +3242,7 @@ class GaborLens(BeamLineElement):
 
 """
 Derived class CylindricalRFCavity:
-====================
+==================================
 
 ** Note; KL; 05Mar24: Linac convention is phase relative to crest.
 
@@ -3252,7 +3252,8 @@ Derived class CylindricalRFCavity:
 
   Class attributes:
   -----------------
-    instances : List of instances of CylindricalRFCavity(BeamLineElement) class
+    instances : List of instances of CylindricalRFCavity(BeamLineElement)
+                class
   __Debug     : Debug flag
 
 
@@ -3371,10 +3372,13 @@ class CylindricalRFCavity(BeamLineElement):
         self.setcprll(_cprll)
         _sprll = mth.sin(self.getwprll()*self.getLength()) / self.getwprll()
         self.setsprll(_sprll)
-        
+
         self.setTransferMatrix()
         self.setmrf()
 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.__Debug:
             print("     ----> New CylindricalRFCavity instance: \n", self)
 
