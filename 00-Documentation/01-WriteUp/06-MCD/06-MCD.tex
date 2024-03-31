@@ -453,7 +453,7 @@ table~\ref{Tab:Aprtr:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{Attribute} processing method is defined in
+The \texttt{Aperture} processing method is defined in
 table~\ref{Tab:Aprtr:Methods}.
 \begin{table}[h]
   \caption{
@@ -564,7 +564,7 @@ table~\ref{Tab:FQuad:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{Attribute} processing method is defined in
+The \texttt{FocusQuadrupole} processing method is defined in
 table~\ref{Tab:FQuad:Methods}.
 \begin{table}[h]
   \caption{
@@ -675,7 +675,7 @@ table~\ref{Tab:DQuad:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{Attribute} processing method is defined in
+The \texttt{DefocusQuadrupole} processing method is defined in
 table~\ref{Tab:DQuad:Methods}.
 \begin{table}[h]
   \caption{
@@ -840,3 +840,110 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 \paragraph{Utilities} ~\newline
 \noindent
 The \texttt{SectorDipole} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Solenoid(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Solenoid} derived class is:
+\begin{center}
+  \texttt{Solenoid(Name, rStrt, vStrt, drStrt, dvStrt,
+          Length, Strength, kSol)} 
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Solenoid} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Slnd:InstAttr} and
+defined in table~\ref{Tab:Slnd:Attributes}.
+The solenoid \texttt{Length} is required together with either the
+magnetic field strength, \texttt{Strength} or the solenoid $k$
+parameter, \texttt{kSol} (equation~\ref{Eq:Effectiveks}).  
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Slnd:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Slnd:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Slnd:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Solenoid(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Slnd:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                     \\
+      \hline
+      \texttt{Length}   & float & m     & Effective length of solenoid.                           \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kSol is not given. \\
+      \texttt{kSol}     & float & m$^2$ & Solenoid $k$ paramter.                                  \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Solenoid} derived
+    class. 
+  }
+  \label{Tab:Slnd:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
+      \hline
+      \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
+      \texttt{setStrength(Length)} & \texttt{getStrength()} & Set/get strength (field gradient).     \\
+      \texttt{setKFQ(Length)}      & \texttt{getKFQ()}      & Set/get kSol, solenoid $k$ parameter. \\
+      \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Solenoid} processing method is defined in
+table~\ref{Tab:Slnd:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{Solenoid} derived
+    class. 
+  }
+  \label{Tab:Slnd:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                      \\
+      \hline
+      \texttt{calckSol()}     &  & float & Calculates \texttt{kSol} if strength is specified.          \\
+      \texttt{calcStrength()} &  & float & Calculates \texttt{Strength} if \texttt{kSol} is specified. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Solenoid} derived class has no utilities.
