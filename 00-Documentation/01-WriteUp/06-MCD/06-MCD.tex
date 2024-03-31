@@ -1056,3 +1056,106 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 \paragraph{Utilities} ~\newline
 \noindent
 The \texttt{GaborLens} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{CylindricalRFCavity(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{CylindricalRFCavity} derived class is:
+\begin{center}
+  \texttt{CylindricalRFCavity(Name, rStrt, vStrt, drStrt, dvStrt,
+          Gradient, Frequency, Phase)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{CylindricalRFCavity} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:CylndclRFCvty:InstAttr} and
+defined in table~\ref{Tab:CylndclRFCvty:Attributes}. 
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:CylndclRFCvty:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:CylndclRFCvty:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:CylndclRFCvty:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{CylindricalRFCavity(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:CylndclRFCvty:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Gradient}          & float & MV/m  & Peak electric field gradient on axis.         \\
+      \texttt{Frequency}         & float & MHz   & Resonant frequency.                           \\
+      \texttt{Phase}             & float & rad   & Phase cavity at time reference particle crosses
+                                                   centre of cavity, ``linac convention''.       \\
+      \texttt{TransitTimeFactor} & float &       & Transit time factor (equation~\ref{}).        \\
+      \texttt{V0}                & float & MV    & Peak voltage.                                 \\
+      \texttt{alpha}             & float &       & $\alpha$ paramter defined in equation~\ref{}. \\
+      \texttt{wperp}             & float &       & $\omega_\perp$ paramter defined in equation~\ref{}. \\
+      \texttt{cperp}             & float &       & $c_\perp$ paramter defined in equation~\ref{}. \\
+      \texttt{sperp}             & float &       & $s_\perp$ paramter defined in equation~\ref{}. \\
+      \texttt{wprll}             & float &       & $\omega_{||}$ paramter defined in equation~\ref{}. \\
+      \texttt{cprll}             & float &       & $c_{||}$ paramter defined in equation~\ref{}. \\
+      \texttt{sprll}             & float &       & $s_{||}$ paramter defined in equation~\ref{}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{CylindricalRFCavity} derived
+    class. 
+  }
+  \label{Tab:CylndclRFCvty:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{setBz(Bz)}         & \texttt{getBz()}     & Set/get magnetic field of the Penning-Malmberg trap.      \\
+      \texttt{setVA(VA)}         & \texttt{getVA()}     & Set/get anode voltage of the Penning-Malmberg trap.       \\
+      \texttt{setRA(RA)}         & \texttt{getRA()}     & Set/get radius of the anode of the Penning-Malmberg trap. \\
+      \texttt{setRP(RP)}         & \texttt{getRP()}     & Set/get magnetic effective radiius of the plasma confined 
+                                                          within the Penning-Malmberg trap.                         \\
+      \texttt{setLength(Length)} & \texttt{getLength()} & Set/get effective length of the lens.                     \\
+
+      \texttt{setStrength(Strength)} & \texttt{getStrength()} & Set/get k-parameter of the solenoid with the
+                                                                equivalent focal length.                            \\
+      \texttt{setElectronDenisty()} & \texttt{getElectronDenisty()} & Set/get electron density.                     \\
+      \texttt{setTransferMatrix()} &                    & Set transfer matrix.                                      \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{CylindricalRFCavity} dericed class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{CylindricalRFCavity} derived class has no utilities.
