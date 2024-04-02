@@ -22,7 +22,7 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
       
   Instance attributes:
   --------------------
-   _BeamLineSpecificationCVSfile : Path to csv file in which beam line is
+   _BeamLineSpecificationCSVfile : Path to csv file in which beam line is
                                    specified.
             _BeamLineParamPandas : Pandas data frame instance containing
                                    parameters.
@@ -45,7 +45,7 @@ __BeamLineInst: Instance of BeamLine class.  Set on creation of first
   Get methods:
      getinstance: Get instance of beam class
       getDebug  : get debug flag
-getBeamLineSpecificationCVSfile:
+getBeamLineSpecificationCSVfile:
                   Get the path to the csv file specifying the beam line
 getBeamLineParamPandas:
                   Get pandas instance specifying the beam line
@@ -129,7 +129,7 @@ class BeamLine(object):
 
 
 #--------  "Built-in methods":
-    def __new__(cls, _BeamLineSpecificationCVSfile=None, readDataFile=False):
+    def __new__(cls, _BeamLineSpecificationCSVfile=None, readDataFile=False):
         if cls.getinstance() == None:
             cls._Element = []
                                                                       
@@ -149,27 +149,27 @@ class BeamLine(object):
                 return cls.getinstance()
               
             #.. Check and load parameter file
-            if _BeamLineSpecificationCVSfile == None:
+            if _BeamLineSpecificationCSVfile == None:
                 raise Exception( \
                             " BeamLine.__new__: no parameter file given.")
         
-            if not os.path.exists(_BeamLineSpecificationCVSfile):
-                print(" BeamLine.__New__: _BeamLineSpecificationCVSfile:", \
-                      _BeamLineSpecificationCVSfile)
+            if not os.path.exists(_BeamLineSpecificationCSVfile):
+                print(" BeamLine.__New__: _BeamLineSpecificationCSVfile:", \
+                      _BeamLineSpecificationCSVfile)
                 raise Exception( \
                     " BeamLine.__new__: parameter file does not exist.")
         
-            cls._BeamLineSpecificationCVSfile = \
-                               _BeamLineSpecificationCVSfile
+            cls._BeamLineSpecificationCSVfile = \
+                               _BeamLineSpecificationCSVfile
             cls._BeamLineParamPandas = BeamLine.csv2pandas( \
-                               _BeamLineSpecificationCVSfile)
+                               _BeamLineSpecificationCSVfile)
             if not isinstance(cls._BeamLineParamPandas, pnds.DataFrame):
                 raise Exception( \
                     " BeamLine.__new__: pandas data frame invalid.")
 
             if cls.getDebug():
                 print("     ----> Parameter file: ", \
-                      cls.getBeamLineSpecificationCVSfile())
+                      cls.getBeamLineSpecificationCSVfile())
                 print("     ----> Dump of pandas paramter list: \n", \
                       cls.getBeamLineParamPandas())
 
@@ -261,12 +261,6 @@ class BeamLine(object):
         return " <---- Beam line parameter dump complete."
                 
     
-#--------  I/o methods:
-    def getBeamLineParams(_filename):
-        BeamLineParams = pnds.read_csv(_filename)
-        return BeamLineParams
-    
-
 #--------  "Set methods"
 #.. Method believed to be self documenting(!)
     @classmethod
@@ -304,8 +298,8 @@ class BeamLine(object):
         return cls.__Debug
 
     @classmethod
-    def getBeamLineSpecificationCVSfile(cls):
-        return cls._BeamLineSpecificationCVSfile
+    def getBeamLineSpecificationCSVfile(cls):
+        return cls._BeamLineSpecificationCSVfile
 
     @classmethod
     def getBeamLineParamPandas(cls):
@@ -319,6 +313,8 @@ class BeamLine(object):
     def getSrcTrcSpc(cls):
         return cls.__SrcTrcSpc
     
+        
+#--------  Processing methods:
     @classmethod
     def addBeamLineElement(cls, iBLE=False):
         if cls.getDebug():
@@ -326,12 +322,6 @@ class BeamLine(object):
         if not isinstance(iBLE, BLE.BeamLineElement):
             raise badBeamLineElement()
         cls._Element.append(iBLE)
-        
-        
-#--------  Processing methods:
-    def csv2pandas(_filename):
-        ParamsPandas = pnds.read_csv(_filename)
-        return ParamsPandas
         
     @classmethod
     def addFacility(cls):
@@ -962,6 +952,10 @@ class BeamLine(object):
 
 
 #--------  I/o methods:
+    def csv2pandas(_filename):
+        ParamsPandas = pnds.read_csv(_filename)
+        return ParamsPandas
+        
     def writeBeamLine(self, beamlineFILE=None):
         if self.getDebug():
             print(" BeamLine.writeBeamLine starts.")

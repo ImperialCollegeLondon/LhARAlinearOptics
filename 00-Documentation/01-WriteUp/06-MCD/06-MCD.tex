@@ -55,6 +55,7 @@ table~\ref{Tab:ClassAttributeAccess}).
 \end{table}
 
 \subsection{\texttt{BeamLineElement}}
+\label{SubSubSect:BLE}
 
 \subsubsection{Parent class}
 
@@ -1166,3 +1167,166 @@ where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
 \paragraph{Utilities} ~\newline
 \noindent
 The \texttt{CylindricalRFCavity} derived class has no utilities.
+
+\FloatBarrier
+
+\subsection{\texttt{BeamLine}}
+
+\texttt{BeamLine} is a singleton class that sets up the beam line
+geometry and provides methods to track particles through the beam line
+using the transfer matarices defined in section~\ref{SubSubSect:BLE}.
+The beam-line geometry is provided in the form of a ``\texttt{csv}''
+file read using \texttt{pandas}.
+The format of the ``\texttt{csv}'' file is defined in
+section~\ref{SubSubSect:??}.
+Alternatively, if a data file written using the \texttt{BeamIO}
+package is being read, the beam-line geometry is read from the top of
+the data file.
+
+\subsubsection{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{BeamLineElenent} class is:
+\begin{center}
+  \texttt{BeamLine(BeamLineSpecificationCSVfile, readDataFile)}
+\end{center}
+\texttt{BeamLineSpecificationCSVfile} is a the full path of the CSV
+file containing the beam-line specificiation.
+\texttt{readDataFile} is a boolean flag.
+If \texttt{readDataFile} is set to \texttt{True}, then the \texttt{BeamLine}
+instance will be created and the beam-line geometry will be read from
+the header of the BeamIO data file.
+If \texttt{readDataFile} is not set or is set to \texttt{False}, the
+beam-line geometry will be read
+from \texttt{BeamLineSpecificationCSVfile}.
+
+\subsubsection{Instance attributes and access methods} ~\newline
+\label{SubSubSect:BLE:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:BL:Attributes}
+and the access methods are summarised in table~\ref{Tab:BL:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{BeamLine} class.
+  }
+  \label{Tab:BL:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{BeamLineSpecificationCSVfile}$^*$ & path      & Full path to beam-line specification \texttt{csv} file.        \\
+      \texttt{BeamLineParamPandasInstance}      & dataframe & Pandas data frame containing beam-line specification.          \\
+      \texttt{Element}                          & list      & List of instances of \texttt{BeamLineElement} class containing
+                                                              pointers to the elements that make up the beam line.           \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
+      \hline
+      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt(1,6)}
+                                                                   \texttt{np.ndarray}.                                          \\
+                                         & \texttt{getinsance()} & Get instance of \texttt{BeamLine} class.                        \\
+                       & \texttt{BeamLineSpecificationCSVfile()} & Get beam line specification csv file.                           \\
+                             & \texttt{(getBeamLineParamPandas)} & Get pandas dat from containing beam-line specification.         \\
+                                         & \texttt{getElement()} & get list of \texttt{BeamLineElement} instances.                 \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:BL:ProcMethods} presents the processing methods provided
+in the \texttt{BeamLine} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
+                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
+                                                                                    falls outside beam pipe, returns True. \\
+      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, across
+                                                                                    element.
+                                                                                    Final trace-space vector returned.       \\
+      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
+                                                                                    to laboratory coordinates.
+                                                                                    Phase-space vector in laboratory frame returned. \\
+      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
+                                                                                    laboratory coordinates to trace-space coordinates in
+                                                                                    the RPLC frame.
+                                                                                    Trace-space vector in RLPC frame returned. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+\begin{table}[h]
+  \caption{
+    I/p methods for the \texttt{BeamLine} class. 
+  }
+  \label{Tab:BL:ioMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Method}  & \textbf{Comment}                                                         \\
+      \hline
+      \texttt{getBeamLineParams(csvFILE)} & Create and return pandas dataframe from csvFILE.           \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Utilities} ~\newline
+\noindent
+Table~\ref{Tab:BL:Utilities} presents the utilities provided in the
+\texttt{BeamLine} class.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:Utilities}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{cleaninstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLine} class.
+                                                           Reset \texttt{instances} list. \\
+      \texttt{removeInstance(inst)} & Instance of BL &  & Remove instance \texttt{inst} and remove from list of instances of
+                                                           \texttt{BeamLine}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier
