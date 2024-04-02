@@ -1234,7 +1234,7 @@ and the access methods are summarised in table~\ref{Tab:BL:AccessMethods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
       \hline
-      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt(1,6)}
+      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
                                                                    \texttt{np.ndarray}.                                          \\
                                          & \texttt{getinsance()} & Get instance of \texttt{BeamLine} class.                        \\
                        & \texttt{BeamLineSpecificationCSVfile()} & Get beam line specification csv file.                           \\
@@ -1260,19 +1260,34 @@ in the \texttt{BeamLine} class.
       \hline
       \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
       \hline
-      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
-                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
-                                                                                    falls outside beam pipe, returns True. \\
-      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, across
-                                                                                    element.
-                                                                                    Final trace-space vector returned.       \\
-      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
-                                                                                    to laboratory coordinates.
-                                                                                    Phase-space vector in laboratory frame returned. \\
-      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
-                                                                                    laboratory coordinates to trace-space coordinates in
-                                                                                    the RPLC frame.
-                                                                                    Trace-space vector in RLPC frame returned. \\
+      \texttt{addBeamLine()}   &  & \texttt{Success} & Loops through pandas data frame and manages parsing and instanciation
+                                                       of the beam line elements defined in the specification \texttt{csv} file.
+                                                       Returns \texttt{Success} (bool) which is \texttt{True} if the beamline
+                                                       has been set up OK and is \texttt{False} otherwise.                     \\
+      \texttt{addFacility()}   &  &  & Manages the extraction of the facility paramters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Facility(BeamLineElement)}.                  \\
+      \texttt{addSource()}     &  &  & Manages the extraction of the source paramters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Source(BeamLineElement)}.                  \\
+      \texttt{parseFacility()} &  & \texttt{Name}, \texttt{K0}, \texttt{VCMVr} & Parses pandas data frane to extract
+                                                                                 facility parameters.
+                                                                                 Returns the facility \texttt{Name} (str), the
+                                                                                 kinetic energy of the reference particle,
+                                                                                 \texttt{K0} (float) in MeV, and the vacuum
+                                                                                 chamber mother volume radius, \texttt{VCMVr}
+                                                                                 (float) in m.                                 \\
+      \texttt{parseSource()}   &  & \texttt{Name}, \texttt{Mode}, \texttt{Param} & Parses pandas data frane to extract
+                                                                                 source parameters.
+                                                                                 Returns \texttt{Name} (str), \texttt{Mode} (int)
+                                                                                 \texttt{Param} (list) containing the parameters
+                                                                                 required to instanciate source \texttt{Mode}. \\
+      \texttt{addBeamLineElement(iBLE)} &  &  & Adds \texttt{BeamLineElement} instance \texttt{iBLE} to the list of instances of
+                                                     \texttt{BeamLineElement} that make up the beam line.                      \\
+      \texttt{checkConsistency()} &  & \texttt{Consistent} & Checks the consistency of the beam line representation in memory
+                                                             with that requested in the specification \texttt{csv} file.
+                                                             Returns \texttt{Consistent} (bool) which is \texttt{True} if the
+                                                             beamline is consistent is \texttt{False} otherwise.                     \\
+      \texttt{trackBeamn(NEvts, particleFILE)} &  &  & Generates \texttt{NEvts} (int) particles and tracks them through the
+                                                       beam line. \\
       \hline
     \end{tabular}
   \end{center}
@@ -1289,44 +1304,16 @@ The calls are:
       \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
 \end{equation}
 where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
-\begin{table}[h]
-  \caption{
-    I/p methods for the \texttt{BeamLine} class. 
-  }
-  \label{Tab:BL:ioMethods}
-  \begin{center}
-    \begin{tabular}{|c|c|p{7cm}|}
-      \hline
-      \textbf{Method}  & \textbf{Comment}                                                         \\
-      \hline
-      \texttt{getBeamLineParams(csvFILE)} & Create and return pandas dataframe from csvFILE.           \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
+In addition the \texttt{csv} file containing the specification of the
+beam line is read in using the method:
+\begin{equation}
+  \texttt{csv2pandas(csvFILE)} \,; \nonumber
+\end{equation}
+where \texttt{csvFILE} (path) is the full path to the \texttt{csv}
+file.
 
 \subsubsection{Utilities} ~\newline
 \noindent
-Table~\ref{Tab:BL:Utilities} presents the utilities provided in the
-\texttt{BeamLine} class.
-\begin{table}[h]
-  \caption{
-    Utilities provided by the \texttt{BeamLine}
-    class. 
-  }
-  \label{Tab:BL:Utilities}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
-      \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
-      \hline
-      \texttt{cleaninstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLine} class.
-                                                           Reset \texttt{instances} list. \\
-      \texttt{removeInstance(inst)} & Instance of BL &  & Remove instance \texttt{inst} and remove from list of instances of
-                                                           \texttt{BeamLine}. \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
+The \texttt{BEamLine} class has no utilities.
 
 \FloatBarrier

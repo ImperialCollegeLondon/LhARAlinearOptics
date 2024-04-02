@@ -316,14 +316,6 @@ class BeamLine(object):
         
 #--------  Processing methods:
     @classmethod
-    def addBeamLineElement(cls, iBLE=False):
-        if cls.getDebug():
-            print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
-        if not isinstance(iBLE, BLE.BeamLineElement):
-            raise badBeamLineElement()
-        cls._Element.append(iBLE)
-        
-    @classmethod
     def addFacility(cls):
         if cls.getDebug():
             print("             ----> BeamLine.addFacility starts:")
@@ -467,7 +459,8 @@ class BeamLine(object):
             MeanE  = float( \
              pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
             SigmaE = float( \
-             pndsSource[pndsSource["Parameter"]=="SigmaEnergy"]["Value"].iloc[0])
+             pndsSource[pndsSource["Parameter"]== \
+                        "SigmaEnergy"]["Value"].iloc[0])
             MinCTheta = float(\
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
         elif SrcMode == 2:               #.. Gaussian:
@@ -487,8 +480,11 @@ class BeamLine(object):
             print("                         ----> SigmaX, SigmaY:", \
                   SigmaX, SigmaY)
             if SrcMode == 0:
-                print("                         ----> Emin, Emax, nPnts, Power, Energy, Wavelength, Duration, Thickness, Intensity, DivAngle:", \
-                      Emin, Emax, nPnts, Power, Energy, Wavelength, Duration, Thickness, Intensity, DivAngle)
+                print("                         ----> Emin, Emax,", \
+                      " nPnts, Power, Energy, Wavelength, Duration,", \
+                      " Thickness, Intensity, DivAngle:", \
+                      Emin, Emax, nPnts, Power, Energy, Wavelength, \
+                      Duration, Thickness, Intensity, DivAngle)
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
@@ -497,7 +493,9 @@ class BeamLine(object):
                       MinE, MaxE)
 
         if SrcMode == 0:
-            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts, Power, Energy, Wavelength, Duration, Thickness, Intensity, DivAngle]
+            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts, \
+                        Power, Energy, Wavelength, Duration, Thickness, \
+                        Intensity, DivAngle]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
@@ -826,6 +824,14 @@ class BeamLine(object):
                 print("                         Momentum:", \
                       refPrtcl.getPrIn()[0])
                 print("                 <---- Done.")
+        
+    @classmethod
+    def addBeamLineElement(cls, iBLE=False):
+        if cls.getDebug():
+            print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
+        if not isinstance(iBLE, BLE.BeamLineElement):
+            raise badBeamLineElement()
+        cls._Element.append(iBLE)
         
     def checkConsistency(self):
         ConsChk = False
