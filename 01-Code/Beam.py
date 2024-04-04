@@ -26,7 +26,7 @@ Class Beam:
   _nEvtMax        : Maximum number of events to read, if not set, read 'em all
   _outputCSVfile : Path to csv file in which summary of beam processing will
                     be written
-_beamlineSpecificationCVSfile : Kept for backward compatibility, optional.
+_beamlineSpecificationCSVfile : Kept for backward compatibility, optional.
                                 Path to csv file containing specification of
                                 beam line.
 
@@ -65,12 +65,12 @@ _beamlineSpecificationCVSfile : Kept for backward compatibility, optional.
          sets: float : Set s coordinate at which phase-space is stored.
 
   Other set methods believed to be self documenting:
-   setbeamlineSpecificationCVSfile, setInputDataFile, setoutputCSVfile,
+   setbeamlineSpecificationCSVfile, setInputDataFile, setoutputCSVfile,
    setnEvtMax, setLocation, sets, setsigmaxy, setEmittance, setTwiss
    
 
   Get methods:
-      getDebug, getbeamlineSpecificationCVSfile,getInputDataFile, 
+      getDebug, getbeamlineSpecificationCSVfile,getInputDataFile, 
       getoutputCSVfile, getBeamInstances(cls), getLocation, 
       getnEvtMax, getCovSums, getnParticles, getCovarianceMatrix,
       getsigmaxy, getemittance, getTwiss
@@ -145,7 +145,7 @@ class Beam:
 #--------  "Built-in methods":
     def __init__(self, _InputDataFile=None, _nEvtMax=None, \
                        _outputCSVfile=None, \
-                       _beamlineSpecificationCVSfile=None):
+                       _beamlineSpecificationCSVfile=None):
         if self.__Debug:
             print(' Beam.__init__: ', \
                   'creating the Beam object')
@@ -193,9 +193,9 @@ class Beam:
         EndOfFile = ibmIOr.readBeamDataRecord()
 
         if BL.BeamLine.getinstance() == None:
-            self.setbeamlineSpecificationCVSfile( \
-                                        _beamlineSpecificationCVSfile)
-            iBm = BL.BeamLine(self.getbeamlineSpecificationCVSfile())
+            self.setbeamlineSpecificationCSVfile( \
+                                        _beamlineSpecificationCSVfile)
+            iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
         
         for iBLE in BLE.BeamLineElement.getinstances():
             if not isinstance(iBLE, BLE.Facility):
@@ -236,7 +236,7 @@ class Beam:
         print(" -----")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Beam specification file:", \
-              self.getbeamlineSpecificationCVSfile())
+              self.getbeamlineSpecificationCSVfile())
         print("     ----> Input data fole:", \
               self.getInputDataFile())
         print("     ----> Number of events to read:", \
@@ -278,7 +278,7 @@ class Beam:
         self._InputDataFile                = None
         self._nEvtMax                      = None
         self._outputCSVfile               = None
-        self._beamlineSpecificationCVSfile = None
+        self._beamlineSpecificationCSVfile = None
 
         self._Location   = []
         self._CovSums    = []
@@ -288,9 +288,9 @@ class Beam:
         self._emittance  = []
         self._Twiss      = []
 
-    def setbeamlineSpecificationCVSfile(self, _beamlineSpecificationCVSfile):
-        self._beamlineSpecificationCVSfile = \
-                        _beamlineSpecificationCVSfile
+    def setbeamlineSpecificationCSVfile(self, _beamlineSpecificationCSVfile):
+        self._beamlineSpecificationCSVfile = \
+                        _beamlineSpecificationCSVfile
 
     def setInputDataFile(self, _InputDataFile):
         self._InputDataFile = _InputDataFile
@@ -452,8 +452,8 @@ class Beam:
     def getDebug(cls):
         return cls.__Debug
 
-    def getbeamlineSpecificationCVSfile(self):
-        return self._beamlineSpecificationCVSfile
+    def getbeamlineSpecificationCSVfile(self):
+        return self._beamlineSpecificationCSVfile
 
     def getInputDataFile(self):
         return self._InputDataFile
@@ -490,59 +490,7 @@ class Beam:
         return self._Twiss
 
     
-#--------  Utilities:
-    @classmethod
-    def cleanBeams(cls):
-        DoneOK = False
-        
-        for iBm in cls.getBeamInstances():
-            del iBm
-            
-        cls.resetBeamInstances()
-        DoneOK = True
-
-        return DoneOK
-    
-    def printProgression(self):
-        for iLoc in range(len(self.getLocation())):
-            with np.printoptions(linewidth=500,precision=5, \
-                                 suppress=True):
-                print(self.getLocation()[iLoc], \
-                      ": z, s, trace space:", \
-                      self.getz()[iLoc], self.gets()[iLoc])
-
-    def getHeader(self):
-        HeaderList = ["Name", "nPrtcls", "sigmaxy", "emittance", "Twiss"]
-        return HeaderList
-
-    def getLines(self):
-        DataList = []
-        for iLoc in range(len(self.getLocation())):
-            DataList.append([  \
-                               self.getLocation()[iLoc], \
-                               self.getnParticles()[iLoc], \
-                               self.getsigmaxy()[iLoc], \
-                               self.getemittance()[iLoc], \
-                               self.getTwiss()[iLoc] \
-                               ])
-        return DataList
-    
-    def createReport(self):
-
-        if self.getoutputCSVfile() == None:
-            print(" Beam.createReport: no data file given, skip.")
-        else:
-            Name   = BLE.BeamLineElement.getinstances()[0].getName()
-            iRprt  = Rprt.Report(Name, None, self.getoutputCSVfile(),
-                             self.getHeader(), self.getLines())
-            if self.getDebug():
-                print("Beam.createReport:")
-                print(iRprt)
-
-            iRprt.asCSV()
-
-
-#--------  Covariance matrix calculation:
+#--------  Processing methods:
     def initialiseSums(self):
         if self.getDebug():
             print(" Beam.intialiseSums start:")
@@ -642,9 +590,6 @@ class Beam:
                         print("                CovMtrx: \n", \
                               self.getCovarianceMatrix()[iLoc]) 
 
-
-#--------  Covariance matrix calculation:
-
     def evaluateBeam(self):
         print(" Beam.evaluateBeam: perform sums to get covariance matrices")
         
@@ -692,6 +637,58 @@ class Beam:
         self.setTwiss()
         print("     <---- done.")
         
+#--------  Utilities:
+    @classmethod
+    def cleanBeams(cls):
+        DoneOK = False
+        
+        for iBm in cls.getBeamInstances():
+            del iBm
+            
+        cls.resetBeamInstances()
+        DoneOK = True
+
+        return DoneOK
+    
+    def printProgression(self):
+        for iLoc in range(len(self.getLocation())):
+            with np.printoptions(linewidth=500,precision=5, \
+                                 suppress=True):
+                print(self.getLocation()[iLoc], \
+                      ": z, s, trace space:", \
+                      self.getz()[iLoc], self.gets()[iLoc])
+
+    def getHeader(self):
+        HeaderList = ["Name", "nPrtcls", "sigmaxy", "emittance", "Twiss"]
+        return HeaderList
+
+    def getLines(self):
+        DataList = []
+        for iLoc in range(len(self.getLocation())):
+            DataList.append([  \
+                               self.getLocation()[iLoc], \
+                               self.getnParticles()[iLoc], \
+                               self.getsigmaxy()[iLoc], \
+                               self.getemittance()[iLoc], \
+                               self.getTwiss()[iLoc] \
+                               ])
+        return DataList
+    
+    def createReport(self):
+
+        if self.getoutputCSVfile() == None:
+            print(" Beam.createReport: no data file given, skip.")
+        else:
+            Name   = BLE.BeamLineElement.getinstances()[0].getName()
+            iRprt  = Rprt.Report(Name, None, self.getoutputCSVfile(),
+                             self.getHeader(), self.getLines())
+            if self.getDebug():
+                print("Beam.createReport:")
+                print(iRprt)
+
+            iRprt.asCSV()
+
+
     def plotBeamProgression(self):
         if self.getDebug():
             print(" Beam.plotBeamProgression: start")

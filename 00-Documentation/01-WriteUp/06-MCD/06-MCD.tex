@@ -1402,14 +1402,18 @@ and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
   \begin{center}
     \begin{tabular}{|c|c|p{7cm}|}
       \hline
-      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                             \\
       \hline
-      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
-                                                                   \texttt{np.ndarray}.                                          \\
-                                         & \texttt{getinsance()} & Get instance of \texttt{Beam} class.                        \\
-                       & \texttt{BeamSpecificationCSVfile()} & Get beam line specification csv file.                           \\
-                             & \texttt{(getBeamParamPandas)} & Get pandas dat from containing beam-line specification.         \\
-                                         & \texttt{getElement()} & get list of \texttt{BeamElement} instances.                 \\
+      \texttt{setInputDataFile} & \texttt{getInputDataFile} & Set/get input \texttt{BeamIO} data file.                          \\
+      \texttt{setoutputCSVfile} & \texttt{getoutputCSVfile} & Set/get output \texttt{csv} file.                                 \\
+      \texttt{setbeamlineSpecificationCSVfile} & \texttt{getbeamlineSpecificationCSVfile} & Set/get beam-line specification CSV
+                                                                                            file.                               \\
+      \texttt{setnEvtMax}      & \texttt{getnEvtMax}   & Set/get maximum number of events to ready.                             \\
+      \texttt{setLocation}     & \texttt{setLocation}  & Set/get location where paramters are stored.                           \\
+      \texttt{sets}            & \texttt{gets}         & Set/get list of $s$ positions where parameters are stored.             \\
+      \texttt{setsigmaxy}      & \texttt{getsigmaxy}   & Set/get list of $\sigma_x$ and $\sigma_y$.                             \\
+      \texttt{setEmittance}    & \texttt{getEmittance} & Set/get list of emittance lists.                                       \\
+      \texttt{setTwiss}        & \texttt{getTwiss}     & Set/get list of sets of Twiss paramters.                               \\
       \hline
     \end{tabular}
   \end{center}
@@ -1430,34 +1434,10 @@ in the \texttt{Beam} class.
       \hline
       \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
       \hline
-      \texttt{addBeam()}   &  & \texttt{Success} & Loops through pandas data frame and manages parsing and instanciation
-                                                       of the beam line elements defined in the specification \texttt{csv} file.
-                                                       Returns \texttt{Success} (bool) which is \texttt{True} if the beamline
-                                                       has been set up OK and is \texttt{False} otherwise.                     \\
-      \texttt{addFacility()}   &  &  & Manages the extraction of the facility paramters from the pandas data frame and the
-                                       creation of the single instance of \texttt{Facility(BeamElement)}.                  \\
-      \texttt{addSource()}     &  &  & Manages the extraction of the source paramters from the pandas data frame and the
-                                       creation of the single instance of \texttt{Source(BeamElement)}.                  \\
-      \texttt{parseFacility()} &  & \texttt{Name}, \texttt{K0}, \texttt{VCMVr} & Parses pandas data frane to extract
-                                                                                 facility parameters.
-                                                                                 Returns the facility \texttt{Name} (str), the
-                                                                                 kinetic energy of the reference particle,
-                                                                                 \texttt{K0} (float) in MeV, and the vacuum
-                                                                                 chamber mother volume radius, \texttt{VCMVr}
-                                                                                 (float) in m.                                 \\
-      \texttt{parseSource()}   &  & \texttt{Name}, \texttt{Mode}, \texttt{Param} & Parses pandas data frane to extract
-                                                                                 source parameters.
-                                                                                 Returns \texttt{Name} (str), \texttt{Mode} (int)
-                                                                                 \texttt{Param} (list) containing the parameters
-                                                                                 required to instanciate source \texttt{Mode}. \\
-      \texttt{addBeamElement(iBLE)} &  &  & Adds \texttt{BeamElement} instance \texttt{iBLE} to the list of instances of
-                                                     \texttt{BeamElement} that make up the beam line.                      \\
-      \texttt{checkConsistency()} &  & \texttt{Consistent} & Checks the consistency of the beam line representation in memory
-                                                             with that requested in the specification \texttt{csv} file.
-                                                             Returns \texttt{Consistent} (bool) which is \texttt{True} if the
-                                                             beamline is consistent is \texttt{False} otherwise.                     \\
-      \texttt{trackBeamn(NEvts, particleFILE)} &  &  & Generates \texttt{NEvts} (int) particles and tracks them through the
-                                                       beam line. \\
+      \texttt{initialiseSums()} &  &  & Initialises sums used to calculate covariance matrix.                                \\
+      \texttt{incrementSums(iPrtcl)}  & \texttt{Particle} instance &  & Increment sums used to calculate covariance matrix.  \\
+      \texttt{calcCovarianceMatrix()} &  &  & Calculate covariance matrix.                                                   \\
+      \texttt{evaluateBeam()} &  &  & Work through locations and calculate paramters from covariance matrix.                 \\
       \hline
     \end{tabular}
   \end{center}
@@ -1465,25 +1445,31 @@ in the \texttt{Beam} class.
 
 \subsubsection{I/o methods} ~\newline
 \noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
-In addition the \texttt{csv} file containing the specification of the
-beam line is read in using the method:
-\begin{equation}
-  \texttt{csv2pandas(csvFILE)} \,; \nonumber
-\end{equation}
-where \texttt{csvFILE} (path) is the full path to the \texttt{csv}
-file.
+The \texttt{Beam} class has no i/o methods.
 
 \subsubsection{Utilities} ~\newline
 \noindent
-The \texttt{BEamLine} class has no utilities.
+The utilities provided by the \texttt{Beam} class are listed in
+table~\ref{Tab:B:UtilMethods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:UtilMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \hline
+      \texttt{cleanBeams()}       &  &  & Delete (using \texttt{del}) instances of beam class.          \\
+      \texttt{printProgression()} &  &  & Prints the paramters at each location.                                           \\
+      \texttt{getHeader()}        &  &  & Returns header for pandas data frame used to store summary.                      \\
+      \texttt{getLines()}         &  &  & Returns lines to be used to create summary pandas data frame.                    \\
+      \texttt{createReport()}     &  &  & Creates \texttt{csv} file containing summary of beam progression.                \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \FloatBarrier
