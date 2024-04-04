@@ -15,19 +15,19 @@ Class BeamLine:
   Class attributes:
   -----------------
    __Debug    : Debug flag
-   __SrcTrcSpc: 6D trace space at source (np.ndarray)
 __BeamLineInst: Instance of BeamLine class.  Set on creation of first
                 (and only) instance.
 
       
   Instance attributes:
   --------------------
+    _Element[] : BeamLineElement : List of beam line elements making up the
+                                   beam line.
    _BeamLineSpecificationCSVfile : Path to csv file in which beam line is
                                    specified.
             _BeamLineParamPandas : Pandas data frame instance containing
                                    parameters.
-    _Element[] : BeamLineElement : List of beam line elements making up the
-                                   beam line.
+                      _SrcTrcSpc : 6D trace space at source (np.ndarray)
     
   Methods:
   --------
@@ -125,7 +125,7 @@ mu0                = constants_instance.mu0()
 class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
-    __SrcTrcSpc    = None
+    _SrcTrcSpc    = None
 
 
 #--------  "Built-in methods":
@@ -285,7 +285,7 @@ class BeamLine(object):
             raise badTraceSpaceVector( \
                         " BeamLine.setSrcTrcSpc:", SrcTrcSpc)
 
-        cls.__SrcTrcSpc = SrcTrcSpc
+        cls._SrcTrcSpc = SrcTrcSpc
         
 #--------  "Get methods"
 #.. Method believed to be self documenting(!)
@@ -311,7 +311,7 @@ class BeamLine(object):
     
     @classmethod
     def getSrcTrcSpc(cls):
-        return cls.__SrcTrcSpc
+        return cls._SrcTrcSpc
     
         
 #--------  Processing methods:

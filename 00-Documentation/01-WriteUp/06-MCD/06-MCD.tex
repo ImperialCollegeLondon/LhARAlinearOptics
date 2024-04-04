@@ -1317,3 +1317,173 @@ file.
 The \texttt{BEamLine} class has no utilities.
 
 \FloatBarrier
+
+\subsection{\texttt{Beam}}
+
+The \texttt{Beam} class provides methods to calculate the parameters
+describing the beam passing through an instance of the BeamLine class.
+The covariance matrix is calculated at the various locations defined
+in the \texttt{BeamLine} instance.
+The calculation is performed either by calculating the covariance
+matrices particle by particle or by using transfer matrices to
+propagate the covariance matrix from the source.
+The latter (propogation of the covariance matrix) is not yet
+implemented.
+
+\subsubsection{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{BeamElenent} class is:
+\begin{center}
+  \texttt{Beam(readDataFile, nEvtMax, outputCSVfile, beamlineSpecificationCSVfile)}
+\end{center}
+\texttt{readDataFile}, the path to the \texttt{BeamIO} file containing
+the particles tht form the beam, is required.
+\texttt{nEvtMax} (optional) defines the number of particles to be
+read; id it is not given, all particles in \texttt{readDataFile} will
+be read.
+A CSV file at \texttt{outputCSVfile} will be created containing a
+summary of the beam parameters if this parameter is given.
+\texttt{beamlineSpecificationCSVfile} (the full path of the CSV file
+containing the beam-line specificiation) is not required if version 2
+or later of the \texttt{BeamIO} data-file format is being used.
+The optional argument is retained for backward compatibility.
+
+\subsubsection{Instance attributes and access methods} ~\newline
+\label{SubSubSect:BLE:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:B:Attributes}
+and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Beam} class.
+    The attributes marked $^*$ above the dividing line are required in
+    the call to instantiate the element.
+    The attributes marked $^\dagger$ below the dividing line are
+    calculated.
+  }
+  \label{Tab:B:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{InputDataFile}$^*$ & path & Path to BeamIO data file containing events to be read (required).                    \\
+      \texttt{nEvtMax}$^*$       & int  & Maximum number of events to read, if not set, read all events (optional).            \\
+      \texttt{outputCSVfile}$^*$ & path & Path to csv file in which summary of beam processing will be written (optional).     \\
+ \texttt{beamlineSpecificationCVSfile}$^*$ &
+                                   path & Kept for backward compatibility (optional).
+                                          Path to csv file containing specification of beam line.                              \\
+      \hline
+      \texttt{Element[]}             & list  & List of instances of \texttt{BeamElement} class containing
+                                                              pointers to the elements that make up the beam line.           \\
+      \texttt{Location[]}$^{\dagger}$    & str   & Name of location where parameters are recorded.                             \\
+      \texttt{s[]}$^{\dagger}$           & float & $s$ coordinate at which parameters are recorded.                            \\
+      \texttt{CovSums[][]}$^{\dagger}$   & list  & Sums required to calculate covariance matrix by location.  Stored as list of $6\times6$ np.ndarrays.     \\
+      \texttt{nParticles[]}$^{\dagger}$  & list  & Number of particles arriving at location.                                       \\
+      \texttt{CovMtrx[][]}$^{\dagger}$   & list  & Covariance matrix by location.  Stored as list of $6\times6$ np.ndarrays.     \\
+      \texttt{sigmaxy[][]}$^{\dagger}$   & list  & RMS x and y by location.  \texttt{[iLoc][0]} $\sigma_x$, \texttt{[iloc][1]} $\sigma_y$. \\
+      \texttt{emittance[][]}$^{\dagger}$ & list  & Emittance by location; calculated from \texttt{CovMtrx}. \texttt{[iloc][0]} $\varepsilon_x$,
+                                                  \texttt{[iloc][1]} $\varepsilon_y$, \texttt{[iloc][2]} $\varepsilon_\perp$, \texttt{[iloc][3]} $\varepsilon_{xy}$
+                                                  \texttt{[iloc][4]} $\varepsilon_{6D}$ \\
+      \texttt{Twiss[][][]}$^{\dagger}$   & list  & Twiss parameters by location.
+                                                  \texttt{[iloc][0][0]} $\alpha_x$, \texttt{[iloc][0][1]} $\beta_x$, \texttt{[iloc][0][2]} $\gamma_x$, 
+                                                  \texttt{[iloc][1][0]} $\alpha_y$, \texttt{[iloc][1][1]} $\beta_y$, \texttt{[iloc][1][2]} $\gamma_y$. \\ 
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
+      \hline
+      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
+                                                                   \texttt{np.ndarray}.                                          \\
+                                         & \texttt{getinsance()} & Get instance of \texttt{Beam} class.                        \\
+                       & \texttt{BeamSpecificationCSVfile()} & Get beam line specification csv file.                           \\
+                             & \texttt{(getBeamParamPandas)} & Get pandas dat from containing beam-line specification.         \\
+                                         & \texttt{getElement()} & get list of \texttt{BeamElement} instances.                 \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:B:ProcMethods} presents the processing methods provided
+in the \texttt{Beam} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{addBeam()}   &  & \texttt{Success} & Loops through pandas data frame and manages parsing and instanciation
+                                                       of the beam line elements defined in the specification \texttt{csv} file.
+                                                       Returns \texttt{Success} (bool) which is \texttt{True} if the beamline
+                                                       has been set up OK and is \texttt{False} otherwise.                     \\
+      \texttt{addFacility()}   &  &  & Manages the extraction of the facility paramters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Facility(BeamElement)}.                  \\
+      \texttt{addSource()}     &  &  & Manages the extraction of the source paramters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Source(BeamElement)}.                  \\
+      \texttt{parseFacility()} &  & \texttt{Name}, \texttt{K0}, \texttt{VCMVr} & Parses pandas data frane to extract
+                                                                                 facility parameters.
+                                                                                 Returns the facility \texttt{Name} (str), the
+                                                                                 kinetic energy of the reference particle,
+                                                                                 \texttt{K0} (float) in MeV, and the vacuum
+                                                                                 chamber mother volume radius, \texttt{VCMVr}
+                                                                                 (float) in m.                                 \\
+      \texttt{parseSource()}   &  & \texttt{Name}, \texttt{Mode}, \texttt{Param} & Parses pandas data frane to extract
+                                                                                 source parameters.
+                                                                                 Returns \texttt{Name} (str), \texttt{Mode} (int)
+                                                                                 \texttt{Param} (list) containing the parameters
+                                                                                 required to instanciate source \texttt{Mode}. \\
+      \texttt{addBeamElement(iBLE)} &  &  & Adds \texttt{BeamElement} instance \texttt{iBLE} to the list of instances of
+                                                     \texttt{BeamElement} that make up the beam line.                      \\
+      \texttt{checkConsistency()} &  & \texttt{Consistent} & Checks the consistency of the beam line representation in memory
+                                                             with that requested in the specification \texttt{csv} file.
+                                                             Returns \texttt{Consistent} (bool) which is \texttt{True} if the
+                                                             beamline is consistent is \texttt{False} otherwise.                     \\
+      \texttt{trackBeamn(NEvts, particleFILE)} &  &  & Generates \texttt{NEvts} (int) particles and tracks them through the
+                                                       beam line. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+In addition the \texttt{csv} file containing the specification of the
+beam line is read in using the method:
+\begin{equation}
+  \texttt{csv2pandas(csvFILE)} \,; \nonumber
+\end{equation}
+where \texttt{csvFILE} (path) is the full path to the \texttt{csv}
+file.
+
+\subsubsection{Utilities} ~\newline
+\noindent
+The \texttt{BEamLine} class has no utilities.
+
+\FloatBarrier

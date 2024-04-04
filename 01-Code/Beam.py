@@ -5,14 +5,11 @@ Class Beam:
 ===========
 
   In some sense a "sister" class to Particle.  Whereas an instsance of
-  Particle records the passage of aparticle travelling through the
+  Particle records the passage of a particle travelling through the
   beam line, an instance of Beam records the collective properties of
   the beam such as emittance, etc., as the beam progresses through the
   beam line. 
 
-  Derived classes:
-  ----------------
-  
 
   Class attributes:
   -----------------
@@ -23,8 +20,26 @@ Class Beam:
   Instance attributes:
   --------------------
    All instance attributes are initialised to Null
-   _Location[] :   str   : Name of location where parameters are recorded
-   _s[]        : float   : s coordinate at which parameters are recorded
+
+   Input arguments:
+  _InputDataFile  : Path to BeamIO data file containing events to be read.
+  _nEvtMax        : Maximum number of events to read, if not set, read 'em all
+  _outputCSVfile : Path to csv file in which summary of beam processing will
+                    be written
+_beamlineSpecificationCVSfile : Kept for backward compatibility, optional.
+                                Path to csv file containing specification of
+                                beam line.
+
+   _Location[] :   str : Name of location where parameters are recorded
+   _s[]        : float : s coordinate at which parameters are recorded
+   _nParticles :  list : Number of particles arriving at location
+   _CovMtrx    :  list : Covariance matrix by location
+   _sigmaxy    :  list : RMS x and y by location.  [0] sigmax, [1] sigmay
+   _emittance  :  list : emittance by location; calculated from CovMtrx
+                         [0] e_x, [1] e_y, [2] e_L, [3] e_{xy}, [4] e_{6D}
+   _Twiss      :  list : Twiss parameters by location
+                         [0][0] alpha_x, [0][1] beta_x, [0][2] gamma_x
+                         [1][0] alpha_y, [1][1] beta_y, [1][2] gamma_y
 
     
   Methods:
@@ -49,10 +64,16 @@ Class Beam:
 
          sets: float : Set s coordinate at which phase-space is stored.
 
+  Other set methods believed to be self documenting:
+   setbeamlineSpecificationCVSfile, setInputDataFile, setoutputCSVfile,
+   setnEvtMax, setLocation, sets, setsigmaxy, setEmittance, setTwiss
+   
 
   Get methods:
-      getDebug, getBeamInstances, getLocation, gets, 
-      getTraceSpace, getRPLCPhaseSpace, getPhaseSpace
+      getDebug, getbeamlineSpecificationCVSfile,getInputDataFile, 
+      getoutputCSVfile, getBeamInstances(cls), getLocation, 
+      getnEvtMax, getCovSums, getnParticles, getCovarianceMatrix,
+      getsigmaxy, getemittance, getTwiss
           -- thought to be self documenting!
 
   Processing methods:
@@ -65,12 +86,33 @@ Class Beam:
      incrementSums: increment sums used to calculate covariance matrix
          Input: Instance of particle class
 
+printProgression : prints evolution of beam parameters by location.
+
+    createReport : creates csv file with evolutio of beam paramters by
+                   location.
+
+   initaliseSums : Initials sums needed to calculate covariance matrix
+
+   incrementSums : Incrememnt sums
+                input : iPrtcl : instance of particle class by which sums are
+                                 to be updated
+
+ calcCovarianceMatrix : Calculate covariance matrix given sums
+
+   evaluateBeam : Read data file and increment sums.  Then, calculate
+                  covariance matrix, RMS x and y, emittance, and Twiss
+                  paramters
+
+plotBeamProgression : create standard plots
+                      (in 99-Scratch/BeamProgressionPlot.pdf!) of beam
+                      parameters.
+
 
   I/o methods:
-
+    CSV file written out using Report module.
 
   Exceptions:
-    badBeam, badParameter
+    badBeam, badParameter, badParameter, badTraceSpace
 
 
 Created on Mon 28Feb24: Version history:
@@ -102,8 +144,8 @@ class Beam:
 
 #--------  "Built-in methods":
     def __init__(self, _InputDataFile=None, _nEvtMax=None, \
-                       _OutputDataFile=None, \
-                       _BeamLineSpecificationCVSfile=None):
+                       _outputCSVfile=None, \
+                       _beamlineSpecificationCVSfile=None):
         if self.__Debug:
             print(' Beam.__init__: ', \
                   'creating the Beam object')
@@ -113,9 +155,6 @@ class Beam:
 #--------  Check and initialise all inputs:  --------  --------  --------
 
         #.. Load parameter file
-        self.setBeamLineSpecificationCVSfile( \
-                           _BeamLineSpecificationCVSfile)
-
         #.. Check and open input data file
         if _InputDataFile == None:
             raise Exception( \
@@ -129,12 +168,12 @@ class Beam:
             raise Exception(" Bad maximum number of events to read")
 
         #.. Check and output data file
-        if _OutputDataFile == None:
+        if _outputCSVfile == None:
             pass
         else:
-            self.setOutputDataFile(_OutputDataFile)
-            print(self.getOutputDataFile())
-            dirname, filename = os.path.split(self.getOutputDataFile())
+            self.setoutputCSVfile(_outputCSVfile)
+            print(self.getoutputCSVfile())
+            dirname, filename = os.path.split(self.getoutputCSVfile())
             print(dirname, filename)
             if not os.path.isdir(dirname):
                 raise Exception( \
@@ -154,7 +193,9 @@ class Beam:
         EndOfFile = ibmIOr.readBeamDataRecord()
 
         if BL.BeamLine.getinstance() == None:
-            iBm = BL.BeamLine(self.getBeamLineSpecificationCVSfile())
+            self.setbeamlineSpecificationCVSfile( \
+                                        _beamlineSpecificationCVSfile)
+            iBm = BL.BeamLine(self.getbeamlineSpecificationCVSfile())
         
         for iBLE in BLE.BeamLineElement.getinstances():
             if not isinstance(iBLE, BLE.Facility):
@@ -195,13 +236,13 @@ class Beam:
         print(" -----")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Beam specification file:", \
-              self.getBeamLineSpecificationCVSfile())
+              self.getbeamlineSpecificationCVSfile())
         print("     ----> Input data fole:", \
               self.getInputDataFile())
         print("     ----> Number of events to read:", \
               self.getnEvtMax())
-        print("     ----> Output data fole:", \
-              self.getOutputDataFile())
+        print("     ----> Output data file:", \
+              self.getoutputCSVfile())
         print("     ----> Beam parameters by location:")
         for iLoc in range(len(self.getLocation())):
             print("         ----> iLoc:", iLoc, self.getLocation()[iLoc], \
@@ -234,10 +275,10 @@ class Beam:
             cls.instances = []
         
     def setAll2None(self):
-        self._BeamLineSpecificationCVSfile = None
         self._InputDataFile                = None
         self._nEvtMax                      = None
-        self._OutputDataFile               = None
+        self._outputCSVfile               = None
+        self._beamlineSpecificationCVSfile = None
 
         self._Location   = []
         self._CovSums    = []
@@ -247,15 +288,15 @@ class Beam:
         self._emittance  = []
         self._Twiss      = []
 
-    def setBeamLineSpecificationCVSfile(self, _BeamLineSpecificationCVSfile):
-        self._BeamLineSpecificationCVSfile = \
-                        _BeamLineSpecificationCVSfile
+    def setbeamlineSpecificationCVSfile(self, _beamlineSpecificationCVSfile):
+        self._beamlineSpecificationCVSfile = \
+                        _beamlineSpecificationCVSfile
 
     def setInputDataFile(self, _InputDataFile):
         self._InputDataFile = _InputDataFile
 
-    def setOutputDataFile(self, _OutputDataFile):
-        self._OutputDataFile = _OutputDataFile
+    def setoutputCSVfile(self, _outputCSVfile):
+        self._outputCSVfile = _outputCSVfile
 
     def setnEvtMax(self, _nEvtMax):
         if isinstance(_nEvtMax, int):
@@ -411,14 +452,14 @@ class Beam:
     def getDebug(cls):
         return cls.__Debug
 
-    def getBeamLineSpecificationCVSfile(self):
-        return self._BeamLineSpecificationCVSfile
+    def getbeamlineSpecificationCVSfile(self):
+        return self._beamlineSpecificationCVSfile
 
     def getInputDataFile(self):
         return self._InputDataFile
         
-    def getOutputDataFile(self):
-        return self._OutputDataFile
+    def getoutputCSVfile(self):
+        return self._outputCSVfile
         
     @classmethod
     def getBeamInstances(cls):
@@ -488,11 +529,11 @@ class Beam:
     
     def createReport(self):
 
-        if self.getOutputDataFile() == None:
+        if self.getoutputCSVfile() == None:
             print(" Beam.createReport: no data file given, skip.")
         else:
             Name   = BLE.BeamLineElement.getinstances()[0].getName()
-            iRprt  = Rprt.Report(Name, None, self.getOutputDataFile(),
+            iRprt  = Rprt.Report(Name, None, self.getoutputCSVfile(),
                              self.getHeader(), self.getLines())
             if self.getDebug():
                 print("Beam.createReport:")
