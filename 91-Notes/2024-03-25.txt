@@ -1,76 +1,48 @@
---------  --------  --------  --------  --------  --------  --------  02Apr24
-Have been updating documentation.  This lead to need to defifine vStrt.  In
-turn this lead to a need to fix all tests and many calls.  So, need to check
-tests:
+--------  --------  --------  --------  --------  --------  --------  25Mar24
+Begun to tidy code and work on documentation.  Over w/e fixed up
+BeamLineElement.  Outstanding task to update write and read.  Next jobs!
 
-Tests:
- - ApertureTst.py            - OK
- - BeamIOTst-wrt.py          - Fails; need to update source!
- - BeamIOTst-rd.py           - Not tested
- - BeamLineElementTst.py     - OK
- - BeamLineTst.py            - Fails; need to update source!
- - BeamTst.py                - Fails -- bad init!
- - CylindricalRFCavityTst.py - OK
- - DRACOfacilityTst.py       - Fails; need to update source!
- - DefocusQuadTst.py         - OK
- - DipoleTst.py              - OK
- - DriftTst.py               - OK
- - ExpSourceTst.py           - Fails; need to update source!
- - FacilityTst.py            - OK
- - FocusQuadTst.py           - OK
- - GaborLensTst.py           - OK
- - LIONfacilityTst.py        - Fails; need to update source!
- - LaTexTst.py               - OK
- - LhARAFacilityTst.py       - Fails; need to update source!
- - OctupoleTst.py            - Fails
- - ParticleTst.py            - Fails; need to update source!
- - PhysicalConstantsTst.py   - OK
- - QuadDoubletTst.py         - Fails, need to fix clean instances
- - QuadTripletTst.py         - Fails, need to fix clean instances
- - ReferenceParticleTst.py   - Fails; need to update source!
- - RunSimulationTst.py       - Fails; need to update source!
- - SimulationTst.py          - Fails; need to update source!
- - SolenoidTst.py            - OK
- - SourceTst.py              - Fails; need to update source!
- - TestWrite.py              - OK
- - TestRead.py               - Fails; need to update source!
- - testGitRepoId.py          - Fails, no module named git!
+Also, need to make thorough update of modification record in modules.
+
+cleanInstances --> cleaninstances
+
+Done:
+ - Updated to write and read.
+ - cleaninstances fix done.
+
+
 
 
 --------  --------  --------  --------  --------  --------  --------  --------
 Tests:
- - ApertureTst.py            -
- - BeamIOTst-wrt.py          -
- - BeamIOTst-rd.py           -
- - BeamLineElementTst.py     -
- - BeamLineTst.py            -
- - BeamTst.py                -
- - CylindricalRFCavityTst.py -
- - DRACOfacilityTst.py       -
- - DefocusQuadTst.py         -
- - DipoleTst.py              -
- - DriftTst.py               -
- - ExpSourceTst.py           -
- - FacilityTst.py            -
- - FocusQuadTst.py           -
- - GaborLensTst.py           -
- - LIONfacilityTst.py        -
- - LaTexTst.py               -
- - LhARAFacilityTst.py       -
- - OctupoleTst.py            -
- - ParticleTst.py            -
- - PhysicalConstantsTst.py   -
- - QuadDoubletTst.py         -
- - QuadTripletTst.py         -
- - ReferenceParticleTst.py   -
- - RunSimulationTst.py       -
- - SimulationTst.py          -
- - SolenoidTst.py            -
- - SourceTst.py              -
- - TestWrite.py              -
- - TestRead.py               -
- - testGitRepoId.py          -
-
+ - BeamIOTst-wrt.py        - 
+ - BeamIOTst-rd.py         - 
+ - BeamLineElementTst.py   - 
+ - BeamLineTst.py          - 
+ - BeamTst.py              -
+ - CylindricalRFCavityTst  -
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DRACOfacilityTst.py     - 	
+ - DriftTst.py             -
+ - ExpSourceTst.py         -
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         -
+ - LaTexTst.py             -
+ - LhARAFacilityTst.py     - 
+ - LIONfacilityTst.py      - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          -
+ - PhysicalConstantsTst.py - 
+ - QuadDoubletTst.py       -
+ - QuadTripletTst.py       -
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestWrite.py            - 
+ - TestRead.py             - 
 
 Scripts:
  - LhARAMagnetTable.py     - 

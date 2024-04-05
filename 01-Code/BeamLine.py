@@ -351,9 +351,9 @@ class BeamLine(object):
 
         #.. Create the source beam line element:
         rStrt = np.array([0.,0.,0.])
-        vStrt = np.array([0.,0.])
+        vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
         drStrt = np.array([0.,0.,0.])
-        dvStrt = np.array([0.,0.])
+        dvStrt = np.array([[0.,0.],[0.,0.]])
         SourceBLE = BLE.Source(Name, rStrt, vStrt, drStrt, dvStrt, \
                                SrcMode, SrcParam)
 
@@ -560,10 +560,10 @@ class BeamLine(object):
                 nDrift   += 1
                 Name      = Name + str(nDrift)
                 Length    = float(iLine.Value)
-                rStrt      = np.array([0.,0.,s])
-                vStrt      = np.array([0.,0.])
-                drStrt     = np.array([0.,0.,0.])
-                dvStrt     = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.Drift(Name, \
@@ -573,10 +573,10 @@ class BeamLine(object):
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
-                rStrt  = np.array([0.,0.,s])
-                vStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 if iLine.Type == "Circular":
                     Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
@@ -611,10 +611,10 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt  = np.array([0.,0.,s])
-                vStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 nFquad += 1
                 Name       = Name + str(nFquad)
                 if cls.getDebug():
@@ -639,10 +639,10 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt  = np.array([0.,0.,s])
-                vStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 nDquad += 1
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
@@ -724,10 +724,11 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt   = np.array([0.,0.,s])
-                vStrt   = np.array([0.,0.])
-                drStrt  = np.array([0.,0.,0.])
-                dvStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
+                nDquad += 1
                 nGbrLns += 1
                 Name  += str(nGbrLns)
                 if iLine.Type == "Length, strength":
@@ -766,10 +767,10 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt   = np.array([0.,0.,s])
-                vStrt   = np.array([0.,0.])
-                drStrt  = np.array([0.,0.,0.])
-                dvStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 nDpl   += 1
                 Name   += str(nDpl)
                 rho     = DplL/DplA
@@ -801,10 +802,10 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt   = np.array([0.,0.,s])
-                vStrt   = np.array([0.,0.])
-                drStrt  = np.array([0.,0.,0.])
-                dvStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 nCvty   += 1
                 Name    += str(nCvty)
                 iBLE    = BLE.CylindricalRFCavity(Name, \

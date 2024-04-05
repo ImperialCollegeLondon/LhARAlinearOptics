@@ -1053,6 +1053,7 @@ setAoertureParameters: Sets aperture parameters:
      getDebug: get debug flag, bool
       getType: Get type, return Type, int
     getParams: Return Params, list
+   getLenbgth: Returns length of aperture (presently 0)
 
   Utilities:
 
@@ -1173,6 +1174,9 @@ class Aperture(BeamLineElement):
     
     def getParams(self):
         return self._Params
+
+    def getLength(self):
+        return 0.
 
     
 #--------  Processing method:
