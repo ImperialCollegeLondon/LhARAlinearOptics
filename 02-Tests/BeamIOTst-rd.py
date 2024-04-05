@@ -58,7 +58,7 @@ print("     <----", iEvt, "events read")
 
 Prtcl.Particle.cleanParticles()
 Prtcl.ReferenceParticle.cleaninstance()
-BLE.BeamLineElement.cleanInstances()
+BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 
 print(" <---- Version 1 data format read check done!")

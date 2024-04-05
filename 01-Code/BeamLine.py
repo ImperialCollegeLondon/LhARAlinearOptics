@@ -681,10 +681,10 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                rStrt   = np.array([0.,0.,s])
-                vStrt   = np.array([0.,0.])
-                drStrt  = np.array([0.,0.,0.])
-                dvStrt  = np.array([0.,0.])
+                rStrt = np.array([0.,0.,s])
+                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
                 nSlnd += 1
                 Name  += str(nSlnd)
                 if iLine.Type == "Length, layers and turns":

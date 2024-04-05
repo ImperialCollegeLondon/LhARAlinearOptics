@@ -494,7 +494,7 @@ class BeamLineElement:
         dataFILE.write(record)
         if self.getDebug():
             print("         ----> rStrt, vStrt:", \
-                      strct.unpack(">5d",record))
+                      strct.unpack(">7d",record))
         
         if self.getDebug():
             print(" <---- BeamLineElement.writeElement done.")
@@ -526,7 +526,7 @@ class BeamLineElement:
         if cls.getDebug():
             print("                   Location:", Location)
 
-        brecord = dataFILE.read((5*8))
+        brecord = dataFILE.read((7*8))
         if brecord == b'':
             return True, None, None
         
@@ -2142,7 +2142,6 @@ class SectorDipole(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Angle=None, _B=None):
-        self.setDebug(True)
         if self.getDebug():
             print(' SectorDipole(BeamLineElement).__init__: ')
             print('     ----> Angle=', _Angle)
