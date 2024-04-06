@@ -5444,25 +5444,6 @@ class RPLCswitch(BeamLineElement):
         if self.getDebug():
             print("     ----> Derived class:", bversion.decode('utf-8'))
 
-        record = strct.pack(">i", self.getType())
-        dataFILE.write(record)
-        if self.getDebug():
-            print("     ----> Type:", strct.unpack(">i", record))
-
-        record = strct.pack(">i", len(self.getParams()))
-        dataFILE.write(record)
-        if self.getDebug():
-            print("     ----> Number of paramters:", \
-                  strct.unpack(">i", record))
-
-        if self.getDebug():
-            print("     ----> Write parameters:")
-        for iPrm in range(len(self.getParams())):
-            record = strct.pack(">d", self.getParams()[iPrm])
-            dataFILE.write(record)
-            if self.getDebug():
-                print("         ----> iPrm, value:", \
-                      iPrm, strct.unpack(">d", record))
         if self.getDebug():
             print("     <---- Done.")
             
@@ -5484,35 +5465,7 @@ class RPLCswitch(BeamLineElement):
                 print(" <---- end of file, return.")
             return True
             
-        record = strct.unpack(">i", brecord)
-        Type = record[0]
-        if cls.getDebug():
-            print("     ----> Type:", Type)
-
-        brecord = dataFILE.read(4)
-        if brecord == b'':
-            if cls.getDebug():
-                print(" <---- end of file, return.")
-            return True
-            
-        record = strct.unpack(">i", brecord)
-        nPrm = record[0]
-        if cls.getDebug():
-            print("     ----> Number of parameters:", nPrm)
-
-        Params = []
-        for iPrm in range(nPrm):
-            brecord = dataFILE.read((1*8))
-            if brecord == b'':
-                return True
-        
-            record  = strct.unpack(">d", brecord)
-            var     = float(record[0])
-            Params.append(var)
-        if cls.getDebug():
-            print("     ----> Parameters:", Params)
-                        
-        return EoF, Type, Params
+        return EoF
 
 
 #--------  Utilities:
