@@ -669,29 +669,7 @@ class Particle:
             print(" Particle.calcRPLCPhaseSpace for nLoc:", \
                   nLoc, "start:")
             
-        TrcSpc = self.getTraceSpace()[nLoc]
-        if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> trace space:", TrcSpc)
-
-        rRPLC  = np.array([TrcSpc[0], TrcSpc[2], 0.])
-
-        p0     = BL.BeamLine.getElement()[0].getp0()
-        E      = np.sprt(protonMASS**2 + p0**2)
-        Enrgy  = protonMASS + TrcSpc[5]*p0
-        
-        Mmtm   = mth.sqrt(Enrgy**2 - protonMASS**2)
-        zPrm   = mth.sqrt(1.-TrcSpc[1]**2-TrcSpc[3]**2)
-        pRPLC  = np.array([TrcSpc[1]*Mmtm, \
-                           TrcSpc[3]*Mmtm, \
-                           zPrm*Mmtm])
-                
-        if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> position:", rRPLC)
-                print("     ----> Mmtm    :", pRPLC)
-
-        PhsSpc = [rRPLC, pRPLC]
+        PhsSpc = self.RPLCTraceSpace2PhaseSpace(self.getTraceSpace()[nLoc])
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
@@ -699,7 +677,92 @@ class Particle:
 
         return PhsSpc
 
+    @classmethod
+    def RPLCTraceSpace2PhaseSpace(cls, TrcSpc):
+        if cls.getDebug():
+            print(" Particle.RPLCTraceSpace2PhaseSpace:")
+            
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> trace space:", TrcSpc)
 
+        p0 = BL.BeamLine.getElement()[0].getp0()
+        E0 = np.sqrt(protonMASS**2 + p0**2)
+        b0 = p0/E0
+        E  = E0 + TrcSpc[5]*p0
+        p  = mth.sqrt(E**2 - protonMASS**2)
+        if cls.getDebug():
+            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
+            K0 = E0 - protonMASS
+            K  = E  - protonMASS
+            print("     ----> protonMass, K0, K:", protonMASS, K0, K)
+        
+        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
+
+        px    = TrcSpc[1]*p0
+        py    = TrcSpc[3]*p0
+        pz    = mth.sqrt(p**2 - px**2 - py**2)
+        pRPLC = np.array([px, py, pz])
+                
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> position:", rRPLC)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Mmtm    :", pRPLC)
+            Etmp = mth.sqrt(protonMASS**2 + np.dot(pRPLC, pRPLC))
+            print("     ----> Energy  :", Etmp)
+
+        PhsSpc = np.array([rRPLC, pRPLC])
+
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Return phase space:", PhsSpc)
+
+        return PhsSpc
+
+    @classmethod
+    def RPLCPhaseSpace2TraceSpace(cls, PhsSpc):
+        if cls.getDebug():
+            print(" Particle..RPLCPhaseSpace2TraceSpace: start.")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> PhsSpx:", PhsSpc)
+            
+        p0        = BL.BeamLine.getElement()[0].getp0()
+        E0        = mth.sqrt( protonMASS**2 + p0**2)
+        b0        = p0/E0
+        if cls.getDebug():
+            print("     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, \
+                  "(", E0-protonMASS, ")")
+
+        E = mth.sqrt(protonMASS**2 + np.dot(PhsSpc[3:],PhsSpc[3:]))
+        if cls.getDebug():
+            print("     ----> E:", E)
+        
+        x      = PhsSpc[0]
+        y      = PhsSpc[1]
+        
+        xPrime = PhsSpc[3] / p0
+        yPrime = PhsSpc[4] / p0
+
+        if cls.getDebug():
+            print("     ----> xPrime, yPrime:", 
+                  xPrime, yPrime)
+
+        z      = PhsSpc[2] / b0
+        delta  = (E - E0) / p0
+        
+        if cls.getDebug():
+            print("     ----> z, E, delta:", z, E, delta)
+
+        TrcSpc = np.array([x, xPrime, y, yPrime, z, delta])
+
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Trace space:", TrcSpc)
+
+        return TrcSpc
+
+    
 #--------  I/o methods:
 #                     ----> Write instances:
     @classmethod

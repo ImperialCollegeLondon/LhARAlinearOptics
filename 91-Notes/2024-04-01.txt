@@ -3,15 +3,15 @@ Excellent, now do the scripts:
  - LhARAMagnetTable.py     - OK
  - plotQuadTriplet.py      - Failed
  - plotTrajectory.py       - Failed
- - RunDRACOsimulation.py   - 
- - ReadDRACOsimu.py        - 
- - RunLIONsimulation.py    - 
- - ReadLIONsimu.py         - 
- - RunLhARAsimulation.py   - 
- - ReadLhARAsimu.py        - 
- - plotBeam.py             - 
- - runBeamSim.py           -
- - readBeamSim.py          -
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
 
 
 Probably worth working through tests fixing as you go:
