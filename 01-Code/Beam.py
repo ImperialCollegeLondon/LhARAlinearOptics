@@ -4,7 +4,7 @@
 Class Beam:
 ===========
 
-  In some sense a "sister" class to Particle.  Whereas an instsance of
+  In some sense a "sister" class to Particle.  Whereas an instance of
   Particle records the passage of a particle travelling through the
   beam line, an instance of Beam records the collective properties of
   the beam such as emittance, etc., as the beam progresses through the
