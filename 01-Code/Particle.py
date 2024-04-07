@@ -1319,7 +1319,6 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtDrift(self, iBLE=None):
-        self.setDebug(True)
         nRcrds  = len(self.getsIn())
         if self.getDebug():
             print(" --------  --------  --------  //", \
@@ -1424,7 +1423,6 @@ class ReferenceParticle(Particle):
             print(" --------  --------  --------  //", \
                   "  --------  --------  --------")
         
-        self.setDebug(False)
         return Success
     
 #--------  Exceptions:

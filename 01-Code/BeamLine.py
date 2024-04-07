@@ -265,7 +265,7 @@ class BeamLine(object):
 #.. Method believed to be self documenting(!)
     @classmethod
     def setDebug(cls, Debug=False):
-        if cls.getDebug():
+        if Debug or cls.getDebug():
             print(" BeamLine.setdebug: ", Debug)
         cls.__Debug = Debug
         
@@ -516,7 +516,6 @@ class BeamLine(object):
 
     @classmethod
     def addBeamline(cls):
-        cls.setDebug(True)
         if cls.getDebug():
             print("            BeamLine.addBeamline starts:")
             
@@ -552,7 +551,6 @@ class BeamLine(object):
             if cls.getDebug():
                 print("                ----> Name, iLst.Name:", \
                       Name, iLst.getName())
-                print(iLst)
             
             rStrt = iLst.getrStrt() + iLst.getStrt2End()
             vStrt = iLst.getvEnd()
@@ -566,16 +564,59 @@ class BeamLine(object):
                 
             if iLine.Section != Section:
                 Section   = iLine.Section
-                nDrift    = 0
-                nAperture = 0
-                nFquad    = 0
-                nDquad    = 0
-                nSlnd     = 0
-                nGbrLns   = 0
-                nDpl      = 0
-                nCvty     = 0
+                nRPLCswtch = 0
+                nDrift     = 0
+                nAperture  = 0
+                nFquad     = 0
+                nDquad     = 0
+                nSlnd      = 0
+                nGbrLns    = 0
+                nDpl       = 0
+                nCvty      = 0
 
-            if iLine.Element == "Drift":
+            if iLine.Element == "RPLCswitch":
+                if cls.getDebug():
+                    print("               ----> Start on RPLCswitch.")
+                if NewElement:
+                    jtheta = None
+                    jphi   = None
+                    ktheta = None
+                    kphi   = None
+                if iLine.Type == "j":
+                    if iLine.Parameter == "theta":
+                        jtheta = float(iLine.Value)
+                    elif iLine.Parameter == "phi":
+                        jphi   = float(iLine.Value)
+                elif iLine.Type == "k":
+                    if iLine.Parameter == "theta":
+                        ktheta = float(iLine.Value)
+                    elif iLine.Parameter == "phi":
+                        kphi   = float(iLine.Value)
+                if jtheta != None and \
+                   jphi   != None and \
+                   ktheta != None and \
+                   kphi   != None:
+                    NewElement = True
+                    if cls.getDebug():
+                        print("                   <---- jtheta, jphi, ktheta, kphi:", \
+                              jtheta, jphi, ktheta, kphi)
+                else:
+                    if cls.getDebug():
+                        print("                   ----> jtheta, jphi, ktheta, kphi:", \
+                              jtheta, jphi, ktheta, kphi)
+                    NewElement = False
+                    continue
+                nRPLCswtch += 1
+                Name      = Name + str(nRPLCswtch)
+                if cls.getDebug():
+                    print("           ----> Add", Name)
+                vStrt = np.array([ [jtheta, jphi], [ktheta, kphi] ])
+                iBLE = BLE.RPLCswitch(Name, rStrt, vStrt, drStrt, dvStrt)
+                cls.addBeamLineElement(iBLE)
+                s += iBLE.getLength()
+                refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+            elif iLine.Element == "Drift":
                 nDrift   += 1
                 Name      = Name + str(nDrift)
                 Length    = float(iLine.Value)
@@ -587,19 +628,13 @@ class BeamLine(object):
                 """
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                iBLE = BLE.Drift(Name, \
+                iBLE = BLE.Drift(Name, 
                              rStrt, vStrt, drStrt, dvStrt, Length)
                 cls.addBeamLineElement(iBLE)
                 s += Length
                 refPrtcl    = Prtcl.ReferenceParticle.getinstance()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
-                """
-                rStrt = np.array([0.,0.,s])
-                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
-                drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
-                """
                 if iLine.Type == "Circular":
                     Param = [0, float(iLine.Value)]
                 elif iLine.Type == "Elliptical":
@@ -1048,7 +1083,7 @@ class BeamLine(object):
             print("     ----> Number of beam line elements:", nBLE)
                 
         dr = np.array([0., 0., 0.])
-        dv = np.array([0., 0.])
+        dv = np.array([[0., 0.], [0., 0.]])
         for iBLE in range(nBLE):
             if cls.getDebug():
                 print("         ----> Read element:", iBLE)
@@ -1115,8 +1150,13 @@ class BeamLine(object):
                     BLE.FocusQuadrupole.readElement(beamlineFILE)
                 if EoF:
                     return EoF
+            elif derivedCLASS == "RPLCswitch":
+                EoF = BLE.RPLCswitch.readElement(beamlineFILE)
+                if EoF:
+                    return EoF
             else:
-                print("Next derived class:", derivedCLASS)
+                print("Next derived class:", derivedCLASS, " not coded.", \
+                      "  Abort.")
                 sys.exit(1)
 
             EoF, Loc, r, v = BLE.BeamLineElement.readElement(beamlineFILE)
@@ -1179,6 +1219,15 @@ class BeamLine(object):
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
                 if cls.getDebug():
                     print(instBLE)
+            elif derivedCLASS == "RPLCswitch":
+                instBLE = BLE.RPLCswitch(Loc, r, v, dr, dv)
+                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                if cls.getDebug():
+                    print(instBLE)
+            else:
+                print("Derived class:", derivedCLASS, " not coded.", \
+                      "  Abort.")
+                sys.exit(1)
             cls.addBeamLineElement(instBLE)
 
                     

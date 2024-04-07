@@ -425,7 +425,6 @@ class BeamLineElement:
         jcphi   = jx/sjtheta
         jsphi   = jy/sjtheta
 
-        print(ksphi, kcphi)
         kphi = mth.atan2(ksphi, kcphi)
         if kphi < 0.: kphi = 2.*mth.pi + kphi
 
@@ -5388,7 +5387,7 @@ class RPLCswitch(BeamLineElement):
         return " <---- RPLCswitch parameter dump complete."
 
     def SummaryStr(self):
-        Str  = "RPLCswitch         : " + BeamLineElement.SummaryStr(self)
+        Str  = "RPLCswitch       : " + BeamLineElement.SummaryStr(self)
         return Str
 
     
@@ -5454,17 +5453,16 @@ class RPLCswitch(BeamLineElement):
         
     @classmethod
     def readElement(cls, dataFILE):
+        cls.setDebug(True)
         if cls.getDebug():
             print(" RPLCswitch(BeamLineElement).readElement starts.")
 
         EoF = False
 
-        brecord = dataFILE.read(4)
-        if brecord == b'':
-            if cls.getDebug():
-                print(" <---- end of file, return.")
-            return True
+        if cls.getDebug():
+            print(" <---- end of file, return.")
             
+        cls.setDebug(False)
         return EoF
 
 

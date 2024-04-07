@@ -2,7 +2,7 @@
 0,Facility,Global,Name,Name,LhARA,,
 0,Facility,Global,Reference particle,Kinetic energy,15,MeV,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.035,m,
-1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy
+1,Source,Source,Parameterised TNSA,SourceMode,0,,Mode
 1,Source,Source,Parameterised TNSA,SigmaX,0.000004,m,"Gaussian width, x"
 1,Source,Source,Parameterised TNSA,SigmaY,0.000004,m,"Gaussian width, y"
 1,Source,Source,Parameterised TNSA,Emin,1,MeV,Minimum of energy distribution
@@ -70,6 +70,10 @@
 1,Matching,Gabor lens,"Length, strength",Strength,1.16596749,rad/m,
 1,Matching,Drift,,Length,0.15,m,Drift out of Gabor lens
 1,Arc,Drift,,Length,0.2,m,
+1,Arc,RPLCswitch,j,theta,1.570796327,rad,
+1,Arc,RPLCswitch,j,phi,0,rad,
+1,Arc,RPLCswitch,k,theta,0,rad,
+1,Arc,RPLCswitch,k,phi,0,rad,
 1,Arc,Dipole,"Sector (Length, angle)",Length,0.8,m,
 1,Arc,Dipole,"Sector (Length, angle)",Angle,45,degrees,
 1,Arc,Drift,,Length,0.2,m,
