@@ -536,10 +536,14 @@ class Particle:
         if iSrc.getMode() == 0:
             logE = True
        
+        speed_of_light = \
+            iPhysclCnstnts.SoL()
+        
         nPrtcl = 0
         for iPrtcl in cls.getParticleInstances():
             particleMASS = \
                 iPhysclCnstnts.getparticleMASS(iPrtcl.getSpecies())
+                
             nPrtcl += 1
             if isinstance(iPrtcl, ReferenceParticle):
                 iRefPrtcl = iPrtcl
