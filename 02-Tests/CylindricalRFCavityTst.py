@@ -40,9 +40,9 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     RF = BLE.CylindricalRFCavity("Cavity", rStrt, vStrt, drStrt, dvStrt)
 except:

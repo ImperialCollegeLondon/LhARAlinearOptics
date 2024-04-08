@@ -1,0 +1,143 @@
+--------  --------  --------  --------  --------  --------  --------  05Apr24
+Excellent, now do the scripts:
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - Failed
+ - plotTrajectory.py       - Failed
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
+
+
+Probably worth working through tests fixing as you go:
+ - ApertureTst.py            - OK
+ - BeamIOTst-wrt.py          - OK (after fix in BeamLine, addBeamLine to i/p
+                               to solenoid and fix in printout in BeamIO).
+ - BeamIOTst-rd.py           - OK (after minor fix to BeamIO read).
+ - BeamLineElementTst.py     - OK
+ - BeamLineTst.py            - OK
+ - BeamTst.py                - OK (after minor fix to BeamTst).
+ - CylindricalRFCavityTst.py - OK
+ - DRACOfacilityTst.py       - OK
+ - DefocusQuadTst.py         - OK
+ - DipoleTst.py              - OK
+ - DriftTst.py               - OK
+ - ExpSourceTst.py           - OK (after minor fix to ExpSourceTst)
+ - FacilityTst.py            - OK
+ - FocusQuadTst.py           - OK
+ - GaborLensTst.py           - OK
+ - LIONfacilityTst.py        - OK
+ - LaTexTst.py               - OK
+ - LhARAFacilityTst.py       - OK
+ - OctupoleTst.py            - Not run.
+ - ParticleTst.py            - OK
+ - PhysicalConstantsTst.py   - OK
+ - QuadDoubletTst.py         - OK
+ - QuadTripletTst.py         - OK
+ - ReferenceParticleTst.py   - OK
+ - RunSimulationTst.py       - OK
+ - SimulationTst.py          - OK
+ - SolenoidTst.py            - OK
+ - SourceTst.py              - OK
+ - TestWrite.py              - OK
+ - TestRead.py               - OK
+ - testGitRepoId.py          - Fails, no module named git.
+
+
+--------  --------  --------  --------  --------  --------  --------  04Apr24
+Done pass on documentation, now back to debugging.  Take "SourceTst":
+ - Fixed.  Had to restore "getLength" to Aperture derived class.  Othewise
+   routine.
+
+--------  --------  --------  --------  --------  --------  --------  02Apr24
+Have been updating documentation.  This lead to need to defifine vStrt.  In
+turn this lead to a need to fix all tests and many calls.  So, need to check
+tests:
+
+Tests:
+ - ApertureTst.py            - OK
+ - BeamIOTst-wrt.py          - Fails; need to update source!
+ - BeamIOTst-rd.py           - Not tested
+ - BeamLineElementTst.py     - OK
+ - BeamLineTst.py            - Fails; need to update source!
+ - BeamTst.py                - Fails -- bad init!
+ - CylindricalRFCavityTst.py - OK
+ - DRACOfacilityTst.py       - Fails; need to update source!
+ - DefocusQuadTst.py         - OK
+ - DipoleTst.py              - OK
+ - DriftTst.py               - OK
+ - ExpSourceTst.py           - Fails; need to update source!
+ - FacilityTst.py            - OK
+ - FocusQuadTst.py           - OK
+ - GaborLensTst.py           - OK
+ - LIONfacilityTst.py        - Fails; need to update source!
+ - LaTexTst.py               - OK
+ - LhARAFacilityTst.py       - Fails; need to update source!
+ - OctupoleTst.py            - Fails
+ - ParticleTst.py            - Fails; need to update source!
+ - PhysicalConstantsTst.py   - OK
+ - QuadDoubletTst.py         - Fails, need to fix clean instances
+ - QuadTripletTst.py         - Fails, need to fix clean instances
+ - ReferenceParticleTst.py   - Fails; need to update source!
+ - RunSimulationTst.py       - Fails; need to update source!
+ - SimulationTst.py          - Fails; need to update source!
+ - SolenoidTst.py            - OK
+ - SourceTst.py              - Fails; need to update source!
+ - TestWrite.py              - OK
+ - TestRead.py               - Fails; need to update source!
+ - testGitRepoId.py          - Fails, no module named git!
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py            -
+ - BeamIOTst-wrt.py          -
+ - BeamIOTst-rd.py           -
+ - BeamLineElementTst.py     -
+ - BeamLineTst.py            -
+ - BeamTst.py                -
+ - CylindricalRFCavityTst.py -
+ - DRACOfacilityTst.py       -
+ - DefocusQuadTst.py         -
+ - DipoleTst.py              -
+ - DriftTst.py               -
+ - ExpSourceTst.py           -
+ - FacilityTst.py            -
+ - FocusQuadTst.py           -
+ - GaborLensTst.py           -
+ - LIONfacilityTst.py        -
+ - LaTexTst.py               -
+ - LhARAFacilityTst.py       -
+ - OctupoleTst.py            -
+ - ParticleTst.py            -
+ - PhysicalConstantsTst.py   -
+ - QuadDoubletTst.py         -
+ - QuadTripletTst.py         -
+ - ReferenceParticleTst.py   -
+ - RunSimulationTst.py       -
+ - SimulationTst.py          -
+ - SolenoidTst.py            -
+ - SourceTst.py              -
+ - TestWrite.py              -
+ - TestRead.py               -
+ - testGitRepoId.py          -
+
+
+Scripts:
+ - LhARAMagnetTable.py     - 
+ - plotQuadTriplet.py      - 
+ - plotTrajectory.py       - 
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotBeam.py             - 
+ - runBeamSim.py           -
+ - readBeamSim.py          -

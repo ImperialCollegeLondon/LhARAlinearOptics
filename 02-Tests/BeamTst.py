@@ -58,24 +58,11 @@ else:
     raise Exception()
 Bm.Beam.cleanBeams()
 
-BeamTest += 1
-print()
-print("BeamTest:", BeamTest, " check trap no input data file!")
-try:
-    BmInst = Bm.Beam(filename)
-except:
-    print("     ----> Successfully trapped no input data file")
-else:
-    print("     ----> Failed successfully to trap no input data file", \
-          " abort")
-    raise Exception()
-Bm.Beam.cleanBeams()
-
 ##! Create valid instance
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " create valid instance:")
-BmInst = Bm.Beam(filename, inputdatafile, 1000, outputdatafile)
+BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, filename)
 
 ##! Create valid instance
 BeamTest += 1

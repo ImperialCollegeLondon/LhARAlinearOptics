@@ -1,0 +1,59 @@
+--------  --------  --------  --------  --------  --------  --------  25Mar24
+Begun to tidy code and work on documentation.  Over w/e fixed up
+BeamLineElement.  Outstanding task to update write and read.  Next jobs!
+
+Also, need to make thorough update of modification record in modules.
+
+cleanInstances --> cleaninstances
+
+Done:
+ - Updated to write and read.
+ - cleaninstances fix done.
+
+
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamIOTst-wrt.py        - 
+ - BeamIOTst-rd.py         - 
+ - BeamLineElementTst.py   - 
+ - BeamLineTst.py          - 
+ - BeamTst.py              -
+ - CylindricalRFCavityTst  -
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DRACOfacilityTst.py     - 	
+ - DriftTst.py             -
+ - ExpSourceTst.py         -
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         -
+ - LaTexTst.py             -
+ - LhARAFacilityTst.py     - 
+ - LIONfacilityTst.py      - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          -
+ - PhysicalConstantsTst.py - 
+ - QuadDoubletTst.py       -
+ - QuadTripletTst.py       -
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestWrite.py            - 
+ - TestRead.py             - 
+
+Scripts:
+ - LhARAMagnetTable.py     - 
+ - plotQuadTriplet.py      - 
+ - plotTrajectory.py       - 
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotBeam.py             - 
+ - runBeamSim.py           -
+ - readBeamSim.py          -

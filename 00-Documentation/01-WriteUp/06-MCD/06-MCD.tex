@@ -1,0 +1,1475 @@
+\graphicspath{ {06-MCD/Figures/} }
+
+\section{Module, class and data structures}
+
+The linear optics package has been written in object-oriented Python
+and is broken down in four principal modules:
+\begin{itemize}
+  \item \underline{\texttt{BeamLineElement}:} provides descriptions
+    of the various beam-line elements required to build a description
+    of the beam line.
+    Each individual element, such as a drift, quadrupole, etc., is
+    described in a class derived from the \texttt{BeamLineElement}
+    parent class.
+  \item \underline{\texttt{BeamLine}:} provides code to assemble the
+    elements into a coherent beam line.
+    \texttt{BeamLine} is a singleton class to ensure that two beam
+    lines can not be simulated in a single run of the package.
+  \item \underline{\texttt{Beam}:} provides code to calculate
+    ensemble properties of the beam such as emittance, etc.
+    The ensemble properties are stored as instance attributes of
+    the \texttt{Beam} class.
+  \item \underline{\texttt{Particle}:} provides code to record beam
+    particles at positions along the beam line.
+    The module provides the singleton \texttt{ReferenceParticle}
+    class derived from the \texttt{Particle} class.
+\end{itemize}
+Other modules: \texttt{BeamIO}, \texttt{LaTeX},
+\texttt{PhysicalConstants}, \texttt{Report}, \texttt{Simulation}
+and \texttt{Utilities} support the principal modules or provide
+services.
+The data structure is implemented as attributes of the instances of the 
+various classes.
+This section describes the implementation of the various modules, the
+classes of which they are composed, and how access to the data is
+provided.
+
+Each class has methods by which to access a list of the class
+instances and a Boolean flag by which to generate debug print out (see
+table~\ref{Tab:ClassAttributeAccess}).
+\begin{table}[h]
+  \caption{Methods by which to set and access class attributes.}
+  \label{Tab:ClassAttributeAccess}
+  \begin{center}
+    \begin{tabular}{|l|c|l|p{7cm}|}
+      \hline
+      \textbf{Method}          & \textbf{Argument} & \textbf{Return}            & \textbf{Comment}                      \\
+      \hline
+      \texttt{getinstances()}  &                   & List of instances of class &                                       \\
+      \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
+      \texttt{getDebug()}      &                   & Boolean debug flag         & If true, generate debug print-out     \\
+      \texttt{setAll2None()}   &                   &                            & Set all instance attributes to \texttt{None} at start of instantiation. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{\texttt{BeamLineElement}}
+\label{SubSubSect:BLE}
+
+\subsubsection{Parent class}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{BeamLineElenent} class is:
+\begin{center}
+  \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt)}
+\end{center}
+The arguments are translated into instance attributes as described in
+section~\ref{SubSubSect:BLE:InstAttr} and defined in
+table~\ref{Tab:BLE:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:BLE:InstAttr}
+\noindent
+Properties common to all beam-line elements are stored as instance
+attributes of the parent \texttt{BeamLineElement} class.
+The instance attributes are defined in table~\ref{Tab:BLE:Attributes}.
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:BLE:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{BeamLineElement} class.
+    The attributes marked $^*$ above the dividing line are required in
+    the call to instantiate the element.
+    The attributes marked $^\dagger$ below the dividing line are
+    calculated.
+  }
+  \label{Tab:BLE:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
+      \hline
+      \texttt{Name}$^*$     & String        &     & Name of beam-line element.                                                                \\
+      \texttt{rStrt}$^*$    & numpy.ndarray & m   & $[x, y, z]$ position of entrance to element in laboratory coordinate system.              \\
+      \texttt{vStrt}$^*$    & numpy.ndarray & rad & $[[i],[\theta, \phi]]$ (polar and azimuthal angles) of RPLC $y$ and $z$ axes ($i=0,1$ respectively) at start. \\
+      \texttt{drStrt}$^*$   & numpy.ndarray & m   & ``Error'', $[x, y, z]$, displacement of start from nominal position (not yet implemented).\\
+      \texttt{dvStrt}$^*$   & numpy.ndarray & rad & ``Error'', $[[i],[\theta, \phi]]$, deviation in $\theta$ and $\phi$ from nominal axis (not yet implemented). \\
+      \hline
+      \texttt{Strt2End}$^\dagger$     & numpy.ndarray &     & $1\times3$ translation from start of element to end; in laboratory coordinates.  Set in derived class. \\
+      \texttt{Rot2LbStrt}$^\dagger$   & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes at start.     \\
+      \texttt{Rot2LbEnd}$^\dagger$    & numpy.ndarray &     & $3\times3$ rotation matrix that takes RPLC axes to laboratory axes at end.  Set in derived class.      \\
+      \texttt{TnrsMtrx}$^\dagger$     & numpy.ndarray &     & $3\times3$ transfer matrix.  Set in derived class.                               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                         \\
+      \hline
+      \texttt{setName(Name)}     & \texttt{getName()}        & Set/get name of beam-line element.                                \\
+      \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}       & Set/get laboratory $[x, y, z]$ position of entrance.              \\
+                                         \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}      & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
+      \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()}      & Set/get ``error'' displacement.                                   \\
+      \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()}      & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
+      \texttt{setRot2LbStrt()}   & \texttt{getRot2LbStrt()}  & Set/get rotation matrix from RPLC axes to laboratory.             \\
+      \texttt{setRot2LabStrt()}  & \texttt{getRot2LbStrt()}  & Setget rotation matrix from RPLC to laboratory at start.             \\
+      \texttt{setStrt2End(t)}    & \texttt{getStrt2End()}    & Set/get displacement vector start to end in laboratory coordinates.
+                                                               setStrt2End takes 1 argument, \texttt{t}, a 1D np.ndarray containing
+                                                               the translation from the start to the end of the element in RPLC. \\
+      \texttt{setRot2LbEnd(R)}  & \texttt{getRot2LbEnd()}    & Set/get rotation matrix from RPLC to laboratory at end.
+                                                               setRot2LbEnd takes 1 argument, \texttt{R}, a 2D np.array containing
+                                                               the rotation matrix to be set.                                    \\
+                                & \texttt{getTransferMatrix()}  & Get transfer matrix set in derived class.                         \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
+in the \texttt{BeamLineElement} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
+                                                                                    If \texttt{R}, radial distance from $z$ axis in RPLC,
+                                                                                    falls outside beam pipe, returns True. \\
+      \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, across
+                                                                                    element.
+                                                                                    Final trace-space vector returned.       \\
+      \texttt{Shit2Local(V)}      & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D trace-space vector, \texttt{V}, from RPLC
+                                                                                    to laboratory coordinates.
+                                                                                    Phase-space vector in laboratory frame returned. \\
+      \texttt{Shit2Laboratory(U)} & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transform 6D phase-space vector, \texttt{U}, from 
+                                                                                    laboratory coordinates to trace-space coordinates in
+                                                                                    the RPLC frame.
+                                                                                    Trace-space vector in RLPC frame returned. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
+\texttt{BeamLineElement} class.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{BeamLineElement}
+    class. 
+  }
+  \label{Tab:BLE:Utilities}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{cleaninstances()}     &                 &  & Delete (using ``del'') all instances of the \texttt{BeamLineElement} class.
+                                                           Reset \texttt{instances} list. \\
+      \texttt{removeInstance(inst)} & Instance of BLE &  & Remove instance \texttt{inst} and remove from list of instances of
+                                                           \texttt{BeamLineElement}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Facility(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Facility} derived class is:
+\begin{center}
+  \texttt{FacilityName, rStrt, vStrt, drStrt, dvStrt, p0, VCMV)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Facility} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Fclty:InstAttr} and
+defined in table~\ref{Tab:Fclty:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Fclty:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Fclty:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Fclty:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Facility(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Fclty:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
+      \hline
+      \texttt{p0}   & float & MeV & Kinetic energy of reference particle. \\
+      \texttt{VCMV} & float & m   & Radius of vacuum-chamber mother
+                                    volume.
+                                    The radius defines edge of the volume
+                                    at which a particle trajectory is
+                                    terminated.
+                                    It may be necessary to introduce a beam
+                                    pipe later.                            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Facility} derived
+    class. 
+  }
+  \label{Tab:Fclty:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                   \\
+      \hline
+      \texttt{setp0(Name)}   & \texttt{getp0()}    & Set/get momentum of reference particle (in MeV). \\
+      \texttt{setVCMV(VCMV)} & \texttt{getrVCMV()} & Set/get radius of vacuum chamber mother volume.  \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Facility} derived class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Facility} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Drift(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Drift} derived class is:
+\begin{center}
+  \texttt{Drift(Name, rStrt, vStrt, drStrt, dvStrt, Length)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Drift} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Drft:InstAttr} and
+defined in table~\ref{Tab:Drft:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Drft:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Drft:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Drft:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Drift(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Drft:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
+      \hline
+      \texttt{Length} & float & m & Length of drift. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Facility} derived
+    class. 
+  }
+  \label{Tab:Drft:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                       \\
+      \hline
+      \texttt{setLength(Length)}   & \texttt{getLength()} & Set/get length of drift (in m). \\
+      \texttt{setTransferMatrix()} &                      & Set transfer matrix.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Facility} derived class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The \texttt{Facility} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Aperture(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Aperture} derived class is:
+\begin{center}
+  \texttt{Aperture(Name, rStrt, vStrt, drStrt, dvStrt, ParamList)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Aperture} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Aprtr:InstAttr} and
+defined in table~\ref{Tab:Aprtr:Attributes}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Aprtr:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Aprtr:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Aprtr:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Aperture(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Aprtr:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
+      \hline
+      \texttt{ParamList}   & [] &   & List containing aperture parameters.
+                                    The first parameter is an \texttt{int}
+                                    and defines the aperture ``\texttt{Type}''.
+                                    The remaining elements in the parameter list
+                                    are \texttt{float}s with meanings that depend
+                                    on \texttt{Type}.                             \\
+      \hline
+      \texttt{ParamList[0]} & int   &   & \texttt{Type}$=0$; circular                 \\
+      \texttt{ParamList[1]} & float & m & Radius of circular aperture                 \\
+      \hline
+      \texttt{ParamList[0]} & int   &   & \texttt{Type}$=1$; Elliptical                           \\
+      \texttt{ParamList[1]} & float & m & Radius of elliptical aperture along $x_{\rm RPLC}$ axis \\
+      \texttt{ParamList[2]} & float & m & Radius of elliptical aperture along $y_{\rm RPLC}$ axis \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Facility} derived
+    class. 
+  }
+  \label{Tab:Aprtr:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
+      \hline
+      \texttt{setApertureParameters(ParamList)} &                      & Set aperture paramters.
+                                                                         Sets \texttt{Type} and parameters
+                                                                         depending on \texttt{Type}. \\
+                                                & \texttt{getType()} & Get \texttt{Type} of aperture.\\
+                                                & \texttt{getParams()} & Get aperture parameters.    \\
+      \texttt{setTransferMatrix()}              &                      & Set transfer matrix.        \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Aperture} processing method is defined in
+table~\ref{Tab:Aprtr:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{Aperture} derived
+    class. 
+  }
+  \label{Tab:Aprtr:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{Transport(V)} & \texttt{np.ndarray} & \texttt{np.ndarray} or \texttt{None} &
+                        Transport trace-space vector \texttt{V}.  If \texttt{V} falls outside of the aperture, return \texttt{None}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Aperture} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{FocusQuadrupole(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{FocusQuadrupole} derived class is:
+\begin{center}
+  \texttt{FocusQuadrupole(Name, rStrt, vStrt, drStrt, dvStrt, Length,
+          Strength, kFQ)} 
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{FocusQuadrupole} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:FQuad:InstAttr} and
+defined in table~\ref{Tab:FQuad:Attributes}.
+The quadrupole \texttt{Length} is required together with
+either the field gradient, \texttt{Strength}
+(equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
+parameter, \texttt{kFQ} (equation~\ref{Eq:Effectivekq}).
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:FQuad:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:FQuad:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:FQuad:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{FocusQuadrupole(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:FQuad:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{FQmode}   & int   &       & If 0, use particle momentum in calculation of transfer
+                                          matrix; if 1, use reference particle momentum.         \\
+      \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kFQ is not given. \\
+      \texttt{kFQ}      & float & m$^{-2}$ & Quadrupole $k$ paramter.                               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{FocusQuadrupole} derived
+    class. 
+  }
+  \label{Tab:FQuad:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                    \\
+      \hline
+      \texttt{setFQmode(FQmode)}   & \texttt{getFQmode()}   & Set/get FQmode.                        \\
+      \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
+      \texttt{setStrength(Length)} & \texttt{getStrength()} & Set/get strength (field gradient).     \\
+      \texttt{setKFQ(Length)}      & \texttt{getKFQ()}      & Set/get kFQ, quadrupole $k$ parameter. \\
+      \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{FocusQuadrupole} processing method is defined in
+table~\ref{Tab:FQuad:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{FocusQuadrupole} derived
+    class. 
+  }
+  \label{Tab:FQuad:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                     \\
+      \hline
+      \texttt{calckFQ()} &  & float & Calculates \texttt{kFQ} if strength is specified.               \\
+      \texttt{calcStrength()} &  & float & Calculates \texttt{Strength} if \texttt{kFQ} is specified. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{FocusQuadrupole} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{DefocusQuadrupole(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{DefocusQuadrupole} derived class is:
+\begin{center}
+  \texttt{DefocusQuadrupole(Name, rStrt, vStrt, drStrt, dvStrt, Length,
+          Strength, kDQ)} 
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{DefocusQuadrupole} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:DQuad:InstAttr} and
+defined in table~\ref{Tab:DQuad:Attributes}.
+The quadrupole \texttt{Length} is required together with
+either the field gradient, \texttt{Strength}
+(equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
+parameter, \texttt{kDQ} (equation~\ref{Eq:Effectivekq}).
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:DQuad:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:DQuad:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:DQuad:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{DefocusQuadrupole(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:DQuad:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{DQmode}   & int   &       & If 0, use particle momentum in calculation of transfer
+                                          matrix; if 1, use reference particle momentum.         \\
+      \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kDQ is not given. \\
+      \texttt{kDQ}      & float & m$^{-2}$ & Quadrupole $k$ paramter.                               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{DefocusQuadrupole} derived
+    class. 
+  }
+  \label{Tab:DQuad:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                    \\
+      \hline
+      \texttt{setDQmode(DQmode)}   & \texttt{getDQmode()}   & Set/get DQmode.                        \\
+      \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
+      \texttt{setStrength(Length)} & \texttt{getStrength()} & Set/get strength (field gradient).     \\
+      \texttt{setKDQ(Length)}      & \texttt{getKDQ()}      & Set/get kDQ, quadrupole $k$ parameter. \\
+      \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{DefocusQuadrupole} processing method is defined in
+table~\ref{Tab:DQuad:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{DefocusQuadrupole} derived
+    class. 
+  }
+  \label{Tab:DQuad:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                     \\
+      \hline
+      \texttt{calckDQ()} &  & float & Calculates \texttt{kDQ} if strength is specified.               \\
+      \texttt{calcStrength()} &  & float & Calculates \texttt{Strength} if \texttt{kDQ} is specified. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{DefocusQuadrupole} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{SectorDipole(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{SectorDipole} derived class is:
+\begin{center}
+  \texttt{SectorDipole(Name, rStrt, vStrt, drStrt, dvStrt, 
+          Angle, B)} 
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{SectorDipole} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:SDpl:InstAttr} and
+defined in table~\ref{Tab:SDpl:Attributes}.
+
+The orientation of the RLPC coordinate axes with respect to those of
+the laboratory frame changes from the start of sector dipole to its
+end.
+Referring to figure~\ref{fig:Dipole}, the vector, $\bm{v}_{\rm ES}$,
+that translates the origin of the RLPC coordinate system at the start
+of the sector dipole to the origin of the RLPC coordinate system at
+its end is given by:
+\begin{equation}
+  \bm{v}_{\rm ES} = 2 \rho_0 \sin\left( \frac{\phi}{2} \right)
+                     \begin{pmatrix}
+                       \sin\left( \frac{\phi}{2} \right) \\
+                       0                                 \\
+                       \cos\left( \frac{\phi}{2} \right)
+                     \end{pmatrix} \,;
+\end{equation}
+where $\rho_0$ is the radius of the circular locus of the trajectory
+of the reference particle.
+If the rotation matrix taking the RPLC axes at the start of the sector
+dipole to the laboratory coordinate axes is
+$\underline{\underline{R}}_{\rm S}$, then the vector,
+$\bm{v}^{\rm lab}_{\rm ES}$, that translates from the start 
+of the sector dipole to its end in laboratory coordinates is given by:
+\begin{equation}
+  \bm{v}^{\rm lab}_{\rm ES} = \underline{\underline{R}}_{\rm S} \bm{v}_{\rm ES} \,.
+\end{equation}
+The rotation matrix that transforms from the RPLC system at the end
+of the sector dipole to the laboratory coordinate system,
+$\underline{\underline{R}}_{\rm E}$ is given by:
+\begin{equation}
+  \underline{\underline{R}}_{\rm E} =
+      \underline{\underline{R}}_{\rm S} \underline{\underline{R}} \, ;
+\end{equation}
+where:
+\begin{equation}
+  \underline{\underline{R}} = 
+        \begin{pmatrix}
+          \cos \phi & 0 & -\sin \phi \\
+          0         & 1 &  0         \\
+          \sin \phi & 0 &  \cos \phi 
+        \end{pmatrix} \, .
+\end{equation}
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:SDpl:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:SDpl:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:SDpl:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{SectorDipole(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:SDpl:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                      \\
+      \hline
+      \texttt{Angle}   & float & rad & Angle through which sector dipole bends positive reference
+                                 particle.                                                         \\
+      \texttt{B}       & float & T   & Magnetic field.                                             \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{SectorDipole} derived
+    class. 
+  }
+  \label{Tab:SDpl:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}       \\
+      \hline
+      \texttt{setAngle(Angle)}     & \texttt{getAngle()}  & Set/get bending angle.         \\
+      \texttt{setB(B)}             & \texttt{getB()}      & Set/get dipole magnetic field. \\
+      \texttt{setLength()}         & \texttt{getLength()} & Set/get length of reference
+                                                            particle trajectory through
+                                                            sector dipole (arc length).    \\
+      \texttt{setTransferMatrix()} &                      & Set transfer matrix.           \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{SectorDipole} derived class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{SectorDipole} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{Solenoid(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Solenoid} derived class is:
+\begin{center}
+  \texttt{Solenoid(Name, rStrt, vStrt, drStrt, dvStrt,
+          Length, Strength, kSol)} 
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{Solenoid} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:Slnd:InstAttr} and
+defined in table~\ref{Tab:Slnd:Attributes}.
+The solenoid \texttt{Length} is required together with either the
+magnetic field strength, \texttt{Strength} or the solenoid $k$
+parameter, \texttt{kSol} (equation~\ref{Eq:Effectiveks}).  
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Slnd:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:Slnd:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Slnd:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Solenoid(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Slnd:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                     \\
+      \hline
+      \texttt{Length}   & float & m     & Effective length of solenoid.                           \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kSol is not given. \\
+      \texttt{kSol}     & float & m$^{-2}$ & GaborLens $k$ paramter required if \texttt{Strength}
+                                          not given.                                              \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Solenoid} derived
+    class. 
+  }
+  \label{Tab:Slnd:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
+      \hline
+      \texttt{setLength(Length)}   & \texttt{getLength()}   & Set/get length.                        \\
+      \texttt{setStrength(B)}      & \texttt{getStrength()} & Set/get strength (solenoid magnetic
+                                                              field).                                \\
+      \texttt{setKSol(Length)}     & \texttt{getKFQ()}      & Set/get kSol, solenoid $k$ parameter.  \\
+      \texttt{setTransferMatrix()} &                        & Set transfer matrix.                   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Solenoid} processing method is defined in
+table~\ref{Tab:Slnd:Methods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{Solenoid} derived
+    class. 
+  }
+  \label{Tab:Slnd:Methods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                      \\
+      \hline
+      \texttt{calckSol()}     &  & float & Calculates \texttt{kSol} if strength is specified.          \\
+      \texttt{calcStrength()} &  & float & Calculates \texttt{Strength} if \texttt{kSol} is specified. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Solenoid} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{GaborLens(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{GaborLens} derived class is:
+\begin{center}
+  \texttt{GaborLens(Name, rStrt, vStrt, drStrt, dvStrt,
+          Bz, VA, RA, Rp, Length, kSol)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{GaborLens} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:GbrLns:InstAttr} and
+defined in table~\ref{Tab:GbrLns:Attributes}. 
+The Gabor lens \texttt{Length} is required together with either the
+paramters \texttt{Bz}, \texttt{VA}, \texttt{RA}, \texttt{Rp}
+correspond, respectively, to the paramters $B_z$, $V_A$, $V_A$ and
+$R_p$ defined in section~\ref{SubSect:TrnsFrMtrx:GL}, or $kSol$, the
+solenoid strength parameter of the equaivalent solenoid (see
+section~\ref{SubSect:TrnsFrMtrx:GL}).
+The effective electon number density inside the trap is calculated
+using either \texttt{Bz}, \texttt{VA}, \texttt{RA} and \texttt{Rp}
+or \texttt{kSol}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:GbrLns:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:GbrLns:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:GbrLns:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{GaborLens(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:GbrLns:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Bz}   & float & T     & Effective length of Gabor lens.                            \\
+      \texttt{VA}   & float & V     & Effective length of Gabor lens.                            \\
+      \texttt{RA}   & float & m     & Effective length of Gabor lens.                            \\
+      \texttt{RP}   & float & m     & Effective length of Gabor lens.                            \\
+      \texttt{Length}   & float & m     & Effective length of Gabor lens.                         \\
+      \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kSol is not given. \\
+      \texttt{kSol}     & float & m$^{-2}$ & $k$ parameter of the solenoid with the equivalent
+                                            focusing strength.                                    \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{GaborLens} derived
+    class. 
+  }
+  \label{Tab:GbrLns:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{setBz(Bz)}         & \texttt{getBz()}     & Set/get magnetic field of the Penning-Malmberg trap.      \\
+      \texttt{setVA(VA)}         & \texttt{getVA()}     & Set/get anode voltage of the Penning-Malmberg trap.       \\
+      \texttt{setRA(RA)}         & \texttt{getRA()}     & Set/get radius of the anode of the Penning-Malmberg trap. \\
+      \texttt{setRP(RP)}         & \texttt{getRP()}     & Set/get magnetic effective radiius of the plasma confined 
+                                                          within the Penning-Malmberg trap.                         \\
+      \texttt{setLength(Length)} & \texttt{getLength()} & Set/get effective length of the lens.                     \\
+
+      \texttt{setStrength(Strength)} & \texttt{getStrength()} & Set/get k-parameter of the solenoid with the
+                                                                equivalent focal length.                            \\
+      \texttt{setElectronDenisty()} & \texttt{getElectronDenisty()} & Set/get electron density.                     \\
+      \texttt{setTransferMatrix()} &                    & Set transfer matrix.                                      \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{GaborLens} dericed class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{GaborLens} derived class has no utilities.
+
+\FloatBarrier
+
+\subsubsection{Derived class: \texttt{CylindricalRFCavity(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{CylindricalRFCavity} derived class is:
+\begin{center}
+  \texttt{CylindricalRFCavity(Name, rStrt, vStrt, drStrt, dvStrt,
+          Gradient, Frequency, Phase)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+The \texttt{CylindricalRFCavity} arguments are translated into instance
+attributes as described in section~\ref{SubSubSect:CylndclRFCvty:InstAttr} and
+defined in table~\ref{Tab:CylndclRFCvty:Attributes}. 
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:CylndclRFCvty:InstAttr}
+\noindent
+The instance attributes are defined in
+table~\ref{Tab:CylndclRFCvty:Attributes}. 
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:CylndclRFCvty:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{CylindricalRFCavity(BeamLineElement)} derived class.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:CylndclRFCvty:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute}   & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Gradient}          & float & MV/m  & Peak electric field gradient on axis.         \\
+      \texttt{Frequency}         & float & MHz   & Resonant frequency.                           \\
+      \texttt{Phase}             & float & rad   & Phase cavity at time reference particle crosses
+                                                   centre of cavity, ``linac convention''.       \\
+      \texttt{TransitTimeFactor} & float &       & Transit time factor (equation~\ref{}).        \\
+      \texttt{V0}                & float & MV    & Peak voltage.                                 \\
+      \texttt{alpha}             & float &       & $\alpha$ paramter defined in equation~\ref{}. \\
+      \texttt{wperp}             & float &       & $\omega_\perp$ paramter defined in equation~\ref{}. \\
+      \texttt{cperp}             & float &       & $c_\perp$ paramter defined in equation~\ref{}. \\
+      \texttt{sperp}             & float &       & $s_\perp$ paramter defined in equation~\ref{}. \\
+      \texttt{wprll}             & float &       & $\omega_{||}$ paramter defined in equation~\ref{}. \\
+      \texttt{cprll}             & float &       & $c_{||}$ paramter defined in equation~\ref{}. \\
+      \texttt{sprll}             & float &       & $s_{||}$ paramter defined in equation~\ref{}. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{CylindricalRFCavity} derived
+    class. 
+  }
+  \label{Tab:CylndclRFCvty:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{setGradient(Gradient)}        & \texttt{getGradient()}         & Set/get peak electric field gradient.      \\
+      \texttt{setFrequency(Frequency)}      & \texttt{getFrequency()}        & Set/get frequency.       \\
+      \texttt{setAngularFrequency(AngFreq)} & \texttt{getAngularFrequency()} & Set/get angular frequency. \\
+      \texttt{setPhase(Phase)}              & \texttt{getPhase()}            & Set/get phase. \\ 
+      \texttt{setWaveNumber(WaveNumber)}    & \texttt{getWaveNumber()}       & Set/get wavenumber.                     \\
+      \texttt{setLength(Length)}            & \texttt{getLength()}           & Set/get Length. \\
+      \texttt{setRadius(Radius)}            & \texttt{getRadius()}           & Set/get Radius. \\
+      \texttt{setTransitTimeFactor(TransitTimeFactor)}            & \texttt{getTransitTimeFactor()}           & Set/get TransitTimeFactor. \\
+      \texttt{setV0(V0)}                    & \texttt{getV0()}               & Set/get peak voltage.                     \\
+      \texttt{setalpha(alpha)}              & \texttt{getalpha()}            & Set/get alpha.                     \\
+      \texttt{setwperp(wperp)}              & \texttt{getwperp()}             & Set/get wperp.                     \\
+      \texttt{setcperp(cperp)}              & \texttt{getcperp()}             & Set/get cperp.                     \\
+      \texttt{setsperp(sperp)}              & \texttt{getsperp()}             & Set/get sperp.                     \\
+      \texttt{setwprll(wprll)}              & \texttt{getwprll()}             & Set/get wprll.                     \\
+      \texttt{setcprll(cprll)}              & \texttt{getcprll()}             & Set/get cprll.                     \\
+      \texttt{setsprll(sprll)}              & \texttt{getsprll()}             & Set/get sprll.                     \\
+      \texttt{setmrf(mrf)}                  & \texttt{getmrf()}              & Set/get mrf.                     \\
+      \texttt{setTransferMatrix()}          &                                & Set transfer matrix.               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{CylindricalRFCavity} dericed class has no processing methods.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{CylindricalRFCavity} derived class has no utilities.
+
+\FloatBarrier
+
+\subsection{\texttt{BeamLine}}
+
+\texttt{BeamLine} is a singleton class that sets up the beam line
+geometry and provides methods to track particles through the beam line
+using the transfer matarices defined in section~\ref{SubSubSect:BLE}.
+The beam-line geometry is provided in the form of a ``\texttt{csv}''
+file read using \texttt{pandas}.
+The format of the ``\texttt{csv}'' file is defined in
+section~\ref{SubSubSect:??}.
+Alternatively, if a data file written using the \texttt{BeamIO}
+package is being read, the beam-line geometry is read from the top of
+the data file.
+
+\subsubsection{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{BeamLineElenent} class is:
+\begin{center}
+  \texttt{BeamLine(BeamLineSpecificationCSVfile, readDataFile)}
+\end{center}
+\texttt{BeamLineSpecificationCSVfile} is a the full path of the CSV
+file containing the beam-line specificiation.
+\texttt{readDataFile} is a boolean flag.
+If \texttt{readDataFile} is set to \texttt{True}, then the \texttt{BeamLine}
+instance will be created and the beam-line geometry will be read from
+the header of the BeamIO data file.
+If \texttt{readDataFile} is not set or is set to \texttt{False}, the
+beam-line geometry will be read
+from \texttt{BeamLineSpecificationCSVfile}.
+
+\subsubsection{Instance attributes and access methods} ~\newline
+\label{SubSubSect:BLE:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:BL:Attributes}
+and the access methods are summarised in table~\ref{Tab:BL:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{BeamLine} class.
+  }
+  \label{Tab:BL:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{BeamLineSpecificationCSVfile}$^*$ & path      & Full path to beam-line specification \texttt{csv} file.        \\
+      \texttt{BeamLineParamPandasInstance}      & dataframe & Pandas data frame containing beam-line specification.          \\
+      \texttt{Element}                          & list      & List of instances of \texttt{BeamLineElement} class containing
+                                                              pointers to the elements that make up the beam line.           \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
+      \hline
+      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
+                                                                   \texttt{np.ndarray}.                                          \\
+                                         & \texttt{getinsance()} & Get instance of \texttt{BeamLine} class.                        \\
+                       & \texttt{BeamLineSpecificationCSVfile()} & Get beam line specification csv file.                           \\
+                             & \texttt{(getBeamLineParamPandas)} & Get pandas dat from containing beam-line specification.         \\
+                                         & \texttt{getElement()} & get list of \texttt{BeamLineElement} instances.                 \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:BL:ProcMethods} presents the processing methods provided
+in the \texttt{BeamLine} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{addBeamLine()}   &  & \texttt{Success} & Loops through pandas data frame and manages parsing and instanciation
+                                                       of the beam line elements defined in the specification \texttt{csv} file.
+                                                       Returns \texttt{Success} (bool) which is \texttt{True} if the beamline
+                                                       has been set up OK and is \texttt{False} otherwise.                     \\
+      \texttt{addFacility()}   &  &  & Manages the extraction of the facility paramters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Facility(BeamLineElement)}.                  \\
+      \texttt{addSource()}     &  &  & Manages the extraction of the source paramters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Source(BeamLineElement)}.                  \\
+      \texttt{parseFacility()} &  & \texttt{Name}, \texttt{K0}, \texttt{VCMVr} & Parses pandas data frane to extract
+                                                                                 facility parameters.
+                                                                                 Returns the facility \texttt{Name} (str), the
+                                                                                 kinetic energy of the reference particle,
+                                                                                 \texttt{K0} (float) in MeV, and the vacuum
+                                                                                 chamber mother volume radius, \texttt{VCMVr}
+                                                                                 (float) in m.                                 \\
+      \texttt{parseSource()}   &  & \texttt{Name}, \texttt{Mode}, \texttt{Param} & Parses pandas data frane to extract
+                                                                                 source parameters.
+                                                                                 Returns \texttt{Name} (str), \texttt{Mode} (int)
+                                                                                 \texttt{Param} (list) containing the parameters
+                                                                                 required to instanciate source \texttt{Mode}. \\
+      \texttt{addBeamLineElement(iBLE)} &  &  & Adds \texttt{BeamLineElement} instance \texttt{iBLE} to the list of instances of
+                                                     \texttt{BeamLineElement} that make up the beam line.                      \\
+      \texttt{checkConsistency()} &  & \texttt{Consistent} & Checks the consistency of the beam line representation in memory
+                                                             with that requested in the specification \texttt{csv} file.
+                                                             Returns \texttt{Consistent} (bool) which is \texttt{True} if the
+                                                             beamline is consistent is \texttt{False} otherwise.                     \\
+      \texttt{trackBeamn(NEvts, particleFILE)} &  &  & Generates \texttt{NEvts} (int) particles and tracks them through the
+                                                       beam line. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods} ~\newline
+\noindent
+Methods to read and write instance attributes to the files defined
+using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
+provided.
+The calls are:
+\begin{equation}
+  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
+      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
+\end{equation}
+where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+In addition the \texttt{csv} file containing the specification of the
+beam line is read in using the method:
+\begin{equation}
+  \texttt{csv2pandas(csvFILE)} \,; \nonumber
+\end{equation}
+where \texttt{csvFILE} (path) is the full path to the \texttt{csv}
+file.
+
+\subsubsection{Utilities} ~\newline
+\noindent
+The \texttt{BEamLine} class has no utilities.
+
+\FloatBarrier
+
+\subsection{\texttt{Beam}}
+
+The \texttt{Beam} class provides methods to calculate the parameters
+describing the beam passing through an instance of the BeamLine class.
+The covariance matrix is calculated at the various locations defined
+in the \texttt{BeamLine} instance.
+The calculation is performed either by calculating the covariance
+matrices particle by particle or by using transfer matrices to
+propagate the covariance matrix from the source.
+The latter (propogation of the covariance matrix) is not yet
+implemented.
+
+\subsubsection{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{BeamElenent} class is:
+\begin{center}
+  \texttt{Beam(readDataFile, nEvtMax, outputCSVfile, beamlineSpecificationCSVfile)}
+\end{center}
+\texttt{readDataFile}, the path to the \texttt{BeamIO} file containing
+the particles tht form the beam, is required.
+\texttt{nEvtMax} (optional) defines the number of particles to be
+read; id it is not given, all particles in \texttt{readDataFile} will
+be read.
+A CSV file at \texttt{outputCSVfile} will be created containing a
+summary of the beam parameters if this parameter is given.
+\texttt{beamlineSpecificationCSVfile} (the full path of the CSV file
+containing the beam-line specificiation) is not required if version 2
+or later of the \texttt{BeamIO} data-file format is being used.
+The optional argument is retained for backward compatibility.
+
+\subsubsection{Instance attributes and access methods} ~\newline
+\label{SubSubSect:BLE:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:B:Attributes}
+and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Beam} class.
+    The attributes marked $^*$ above the dividing line are required in
+    the call to instantiate the element.
+    The attributes marked $^\dagger$ below the dividing line are
+    calculated.
+  }
+  \label{Tab:B:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{InputDataFile}$^*$ & path & Path to BeamIO data file containing events to be read (required).                    \\
+      \texttt{nEvtMax}$^*$       & int  & Maximum number of events to read, if not set, read all events (optional).            \\
+      \texttt{outputCSVfile}$^*$ & path & Path to csv file in which summary of beam processing will be written (optional).     \\
+ \texttt{beamlineSpecificationCVSfile}$^*$ &
+                                   path & Kept for backward compatibility (optional).
+                                          Path to csv file containing specification of beam line.                              \\
+      \hline
+      \texttt{Element[]}             & list  & List of instances of \texttt{BeamElement} class containing
+                                                              pointers to the elements that make up the beam line.           \\
+      \texttt{Location[]}$^{\dagger}$    & str   & Name of location where parameters are recorded.                             \\
+      \texttt{s[]}$^{\dagger}$           & float & $s$ coordinate at which parameters are recorded.                            \\
+      \texttt{CovSums[][]}$^{\dagger}$   & list  & Sums required to calculate covariance matrix by location.  Stored as list of $6\times6$ np.ndarrays.     \\
+      \texttt{nParticles[]}$^{\dagger}$  & list  & Number of particles arriving at location.                                       \\
+      \texttt{CovMtrx[][]}$^{\dagger}$   & list  & Covariance matrix by location.  Stored as list of $6\times6$ np.ndarrays.     \\
+      \texttt{sigmaxy[][]}$^{\dagger}$   & list  & RMS x and y by location.  \texttt{[iLoc][0]} $\sigma_x$, \texttt{[iloc][1]} $\sigma_y$. \\
+      \texttt{emittance[][]}$^{\dagger}$ & list  & Emittance by location; calculated from \texttt{CovMtrx}. \texttt{[iloc][0]} $\varepsilon_x$,
+                                                  \texttt{[iloc][1]} $\varepsilon_y$, \texttt{[iloc][2]} $\varepsilon_\perp$, \texttt{[iloc][3]} $\varepsilon_{xy}$
+                                                  \texttt{[iloc][4]} $\varepsilon_{6D}$ \\
+      \texttt{Twiss[][][]}$^{\dagger}$   & list  & Twiss parameters by location.
+                                                  \texttt{[iloc][0][0]} $\alpha_x$, \texttt{[iloc][0][1]} $\beta_x$, \texttt{[iloc][0][2]} $\gamma_x$, 
+                                                  \texttt{[iloc][1][0]} $\alpha_y$, \texttt{[iloc][1][1]} $\beta_y$, \texttt{[iloc][1][2]} $\gamma_y$. \\ 
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                             \\
+      \hline
+      \texttt{setInputDataFile} & \texttt{getInputDataFile} & Set/get input \texttt{BeamIO} data file.                          \\
+      \texttt{setoutputCSVfile} & \texttt{getoutputCSVfile} & Set/get output \texttt{csv} file.                                 \\
+      \texttt{setbeamlineSpecificationCSVfile} & \texttt{getbeamlineSpecificationCSVfile} & Set/get beam-line specification CSV
+                                                                                            file.                               \\
+      \texttt{setnEvtMax}      & \texttt{getnEvtMax}   & Set/get maximum number of events to ready.                             \\
+      \texttt{setLocation}     & \texttt{setLocation}  & Set/get location where paramters are stored.                           \\
+      \texttt{sets}            & \texttt{gets}         & Set/get list of $s$ positions where parameters are stored.             \\
+      \texttt{setsigmaxy}      & \texttt{getsigmaxy}   & Set/get list of $\sigma_x$ and $\sigma_y$.                             \\
+      \texttt{setEmittance}    & \texttt{getEmittance} & Set/get list of emittance lists.                                       \\
+      \texttt{setTwiss}        & \texttt{getTwiss}     & Set/get list of sets of Twiss paramters.                               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:B:ProcMethods} presents the processing methods provided
+in the \texttt{Beam} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{initialiseSums()} &  &  & Initialises sums used to calculate covariance matrix.                                \\
+      \texttt{incrementSums(iPrtcl)}  & \texttt{Particle} instance &  & Increment sums used to calculate covariance matrix.  \\
+      \texttt{calcCovarianceMatrix()} &  &  & Calculate covariance matrix.                                                   \\
+      \texttt{evaluateBeam()} &  &  & Work through locations and calculate paramters from covariance matrix.                 \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods} ~\newline
+\noindent
+The \texttt{Beam} class has no i/o methods.
+
+\subsubsection{Utilities} ~\newline
+\noindent
+The utilities provided by the \texttt{Beam} class are listed in
+table~\ref{Tab:B:UtilMethods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:UtilMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \hline
+      \texttt{cleanBeams()}       &  &  & Delete (using \texttt{del}) instances of beam class.          \\
+      \texttt{printProgression()} &  &  & Prints the paramters at each location.                                           \\
+      \texttt{getHeader()}        &  &  & Returns header for pandas data frame used to store summary.                      \\
+      \texttt{getLines()}         &  &  & Returns lines to be used to create summary pandas data frame.                    \\
+      \texttt{createReport()}     &  &  & Creates \texttt{csv} file containing summary of beam progression.                \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier

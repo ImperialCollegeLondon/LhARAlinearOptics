@@ -1,18 +1,13 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 To do:
 ======
  - Still to do:
-   - Editing/checking pass through BLEs to make sure up to date with
-     documentation.
-   - Constants
-   - KL: Add length to aperture: i.e. there can be a length to the plate
-         or other collimator structure.
-   - KL: Add rotation to Shift2Local and Shift2Global.  Need to update dvStrt
-         to Euler angles, I think.
+   - KL: Add rotation to Shift2Local and Shift2Laboratory.  Need to update
+         dvStrt to Euler angles, I think.
          Also, as coded, these methods are not correct, they do not account
-         for position of element in global coordinates.
+         for position of element in laboratory coordinates.
+   - KL: Need to write out Rot2LbStrt and end etc.
 
 
 Class BeamLineElement:
@@ -38,18 +33,26 @@ constants_instance: Instance of PhysicalConstants class
   Instance attributes:
   --------------------
   Calling arguments:
-   _Name : string; name of element, should be identifiable, e.g., Drift1
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
-  _drStrt : "error", displacement of start from nominal position (rad).
-  _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
-  _Rot2Lb : Optional; rotation matrix that takes RPLC axes to Lab axes.
-            3x3 np.ndarray
+       _Name : string; name of element, should be identifiable, e.g.,
+               Drift1 
+       _rStrt : numpy array; x, y, z position (in m) of start of
+                element. 
+       _vStrt : numpy array; theta, phi of principal axis of element.
+      _drStrt : "error", displacement of start from nominal position
+                (rad). 
+      _dvStrt : "error", deviation in theta and phy from nominal axis
+                (rad).
 
-  Instance attributes assigned in BeamLineElement parent class:
-  _TrnsMtrx: Transfer matrix (6x6).  Set to Null in __init__, initialised
-              (to Null) in BeamLineElement.__init__, filled in derived
-              classes.
+  Calculated and set in derived classes:
+    _Strt2End : Calculated; vector that translates from start to end of
+                element in lab coordinates.  Set in derived class.
+  _Rot2LbStrt : Calculated; rotation matrix that takes RPLC axes to Lab
+                axes.  3x3 np.ndarray
+   _Rot2LbEnd : Calculated; otation matrix that takes RPLC axes to Lab
+                axes.  3x3 np.ndarray.  Set in derived class.
+    _TrnsMtrx : Calculated; transfer matrix (6x6).  Set to Null in
+                __init__, initialised (to Null) in
+                BeamLineElement.__init__, set in derived classes.
 
     
   Methods:
@@ -65,38 +68,66 @@ constants_instance: Instance of PhysicalConstants class
            Return: str="Pos: [x, y, z] = " + str(self.getrStrt())
 
   Set methods:
-      setDebug  : Set debug flag
-    setAll2None : Set all attributes to Null
-       setName  : Set name of element
-       setrStrt  : Set start of element, x, y, z (m)
-       setvStrt  : Set orientation of element, theta, phi (rad)
-      setdrStrt  : Set offset of start of element, x, y, z (m)
-      setdvStrt  : Set offset orientation of element, theta, phi (rad)
+         setDebug  : Set debug flag
+       setAll2None : Set all attributes to Null
+          setName  : Set name of element
+         setrStrt  : Set start of element, x, y, z (m)
+         setvStrt  : Set orientation of element, theta, phi (rad)
+        setdrStrt  : Set offset of start of element, x, y, z (m)
+        setdvStrt  : Set offset orientation of element, theta, phi (rad)
+     setRot2LbStrt : set rotation matrix totransform from RLBC to lab at
+                     start.
 
   Get methods:
-      getDebug  : get debug flag
-  getinstances  : get list of instances
-       getName  : Get name of element
-       getrStrt  : Get start of element, x, y, z (m)
-       getvStrt  : Get orientation of element, theta, phi (rad)
-      getdrStrt  : Get offset from nominal start of element, x, y, z (m)
-      getdvStrt  : Get offset of orientation of element, theta, phi (rad)
+         getDebug  : get debug flag
+     getinstances  : get list of instances
+          getName  : Get name of element
+          getrStrt : Get start of element, x, y, z (m)
+          getvStrt : Get orientation of element, theta, phi (rad)
+         getdrStrt : Get offset from nominal start of element, x, y, z (m)
+         getdvStrt : Get offset of orientation of element, theta, phi (rad)
+       getStrt2End : Get vector to translate from start to end in lab
+     getRot2LbStrt : Get rotation matrix totransform from RLBC to lab at
+                     start.
+      getRot2LbEnd : Get rotation matrix totransform from RLBC to lab at end.
  getTransferMatrix : Get transfer matrix.
 
-  Processing method:
+
+  Processing methods:
+OutsideBeamPipe : Returns true of  particle outside beam pipe defined in
+                  Facility
+             Input: R: np.ndarray trace-space vector.
+
       Transport : Applies transfer matrix to phase-space vector.
              Input: 6D phase-space vector, np.array.
             Return: 6D phase-space vector after element
 
-    Shift2Local : Transform from global to local coordinates.
+    Shift2Local : Transform from laboratory to local coordinates.
                  <---- Not correct yet!
              Input: 6D phase-space vector, np.array.
             Return: Transformed 6D phase-space vector
 
-   Shift2Global : Transform from local to global coordinates
+   Shift2Laboratory : Transform from local to laboratory coordinates
                  <---- Not correctyet!
              Input: 6D phase-space vector, np.array.
             Return: Transformed 6D phase-space vector
+
+   
+  I/o methods:
+      writeElement : Class method; write element data to "dataFILE"
+          i/p: dataFILE; i.o writer
+
+       readElement : Class method; read element fromd to "dataFILE"
+          i/p: dataFILE; i.o reader
+
+
+  Utilities:
+    cleaninstances : Class method: cleans (using "del") instances and resets
+                     list.
+
+    removeInstance : Class method: remove (using remoce) instance, inst, from
+                     memory and list of instances.
+           input: inst; instance of BLE class
 
 
 Created on Mon 12Jun23: Version history:
@@ -149,7 +180,7 @@ class BeamLineElement:
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
-        if self.__Debug:
+        if self.getDebug():
             print(' BeamLineElement.__init__: ', \
                   'creating the BeamLineElement object')
             print("     ---->               Name:", _Name)
@@ -160,7 +191,7 @@ class BeamLineElement:
 
         BeamLineElement.instances.append(self)
 
-        self.setAll2None()
+        BeamLineElement.setAll2None(self)
         
         if  not isinstance( _Name, str)        or \
             not isinstance( _rStrt, np.ndarray) or \
@@ -170,14 +201,14 @@ class BeamLineElement:
             raise badBeamLineElement( \
                   " BeamLineElement: no default beamline element!"
                                       )
-
         self.setName(_Name)
         self.setrStrt(_rStrt)
         self.setvStrt(_vStrt)
         self.setdrStrt(_drStrt)
         self.setdvStrt(_dvStrt)
+        self.setRot2LbStrt()
         
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> New BeamLineElement instance: \n", \
                   BeamLineElement.__str__(self))
             
@@ -187,12 +218,18 @@ class BeamLineElement:
     def __str__(self):
         print(" BeamLineElement:")
         print(" ----------------")
-        print("     ---->         Debug flag:", BeamLineElement.getDebug())
-        print("     ---->               Name:", self.getName())
-        print("     ---->           Position:", self.getrStrt())
-        print("     ---->        Orientation:", self.getvStrt())
-        print("     ---->    Position offset:", self.getdrStrt())
-        print("     ----> Orientation offset:", self.getdvStrt())
+        print("     ---->             Debug flag:", BeamLineElement.getDebug())
+        print("     ---->                   Name:", self.getName())
+        print("     ---->               Position:", self.getrStrt())
+        print("     ---->            Orientation: \n", self.getvStrt())
+        print("     ---->        Position offset:", self.getdrStrt())
+        print("     ---->     Orientation offset: \n", self.getdvStrt())
+        print("     ---->    Start to end vector:", self.getStrt2End())
+        print("     ----> Rotate to lab at start: \n", self.getRot2LbStrt())
+        print("     ---->   Rotate to lab at end: \n", self.getRot2LbEnd())
+        with np.printoptions(linewidth=500,precision=7,suppress=True):
+            print("     ---->        Transfer matrix: \n", \
+                  self.getTransferMatrix())
         return " <---- BeamLineElement parameter dump complete."
 
     def SummaryStr(self):
@@ -203,43 +240,23 @@ class BeamLineElement:
 #--------  "Set method" only Debug
 #.. Method believed to be self documenting(!)
     @classmethod
-    def cleanInstances(cls):
-        for inst in cls.instances:
-            if cls.getDebug():
-                print(" Kill:", inst.getName())
-            if isinstance(inst, Facility):
-                Facility.instance = None
-            del inst
-        cls.instances = []
-        if cls.getDebug():
-            print(' BeamLineElement.cleanInstance: instances removed.')
-
-    @classmethod
-    def removeInstance(cls, inst):
-        if inst in cls.getinstances():
-            if cls.getDebug():
-                print(" BeamLineElement.removeInstance: remove", \
-                      inst.getName(), "from beamline instances list")
-            cls.getinstances().remove(inst)
-        else:
-            if cls.getDebug():
-                print(" BeamLineElement.removeInstance: instance", \
-                      inst.Name, "not in BeamLineElement.Instances!")
-
-    @classmethod
     def setDebug(self, Debug=False):
-        if self.__Debug:
+        if self.getDebug():
             print(" BeamLineElement.setdebug: ", Debug)
         self.__Debug = Debug
 
     def setAll2None(self):
-        self._Name      = None
+        self._Name       = None
         self._rStrt      = None
         self._vStrt      = None
         self._drStrt     = None
         self._dvStrt     = None
-        self._TrnsMtrx = None
-        
+        self._Length     = None
+        self._Strt2End   = None
+        self._Rot2LbStrt = None
+        self._Rot2LbEnd  = None
+        self._TrnsMtrx   = None
+    
     def setName(self, _Name):
         if not isinstance(_Name, str):
             raise badParameter(" BeamLineElement.setName: bad name:", \
@@ -256,6 +273,9 @@ class BeamLineElement:
         if not isinstance(_vStrt, np.ndarray):
             raise badParameter(" BeamLineElement.setvStrt: bad orienttion:", \
                                _vStrt)
+        if len(np.shape(_vStrt)) == 1:
+            raise badParameter(" BeamLineElement.setvStrt: legacy _vStrt, ", \
+                               "np.shape(_vStrt)=", np.shape(_vStrt))
         self._vStrt = _vStrt
         
     def setdrStrt(self, _drStrt):
@@ -272,6 +292,75 @@ class BeamLineElement:
                                _dvStrt)
         self._dvStrt = _dvStrt
 
+    def setLength(self, _Length):
+        self._Length = _Length
+
+    def setRot2LbStrt(self):
+        if not isinstance(self.getvStrt(), np.ndarray):
+            raise badParameter(" BeamLineElement.setRot2LbStrt:" + \
+                               " vStrt not set.")
+        if len(np.shape(self.getvStrt())) != 2:
+            raise badParameter(" BeamLineElement.setRot2LbStrt:" + \
+                               " bad vStrt=", np.shape(self.getvStrt()))
+
+        jr = np.array( [ \
+              mth.sin(self.getvStrt()[0][0]) * mth.cos(self.getvStrt()[0][1]), \
+              mth.sin(self.getvStrt()[0][0]) * mth.sin(self.getvStrt()[0][1]), \
+              mth.cos(self.getvStrt()[0][0]) \
+                         ])
+        kr = np.array( [ \
+              mth.sin(self.getvStrt()[1][0]) * mth.cos(self.getvStrt()[1][1]), \
+              mth.sin(self.getvStrt()[1][0]) * mth.sin(self.getvStrt()[1][1]), \
+              mth.cos(self.getvStrt()[1][0]) \
+                         ])
+        ir = np.cross(jr, kr)
+
+        Rot2LbStrt = np.array( [ \
+                                 [ir[0], jr[0], kr[0]], \
+                                 [ir[1], jr[1], kr[1]], \
+                                 [ir[2], jr[2], kr[2]]  \
+                                 ] )
+        
+        self._Rot2LbStrt = Rot2LbStrt
+        
+        if self.getDebug():
+            print(" BeamLineElement.setRot2LbStrt:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> vStrt: \n", self.getvStrt())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rot2LbStrt: \n", Rot2LbStrt)
+            print(" <---- BeamLineElement.setRot2LbStrt: done.")
+
+    def setStrt2End(self, t):
+        if not isinstance(t, np.ndarray):
+            raise badParameter(" BeamLineElement.setStrt2End:" + \
+                               " bad translation (RLPC)")
+
+        self._Strt2End = np.matmul(self.getRot2LbStrt(), t)
+        
+        if self.getDebug():
+            print(" BeamLineElement.setStrt2End:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> t: \n", t)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rot2LbStrt: \n", self.getRot2LbStrt())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Strt2End: \n", self.getStrt2End())
+            print(" <---- BeamLineElement.setStrt2End: done.")
+        
+    def setRot2LbEnd(self, _Rot2LbEnd):
+        if not isinstance(_Rot2LbEnd, np.ndarray):
+            raise badParameter(" BeamLineElement.setRot2LbEnd:", \
+                               " bad argument")
+        self._Rot2LbEnd = _Rot2LbEnd
+
+        if self.getDebug():
+            print(" BeamLineElement.setRot2LbEnd:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rot2LbEnd: \n", self.getRot2LbEnd())
+            print(" <---- BeamLineElement.setRot2LbEnd: done.")
+
+            
         
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
@@ -299,9 +388,58 @@ class BeamLineElement:
     def getdvStrt(self):
         return self._dvStrt
 
+    def getLength(self):
+        return self._Length
+
+    def getStrt2End(self):
+        return self._Strt2End
+
+    def getRot2LbStrt(self):
+        return self._Rot2LbStrt
+
+    def getRot2LbEnd(self):
+        return self._Rot2LbEnd
+
+    def getvEnd(self):
+        kx = self.getRot2LbEnd()[0][2]
+        ky = self.getRot2LbEnd()[1][2]
+        kz = self.getRot2LbEnd()[2][2]
+        
+        jx = self.getRot2LbEnd()[0][1]
+        jy = self.getRot2LbEnd()[1][1]
+        jz = self.getRot2LbEnd()[2][1]
+
+        ktheta = mth.acos(kz)
+        sktheta = mth.sqrt(1. - kz**2)
+        
+        jtheta = mth.acos(jz)
+        sjtheta = mth.sqrt(1. - jz**2)
+
+        if abs(sktheta) > 1.E-12:
+            kcphi   = kx/sktheta
+            ksphi   = ky/sktheta
+        else:
+            kcphi = 1.
+            ksphi = 0.
+
+        jcphi   = jx/sjtheta
+        jsphi   = jy/sjtheta
+
+        kphi = mth.atan2(ksphi, kcphi)
+        if kphi < 0.: kphi = 2.*mth.pi + kphi
+
+        jphi = mth.atan2(jsphi, jcphi)
+        if jphi < 0.: jphi = 2.*mth.pi + jphi
+
+        vEnd = np.array( [ [jtheta, jphi], [ktheta, kphi] ])
+
+        return vEnd
+
     def getTransferMatrix(self):
         return self._TrnsMtrx
-    
+
+
+#--------  Processing methods:
     def OutsideBeamPipe(self, _R):
         Outside = False
         Rad = np.sqrt(_R[0]**2 + _R[2]**2)
@@ -309,83 +447,6 @@ class BeamLineElement:
             Outside = True
         return Outside
 
-
-#--------  I/o methods:
-    def writeElement(self, dataFILE):
-        if self.getDebug():
-            print(" BeamLineElement.writeElement starts.")
-
-        bLocation = bytes(self.getName(), 'utf-8')
-        record    = strct.pack(">i", len(bLocation))
-        dataFILE.write(record)
-        if self.getDebug():
-            print("     ----> Length of element name:", \
-                  strct.unpack(">i", record))
-        
-        record = bLocation
-        dataFILE.write(record)
-            
-        if self.getDebug():
-            print("     ----> Location:", bLocation.decode('utf-8'))
-
-        record = strct.pack(">5d", \
-                            self.getrStrt()[0], \
-                            self.getrStrt()[1], \
-                            self.getrStrt()[2], \
-                            self.getvStrt()[0], \
-                            self.getvStrt()[1]
-                            )
-        dataFILE.write(record)
-        if self.getDebug():
-            print("         ----> rStrt, vStrt:", \
-                      strct.unpack(">5d",record))
-        
-        if self.getDebug():
-            print(" <---- BeamLineElement.writeElement done.")
-
-    """
-  _drStrt : "error", displacement of start from nominal position (rad).
-  _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
-    """
-    @classmethod
-    def readElement(cls, dataFILE):
-        if cls.getDebug():
-            print(" BeamLineElement.readElement starts.")
-
-        EoF = False
-
-        brecord = dataFILE.read(4)
-        if brecord == b'':
-            if cls.getDebug():
-                print(" <---- end of file, return.")
-            return True
-            
-        record = strct.unpack(">i", brecord)
-        nChr   = record[0]
-        if cls.getDebug():
-            print("     ----> Number of characters:", nChr)
-                
-        brecord  = dataFILE.read(nChr)
-        Location = brecord.decode('utf-8')
-        if cls.getDebug():
-            print("                   Location:", Location)
-
-        brecord = dataFILE.read((5*8))
-        if brecord == b'':
-            return True, None, None
-        
-        record  = strct.unpack(">5d", brecord)
-        r      = np.array([float(record[0]), float(record[1]), \
-                           float(record[2])])
-        v      = np.array([float(record[3]), float(record[4])])
-        
-        if cls.getDebug():
-            print("     ----> r, v:", r, v)
-
-        return EoF, Location, r, v
-
-    
-#--------  Utilities:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
@@ -434,7 +495,7 @@ class BeamLineElement:
 
         return _Rprime
 
-    def Shift2Global(self, _R):
+    def Shift2Laboratory(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Shift2Local: bad input vector:", \
@@ -445,6 +506,109 @@ class BeamLineElement:
         _Rprime[2] += self._drStrt[1]
         
         return _Rprime
+
+    
+#--------  I/o methods:
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" BeamLineElement.writeElement starts.")
+
+        bLocation = bytes(self.getName(), 'utf-8')
+        record    = strct.pack(">i", len(bLocation))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of element name:", \
+                  strct.unpack(">i", record))
+        
+        record = bLocation
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Location:", bLocation.decode('utf-8'))
+
+        record = strct.pack(">7d", \
+                            self.getrStrt()[0],    \
+                            self.getrStrt()[1],    \
+                            self.getrStrt()[2],    \
+                            self.getvStrt()[0][0], \
+                            self.getvStrt()[0][1], \
+                            self.getvStrt()[1][0], \
+                            self.getvStrt()[1][1]
+                            )
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> rStrt, vStrt:", \
+                      strct.unpack(">7d",record))
+        
+        if self.getDebug():
+            print(" <---- BeamLineElement.writeElement done.")
+
+    """
+  _drStrt : "error", displacement of start from nominal position (rad).
+  _dvStrt : "error", deviation in theta and phy from nominal axis (rad).
+    """
+    @classmethod
+    def readElement(cls, dataFILE):
+        if cls.getDebug():
+            print(" BeamLineElement.readElement starts.")
+
+        EoF = False
+
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True
+            
+        record = strct.unpack(">i", brecord)
+        nChr   = record[0]
+        if cls.getDebug():
+            print("     ----> Number of characters:", nChr)
+                
+        brecord  = dataFILE.read(nChr)
+        Location = brecord.decode('utf-8')
+        if cls.getDebug():
+            print("                   Location:", Location)
+
+        brecord = dataFILE.read((7*8))
+        if brecord == b'':
+            return True, None, None
+        
+        record  = strct.unpack(">7d", brecord)
+        r      = np.array([float(record[0]), float(record[1]),   \
+                           float(record[2])])
+        v      = np.array([[float(record[3]), float(record[4])], \
+                           [float(record[5]), float(record[6])]]  )
+        
+        if cls.getDebug():
+            print("     ----> r, v:", r, v)
+
+        return EoF, Location, r, v
+
+    
+#--------  Utilities:
+    @classmethod
+    def cleaninstances(cls):
+        for inst in cls.instances:
+            if cls.getDebug():
+                print(" Kill:", inst.getName())
+            if isinstance(inst, Facility):
+                Facility.instance = None
+            del inst
+        cls.instances = []
+        if cls.getDebug():
+            print(' BeamLineElement.cleaninstance: instances removed.')
+
+    @classmethod
+    def removeInstance(cls, inst):
+        if inst in cls.getinstances():
+            if cls.getDebug():
+                print(" BeamLineElement.removeInstance: remove", \
+                      inst.getName(), "from beamline instances list")
+            cls.getinstances().remove(inst)
+        else:
+            if cls.getDebug():
+                print(" BeamLineElement.removeInstance: instance", \
+                      inst.Name, "not in BeamLineElement.Instances!")
 
 
 #--------  Derived classes  --------  --------  --------  --------  --------
@@ -465,17 +629,27 @@ Derived class Facility:
 
   Parent class attributes:
   ------------------------
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
-  _drStrt : "error", displacement of start from nominal position.
-  _dvStrt : "error", deviation in theta and phy from nominal axis.
-  _TrnsMtrx : Transfer matrix.
+        _Name : str : Name of facility
+       _rStrt : numpy array; x, y, z position (in m) of start of
+                element. 
+       _vStrt : numpy array; theta, phi of principal axis of element.
+      _drStrt : "error", displacement of start from nominal position
+                (rad). 
+      _dvStrt : "error", deviation in theta and phy from nominal axis
+                (rad).
+
+  Calculated and set in derived classes:
+    _Strt2End, _Rot2LbStrt, _Rot2LbEnd, _TrnsMtrx not needed, so not
+    set.  Will remain "None" as set in parent class.
 
 
   Instance attributes to define Facility:
-  ------------------------------------
-  _Name : str   : Name of facility
-  _p0   : float : Reference particle momentum
+  ---------------------------------------
+  _p0   : float : Reference particle momentum; unit MeV
+ _VCMVr : float : Vacuum chamber mother volume; unit m.  Idea here is to
+                  define the radius at which a particle trajectory is
+                  terminated.  It may be necessary to introduce a beam
+                  pipe later.
     
   Methods:
   --------
@@ -485,11 +659,19 @@ Derived class Facility:
       __str__ : Dump of constants
 
   Set methods:
-        setName  : 
-          setp0  : 
+          setp0 : float : e.g. 15 MeV
+       setVCMVr : float : e.g. 0.5 m
 
   Get methods:
-     getName, getp0
+     getp0, getVCMVr
+
+  I/o methods:
+      writeElement : Class method; write element data to "dataFILE"
+          i/p: dataFILE; i.o writer
+
+       readElement : Class method; read element fromd to "dataFILE"
+          i/p: dataFILE; i.o reader
+
 
 """
 class Facility(BeamLineElement):
@@ -502,15 +684,18 @@ class Facility(BeamLineElement):
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _p0=None, _VCMVr=None):
 
+        if self.__Debug:
+            print(' Facility.__init__: ', \
+                      'entering the Facility object creation method:')
+
         if Facility.instance == None:
             Facility.instance = self
             
             if self.__Debug:
-                print(' Facility.__init__: ', \
-                      'creating the Facility object:')
-                print("     ----> Name:", _Name)
-                print("     ----> Reference particle momentum:", _p0)
-                print("     ----> Vacuum chamber mother volume radius", \
+                print('     ----> Creating the Facility object:')
+                print("         ----> Name:", _Name)
+                print("         ----> Reference particle momentum:", _p0)
+                print("         ----> Vacuum chamber mother volume radius", \
                       _VCMVr)
 
             Facility.instance = self
@@ -531,6 +716,10 @@ class Facility(BeamLineElement):
             self.setp0(_p0)
             self.setVCMVr(_VCMVr)
                 
+            self.setLength(0.)
+            self.setStrt2End(np.array([0., 0., self.getLength()]))
+            self.setRot2LbEnd(self.getRot2LbStrt())
+        
             if self.__Debug:
                 print("     ----> New Facility instance: \n", \
                       self)
@@ -656,11 +845,18 @@ Derived class Drift:
 
   Parent class attributes:
   ------------------------
-   _rStrt : numpy array; x, y, z position (in m) of start of element.
-   _vStrt : numpy array; theta, phi of principal axis of element.
-  _drStrt : "error", displacement of start from nominal position.
-  _dvStrt : "error", deviation in theta and phy from nominal axis.
-  _TrnsMtrx : Transfer matrix.
+        _Name : str : Name of facility
+       _rStrt : numpy array; x, y, z position (in m) of start of
+                element. 
+       _vStrt : numpy array; theta, phi of principal axis of element.
+      _drStrt : "error", displacement of start from nominal position
+                (rad). 
+      _dvStrt : "error", deviation in theta and phy from nominal axis
+                (rad).
+
+  Calculated and set in derived classes:
+    _Strt2End, _Rot2LbStrt, _Rot2LbEnd, _TrnsMtrx not needed, so not
+    set.  
 
 
   Instance attributes to define drift:
@@ -707,6 +903,9 @@ class Drift(BeamLineElement):
                   " Drift: bad specification for length of drift!"
                                       )
         self.setLength(_Length)
+
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
         
         self.setTransferMatrix()
                 
@@ -901,6 +1100,7 @@ setAoertureParameters: Sets aperture parameters:
      getDebug: get debug flag, bool
       getType: Get type, return Type, int
     getParams: Return Params, list
+   getLenbgth: Returns length of aperture (presently 0)
 
   Utilities:
 
@@ -929,6 +1129,9 @@ class Aperture(BeamLineElement):
                   " Aperture: bad specification for aperture!"
                                       )
         self.setApertureParameters(_Param)
+        
+        self.setStrt2End(np.array([0., 0., 0.]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
         
         self.setTransferMatrix()
                 
@@ -1023,7 +1226,7 @@ class Aperture(BeamLineElement):
         return 0.
 
     
-#--------  Utilities:
+#--------  Processing method:
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
@@ -1234,7 +1437,7 @@ class FocusQuadrupole(BeamLineElement):
         #   - FQmode = 0 ==> use particle momentum in calculation of k
         #            = 1 ==> use reference particle momentum and dispersion
         #                    calculation.
-        self._FQmode = 0
+        self.setFQmode(0)
 
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
@@ -1254,7 +1457,10 @@ class FocusQuadrupole(BeamLineElement):
         if isinstance(_kFQ, float):
             self.setkFQ(_kFQ)
             self.setStrength(self.calcStrength())
-                
+
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New FocusQuadrupole instance: \n", self)
             print(" <---- Done.")
@@ -1266,6 +1472,7 @@ class FocusQuadrupole(BeamLineElement):
         print(" FocusQuadrupole:")
         print(" ----------------")
         print("     ---->     Debug flag:", FocusQuadrupole.getDebug())
+        print("     ---->         FQmode:", self.getFQmode())
         print("     ---->     Length (m):", self.getLength())
         print("     ----> Strength (T/m):", self.getStrength())
         print("     ---->       kFQ (/m):", self.getkFQ())
@@ -1295,6 +1502,13 @@ class FocusQuadrupole(BeamLineElement):
         self._TrnsMtrx = None
         self._FQmode   = None
         
+    def setFQmode(self, _FQmode):
+        if not isinstance(_FQmode, int):
+            raise badParameter( \
+                            "BeamLineElement.FocusQuadrupole.setFQmode:", \
+                            " bad FQmode:", _FQmode)
+        self._FQmode = _FQmode
+
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
@@ -1609,10 +1823,10 @@ class DefocusQuadrupole(BeamLineElement):
         self.setAll2None()
 
         #.. Hard wired:
-        #   - FQmode = 0 ==> use particle momentum in calculation of k
+        #   - DQmode = 0 ==> use particle momentum in calculation of k
         #            = 1 ==> use reference particle momentum and dispersion
         #                    calculation.
-        self._DQmode = 0
+        self.setDQmode(0)
         
         # BeamLineElement class initialization:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
@@ -1633,6 +1847,9 @@ class DefocusQuadrupole(BeamLineElement):
             self.setkDQ(_kDQ)
             self.setStrength(self.calcStrength())
                 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New DefocusQuadrupole instance: \n", self)
             print(" <---- Done.")
@@ -1644,6 +1861,7 @@ class DefocusQuadrupole(BeamLineElement):
         print(" DefocusQuadrupole:")
         print(" -------------------")
         print("     ---->     Debug flag:", DefocusQuadrupole.getDebug())
+        print("     ---->         DQmode:", self.getDQmode())
         print("     ---->     Length (m):", self.getLength())
         print("     ----> Strength (T/m):", self.getStrength())
         print("     ---->       kDQ (/m):", self.getkDQ())
@@ -1673,6 +1891,13 @@ class DefocusQuadrupole(BeamLineElement):
         self._TrnsMtrx = None
         self._DQmode   = None
         
+    def setDQmode(self, _DQmode):
+        if not isinstance(_DQmode, int):
+            raise badParameter( \
+                            "BeamLineElement.FocusQuadrupole.setDQmode:", \
+                            " bad DQmode:", _DQmode)
+        self._DQmode = _DQmode
+
     def setLength(self, _Length):
         if not isinstance(_Length, float):
             raise badParameter( \
@@ -1967,7 +2192,7 @@ class SectorDipole(BeamLineElement):
         if self.getDebug():
             print(' SectorDipole(BeamLineElement).__init__: ')
             print('     ----> Angle=', _Angle)
-            print('     ----> Angle=', _B)
+            print('     ---->     B=', _B)
 
         SectorDipole.instances.append(self)
 
@@ -1982,6 +2207,23 @@ class SectorDipole(BeamLineElement):
         self.setB(_B)
         self.setLength()
 
+        ChalfAngle = mth.cos(self.getAngle()/2.)
+        ShalfAngle = mth.sin(self.getAngle()/2.)
+        Radius     = self.getLength()/self.getAngle()
+        Scale      = 2. * Radius * ShalfAngle
+        deltaV     = np.array([-ShalfAngle, 0., ChalfAngle]) * Scale
+        self.setStrt2End(deltaV)
+        
+        CAngle = mth.cos(self.getAngle())
+        SAngle = mth.sin(self.getAngle())
+        Rot2End    = np.array([ \
+                                [CAngle, 0., -SAngle], \
+                                [    0., 1.,      0.], \
+                                [SAngle, 0.,  CAngle]  \
+                                ])
+        Rot2LbEnd  = np.matmul(self.getRot2LbStrt(), Rot2End)
+        self.setRot2LbEnd(Rot2LbEnd)
+        
         if self.getDebug():
             print("     ----> New SectorDipole instance: \n", self)
 
@@ -2327,7 +2569,8 @@ class Solenoid(BeamLineElement):
         self.setAll2None()
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+        BeamLineElement.__init__(self, \
+                                 _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement( \
@@ -2345,6 +2588,9 @@ class Solenoid(BeamLineElement):
             self.setksol(_ksol)
             self.setStrength(self.calcStrength())
                 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New Solenoid instance: \n", self)
             print(" <---- Done.")
@@ -2728,6 +2974,9 @@ class GaborLens(BeamLineElement):
             
         self.setElectronDensity()
 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.getDebug():
             print("     ----> New GaborLens instance: \n", self)
 
@@ -3043,7 +3292,7 @@ class GaborLens(BeamLineElement):
 
 """
 Derived class CylindricalRFCavity:
-====================
+==================================
 
 ** Note; KL; 05Mar24: Linac convention is phase relative to crest.
 
@@ -3053,7 +3302,8 @@ Derived class CylindricalRFCavity:
 
   Class attributes:
   -----------------
-    instances : List of instances of CylindricalRFCavity(BeamLineElement) class
+    instances : List of instances of CylindricalRFCavity(BeamLineElement)
+                class
   __Debug     : Debug flag
 
 
@@ -3172,10 +3422,13 @@ class CylindricalRFCavity(BeamLineElement):
         self.setcprll(_cprll)
         _sprll = mth.sin(self.getwprll()*self.getLength()) / self.getwprll()
         self.setsprll(_sprll)
-        
+
         self.setTransferMatrix()
         self.setmrf()
 
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         if self.__Debug:
             print("     ----> New CylindricalRFCavity instance: \n", self)
 
@@ -3612,8 +3865,7 @@ Derived class Source:
              [3] - E_min: min energy to generate
              [4] - E_max: max energy to generate
              [5] - nPnts: Number of points to sample for integration of PDF
-             [6] - P_L: Laser power [W]
-             [7] - E_L: Laser energy [J]
+             [6] - P_L: Laser power [W]             [7] - E_L: Laser energy [J]
              [8] - lamda: Laser wavelength [um]
              [9] - t_laser: Laser pulse duration [s]
              [10] - d: Laser thickness [m]
@@ -3649,7 +3901,7 @@ Derived class Source:
         getModeText : Set mode text--string identifying source
 
   Utilities and processing methods:
-     cleanInstances : Deletes source instance(s) and empties list of sources.
+     cleaninstances : Deletes source instance(s) and empties list of sources.
 
     CheckSoureParam : Checks source parameters are self consistent.  Calls
                       CheckMode and CheckParam
@@ -3724,6 +3976,10 @@ class Source(BeamLineElement):
         #.. BeamLineElement class initialisation:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
+        self.setLength(0.)
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
         #.. Check valid mode and parameters:
         if _Mode==None or _Param==None:
             print(" BeamLineElement(Source).__init__:", \
@@ -5041,6 +5297,211 @@ class QuadTriplet(BeamLineElement):
     
 # -------- Utilities:
     
+    
+"""
+Derived class RPLCswitch:
+=========================
+
+  RPLCswitch class derived from BeamLineElement to manage a change in the
+  relation of RPLC coordinates to laboratiry coordinates.  __init__
+  sets parameters of the RPLCswitch.  The transfer matrix is the
+  effective transformation from the previous RPLC->laboratory
+  relationship to the new one.
+
+
+  Class attributes:
+  -----------------
+    instances : List of instances of BeamLineElement class
+  __Debug     : Debug flag
+
+
+  Parent class instance attributes:
+  ---------------------------------
+  Calling arguments:
+   _Name : Name
+   _rStrt : numpy array; x, y, z position (in m) of start of element.
+   _vStrt : numpy array; theta, phi of y and z axes of new RPLC
+            coordinate system.
+  _drStrt : "error", displacement of start from nominal position.
+  _dvStrt : "error", deviation in theta and phy from nominal axis.
+
+  _Length   : 0
+  _TrnsMtrx : Transfer matrix.
+
+
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+    SummaryStr: No arguments, returns one-line string summarising RPLCswitch
+                parameterrs.
+
+  Set methods:
+ setTransferMatrix : "Calculate" amd set transfer matrix.
+
+  Get methods:
+     getDebug: get debug flag, bool
+    getLength: Returns length of RPLCswitch (presently 0)
+
+  Utilities:
+
+
+"""
+class RPLCswitch(BeamLineElement):
+    instances  = []
+    __Debug    = False
+
+#--------  "Built-in methods":    
+    def __init__(self, _Name=None, \
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
+        if self.getDebug():
+            print(' RPLCswitch.__init__: ', \
+                  'creating the RPLCswitch object')
+            print("     ----> vStrt:", _vStrt)
+
+        #.. BeamLineElement class initialisation:
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+
+        RPLCswitch.instances.append(self)
+        
+        self.setStrt2End(np.array([0., 0., 0.]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
+        
+        self.setTransferMatrix()
+                
+        if self.getDebug():
+            print("     ----> New RPLCswitch instance: \n", \
+                  self)
+            
+    def __repr__(self):
+        return "RPLCswitch()"
+    
+    def __str__(self):
+        print(" RPLCswitch:")
+        print(" -----------")
+        print("     ----> Debug flag:", RPLCswitch.getDebug())
+        BeamLineElement.__str__(self)
+        return " <---- RPLCswitch parameter dump complete."
+
+    def SummaryStr(self):
+        Str  = "RPLCswitch       : " + BeamLineElement.SummaryStr(self)
+        return Str
+
+    
+#--------  "Set methods".
+#.. Methods believed to be self documenting(!)
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+        
+    def setTransferMatrix(self):
+
+        iLst  = BeamLineElement.getinstances()[ \
+                                len(BeamLineElement.getinstances())-2 \
+                                               ]
+        invRE = np.linalg.inv(iLst.getRot2LbEnd())
+
+        effctvRot = np.matmul(invRE, self.getRot2LbStrt())
+
+        offDiag   = np.zeros((3,3))
+
+        TrnsMtrx = np.block([ \
+                              [effctvRot, offDiag],  \
+                              [  offDiag, effctvRot] \
+                              ])
+                             
+        self._TrnsMtrx = TrnsMtrx
+
+
+#--------  "get methods"
+#.. Methods believed to be self documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+    
+    def getLength(self):
+        return 0.
+
+    
+#--------  I/o methods:               <--------  Here
+    def writeElement(self, dataFILE):
+        if self.getDebug():
+            print(" RPLCswitch(BeamLineElement).writeElement starts.")
+
+        derivedCLASS = "RPLCswitch"
+        bversion = bytes(derivedCLASS, 'utf-8')
+        record   = strct.pack(">i", len(derivedCLASS))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Length of derived class record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("     ----> Derived class:", bversion.decode('utf-8'))
+
+        if self.getDebug():
+            print("     <---- Done.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+        
+        if self.getDebug():
+            print(" <---- RPLCswitch(BeamLineElement).writeElement done.")
+        
+    @classmethod
+    def readElement(cls, dataFILE):
+        cls.setDebug(True)
+        if cls.getDebug():
+            print(" RPLCswitch(BeamLineElement).readElement starts.")
+
+        EoF = False
+
+        if cls.getDebug():
+            print(" <---- end of file, return.")
+            
+        cls.setDebug(False)
+        return EoF
+
+
+#--------  Utilities:
+    def Transport(self, _R=None):
+        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
+            raise badParameter( \
+            " RPLCswitch(BeamLineElement).Transport:" + \
+                                "bad input vector:", \
+                                _R)
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" RPLCswitch(BeamLineElement).Transport: \n", \
+                      "     ----> input trace space:", _R)
+            print("          ----> Outside:", self.OutsideBeamPipe(_R))
+            
+        if self.OutsideBeamPipe(_R):
+            _Rprime = None
+        else:
+            phsSpc      = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ----> PhaseSpace      :", phsSpc) 
+            phsSpcprime = self.getTransferMatrix().dot(phsSpc)
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ----> PhaseSpace prime:", phsSpcprime)
+            _Rprime     = Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Rprime:", _Rprime)
+
+        if not isinstance(_Rprime, np.ndarray):
+            pass
+
+        return _Rprime
+
     
 #--------  Exceptions:
 class badBeamLineElement(Exception):

@@ -31,9 +31,9 @@ except:
 #.. Create valid instance:
 Name = "BLE1"
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 BmLnElmnt = BLE.BeamLineElement(Name, rStrt, vStrt, drStrt, dvStrt)
     
 #.. __repr__
@@ -71,8 +71,9 @@ BmLnElmnt.setdrStrt(np.array([0.1, 0.2, 0.3]))
 print("     ----> Offset to start of element position:", BmLnElmnt.getdrStrt())
 Rprime = BmLnElmnt.Shift2Local(R)
 print("         ----> Phase-space vector in local coordiantes:", Rprime)
-R2prime = BmLnElmnt.Shift2Global(Rprime)
-print("         ----> Phase-space vector back in global coordiantes:", R2prime)
+R2prime = BmLnElmnt.Shift2Laboratory(Rprime)
+print("         ----> Phase-space vector back in laboratory coordiantes:", \
+      R2prime)
 Diff       = np.subtract(R, R2prime)
 Norm       = np.linalg.norm(Diff)
 print("     ----> Difference R - R2prime:", Diff)

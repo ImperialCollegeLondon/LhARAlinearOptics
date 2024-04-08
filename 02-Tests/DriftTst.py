@@ -41,16 +41,16 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     Drft = BLE.Drift("NoDriftLength", rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no drift length exception.')
 
 #--------> Clean instances and restart:
-BLE.BeamLineElement.cleanInstances()
+BLE.BeamLineElement.cleaninstances()
 
 BLI  = BL.BeamLine(filename)
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
@@ -72,9 +72,7 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-BLE.Drift.setDebug(True)
 Drft = BLE.Drift("ValidDrift", rStrt, vStrt, drStrt, dvStrt, 1.5)
-BLE.Drift.setDebug(False)
     
 #.. __repr__
 print("    __repr__:")
@@ -96,9 +94,7 @@ print(Drft)
 DriftTest = 4
 print()
 print("DriftTest:", DriftTest, " check set method.")
-BLE.Drift.setDebug(True)
 print(Drft)
-BLE.Drift.setDebug(False)
 
 ##! Check set method:
 DriftTest += 1

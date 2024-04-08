@@ -40,10 +40,10 @@ try:
     DfQuad = BLE.DefocusQuadrupole()
 except:
     print('      ----> Correctly trapped no argument exception.')
-rStrt = np.array([0., 0., 0.])
-vStrt = np.array([0., 0.])
-drStrt = np.array([0., 0., 0.])
-dvStrt = np.array([0., 0.])
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+drStrt = np.array([0.,0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     DfQuad = BLE.DefocusQuadrupole("NoStrength", rStrt, vStrt, drStrt, dvStrt)
 except:
@@ -51,7 +51,7 @@ except:
 
 
 #--------> Clean instances and restart:
-BLE.BeamLineElement.cleanInstances()
+BLE.BeamLineElement.cleaninstances()
 
 BLI  = BL.BeamLine(filename)
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
@@ -75,7 +75,6 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
 #.. Create valid instance:
 DfQuad = BLE.DefocusQuadrupole("ValidDquad1", rStrt, vStrt, drStrt, dvStrt, \
                                0.1, 100.)
-    
 DfQuad = BLE.DefocusQuadrupole("ValidDquad2", rStrt, vStrt, drStrt, dvStrt, \
                                0.1, None, 153.93033817278908)
     
@@ -94,14 +93,6 @@ print()
 print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, " check get methods.")
 print("    ----> print() method; tests all get methods")
 print(DfQuad)
-
-##! Check set method:
-DefocusQuadrupoleTest = 4
-print()
-print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, " check set method.")
-BLE.DefocusQuadrupole.setDebug(True)
-print(DfQuad)
-BLE.DefocusQuadrupole.setDebug(False)
 
 ##! Check set method:
 DefocusQuadrupoleTest += 1

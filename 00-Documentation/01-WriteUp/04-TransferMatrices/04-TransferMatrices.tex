@@ -65,7 +65,7 @@ to be ``uncoupled''.
 If the field gradient along the $x$ and $y$ axes is identical, then:
 \begin{equation}
   g_x = \frac{\partial B_{qx}}{\partial x} =
-  g_y = \frac{\partial B_{qy}}{\partial y} = g \, ; 
+  g_y = \frac{\partial B_{qy}}{\partial y} = g \, ; \label{Eq:Trnsf:gxy}
 \end{equation}
 where the field in the quadrupole, $\bm{B_q}$, has components
 $(B_{qx}, B_{qy}, 0)$.
@@ -146,7 +146,8 @@ magnet is given by $\bm{B}_s = (0, 0, B_{s0})$, where the solenoid axis
 lies along the $z_{\rm RPLC}$ axis.
 The solenoid field strength parameter is then given by:
 \begin{equation}
-  k_s = \left[ \frac{B_{s0} c}{2p} \times 10^{-3} \right]^2\,; \label{Eq:Effectiveks}
+  k_s = \left[ \frac{B_{s0} c}{2p} \times 10^{-3} \right]^2\,;
+  \label{Eq:Effectiveks}
 \end{equation}
 where $B_{s0}$ is measured in T, $p$ in MeV/c and $c$ in m/s.
 
@@ -172,6 +173,7 @@ The increment in the reference particle trajectory is:
 \end{equation}
 
 \subsection{Non-neutral (electron) plasma (Gabor) lens}
+\label{SubSect:TrnsFrMtrx:GL}
 
 A dense gas of electrons confined in a Penning-Malmberg trap provides
 an electric field that can be used to focus a positive ion beam.

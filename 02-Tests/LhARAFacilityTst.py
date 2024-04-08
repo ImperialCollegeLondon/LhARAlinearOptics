@@ -15,10 +15,10 @@ import os
 
 LhARAOpticsPATH    = os.getenv('LhARAOpticsPATH')
 filename     = os.path.join(LhARAOpticsPATH, \
-#                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
+                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
 #                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')
 #                '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
-                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
+#                '11-Parameters/LhARABeamLine-Params-Gauss-Solenoid.csv')
 
 ##! Start:
 print("========  LhARAFacility: tests start  ========")
@@ -43,21 +43,6 @@ print("LhARAFacilityTest:", LhARAFacilityTest, \
       " check built-in methods.")
 print("    __repr__:")
 print(LhARAFclty)
-
-##! Check get methods:
-LhARAFacilityTest = 3
-print()
-print("LhARAFacilityTest:", LhARAFacilityTest, " check get methods.")
-print("    ----> Tests all get methods")
-print(LhARAFclty)
-
-##! Check set method:
-LhARAFacilityTest = 4
-print()
-print("LhARAFacilityTest:", LhARAFacilityTest, " check set method.")
-BL.BeamLine.setDebug(True)
-print(LhARAFclty)
-BL.BeamLine.setDebug(False)
 
 ##! Complete:
 print()

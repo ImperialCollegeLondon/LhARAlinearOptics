@@ -98,8 +98,9 @@ def main(argv):
                 if iCnt == 10:
                     iCnt = 1
                     Scl  = Scl * 10
-        if iEvt <0:
-            print(Prtcl.Particle.getParticleInstances()[iEvt])
+        if iEvt < 1:
+            print(BL.BeamLine.getinstance())
+            print(Prtcl.Particle.getParticleInstances()[iEvt-1])
         if nEvts != None and iEvt == nEvts:
             break
 

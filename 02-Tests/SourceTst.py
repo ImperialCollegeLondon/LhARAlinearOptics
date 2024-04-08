@@ -41,9 +41,9 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     Src = BLE.Source(rStrt, vStrt, drStrt, dvStrt)
 except:
@@ -73,7 +73,7 @@ print()
 print("BeamLineElement(Source)Test:", SourceTest, \
       " test gaussian source distribution.")
 BLE.Source.setDebug(False)
-BLE.Source.cleanInstances()
+BLE.Source.cleaninstances()
 Src = BLE.Source("Source1", rStrt, vStrt, drStrt, dvStrt, \
                  1, [0.000004, 0.000004, 0.998, 20., 0.3])
 x, y, K, cTheta, Phi = Src.getParticle()
