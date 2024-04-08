@@ -58,6 +58,7 @@ import scipy.constants
 class PhysicalConstants(object):
     __instance = None
     __Debug    = False
+    _Species   = ["proton", "pion", "muon", "neutrino"]
 
 #--------  "Built-in methods":
     def __new__(cls):
@@ -117,6 +118,29 @@ class PhysicalConstants(object):
     def SoL(self):
         return sp.constants.c
 
+    @classmethod
+    def getSpecies(cls):
+        return cls._Species
+
+    def getparticleMASS(self, _Species):
+        particleMASS = None
+        if not isinstance(_Species, str):
+            raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
+                               _Species + " not a string!")
+        if _Species.lower() in PhysicalConstants.getSpecies():
+            if   _Species.lower() == "proton":
+                particleMASS = self.mp()
+            elif _Species.lower() == "pion":
+                particleMASS = self.mPion()
+            elif _Species.lower() == "muon":
+                particleMASS = self.mMuon()
+            elif _Species.lower() == "neutrino":
+                particleMASS = 0.
+        else:
+            raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
+                               _Species + " not allowed!")
+        return particleMASS
+    
     def mp(self):
         return 938.27208816
 
@@ -131,3 +155,8 @@ class PhysicalConstants(object):
 
 
 #--------  Utilities:
+
+
+#--------  Exceptions:
+class badParameter(Exception):
+    pass
