@@ -350,6 +350,10 @@ class Particle:
         return cls.instances
 
     def getSpecies(self):
+        if self._Species != "proton":
+            x=1.
+            y=0.
+            z=x/y
         return self._Species
             
     def getLocation(self):
@@ -730,7 +734,21 @@ class Particle:
 
         px    = TrcSpc[1]*p0
         py    = TrcSpc[3]*p0
-        pz    = mth.sqrt(p**2 - px**2 - py**2)
+        p2    = p**2 - px**2 - py**2
+        if p2 < 0.:
+            print(" Crashing!")
+            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
+            K0 = E0 - particleMASS
+            K  = E  - particleMASS
+            print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
+            print("     ----> p2, px, py, p:", p2, px, py, p)
+            print("     ----> species, particleMASS, p0, E0, b0:", \
+                  species, particleMASS, p0, E0, b0)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> TrcSpc:", TrcSpc)
+            print("     ----> Reference particle: \n", \
+                  Prtcl.ReferenceParticle.getinstance())
+        pz    = mth.sqrt(p2)
         pRPLC = np.array([px, py, pz])
                 
         if cls.getDebug():

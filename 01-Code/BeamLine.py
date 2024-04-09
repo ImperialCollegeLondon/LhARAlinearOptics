@@ -990,7 +990,8 @@ class BeamLine(object):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
-                
+
+                #.. KL: consider trap on expansion paramter here.
                 TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\

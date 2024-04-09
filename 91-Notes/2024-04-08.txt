@@ -46,11 +46,11 @@ Scripts:
  - ReadDRACOsimu.py        - OK
  - RunLIONsimulation.py    - OK
  - ReadLIONsimu.py         - OK
- - RunLhARAsimulation.py   - 
- - ReadLhARAsimu.py        - 
- - plotBeam.py             - 
- - runBeamSim.py           -
- - readBeamSim.py          -
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
 
 
 --------  --------  --------  --------  --------  --------  --------  --------
