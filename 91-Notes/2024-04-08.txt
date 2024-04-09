@@ -42,10 +42,10 @@ Scripts:
  - LhARAMagnetTable.py     - OK
  - plotQuadTriplet.py      - Failed
  - plotTrajectory.py       - Not run
- - RunDRACOsimulation.py   - 
- - ReadDRACOsimu.py        - 
- - RunLIONsimulation.py    - 
- - ReadLIONsimu.py         - 
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
  - RunLhARAsimulation.py   - 
  - ReadLhARAsimu.py        - 
  - plotBeam.py             - 
