@@ -4396,7 +4396,7 @@ class Source(BeamLineElement):
         E_max = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
                                 theta_degrees)[4]     # Maximum ion energy [J]
         
-        E_min = 0.00001*1.6e-19*1e6        # [J]
+        E_min = 1.*1.6e-19*1e6        # [J] -- KL fix
         E = np.linspace(E_min,E_max,1000)  # [J]
 
         # Required distribution
@@ -5483,7 +5483,8 @@ class RPLCswitch(BeamLineElement):
         if self.OutsideBeamPipe(_R):
             _Rprime = None
         else:
-            phsSpc      = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
+            phsSpc      = \
+                Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
             if self.getDebug():
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
                     print("     ----> PhaseSpace      :", phsSpc) 

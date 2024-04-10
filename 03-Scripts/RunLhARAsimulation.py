@@ -28,7 +28,6 @@ print(" <---- Simulation initialised.")
 
 ##! Start:
 print(" ----> Run simulation test:")
-print()
 Smltn.RunSim()
 print()
 print(" <---- Simulation test done.")
