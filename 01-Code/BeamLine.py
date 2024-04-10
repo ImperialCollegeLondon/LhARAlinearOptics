@@ -935,7 +935,7 @@ class BeamLine(object):
     @classmethod
     def trackBeam(cls, NEvts=0, ParticleFILE=None):
         if cls.getDebug() or NEvts > 1:
-            print("         ----> BeamLine.trackBeam for", NEvts, " events.")
+            print("     ----> BeamLine.trackBeam for", NEvts, " events.")
         Scl  = 10
         iCnt = 1
 
@@ -944,7 +944,7 @@ class BeamLine(object):
         for iEvt in range(1, NEvts):
             if (iEvt % Scl) == 0:
                 if cls.getDebug() or NEvts > 1:
-                    print("             ----> Generating event ", iEvt)
+                    print("         ----> Generating event ", iEvt)
                 iCnt += 1
                 if iCnt == 10:
                     iCnt = 1
@@ -990,7 +990,8 @@ class BeamLine(object):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
-                
+
+                #.. KL: consider trap on expansion paramter here.
                 TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
