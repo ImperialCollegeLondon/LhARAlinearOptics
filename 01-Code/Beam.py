@@ -172,9 +172,7 @@ class Beam:
             pass
         else:
             self.setoutputCSVfile(_outputCSVfile)
-            print(self.getoutputCSVfile())
             dirname, filename = os.path.split(self.getoutputCSVfile())
-            print(dirname, filename)
             if not os.path.isdir(dirname):
                 raise Exception( \
                         " Beam.__init__: output data frame invalid.")
@@ -224,15 +222,16 @@ class Beam:
             print(" <---- Beam instance created.")
             
     def __repr__(self):
-        return "Beam(<BeamLineSpecCSV>, <InputDataFile>, " + \
-               "nEvtMax=None, <OutputFile>=None)"
+        return "Beam(<InputDataFile>, " + \
+               "nEvtMax=None, <OutputFile>=None, " + \
+               "[<BeamLineSpecCSV>=None] )"
 
     def __str__(self):
         self.print()
         return " Beam __str__ done."
 
     def print(self):
-        print("\n Beam:")
+        print(" Beam:")
         print(" -----")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Beam specification file:", \
@@ -245,8 +244,9 @@ class Beam:
               self.getoutputCSVfile())
         print("     ----> Beam parameters by location:")
         for iLoc in range(len(self.getLocation())):
-            print("         ----> iLoc:", iLoc, self.getLocation()[iLoc], \
-                  " nParticles:", self.getnParticles()[iLoc])
+            if iLoc < len(self.getnParticles()):
+                print("         ----> iLoc:", iLoc, self.getLocation()[iLoc], \
+                      " nParticles:", self.getnParticles()[iLoc])
             print("             ---->   sigma_x,   sigma_y:", \
                   self.getsigmaxy()[iLoc][0], self.getsigmaxy()[iLoc][1])
             print("             ----> epsilon_x, epsilon_y:", \
@@ -474,6 +474,9 @@ class Beam:
     def getCovSums(self):
         return self._CovSums
     
+    def getCovMtrx(self):
+        return self._CovMtrx
+    
     def getnParticles(self):
         return self._nParticles
     
@@ -665,13 +668,22 @@ class Beam:
     def getLines(self):
         DataList = []
         for iLoc in range(len(self.getLocation())):
-            DataList.append([  \
-                               self.getLocation()[iLoc], \
-                               self.getnParticles()[iLoc], \
-                               self.getsigmaxy()[iLoc], \
-                               self.getemittance()[iLoc], \
-                               self.getTwiss()[iLoc] \
-                               ])
+            if iLoc < len(self.getnParticles()):
+                DataList.append([  \
+                                   self.getLocation()[iLoc], \
+                                   self.getnParticles()[iLoc], \
+                                   self.getsigmaxy()[iLoc], \
+                                   self.getemittance()[iLoc], \
+                                   self.getTwiss()[iLoc] \
+                                 ])
+            else:
+                DataList.append([  \
+                                   self.getLocation()[iLoc], \
+                                   None, \
+                                   self.getsigmaxy()[iLoc], \
+                                   self.getemittance()[iLoc], \
+                                   self.getTwiss()[iLoc] \
+                                 ])
         return DataList
     
     def createReport(self):
@@ -795,6 +807,432 @@ class Beam:
             print(" <----  Beam.plotBeamProgression done.")
 
                 
+"""
+Derived class extrapolateBeam(Beam):
+=====================================
+
+  The Beam class provides methods to calculate the collective
+  properties of the beam such as emittance, etc., from the
+  distributions of beam particles as the beam progresses through the 
+  beam line.  The extrapolateBeam derived class uses the transfer
+  matrices to extrapolate the initial phase-space distribution along
+  the beam line.
+
+
+  Class attributes:
+  -----------------
+    instances : List of instances of Particle class
+  __Debug     : Debug flag
+
+      
+  Instance attributes:
+  --------------------
+   All instance attributes are initialised to Null
+
+   Input arguments:
+  _InputDataFile  : Path to BeamIO data file containing events to be read.
+  _nEvtMax        : Maximum number of events to read, if not set, read 'em all
+   _outputCSVfile : Path to csv file in which summary of beam processing will
+                    be written
+
+    
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+  Set methods:
+     setDebug: set class debug flag
+           Input: bool, True/False
+          Return: None
+
+  resetBeamInsances:
+               Sets cls.instances []
+
+  setAll2None: Set all instance attributes to None.
+        No input or return.
+
+
+  Get methods:
+      getDebug, getbeamlineSpecificationCSVfile,getInputDataFile, 
+      getoutputCSVfile, getextrapolateBeamInstances
+          -- thought to be self documenting!
+
+  Processing methods:
+    cleanextrapolateBeams : Deletes all extrapolateBeam instances
+                             and resets list of extrapolateBeam.
+         No input; Returns bool flag, True means all good.
+
+
+  I/o methods:
+    CSV file written out using Report module.
+
+  Exceptions:
+    badBeam, badParameter, badParameter, badTraceSpace
+
+
+Created on Mon 28Feb24: Version history:
+----------------------------------------
+ 1.0: 09Apr24: First implementation
+
+@author: kennethlong
+"""
+
+class extrapolateBeam(Beam):
+    instances  = []
+    __Debug    = False
+
+
+#--------  "Built-in methods":
+    def __init__(self, _InputDataFile=None, _nEvtMax=None, \
+                       _outputCSVfile=None, \
+                       _beamlineSpecificationCSVfile=None):
+        if self.__Debug:
+            print(' extrapolateBeam.__init__: ', \
+                  'creating the Beam object')
+            
+        self.setAll2None()
+
+#--------  Check and initialise all inputs:  --------  --------  --------
+
+        #.. Check and open input data file
+        if _InputDataFile == None:
+            raise Exception( \
+                    " extrapolateBeam.__init__: no input data file given.")
+
+        if _nEvtMax == None:
+            pass
+        elif isinstance(_nEvtMax, int):
+            self.setnEvtMax(_nEvtMax)
+        else:
+            raise Exception(" Bad maximum number of events to read")
+
+        #.. Check and output data file
+        if _outputCSVfile == None:
+            pass
+        else:
+            self.setoutputCSVfile(_outputCSVfile)
+            dirname, filename = os.path.split(self.getoutputCSVfile())
+            if not os.path.isdir(dirname):
+                raise Exception( \
+                  " extrapolateBeam.__init__: output data frame invalid.")
+
+        extrapolateBeam.instances.append(self)
+
+#--------  <---- Check and initialise all inputs done.:  --------  --------
+
+#--------  Open input data file, read first record:      --------  --------
+
+        ibmIOr = bmIO.BeamIO(None, _InputDataFile)
+        ParticleFILE = ibmIOr.getdataFILE()
+        self.setInputDataFile(ParticleFILE)
+
+        EndOfFile = False
+        EndOfFile = ibmIOr.readBeamDataRecord()
+
+        if BL.BeamLine.getinstance() == None:
+            self.setbeamlineSpecificationCSVfile( \
+                                        _beamlineSpecificationCSVfile)
+            iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
+        
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if not isinstance(iBLE, BLE.Facility):
+                self.setLocation(iBLE.getName())
+        self.initialiseSums()
+        
+        #.. Must have reference particle:
+        if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
+                          Prtcl.ReferenceParticle):
+            raise noReferenceBeam(" Reference particle, ", \
+                                      "not first in particle list.")
+
+#--------  <---- Open input data file and load reference particle: done.  --
+
+#--------  Loop over particles, form summs: --------  --------  --------
+
+        self.extrapolateBeam()
+
+#--------  <---- Open input data file and load reference particle: done.  --
+
+        if self.__Debug:
+            print("     ----> New extrapolateBeam instance: \n", \
+                  extrapolateBeam.__str__(self))
+            print(" <---- Beam instance created.")
+            
+    def __repr__(self):
+        return "extrapolateBeam(<BeamLineSpecCSV>, <InputDataFile>, " + \
+               "nEvtMax=None, <OutputFile>=None)"
+
+    def __str__(self):
+        print(" extrapolateBeam:")
+        print(" -----------------")
+        self.print()
+        return " extrapolateBeam __str__ done."
+
+
+#--------  "Set method" only Debug
+#.. Method believed to be self documenting(!)
+
+    @classmethod
+    def setDebug(cls, Debug=False):
+        if cls.__Debug:
+            print(" extrapolateBeam.setdebug: ", Debug)
+        cls.__Debug = Debug
+
+    @classmethod
+    def resetextrapolateBeamInstances(cls):
+        if len(cls.instances) > 0:
+            cls.instances = []
+        
+    def setAll2None(self):
+        Beam.setAll2None(self)
+        
+    
+#--------  "Get methods" only; version, reference, and constants
+#.. Methods believed to be self documenting(!)
+
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
+    @classmethod
+    def getextrapolateBeamInstances(cls):
+        return cls.instances
+
+#--------  Processing methods:    
+    def initialiseSums(self):
+        if self.getDebug():
+            print(" extrapolateBeam.intialiseSums start:")
+            
+        CovSums = np.zeros((6,6))
+
+        iLoc = -1
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if isinstance(iBLE, BLE.Source):
+                if self.getDebug():
+                    print("     ----> BLE name, type:", \
+                          iBLE.getName(), type(iBLE))
+
+                iLoc += 1
+                    
+                self._CovSums.append(deepcopy(CovSums))
+                self._nParticles.append(0.)
+
+                break
+                
+        if self.getDebug():
+            print(" extrapolateBeam.initialiseSums: n, CovSums:")
+            for i in range(len(self.getnParticles())):
+                with np.printoptions(linewidth=500,precision=7,
+                                     suppress=True):
+                    print("     ----> ", i, "\n", self._CovSums[i])
+
+    def incrementSums(self, iPrtcl):
+        if self.getDebug():
+            print(" extrapolateBeam.incrementSums start:")
+            print("     ----> Number of locations:", \
+                  len(self.getCovSums()))
+            print("     ----> Particle trace space:")
+            for iLoc in range(len(iPrtcl.getTraceSpace())):
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("         ----> iLoc, trace space:", \
+                          iLoc, \
+                          iPrtcl.getTraceSpace()[iLoc])
+            
+        CovSumsIncrmnt = np.zeros((6,6))
+
+        iAddr = -1
+        for iLoc in range(len(iPrtcl.getTraceSpace())):
+            if isinstance(BLE.BeamLineElement.getinstances()[iLoc], \
+                          BLE.Source):
+                
+                iAddr                  += 1
+                self._nParticles[iAddr] += 1
+
+                if self.getDebug():
+                    print("         ----> Location:", iLoc)
+                    with np.printoptions(linewidth=500,precision=10,\
+                                         suppress=True):
+                        print("                CovSums_(i): \n", \
+                              self.getCovSums()[iAddr])
+
+                for i in range(6):
+                    for j in range(i,6):
+                        self._CovSums[iAddr][i,j]     = \
+                            self._CovSums[iAddr][i,j] + \
+                            iPrtcl.getTraceSpace()[iLoc][i] * \
+                            iPrtcl.getTraceSpace()[iLoc][j]
+                        if i != j:
+                            self._CovSums[iAddr][j,i] = \
+                                deepcopy(self._CovSums[iAddr][i,j])
+                if self.getDebug():
+                    print("         ----> Location:", iLoc)
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("                CovSums_(i+1): \n", \
+                              self.getCovSums()[iAddr]) 
+
+        if self.getDebug():
+            print(" <---- extrapolateBeam.incrementSums: Done")
+
+    def calcCovarianceMatrix(self):
+        if self.getDebug():
+            print(" extrapolateBeam.calcCovarianceMatrix start:")
+            print("     ----> Number of locations:", \
+                  len(self.getCovSums()))
+
+        for iLoc in range(len(self.getCovSums())):
+            if self.getDebug():
+                print("         ----> Location:", iLoc)
+                print("               Number of particles:", \
+                      self.getnParticles()[iLoc])
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("                CovSums: \n", \
+                          self.getCovSums()[iLoc])
+                    
+            if self.getnParticles()[iLoc] > 0:
+                self._CovMtrx.append(                             \
+                                self.getCovSums()[iLoc] /         \
+                                float(self.getnParticles()[iLoc]) \
+                                     )
+                
+                if self.getDebug():
+                    print("     <---- Covariance matrix:")
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("                CovMtrx: \n", \
+                              self.getCovarianceMatrix()[iLoc]) 
+    
+    def extrapolateCovarianceMatrix(self):
+        if self.getDebug():
+            print(" extrapolateBeam.extrapolateCovarianceMatrix start:")
+
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        iLoc = -1
+        jLoc = 0
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if isinstance(iBLE, BLE.Facility) or isinstance(iBLE, BLE.Source):
+                continue
+            
+            if self.getDebug():
+                print("     ----> BLE name, type:", \
+                      iBLE.getName(), type(iBLE))
+
+            iLoc += 1
+            jLoc += 1
+            if self.getDebug():
+                print("         ---->          Location:", jLoc)
+                print("         ----> Previous location:", iLoc)
+
+            if isinstance(iBLE, BLE.Drift) or \
+               isinstance(iBLE, BLE.Aperture) or \
+               isinstance(iBLE, BLE.Octupole) or \
+               isinstance(iBLE, BLE.CylindricalRFCavity) or \
+               isinstance(iBLE, BLE.RPLCswitch):
+
+                pass
+                
+            else:
+                TrcSpc       = iRefPrtcl.getTraceSpace()[iLoc]
+                TrnsfrMtrx   = iBLE.setTransferMatrix(TrcSpc)
+                
+            TrnsfrMtrx       = iBLE.getTransferMatrix()
+            TrnspsTrnsfrMtrx = np.transpose(TrnsfrMtrx)
+                
+            if self.getDebug():
+                print("         ----> Name:", iBLE.getName())
+                with np.printoptions(linewidth=500,precision=10,\
+                                     suppress=True):
+                    print("         ----> Transfer matrix: \n", \
+                          TrnsfrMtrx)
+                    print("         ----> Transpose of transfer matrix: \n", \
+                          TrnspsTrnsfrMtrx)
+                    unt = np.matmul(TrnspsTrnsfrMtrx, TrnsfrMtrx)
+                    print("         ----> Product for check: \n", unt)
+                    print("         ----> iLoc, covariance matrix: \n", \
+                          self.getCovMtrx()[iLoc])
+
+            CovInv  = np.matmul(self.getCovMtrx()[iLoc], TrnspsTrnsfrMtrx)
+            CovMtrx = np.matmul(TrnsfrMtrx, CovInv)
+
+            self._CovMtrx.append(CovMtrx)
+            
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=10, \
+                                     suppress=True):
+                    print("         ----> jLoc, CovMtrx: \n", \
+                          self.getCovMtrx()[jLoc])
+
+    def extrapolateBeam(self):
+        print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
+        
+        EndOfFile = False
+        iEvt = 0
+        iCnt = 0
+        Scl  = 10
+
+        ParticleFILE = self.getInputDataFile()
+        print("     ----: event loop")
+        while not EndOfFile:
+            EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+            if not EndOfFile:
+                iEvt += 1
+                if (iEvt % Scl) == 0:
+                    print("         ----> Read event ", iEvt)
+                    iCnt += 1
+                    if iCnt == 10:
+                        iCnt = 1
+                        Scl  = Scl * 10
+
+                iPrtcl = Prtcl.Particle.getParticleInstances()[1]
+                self.incrementSums(iPrtcl)
+
+                Cleaned = Prtcl.Particle.cleanParticles()
+            
+            if self.getDebug():
+                print("     ----> Cleaned:", Cleaned)
+
+            if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
+                break
+            
+        print("     <----", iEvt, "events read")
+
+        print("     ----> calculate covariance matrix:")
+        self.calcCovarianceMatrix()
+        print("     <---- done.")
+        print("     ----> extrapolate covariance matrix:")
+        self.extrapolateCovarianceMatrix()
+        print("     <---- done.")
+        print("     ----> calculate sigma x, y:")
+        self.setsigmaxy()
+        print("     <---- done.")
+        print("     ----> calculate emittances:")
+        self.setEmittance()
+        print("     <---- done.")
+        print("     ----> Twiss paramters:")
+        self.setTwiss()
+        print("     <---- done.")
+        
+
+#--------  Utilities:
+    @classmethod
+    def cleanextrapolateBeams(cls):
+        DoneOK = False
+        
+        for iexBm in cls.getextrapolateBeamInstances():
+            del iexBm
+            
+        cls.resetextrapolateBeamInstances()
+        DoneOK = True
+
+        return DoneOK
+
+    
 #--------  Exceptions:
 class noReferenceBeam(Exception):
     pass
