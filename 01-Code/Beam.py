@@ -24,8 +24,9 @@ Class Beam:
    Input arguments:
   _InputDataFile  : Path to BeamIO data file containing events to be read.
   _nEvtMax        : Maximum number of events to read, if not set, read 'em all
-  _outputCSVfile : Path to csv file in which summary of beam processing will
+  _outputCSVfile  : Path to csv file in which summary of beam processing will
                     be written
+  _startlocation  : Location at which extrapolation should start. Integer.
 _beamlineSpecificationCSVfile : Kept for backward compatibility, optional.
                                 Path to csv file containing specification of
                                 beam line.
@@ -144,9 +145,9 @@ class Beam:
 
 #--------  "Built-in methods":
     def __init__(self, _InputDataFile=None, _nEvtMax=None, \
-                       _outputCSVfile=None, \
+                       _outputCSVfile=None, _startlocation=None, \
                        _beamlineSpecificationCSVfile=None):
-        if self.__Debug:
+        if self.getDebug():
             print(' Beam.__init__: ', \
                   'creating the Beam object')
             
@@ -244,9 +245,9 @@ class Beam:
               self.getoutputCSVfile())
         print("     ----> Beam parameters by location:")
         for iLoc in range(len(self.getLocation())):
-            if iLoc < len(self.getnParticles()):
-                print("         ----> iLoc:", iLoc, self.getLocation()[iLoc], \
-                      " nParticles:", self.getnParticles()[iLoc])
+            print(iLoc, len(self.getnParticles()))
+            print("         ----> iLoc:", iLoc, self.getLocation()[iLoc], \
+                  " nParticles:", self.getnParticles()[iLoc])
             print("             ---->   sigma_x,   sigma_y:", \
                   self.getsigmaxy()[iLoc][0], self.getsigmaxy()[iLoc][1])
             print("             ----> epsilon_x, epsilon_y:", \
@@ -277,7 +278,8 @@ class Beam:
     def setAll2None(self):
         self._InputDataFile                = None
         self._nEvtMax                      = None
-        self._outputCSVfile               = None
+        self._outputCSVfile                = None
+        self._startlocation                = None
         self._beamlineSpecificationCSVfile = None
 
         self._Location   = []
@@ -303,6 +305,12 @@ class Beam:
             self._nEvtMax = _nEvtMax
         else:
             raise Exception(" Bad maximum number of events to read")
+        
+    def setstartlocation(self, _startlocation):
+        if isinstance(_startlocation, int):
+            self._startlocation = _startlocation
+        else:
+            raise Exception(" Bad startlocation")
         
     def setLocation(self, Location):
         Success = False
@@ -470,6 +478,9 @@ class Beam:
     
     def getnEvtMax(self):
         return self._nEvtMax
+
+    def getstartlocation(self):
+        return self._startlocation
 
     def getCovSums(self):
         return self._CovSums
@@ -887,15 +898,20 @@ class extrapolateBeam(Beam):
 
 #--------  "Built-in methods":
     def __init__(self, _InputDataFile=None, _nEvtMax=None, \
-                       _outputCSVfile=None, \
+                       _outputCSVfile=None, _startlocation=None,\
                        _beamlineSpecificationCSVfile=None):
         if self.__Debug:
             print(' extrapolateBeam.__init__: ', \
                   'creating the Beam object')
             
-        self.setAll2None()
+        extrapolateBeam.instances.append(self)
 
 #--------  Check and initialise all inputs:  --------  --------  --------
+
+        Beam.__init__(self, _InputDataFile, _nEvtMax, _outputCSVfile, \
+                      _startlocation, _beamlineSpecificationCSVfile)
+        """
+        self.setAll2None()
 
         #.. Check and open input data file
         if _InputDataFile == None:
@@ -919,7 +935,13 @@ class extrapolateBeam(Beam):
                 raise Exception( \
                   " extrapolateBeam.__init__: output data frame invalid.")
 
-        extrapolateBeam.instances.append(self)
+        if _startlocation == None:
+            pass
+        elif isinstance(_startlocation, int):
+            self.setstartlocation(_startlocation)
+        else:
+            raise Exception(" Bad maximum number of events to read")
+        """
 
 #--------  <---- Check and initialise all inputs done.:  --------  --------
 
@@ -963,11 +985,12 @@ class extrapolateBeam(Beam):
             
     def __repr__(self):
         return "extrapolateBeam(<BeamLineSpecCSV>, <InputDataFile>, " + \
-               "nEvtMax=None, <OutputFile>=None)"
+               "nEvtMax=None, startlocation=None <OutputFile>=None)"
 
     def __str__(self):
         print(" extrapolateBeam:")
         print(" -----------------")
+        print("     ----> Start location:", self.getstartlocation())
         self.print()
         return " extrapolateBeam __str__ done."
 
@@ -1113,8 +1136,10 @@ class extrapolateBeam(Beam):
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
         
-        iLoc = -1
-        jLoc = 0
+        iLoc          = -1
+        jLoc          = 0
+        startlocation = self.getstartlocation()
+        
         for iBLE in BLE.BeamLineElement.getinstances():
             if isinstance(iBLE, BLE.Facility) or isinstance(iBLE, BLE.Source):
                 continue
