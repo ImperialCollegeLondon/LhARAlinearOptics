@@ -86,11 +86,10 @@ print("    <---- __str__ done.")
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, " creation of pandas report.")
-Bm.extrapolateBeam.setDebug(True)
-exBmInst.createReport()
-Bm.extrapolateBeam.setDebug(False)
-sys.exit()
 
+exBmInst.extrapolateBeam()
+exBmInst.createReport()
+print(exBmInst)
 
 ##! Complete:
 print()
