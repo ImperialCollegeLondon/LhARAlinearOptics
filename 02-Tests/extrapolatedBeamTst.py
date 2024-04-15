@@ -79,17 +79,32 @@ print("      ---->", repr(exBmInst))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-print(exBmInst)
+#print(exBmInst)
 print("    <---- __str__ done.")
 
 ##! Check creation of report:
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, " creation of pandas report.")
+print(BL.BeamLine.getinstance())
 
 exBmInst.extrapolateBeam()
 exBmInst.createReport()
-print(exBmInst)
+#print(exBmInst)
+
+##! Check start of calculation beyond source:
+extrapolateBeamTest += 1
+print()
+print("extrapolateBeamTest:", extrapolateBeamTest, \
+      " start extrapolation beyond source:")
+exBmInst.getInputDataFile().close()
+Bm.extrapolateBeam.cleanextrapolateBeams()
+exBmInst = Bm.extrapolateBeam(inputdatafile, 1000, outputdatafile, 3, \
+                               filename)
+exBmInst.extrapolateBeam()
+exBmInst.createReport()
+#print(exBmInst)
+
 
 ##! Complete:
 print()

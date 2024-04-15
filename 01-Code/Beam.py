@@ -180,6 +180,12 @@ class Beam:
                 raise Exception( \
                         " Beam.__init__: output data frame invalid.")
 
+        #.. Check and set start location:
+        if _startlocation == None:
+            pass
+        else:
+            self.setstartlocation(_startlocation)
+
 #--------  <---- Check and initialise all inputs done.:  --------  --------
 
 #--------  Open input data file, read first record:      --------  --------
@@ -307,7 +313,7 @@ class Beam:
         if isinstance(_startlocation, int):
             self._startlocation = _startlocation
         else:
-            raise Exception(" Bad startlocation")
+            raise Exception(" Bad start location")
         
     def setLocation(self, Location):
         Success = False
@@ -540,8 +546,6 @@ class Beam:
                           iLoc, \
                           iPrtcl.getTraceSpace()[iLoc])
             
-        CovSumsIncrmnt = np.zeros((6,6))
-        
         for iLoc in range(len(iPrtcl.getTraceSpace())):
             if self.getDebug():
                 print("         ----> Location:", iLoc)
@@ -899,7 +903,8 @@ class extrapolateBeam(Beam):
                        _beamlineSpecificationCSVfile=None):
         if self.__Debug:
             print(' extrapolateBeam.__init__: ', \
-                  'creating the Beam object')
+                  'creating the Beam object:', \
+                  'start location =', _startlocation)
             
         extrapolateBeam.instances.append(self)
 
@@ -963,18 +968,22 @@ class extrapolateBeam(Beam):
             
         CovSums = np.zeros((6,6))
 
-        iLoc = -1
+        iLoc   = -1
+        gotLoc = False
         for iBLE in BLE.BeamLineElement.getinstances():
-            if isinstance(iBLE, BLE.Source):
-                if self.getDebug():
-                    print("     ----> BLE name, type:", \
-                          iBLE.getName(), type(iBLE))
+            iLoc += 1
+            if self.getDebug():
+                print("     ----> iLoc, BLE name, type:", \
+                      iLoc, iBLE.getName(), type(iBLE))
+            if self.getstartlocation() == None:
+                if isinstance(iBLE, BLE.Source):
+                    gotLoc = True
+            elif iLoc == self.getstartlocation():
+                gotLoc = True
 
-                iLoc += 1
-                    
+            if gotLoc:
                 self._CovSums.append(deepcopy(CovSums))
                 self._nParticles.append(0.)
-
                 break
                 
         if self.getDebug():
@@ -985,6 +994,7 @@ class extrapolateBeam(Beam):
                     print("     ----> ", i, "\n", self._CovSums[i])
 
     def incrementSums(self, iPrtcl):
+        self.setDebug(False)
         if self.getstartlocation() == None:
             startlocation = 1
         else:
@@ -997,42 +1007,50 @@ class extrapolateBeam(Beam):
             print("     ----> Start location", startlocation, \
                   BLE.BeamLineElement.getinstances()[startlocation].getName())
             print("     ----> Particle trace space:")
-            with np.printoptions(linewidth=500,precision=7,\
-                                 suppress=True):
-                print("         ----> iLoc, trace space:", \
+            print("         ----> Number of trace-space vectors:", \
+                  len(iPrtcl.getTraceSpace()))
+            if len(iPrtcl.getTraceSpace()) > startlocation:
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("         ----> iLoc, trace space:", \
                           startlocation, \
-                          iPrtcl.getTraceSpace()[startlocation])
+                          iPrtcl.getTraceSpace()[startlocation-1])
+
+        if len(iPrtcl.getTraceSpace()) > startlocation:
             
-        CovSumsIncrmnt = np.zeros((6,6))
+            iAddr = 0
+            if self.getDebug():
+                print("     ----> Start location:", startlocation, \
+                BLE.BeamLineElement.getinstances()[startlocation].getName())
+            
+            self._nParticles[iAddr] += 1
 
-        iAddr = 0
-        self._nParticles[iAddr] += 1
+            if self.getDebug():
+                print("         ----> Location:", startlocation)
+                with np.printoptions(linewidth=500,precision=10,\
+                                     suppress=True):
+                    print("                CovSums_(i): \n", \
+                          self.getCovSums()[iAddr])
 
-        if self.getDebug():
-            print("         ----> Location:", startlocation)
-            with np.printoptions(linewidth=500,precision=10,\
-                                 suppress=True):
-                print("                CovSums_(i): \n", \
-                      self.getCovSums()[iAddr])
-
-        for i in range(6):
-            for j in range(i,6):
-                self._CovSums[iAddr][i,j]     = \
-                    self._CovSums[iAddr][i,j] + \
-                    iPrtcl.getTraceSpace()[startlocation][i] * \
-                    iPrtcl.getTraceSpace()[startlocation][j]
-                if i != j:
-                    self._CovSums[iAddr][j,i] = \
-                        deepcopy(self._CovSums[iAddr][i,j])
-        if self.getDebug():
-            print("         ----> Location:", startlocation)
-            with np.printoptions(linewidth=500,precision=7,\
-                                 suppress=True):
-                print("                CovSums_(i+1): \n", \
-                      self.getCovSums()[iAddr]) 
+            for i in range(6):
+                for j in range(i,6):
+                    self._CovSums[iAddr][i,j]     = \
+                        self._CovSums[iAddr][i,j] + \
+                        iPrtcl.getTraceSpace()[startlocation-1][i] * \
+                        iPrtcl.getTraceSpace()[startlocation-1][j]
+                    if i != j:
+                        self._CovSums[iAddr][j,i] = \
+                            deepcopy(self._CovSums[iAddr][i,j])
+            if self.getDebug():
+                print("         ----> Location:", startlocation)
+                with np.printoptions(linewidth=500,precision=7,\
+                                     suppress=True):
+                    print("                CovSums_(i+1): \n", \
+                          self.getCovSums()[iAddr]) 
 
         if self.getDebug():
             print(" <---- extrapolateBeam.incrementSums: Done")
+        self.setDebug(False)
 
     def extrapolateCovarianceMatrix(self):
         if self.getDebug():
