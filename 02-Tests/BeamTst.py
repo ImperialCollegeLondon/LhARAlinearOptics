@@ -62,7 +62,7 @@ Bm.Beam.cleanBeams()
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " create valid instance:")
-BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, filename)
+BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, None, filename)
 
 ##! Create valid instance
 BeamTest += 1
@@ -77,21 +77,14 @@ print("    __str__:")
 print(BmInst)
 print("    <---- __str__ done.")
 
-##! Check get methods:
-BeamTest += 1
-print()
-print("BeamTest:", BeamTest, " check get methods.")
-print("    ----> print(instance); tests all get methods")
-print(BmInst)
-
 ##! Check creation of report:
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " creation of pandas report.")
-Bm.Beam.setDebug(True)
-BmInst.createReport()
-Bm.Beam.setDebug(False)
 
+BmInst.evaluateBeam()
+BmInst.createReport()
+print(BmInst)
 
 ##! Complete:
 print()
