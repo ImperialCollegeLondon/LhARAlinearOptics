@@ -66,7 +66,7 @@ Bm.extrapolateBeam.cleanextrapolateBeams()
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, " create valid instance:")
-exBmInst = Bm.extrapolateBeam(inputdatafile, 1000, outputdatafile, None, \
+exBmInst = Bm.extrapolateBeam(inputdatafile, 3, outputdatafile, None, \
                                filename)
 
 ##! Create valid instance
@@ -99,7 +99,7 @@ print("extrapolateBeamTest:", extrapolateBeamTest, \
       " start extrapolation beyond source:")
 exBmInst.getInputDataFile().close()
 Bm.extrapolateBeam.cleanextrapolateBeams()
-exBmInst = Bm.extrapolateBeam(inputdatafile, 1000, outputdatafile, 3, \
+exBmInst = Bm.extrapolateBeam(inputdatafile, 3, outputdatafile, 3, \
                                filename)
 exBmInst.extrapolateBeam()
 exBmInst.createReport()

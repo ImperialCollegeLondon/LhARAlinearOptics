@@ -14,12 +14,13 @@ def main(argv):
     """
        Parse input arguments:
     """
-    opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
-                               ["ifile=","nEvts", "ofile=","bfile"])
+    opts, args = getopt.getopt(argv,"hdi:o:b:n:l:",\
+                               ["ifile=","nEvts", "ofile=","bfile", "iLoc"])
 
     beamlinefile = None
     inputfile    = None
     outputfile   = None
+    strtloc      = None
     Debug        = False
     nEvts        = None
     for opt, arg in opts:
@@ -27,8 +28,7 @@ def main(argv):
             print ( \
                     'plotextrapolateBeam.py '  + \
                     ' -i <inputfile> -n <nEvts> -o <outputfile>' + \
-                    ' -l <startlocation>]')
-                    ' [-b <beamlinefile>]')
+                    ' -l <startlocation> [-b <beamlinefile>]')
             sys.exit()
         if opt == '-d':
             Debug = True
@@ -41,13 +41,13 @@ def main(argv):
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
         elif opt in ("-l", "--iLoc"):
-            nEvts = int(arg)
+            strtloc = int(arg)
 
     if inputfile    == None:
         print ( \
                 'plotextrapolateBeam.py '  + \
                 ' -i <inputfile> -n <nEvts> -o <outputfile>' + \
-                ' [-b <beamlinefile>]')
+                ' -l <startlocation> [-b <beamlinefile>]')
         sys.exit()
 
     print(" plotextrapolateBeam: start")
@@ -72,13 +72,17 @@ def main(argv):
     if outputfile != None:
         CSVoutputFILE = os.path.join(HOMEPATH, outputfile)
         print("         ----> Write beamline summary file to:", CSVoutputFILE)
-    
-    iexBm = Bm.extrapolateBeam(particlefile, nEvts, iLoc, CSVoutputFILE)
+
+    print("         ----> Start at location:", strtloc)
+    iexBm = Bm.extrapolateBeam(particlefile, nEvts, CSVoutputFILE, strtloc)
 
     print("     <---- Beam instance initialised.")
 
+    print(BL.BeamLine.getinstance())
+
     print("     ----> Create report:")
 
+    iexBm.extrapolateBeam()
     iexBm.createReport()
 
     print("     <---- Create report:")

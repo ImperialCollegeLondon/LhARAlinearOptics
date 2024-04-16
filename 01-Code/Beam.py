@@ -679,22 +679,40 @@ class Beam:
 
     def getLines(self):
         DataList = []
-        for iLoc in range(len(self.getLocation())):
-            if iLoc < len(self.getnParticles()):
+        iAddr   = -1
+        iLocMin = 1
+        if self.getstartlocation() != None:
+            iLocMin = self.getstartlocation()
+
+        if self.getDebug():
+            print(" Beam.getLines:")
+            print("     ----> Start location, iLocMin:", \
+                  self.getstartlocation(), iLocMin)
+            print("     ----> Number of locations:", \
+                  len(self.getLocation()))
+        
+        for iLoc in range(iLocMin, \
+                          len(BLE.BeamLineElement.getinstances())-1):
+            iAddr += 1
+            if self.getDebug():
+                print("         ----> iLoc, Name, iAddr:", \
+                      iLoc, self.getLocation()[iLoc], iAddr)
+        
+            if iAddr < len(self.getnParticles()):
                 DataList.append([  \
                                    self.getLocation()[iLoc], \
-                                   self.getnParticles()[iLoc], \
-                                   self.getsigmaxy()[iLoc], \
-                                   self.getemittance()[iLoc], \
-                                   self.getTwiss()[iLoc] \
+                                   self.getnParticles()[iAddr], \
+                                   self.getsigmaxy()[iAddr], \
+                                   self.getemittance()[iAddr], \
+                                   self.getTwiss()[iAddr] \
                                  ])
             else:
                 DataList.append([  \
                                    self.getLocation()[iLoc], \
                                    None, \
-                                   self.getsigmaxy()[iLoc], \
-                                   self.getemittance()[iLoc], \
-                                   self.getTwiss()[iLoc] \
+                                   self.getsigmaxy()[iAddr], \
+                                   self.getemittance()[iAddr], \
+                                   self.getTwiss()[iAddr] \
                                  ])
         return DataList
     
@@ -714,6 +732,7 @@ class Beam:
 
 
     def plotBeamProgression(self):
+        self.setDebug(True)
         if self.getDebug():
             print(" Beam.plotBeamProgression: start")
 
@@ -734,17 +753,32 @@ class Beam:
 
         print(BL.BeamLine.getinstance())
         
-        for iLoc in range(len(self.getLocation())):
-            s.append(iRefPrtcl.getsOut()[iLoc])
-            sx.append(self.getsigmaxy()[iLoc][0])
-            sy.append(self.getsigmaxy()[iLoc][1])
-            ex.append(self.getemittance()[iLoc][0])
-            ey.append(self.getemittance()[iLoc][1])
+        iAddr   = -1
+        iLocMin = 1
+        if self.getstartlocation() != None:
+            iLocMin = self.getstartlocation()
+
+        if self.getDebug():
+            print("     ----> Start location, iLocMin:", \
+                  self.getstartlocation(), iLocMin)
+            print("     ----> Number of locations:", \
+                  len(self.getLocation()))
+        
+        for iLoc in range(iLocMin, \
+                          len(BLE.BeamLineElement.getinstances())-1):
+            iAddr += 1
+            s.append(iRefPrtcl.getsOut()[iLoc-1])
+            sx.append(self.getsigmaxy()[iAddr][0])
+            sy.append(self.getsigmaxy()[iAddr][1])
+            ex.append(self.getemittance()[iAddr][0])
+            ey.append(self.getemittance()[iAddr][1])
             
             if self.getDebug():
                 print("     ----> iLoc, s, sx, sy:", \
-                      iLoc, s[iLoc], sx[iLoc], sy[iLoc])
+                      iLoc, self.getLocation()[iLoc], \
+                      s[iAddr], sx[iAddr], sy[iAddr])
 
+        self.setDebug(False)
         plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(nrows=3, ncols=1, \
@@ -994,7 +1028,6 @@ class extrapolateBeam(Beam):
                     print("     ----> ", i, "\n", self._CovSums[i])
 
     def incrementSums(self, iPrtcl):
-        self.setDebug(False)
         if self.getstartlocation() == None:
             startlocation = 1
         else:
@@ -1050,19 +1083,22 @@ class extrapolateBeam(Beam):
 
         if self.getDebug():
             print(" <---- extrapolateBeam.incrementSums: Done")
-        self.setDebug(False)
 
     def extrapolateCovarianceMatrix(self):
         if self.getDebug():
             print(" extrapolateBeam.extrapolateCovarianceMatrix start:")
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+        iAddr   = -1
+        iLocMin = 1
+        if self.getstartlocation() != None:
+            iLocMin = self.getstartlocation()
         
-        iLoc          = -1
-        jLoc          = 0
-        startlocation = self.getstartlocation()
-        
-        for iBLE in BLE.BeamLineElement.getinstances():
+        for iLoc in range(iLocMin, len(BLE.BeamLineElement.getinstances())):
+            
+            iBLE = BLE.BeamLineElement.getinstances()[iLoc]
+                          
             if isinstance(iBLE, BLE.Facility) or isinstance(iBLE, BLE.Source):
                 continue
             
@@ -1070,8 +1106,8 @@ class extrapolateBeam(Beam):
                 print("     ----> BLE name, type:", \
                       iBLE.getName(), type(iBLE))
 
-            iLoc += 1
-            jLoc += 1
+            jLoc  = iLoc + 1
+            iAddr += 1
             if self.getDebug():
                 print("         ---->          Location:", jLoc)
                 print("         ----> Previous location:", iLoc)
@@ -1102,9 +1138,9 @@ class extrapolateBeam(Beam):
                     unt = np.matmul(TrnspsTrnsfrMtrx, TrnsfrMtrx)
                     print("         ----> Product for check: \n", unt)
                     print("         ----> iLoc, covariance matrix: \n", \
-                          self.getCovMtrx()[iLoc])
+                          self.getCovMtrx()[iAddr])
 
-            CovInv  = np.matmul(self.getCovMtrx()[iLoc], TrnspsTrnsfrMtrx)
+            CovInv  = np.matmul(self.getCovMtrx()[iAddr], TrnspsTrnsfrMtrx)
             CovMtrx = np.matmul(TrnsfrMtrx, CovInv)
 
             self._CovMtrx.append(CovMtrx)
@@ -1113,7 +1149,7 @@ class extrapolateBeam(Beam):
                 with np.printoptions(linewidth=500,precision=10, \
                                      suppress=True):
                     print("         ----> jLoc, CovMtrx: \n", \
-                          self.getCovMtrx()[jLoc])
+                          self.getCovMtrx()[iAddr+1])
 
     def extrapolateBeam(self):
         print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
