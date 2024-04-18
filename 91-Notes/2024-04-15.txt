@@ -1,0 +1,62 @@
+--------  --------  --------  --------  --------  --------  --------  17Apr24
+Total pain, worked through the addressing in Beam class.  Think it now works
+OK.  Next need to make same pass through extrapolateBeam derived class.
+
+--------  --------  --------  --------  --------  --------  --------  16Apr24
+Have worked through Beam class initialisation and, I think, corrected the
+addressing issues as far as initialiseSums.  Need to continue with routine
+checks.  Comminicate with Josie.
+
+--------  --------  --------  --------  --------  --------  --------  15Apr24
+Have first version of covariance matrix extrapolation, but, results look wrong.
+Addressing and/or numerical issues.  Go through Beam.py step by step.  Inlist
+Josie's support.
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py            -
+ - BeamIOTst-wrt.py          -
+ - BeamIOTst-rd.py           -
+ - BeamLineElementTst.py     -
+ - BeamLineTst.py            -
+ - BeamTst.py                -
+ - CylindricalRFCavityTst.py -
+ - DRACOfacilityTst.py       -
+ - DefocusQuadTst.py         -
+ - DipoleTst.py              -
+ - DriftTst.py               -
+ - ExpSourceTst.py           -
+ - FacilityTst.py            -
+ - FocusQuadTst.py           -
+ - GaborLensTst.py           -
+ - LIONfacilityTst.py        -
+ - LaTexTst.py               -
+ - LhARAFacilityTst.py       -
+ - OctupoleTst.py            -
+ - ParticleTst.py            -
+ - PhysicalConstantsTst.py   -
+ - QuadDoubletTst.py         -
+ - QuadTripletTst.py         -
+ - ReferenceParticleTst.py   -
+ - RunSimulationTst.py       -
+ - SimulationTst.py          -
+ - SolenoidTst.py            -
+ - SourceTst.py              -
+ - TestWrite.py              -
+ - TestRead.py               -
+ - testGitRepoId.py          -
+
+
+Scripts:
+ - LhARAMagnetTable.py     - 
+ - plotQuadTriplet.py      - 
+ - plotTrajectory.py       - 
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotBeam.py             - 
+ - runBeamSim.py           -
+ - readBeamSim.py          -
