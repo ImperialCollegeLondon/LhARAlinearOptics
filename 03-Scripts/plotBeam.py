@@ -74,11 +74,17 @@ def main(argv):
 
     print("     <---- Beam instance initialised.")
 
+    print("     ----> Evaluate beam:")
+
+    iBm.evaluateBeam()
+
+    print("     <---- Beam evaluated.")
+        
     print("     ----> Create report:")
 
     iBm.createReport()
 
-    print("     <---- Create report:")
+    print("     <---- Report created.")
         
     print("     ----> Plot beam progression:")
 

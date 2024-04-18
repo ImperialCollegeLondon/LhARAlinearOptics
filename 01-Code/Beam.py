@@ -853,7 +853,6 @@ class Beam:
 
         print(BL.BeamLine.getinstance())
         
-        iAddr   = -1
         iLocMin = self.getstartlocation()
 
         if self.getDebug():
@@ -863,7 +862,7 @@ class Beam:
         
         for iLoc in range(iLocMin, \
                           len(BLE.BeamLineElement.getinstances())-1):
-            iAddr += 1
+            iAddr = iLoc - iLocMin
             s.append(iRefPrtcl.getsOut()[iLoc-1])
             sx.append(self.getsigmaxy()[iAddr][0])
             sy.append(self.getsigmaxy()[iAddr][1])
