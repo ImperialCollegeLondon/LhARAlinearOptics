@@ -377,6 +377,21 @@ class Particle:
             
 #--------  Utilities:
     @classmethod
+    def cleanAllParticles(cls):
+        DoneOK = False
+        
+        for iPrtcl in cls.getParticleInstances():
+            del iPrtcl
+            
+        cls.instances = []
+
+        ReferenceParticle.cleaninstance()
+        
+        DoneOK = True
+
+        return DoneOK
+    
+    @classmethod
     def cleanParticles(cls):
         DoneOK = False
         
@@ -1364,7 +1379,7 @@ class ReferenceParticle(Particle):
         Success = self.sets(self.getsOut()[0])
         if not Success:
             raise fail2setReferenceParticle("sets")
-        TrcSpc  = np.array([0., 0., 0., 0., np.nan, np.nan])
+        TrcSpc  = np.array([0., 0., 0., 0., 0., 0.])
         Success = self.setTraceSpace(TrcSpc)
         if not Success:
             raise fail2setReferenceParticle("setTraceSpace")
