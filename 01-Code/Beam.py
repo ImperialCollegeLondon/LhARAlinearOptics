@@ -270,7 +270,9 @@ class Beam:
                       " nParticles:", int(self.getnParticles()[iAddr]))
             if len(self.getsigmaxy()) > iAddr:
                 print("             ---->   sigma_x,   sigma_y:", \
-                      self.getsigmaxy()[iAddr][0], self.getsigmaxy()[iAddr][1])
+                      self.getsigmaxy()[iAddr][0], \
+                      self.getsigmaxy()[iAddr][1])
+            if len(self.getemittance()) > iAddr:
                 print("             ----> epsilon_x, epsilon_y:", \
                       self.getemittance()[iAddr][0], \
                       self.getemittance()[iAddr][1])
@@ -279,6 +281,7 @@ class Beam:
                       self.getemittance()[iAddr][3])
                 print("             ---->            epsilon_6:", \
                       self.getemittance()[iAddr][4])
+            if len(self.getTwiss()) > iAddr:
                 print("             ---->      Twiss paramters:", \
                       self.getTwiss()[iAddr])
 
@@ -379,9 +382,18 @@ class Beam:
         CovY = None
         CovL = None
         Cov4 = None
+        
+        if len(self.getnParticles()) < 1 or \
+           self.getnParticles()[0] < 10:
+            return
+        else:
+            nPrtcls = self.getnParticles()[0] 
+            
         for iAddr in range(len(self.getCovarianceMatrix())):
-            if self.getnParticles()[iAddr] < 10:
-                break
+            if iAddr < len(self.getnParticles()):
+                nPrtcls = self.getnParticles()[iAddr]
+                
+            if nPrtcls < 10: break
             
             if self.getDebug():
                 print("     ----> iAddr:", iAddr)
@@ -445,9 +457,17 @@ class Beam:
         if self.getDebug():
             print(" Beam.setTwiss: start")
  
+        if len(self.getnParticles()) < 1 or \
+           self.getnParticles()[0] < 10:
+            return
+        else:
+            nPrtcls = self.getnParticles()[0] 
+            
         for iAddr in range(len(self.getCovarianceMatrix())):
-            if self.getnParticles()[iAddr] < 10:
-                break
+            if iAddr < len(self.getnParticles()):
+                nPrtcls = self.getnParticles()[iAddr]
+                
+            if nPrtcls < 10: break
             
             if self.getDebug():
                 print("     ----> iAddr:", iAddr)
@@ -763,11 +783,17 @@ class Beam:
                       len(self.getsigmaxy()), \
                       len(self.getemittance()), \
                       len(self.getTwiss()))
-        
+
+            nPrtcls = None
+            if iAddr < len(self.getnParticles()):
+                nPrtcls = self.getnParticles()[iAddr]
+            else:
+                nPrtcls = None
+                
             if iAddr < len(self.getemittance()):
                 DataList.append([  \
                                    self.getLocation()[iLoc-1], \
-                                   self.getnParticles()[iAddr], \
+                                   nPrtcls, \
                                    self.getsigmaxy()[iAddr], \
                                    self.getemittance()[iAddr], \
                                    self.getTwiss()[iAddr] \
@@ -775,7 +801,7 @@ class Beam:
             elif iAddr < len(self.getsigmaxy()):
                 DataList.append([  \
                                    self.getLocation()[iLoc-1], \
-                                   self.getnParticles()[iAddr], \
+                                   nPrtcls, \
                                    self.getsigmaxy()[iAddr], \
                                    None, \
                                    None  \
@@ -788,7 +814,6 @@ class Beam:
                                    None, \
                                    None, \
                                  ])
-
 
         return DataList
     
@@ -808,7 +833,6 @@ class Beam:
 
 
     def plotBeamProgression(self):
-        self.setDebug(True)
         if self.getDebug():
             print(" Beam.plotBeamProgression: start")
 
@@ -966,6 +990,7 @@ class extrapolateBeam(Beam):
     def __init__(self, _InputDataFile=None, _nEvtMax=None, \
                        _outputCSVfile=None, _startlocation=None,\
                        _beamlineSpecificationCSVfile=None):
+        
         if self.__Debug:
             print(' extrapolateBeam.__init__: ', \
                   'creating the Beam object:', \
@@ -1044,11 +1069,11 @@ class extrapolateBeam(Beam):
         self._nParticles.append(0.)
                 
         if self.getDebug():
-            print(" extrapolateBeam.initialiseSums: n, CovSums:")
+            print("     ----> n, CovSums:")
             for i in range(len(self.getnParticles())):
                 with np.printoptions(linewidth=500,precision=7,
                                      suppress=True):
-                    print("     ----> ", i, "\n", self._CovSums[i])
+                    print("         ----> n =", i, "\n", self._CovSums[i])
 
     def incrementSums(self, iPrtcl):
         startlocation = self.getstartlocation()
@@ -1110,52 +1135,56 @@ class extrapolateBeam(Beam):
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-        iAddr   = -1
         iLocMin = self.getstartlocation()
+        if self.getDebug():
+            print("     ----> iLocMin:", iLocMin)
         
-        for iLoc in range(iLocMin, len(BLE.BeamLineElement.getinstances())):
+        for jLoc in range(iLocMin+1, \
+                          len(BLE.BeamLineElement.getinstances())):
             
-            iBLE = BLE.BeamLineElement.getinstances()[iLoc]
+            jAddr       = jLoc - iLocMin 
+            iLoc        = jLoc - 1
+            iAddr       = iLoc - iLocMin 
+            iPhsSpcRcrd = iLoc - 1
+            if self.getDebug():
+                print("         ---->            Location:", jLoc)
+                print("         ---->   Previous location:", iLoc)
+                print("         ----> Traces-space record:", iPhsSpcRcrd)
+                print("         ---->               jAddr:", jAddr)
+                print("         ---->               iAddr:", iAddr)
                           
-            if isinstance(iBLE, BLE.Facility) or isinstance(iBLE, BLE.Source):
-                continue
+            jBLE  = BLE.BeamLineElement.getinstances()[jLoc]
+            iBLE  = BLE.BeamLineElement.getinstances()[iLoc]
             
             if self.getDebug():
-                print("     ----> BLE name, type:", \
+                print("     ----> iBLE name, type:", \
                       iBLE.getName(), type(iBLE))
+                print("     ----> jBLE name, type:", \
+                      jBLE.getName(), type(jBLE))
 
-            jLoc  = iLoc + 1
-            iAddr += 1
-            if self.getDebug():
-                print("         ---->          Location:", jLoc)
-                print("         ----> Previous location:", iLoc)
-
-            if isinstance(iBLE, BLE.Drift) or \
-               isinstance(iBLE, BLE.Aperture) or \
-               isinstance(iBLE, BLE.Octupole) or \
-               isinstance(iBLE, BLE.CylindricalRFCavity) or \
-               isinstance(iBLE, BLE.RPLCswitch):
-
+            if isinstance(jBLE, BLE.Drift) or \
+               isinstance(jBLE, BLE.Aperture) or \
+               isinstance(jBLE, BLE.Octupole) or \
+               isinstance(jBLE, BLE.CylindricalRFCavity) or \
+               isinstance(jBLE, BLE.RPLCswitch):
                 pass
-                
             else:
-                TrcSpc       = iRefPrtcl.getTraceSpace()[iLoc]
-                TrnsfrMtrx   = iBLE.setTransferMatrix(TrcSpc)
+                TrcSpc       = iRefPrtcl.getTraceSpace()[iPhsSpcRcrd]
+                TrnsfrMtrx   = jBLE.setTransferMatrix(TrcSpc)
                 
-            TrnsfrMtrx       = iBLE.getTransferMatrix()
+            TrnsfrMtrx       = jBLE.getTransferMatrix()
             TrnspsTrnsfrMtrx = np.transpose(TrnsfrMtrx)
                 
             if self.getDebug():
-                print("         ----> Name:", iBLE.getName())
+                print("         ----> Name:", jBLE.getName())
                 with np.printoptions(linewidth=500,precision=10,\
                                      suppress=True):
                     print("         ----> Transfer matrix: \n", \
                           TrnsfrMtrx)
                     print("         ----> Transpose of transfer matrix: \n", \
                           TrnspsTrnsfrMtrx)
-                    unt = np.matmul(TrnspsTrnsfrMtrx, TrnsfrMtrx)
-                    print("         ----> Product for check: \n", unt)
-                    print("         ----> iLoc, covariance matrix: \n", \
+                    print("         ----> iLoc, covariance matrix:", \
+                          iLoc, " \n", \
                           self.getCovMtrx()[iAddr])
 
             CovInv  = np.matmul(self.getCovMtrx()[iAddr], TrnspsTrnsfrMtrx)
@@ -1167,7 +1196,7 @@ class extrapolateBeam(Beam):
                 with np.printoptions(linewidth=500,precision=10, \
                                      suppress=True):
                     print("         ----> jLoc, CovMtrx: \n", \
-                          self.getCovMtrx()[iAddr+1])
+                          self.getCovMtrx()[jAddr])
 
     def extrapolateBeam(self):
         print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
@@ -1175,7 +1204,7 @@ class extrapolateBeam(Beam):
         EndOfFile = False
         iEvt = 0
         iCnt = 0
-        Scl  = 10
+        Scl  = 1
 
         ParticleFILE = self.getInputDataFile()
         print("     ----: event loop")

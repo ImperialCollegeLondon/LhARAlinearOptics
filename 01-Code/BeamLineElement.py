@@ -5453,7 +5453,6 @@ class RPLCswitch(BeamLineElement):
         
     @classmethod
     def readElement(cls, dataFILE):
-        cls.setDebug(True)
         if cls.getDebug():
             print(" RPLCswitch(BeamLineElement).readElement starts.")
 

@@ -47,7 +47,7 @@ outputdatafile = os.path.join(HOMEPATH, \
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, " create valid instance:")
-exBmInst = Bm.extrapolateBeam(inputdatafile, 2, outputdatafile, None)
+exBmInst = Bm.extrapolateBeam(inputdatafile, 1000, outputdatafile, None)
 
 ##!Test built in methods:
 extrapolateBeamTest += 1
@@ -69,6 +69,7 @@ print("extrapolateBeamTest:", extrapolateBeamTest, \
       " creation of pandas report.")
 
 exBmInst.extrapolateBeam()
+print(exBmInst)
 exBmInst.createReport()
 
 ##! Check start of calculation beyond source:
@@ -83,9 +84,9 @@ Bm.Beam.cleanBeams()
 BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 Prtcl.Particle.cleanAllParticles()
-exBmInst = Bm.Beam(inputdatafile, 2, outputdatafile, 3)
+exBmInst = Bm.extrapolateBeam(inputdatafile, 1000, outputdatafile, 3)
+exBmInst.extrapolateBeam()
 print(exBmInst)
-exBmInst.evaluateBeam()
 exBmInst.createReport()
 
 ##! Complete:
