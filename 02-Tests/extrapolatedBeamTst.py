@@ -9,11 +9,12 @@ Test script for "extrapolateBeam" class
 """
 
 import os
-import sys
 import numpy as np
 
-import BeamLine as BL
-import Beam     as Bm
+import Particle        as Prtcl
+import BeamLineElement as BLE
+import BeamLine        as BL
+import Beam            as Bm
 
 ##! Start:
 print("========  extrapolateBeam: tests start  ========")
@@ -33,43 +34,22 @@ else:
     raise Exception()
 Bm.extrapolateBeam.cleanextrapolateBeams()
 
-##! Now create reference beam:
-HOMEPATH = os.getenv('HOMEPATH')
-filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-Gauss.csv')
-
 ##! Now create pointer to input data file:
+HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
-                       '11-Parameters/Data4Tests.dat')
+                             '11-Parameters/Data4Tests.dat')
 
 ##! Now create pointer to output data file:
 outputdatafile = os.path.join(HOMEPATH, \
-                       '99-Scratch/extrapolateBeamParamteres.csv')
-
-##! Test input arguments:
-extrapolateBeamTest += 1
-print()
-print("extrapolateBeamTest:", extrapolateBeamTest, \
-      " check trap no beam specification file!")
-try:
-    exBmInst = Bm.extrapolateBeam()
-except:
-    print("     ----> Successfully trapped no beam specigication file")
-else:
-    print(\
-    "     ----> Failed successfully to trap no beam specification file", \
-          " abort")
-    raise Exception()
-Bm.extrapolateBeam.cleanextrapolateBeams()
+                              '99-Scratch/exBeamParameters.csv')
 
 ##! Create valid instance
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, " create valid instance:")
-exBmInst = Bm.extrapolateBeam(inputdatafile, 3, outputdatafile, None, \
-                               filename)
+exBmInst = Bm.extrapolateBeam(inputdatafile, 2, outputdatafile, None)
 
-##! Create valid instance
+##!Test built in methods:
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, " test built-in methods:")
@@ -79,32 +59,34 @@ print("      ---->", repr(exBmInst))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-#print(exBmInst)
+print(exBmInst)
 print("    <---- __str__ done.")
 
 ##! Check creation of report:
 extrapolateBeamTest += 1
 print()
-print("extrapolateBeamTest:", extrapolateBeamTest, " creation of pandas report.")
-print(BL.BeamLine.getinstance())
+print("extrapolateBeamTest:", extrapolateBeamTest, \
+      " creation of pandas report.")
 
 exBmInst.extrapolateBeam()
 exBmInst.createReport()
-#print(exBmInst)
 
 ##! Check start of calculation beyond source:
 extrapolateBeamTest += 1
 print()
 print("extrapolateBeamTest:", extrapolateBeamTest, \
       " start extrapolation beyond source:")
+outputdatafile = os.path.join(HOMEPATH, \
+                       '99-Scratch/exBeamParameters1.csv')
 exBmInst.getInputDataFile().close()
-Bm.extrapolateBeam.cleanextrapolateBeams()
-exBmInst = Bm.extrapolateBeam(inputdatafile, 3, outputdatafile, 3, \
-                               filename)
-exBmInst.extrapolateBeam()
+Bm.Beam.cleanBeams()
+BL.BeamLine.cleaninstance()
+BLE.BeamLineElement.cleaninstances()
+Prtcl.Particle.cleanAllParticles()
+exBmInst = Bm.Beam(inputdatafile, 2, outputdatafile, 3)
+print(exBmInst)
+exBmInst.evaluateBeam()
 exBmInst.createReport()
-#print(exBmInst)
-
 
 ##! Complete:
 print()

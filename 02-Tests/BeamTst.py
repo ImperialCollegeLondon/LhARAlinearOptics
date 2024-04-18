@@ -22,7 +22,8 @@ print("========  Beam: tests start  ========")
 ##! Test trap of no reference particle:
 BeamTest = 0
 print()
-print("BeamTest:", BeamTest, " check need reference particle first!")
+print("BeamTest:", BeamTest, \
+      " check need reference particle first!")
 try:
     BmInst = Bm.Beam()
 except:
@@ -48,7 +49,7 @@ print()
 print("BeamTest:", BeamTest, " create valid instance:")
 BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, None)
 
-##! Create valid instance
+##! Test buit-in methods:
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " test built-in methods:")
@@ -64,7 +65,8 @@ print("    <---- __str__ done.")
 ##! Check creation of report:
 BeamTest += 1
 print()
-print("BeamTest:", BeamTest, " creation of pandas report.")
+print("BeamTest:", BeamTest, \
+      " creation of pandas report.")
 
 BmInst.evaluateBeam()
 BmInst.createReport()
