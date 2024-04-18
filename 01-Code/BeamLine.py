@@ -1237,6 +1237,17 @@ class BeamLine(object):
 
         return EoF
 
+#--------  Utilities:
+    @classmethod
+    def cleaninstance(cls):
+        
+        del cls.__BeamLineInst
+        cls.__BeamLineInst = None
+
+        if cls.getDebug():
+            print(' BeamLine.cleaninstance: instance removed.')
+
+
 #--------  Exceptions:
 class badParameter(Exception):
     pass

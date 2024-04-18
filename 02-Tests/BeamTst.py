@@ -11,8 +11,10 @@ Test script for "Beam" class
 import os
 import numpy as np
 
-import BeamLine as BL
-import Beam as Bm
+import Particle        as Prtcl
+import BeamLineElement as BLE
+import BeamLine        as BL
+import Beam            as Bm
 
 ##! Start:
 print("========  Beam: tests start  ========")
@@ -24,45 +26,27 @@ print("BeamTest:", BeamTest, " check need reference particle first!")
 try:
     BmInst = Bm.Beam()
 except:
-    print("     ----> Successfully trapped no reference beam")
+    print("     ----> Successfully trapped no argument exception")
 else:
-    print("     ----> Failed successfully to trapped no reference beam", \
+    print("     ----> Failed successfully to trapped no argument exception:",\
           " abort")
     raise Exception()
 Bm.Beam.cleanBeams()
 
-##! Now create reference beam:
-HOMEPATH = os.getenv('HOMEPATH')
-filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-Gauss.csv')
-
 ##! Now create pointer to input data file:
+HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
                        '11-Parameters/Data4Tests.dat')
 
 ##! Now create pointer to output data file:
 outputdatafile = os.path.join(HOMEPATH, \
-                       '99-Scratch/BeamParamteres.csv')
-
-##! Test input arguments:
-BeamTest += 1
-print()
-print("BeamTest:", BeamTest, " check trap no beam specification file!")
-try:
-    BmInst = Bm.Beam()
-except:
-    print("     ----> Successfully trapped no beam specigication file")
-else:
-    print("     ----> Failed successfully to trap no beam specification file", \
-          " abort")
-    raise Exception()
-Bm.Beam.cleanBeams()
+                       '99-Scratch/BeamParameters.csv')
 
 ##! Create valid instance
 BeamTest += 1
 print()
 print("BeamTest:", BeamTest, " create valid instance:")
-BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, None, filename)
+BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, None)
 
 ##! Create valid instance
 BeamTest += 1
@@ -84,7 +68,23 @@ print("BeamTest:", BeamTest, " creation of pandas report.")
 
 BmInst.evaluateBeam()
 BmInst.createReport()
+
+##! Check start of calculation beyond source:
+BeamTest += 1
+print()
+print("BeamTest:", BeamTest, \
+      " start extrapolation beyond source:")
+outputdatafile = os.path.join(HOMEPATH, \
+                       '99-Scratch/BeamParameters1.csv')
+BmInst.getInputDataFile().close()
+Bm.Beam.cleanBeams()
+BL.BeamLine.cleaninstance()
+BLE.BeamLineElement.cleaninstances()
+Prtcl.Particle.cleanAllParticles()
+BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, 3)
 print(BmInst)
+BmInst.evaluateBeam()
+BmInst.createReport()
 
 ##! Complete:
 print()

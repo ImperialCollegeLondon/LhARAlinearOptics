@@ -106,14 +106,9 @@ class Report:
 #--------  "Built-in methods":
     def __init__(self, _Name=None, _ReportPath=None, _FileName=None,
                  _Header=[], _Lines=[]):
-        if self.getDebug():
-            print(" Report.__init__ start:")
-            print("     ----> Name:", _Name)
-            print("     ----> Path:", _ReportPath)
-            print("     ----> File:", _FileName)
-            print("     ----> len(Header):", len(_Header))
-            print("     ---->  len(Lines):", len(_Lines))
 
+        Report.instances.append(self)
+        
         if _Name == None:
             raise NoReportNameProvided( \
                   'No report name provided; execution termimated.')
@@ -139,18 +134,20 @@ class Report:
         self._Header     = _Header
         self._Lines      = _Lines
 
-        Report.instances.append(self)
+        if self.getDebug():
+            print(" Report.__init__ start:")
+            print("     ----> Name:", _Name)
+            print("     ----> Path:", _ReportPath)
+            print("     ----> File:", _FileName)
+            print("     ----> len(Header):", len(_Header))
+            print("     ---->  len(Lines):", len(_Lines))
 
     def __repr__(self):
         return "Report(ReportName, PathToDirectory, ReportFile)"
 
     def __str__(self):
         print(" Report: Name: ", self._Name)
-        if self.__Debug:
-            print("     Output directory path: ", self._ReportPath)
-        else:
-            dirname, filename  = os.path.split(self._FileName)
-            print("     Output directory path: ", dirname)
+        print("     Output directory path: ", self._ReportPath)
         print("     Report file name: ", self._FileName)
         print("     Header fields:", self._Header)
         for i in range(len(self._Lines)):
@@ -205,6 +202,9 @@ class Report:
         _filename = os.path.join(self._ReportPath, self._FileName)
         _DataFrame.to_csv(_filename, index=False, header=False)
 
+
+    def setDebug(self, Debug):
+        self.__Debug = Debug
 
     def getDebug(self):
         return self.__Debug

@@ -106,7 +106,6 @@ class BeamIO:
         return " <---- BeamIO __str__ done. \n"
 
     def print(self):
-        self.setDebug()
         print("\n BeamIO:")
         print(" -------")
         print("     ----> Debug flag:", self.getDebug())
