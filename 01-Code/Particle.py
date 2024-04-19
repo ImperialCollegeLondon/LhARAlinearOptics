@@ -350,10 +350,6 @@ class Particle:
         return cls.instances
 
     def getSpecies(self):
-        if self._Species != "proton":
-            x=1.
-            y=0.
-            z=x/y
         return self._Species
             
     def getLocation(self):
