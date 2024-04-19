@@ -5356,19 +5356,22 @@ class RPLCswitch(BeamLineElement):
 
 #--------  "Built-in methods":    
     def __init__(self, _Name=None, \
-                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
+                 _2Drotation=False):
         if self.getDebug():
             print(' RPLCswitch.__init__: ', \
                   'creating the RPLCswitch object')
             print("     ----> vStrt:", _vStrt)
 
+        RPLCswitch.instances.append(self)
+        
         #.. BeamLineElement class initialisation:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
-        RPLCswitch.instances.append(self)
-        
         self.setStrt2End(np.array([0., 0., 0.]))
         self.setRot2LbEnd(self.getRot2LbStrt())
+
+        self.set2Drotation(_2Drotation)
         
         self.setTransferMatrix()
                 
@@ -5396,24 +5399,59 @@ class RPLCswitch(BeamLineElement):
     @classmethod
     def setDebug(cls, Debug):
         cls.__Debug = Debug
+
+    def set2Drotation(self, _2Drotation):
+        if not isinstance(_2Drotation, bool):
+            raise badParameter()
+
+        self._2Drotation = _2Drotation
         
     def setTransferMatrix(self):
+        self.setDebug(True)
+        if self.getDebug():
+            print(" RPLC(BeamLineElement).setTransferMatrix; start:")
 
         iLst  = BeamLineElement.getinstances()[ \
                                 len(BeamLineElement.getinstances())-2 \
                                                ]
-        invRE = np.linalg.inv(iLst.getRot2LbEnd())
+        if not self.get2Drotation():
+            invRE = np.linalg.inv(iLst.getRot2LbEnd())
 
-        effctvRot = np.matmul(invRE, self.getRot2LbStrt())
+            effctvRot = np.matmul(invRE, self.getRot2LbStrt())
 
-        offDiag   = np.zeros((3,3))
+            offDiag   = np.zeros((3,3))
 
-        TrnsMtrx = np.block([ \
-                              [effctvRot, offDiag],  \
-                              [  offDiag, effctvRot] \
-                              ])
+            TrnsMtrx = np.block([ \
+                                  [effctvRot, offDiag],  \
+                                  [  offDiag, effctvRot] \
+                                 ])
+        else:
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ----> vStrt(iLst), vStrt:", \
+                          iLst.getvStrt(), self.getvStrt())
+                    
+            PhiLst   = iLst.getvStrt()[0][1]
+            Phi      = self.getvStrt()[0][1]
+            if self.getDebug():
+                print("     ----> PhiLst, Phi:", PhiLst, Phi)
+                
+            dPhi     = Phi - PhiLst
+            cdPhi    = mth.cos(dPhi)
+            sdPhi    = mth.sin(dPhi)
+
+            TrnsMtrx = np.array([ \
+                                  [cdPhi,   0., -sdPhi,     0., 0., 0.], \
+                                  [  0., cdPhi,     0., -sdPhi, 0., 0.], \
+                                  [sdPhi,   0.,  cdPhi,     0., 0., 0.], \
+                                  [  0., sdPhi,   0.,    cdPhi, 0., 0.], \
+                                  [  0.,    0.,   0.,       0., 1., 0.], \
+                                  [  0.,    0.,   0.,       0., 0., 1.]  \
+                                 ])
                              
         self._TrnsMtrx = TrnsMtrx
+        
+        self.setDebug(False)
 
 
 #--------  "get methods"
@@ -5424,6 +5462,9 @@ class RPLCswitch(BeamLineElement):
     
     def getLength(self):
         return 0.
+
+    def get2Drotation(self):
+        return self._2Drotation
 
     
 #--------  I/o methods:               <--------  Here
@@ -5482,16 +5523,22 @@ class RPLCswitch(BeamLineElement):
         if self.OutsideBeamPipe(_R):
             _Rprime = None
         else:
-            phsSpc      = \
-                Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
-            if self.getDebug():
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("     ----> PhaseSpace      :", phsSpc) 
-            phsSpcprime = self.getTransferMatrix().dot(phsSpc)
-            if self.getDebug():
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("     ----> PhaseSpace prime:", phsSpcprime)
-            _Rprime     = Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
+            if not self.get2Drotation():
+                phsSpc      = \
+                    Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("     ----> PhaseSpace      :", phsSpc) 
+                phsSpcprime = self.getTransferMatrix().dot(phsSpc)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("     ----> PhaseSpace prime:", phsSpcprime)
+                _Rprime     = \
+                    Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
+            else:
+                _Rprime = self.getTransferMatrix().dot(_R)
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):

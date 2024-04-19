@@ -11,6 +11,7 @@ Test script for "RPLCswitch" class
 import os
 import numpy             as np
 
+import Particle          as Prtcl
 import BeamLineElement   as BLE
 import BeamLine          as BL
 
@@ -38,6 +39,7 @@ except:
 #--------> Clean instances and restart:
 BLE.BeamLineElement.cleaninstances()
 BLI  = BL.BeamLine(filename)
+print(BLI)
 
 #.. Create valid instance:
 rStrt = np.array([0.,0.,0.])
@@ -112,6 +114,73 @@ if Norm > 1E-6:
     raise Exception(" !!!!----> FAILED: drift transport result not as expected.")
 else:
     print(" <---- RPLCswitch transport test successful.")
+
+##! Check switch:
+RPLCswitchTest += 1
+print()
+print("RPLCswitchTest:", RPLCswitchTest, " test 2D rotation.")
+BLE.BeamLineElement.cleaninstances()
+BL.BeamLine.cleaninstance()
+Prtcl.Particle.cleanAllParticles()
+BLI  = BL.BeamLine(filename)
+print(BLI)
+RPLCswtch = BLE.RPLCswitch("ValidRPLCswitch", rStrt, vStrt, drStrt, dvStrt,\
+                           True)
+Rprime = RPLCswtch.Transport(R)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Transported phase-space vector:", Rprime)
+print("     ----> Input phase-space vector:", R)
+print("     ----> Transfer matrix:")
+print("         ", RPLCswtch.getTransferMatrix()[0,0], \
+                   RPLCswtch.getTransferMatrix()[0,1], \
+                   RPLCswtch.getTransferMatrix()[0,2], \
+                   RPLCswtch.getTransferMatrix()[0,3], \
+                   RPLCswtch.getTransferMatrix()[0,4], \
+                   RPLCswtch.getTransferMatrix()[0,5])
+print("         ", RPLCswtch.getTransferMatrix()[1,0], \
+                   RPLCswtch.getTransferMatrix()[1,1], \
+                   RPLCswtch.getTransferMatrix()[1,2], \
+                   RPLCswtch.getTransferMatrix()[1,3], \
+                   RPLCswtch.getTransferMatrix()[1,4], \
+                   RPLCswtch.getTransferMatrix()[1,5])
+print("         ", RPLCswtch.getTransferMatrix()[2,0], \
+                   RPLCswtch.getTransferMatrix()[2,1], \
+                   RPLCswtch.getTransferMatrix()[2,2], \
+                   RPLCswtch.getTransferMatrix()[2,3], \
+                   RPLCswtch.getTransferMatrix()[2,4], \
+                   RPLCswtch.getTransferMatrix()[2,5])
+print("         ", RPLCswtch.getTransferMatrix()[3,0], \
+                   RPLCswtch.getTransferMatrix()[3,1], \
+                   RPLCswtch.getTransferMatrix()[3,2], \
+                   RPLCswtch.getTransferMatrix()[3,3], \
+                   RPLCswtch.getTransferMatrix()[3,4], \
+                   RPLCswtch.getTransferMatrix()[3,5])
+print("         ", RPLCswtch.getTransferMatrix()[4,0], \
+                   RPLCswtch.getTransferMatrix()[4,1], \
+                   RPLCswtch.getTransferMatrix()[4,2], \
+                   RPLCswtch.getTransferMatrix()[4,3], \
+                   RPLCswtch.getTransferMatrix()[4,4], \
+                   RPLCswtch.getTransferMatrix()[4,5])
+print("         ", RPLCswtch.getTransferMatrix()[5,0], \
+                   RPLCswtch.getTransferMatrix()[5,1], \
+                   RPLCswtch.getTransferMatrix()[5,2], \
+                   RPLCswtch.getTransferMatrix()[5,3], \
+                   RPLCswtch.getTransferMatrix()[5,4], \
+                   RPLCswtch.getTransferMatrix()[5,5])
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Transported phase-space vector:", Rprime)
+                        
+Diff       = np.subtract(Rprime, RprimeTest)
+Norm       = np.linalg.norm(Diff)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("     ----> Difference Rprime - RprimeTest:", Diff)
+print("     ----> Magnitude of Diff:", Norm)
+if Norm > 1E-6:
+    raise Exception( \
+            " !!!!----> FAILED: drift transport result not as expected.")
+else:
+    print(" <---- RPLCswitch transport test successful.")
+    
 
 ##! Complete:
 print()
