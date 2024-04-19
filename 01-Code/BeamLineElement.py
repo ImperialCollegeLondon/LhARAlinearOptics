@@ -5357,7 +5357,7 @@ class RPLCswitch(BeamLineElement):
 #--------  "Built-in methods":    
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
-                 _2Drotation=False):
+                 _3Drotation=False):
         if self.getDebug():
             print(' RPLCswitch.__init__: ', \
                   'creating the RPLCswitch object')
@@ -5371,7 +5371,7 @@ class RPLCswitch(BeamLineElement):
         self.setStrt2End(np.array([0., 0., 0.]))
         self.setRot2LbEnd(self.getRot2LbStrt())
 
-        self.set2Drotation(_2Drotation)
+        self.set3Drotation(_3Drotation)
         
         self.setTransferMatrix()
                 
@@ -5386,6 +5386,7 @@ class RPLCswitch(BeamLineElement):
         print(" RPLCswitch:")
         print(" -----------")
         print("     ----> Debug flag:", RPLCswitch.getDebug())
+        print("     ----> 3Drotation:", self.get3Drotation())
         BeamLineElement.__str__(self)
         return " <---- RPLCswitch parameter dump complete."
 
@@ -5400,21 +5401,20 @@ class RPLCswitch(BeamLineElement):
     def setDebug(cls, Debug):
         cls.__Debug = Debug
 
-    def set2Drotation(self, _2Drotation):
-        if not isinstance(_2Drotation, bool):
+    def set3Drotation(self, _3Drotation):
+        if not isinstance(_3Drotation, bool):
             raise badParameter()
 
-        self._2Drotation = _2Drotation
+        self._3Drotation = _3Drotation
         
     def setTransferMatrix(self):
-        self.setDebug(True)
         if self.getDebug():
             print(" RPLC(BeamLineElement).setTransferMatrix; start:")
 
         iLst  = BeamLineElement.getinstances()[ \
                                 len(BeamLineElement.getinstances())-2 \
                                                ]
-        if not self.get2Drotation():
+        if self.get3Drotation():
             invRE = np.linalg.inv(iLst.getRot2LbEnd())
 
             effctvRot = np.matmul(invRE, self.getRot2LbStrt())
@@ -5451,8 +5451,6 @@ class RPLCswitch(BeamLineElement):
                              
         self._TrnsMtrx = TrnsMtrx
         
-        self.setDebug(False)
-
 
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)
@@ -5463,8 +5461,8 @@ class RPLCswitch(BeamLineElement):
     def getLength(self):
         return 0.
 
-    def get2Drotation(self):
-        return self._2Drotation
+    def get3Drotation(self):
+        return self._3Drotation
 
     
 #--------  I/o methods:               <--------  Here
@@ -5502,7 +5500,6 @@ class RPLCswitch(BeamLineElement):
         if cls.getDebug():
             print(" <---- end of file, return.")
             
-        cls.setDebug(False)
         return EoF
 
 
@@ -5523,7 +5520,7 @@ class RPLCswitch(BeamLineElement):
         if self.OutsideBeamPipe(_R):
             _Rprime = None
         else:
-            if not self.get2Drotation():
+            if self.get3Drotation():
                 phsSpc      = \
                     Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
                 if self.getDebug():

@@ -874,7 +874,6 @@ class Beam:
                       iLoc, self.getLocation()[iLoc], \
                       s[iAddr], sx[iAddr], sy[iAddr])
 
-        self.setDebug(False)
         plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(nrows=3, ncols=1, \
