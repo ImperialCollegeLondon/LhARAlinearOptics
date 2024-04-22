@@ -39,6 +39,7 @@ Created on Thu 22Apr24;11:04: Version history:
 @author: kennethlong
 """
 
+import Particle as Prtcl
 
 #--------  visualise class  --------
 class visualise(object):
@@ -47,7 +48,7 @@ class visualise(object):
 
 
 #--------  "Built-in methods":
-    def __init__(self):
+    def __init__(self, _CoordSys=None, _Projection=None):
         if self.getDebug():
             print('visualise.__init__: creating the visualise instance')
             print('------------------')
@@ -55,6 +56,12 @@ class visualise(object):
         self.setAll2None()
 
         self.addinstance(self)
+
+        self.setCoordSys(_CoordSys)
+        self.setProjection(_Projection)
+
+        if self.getDebug():
+            self.print()
 
     def __repr__(self):
         return "visualise()"
@@ -68,8 +75,14 @@ class visualise(object):
     def print(self):
         print(" visualise.print:")
         print(" ----------------")
-        print("                          Debug:", self.getDebug())
-        print("            Number of instances:", len(self.getinstances()))
+        print("                          Debug:", \
+              self.getDebug())
+        print("            Number of instances:", \
+              len(self.getinstances()))
+        print("              Coordinate system:", \
+              self.getCoordSys())
+        print("                     Projection:", \
+              self.getProjection())
         return(" <---- visualise.print done.")
 
         
@@ -80,7 +93,8 @@ class visualise(object):
         cls.__Debug = _Debug
 
     def setAll2None(self):
-        pass
+        self._CoordSys   = None
+        self._Projection = None
 
     @classmethod
     def setinstances(cls, instances):
@@ -94,6 +108,16 @@ class visualise(object):
             raise badParameter()
         cls.__instances.append(instance)
 
+    def setCoordSys(self, _CoordSys):
+        if not isinstance(_CoordSys, str):
+            raise badParameter()
+        self._CoordSys = _CoordSys
+
+    def setProjection(self, _Projection):
+        if not isinstance(_Projection, str):
+            raise badParameter()
+        self._Projection = _Projection
+
         
 #--------  "Get methods":
 #.. Methods believed to be self documenting(!)
@@ -104,6 +128,47 @@ class visualise(object):
     @classmethod
     def getinstances(cls):
         return cls.__instances
+
+    def getCoordSys(self):
+        return self._CoordSys
+
+    def getProjection(self):
+        return self._Projection
+
+
+#--------  Visualisation managers:
+    def ReferenceParticle(self, axs):
+        if self.getDebug():
+            print(" visualise.ReferenceParticle: start")
+            print("     ----> Coordinate system:", \
+                  self.getCoordSys())
+            print("     ----> Projection:", \
+                  self.getProjection())
+
+        irefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        sorz = []
+        xory = []
+        #..  Plotting as a function of s if RPLC or z if laboratory:
+        if self.getCoordSys() == "RPLC":
+            iCrd = 0
+            axl  = "x"
+            if self.getProjection() == "ys":
+                iCrd = 2
+                axl  = "y"
+            sorz = irefPrtcl.getsOut()
+            for TrcSpc in irefPrtcl.getTraceSpace():
+                xory.append(TrcSpc[iCrd])
+
+        if self.getDebug():
+            print("     ----> sorz:", sorz)
+            print("     ----> xory:", xory)
+        
+        axs.plot(sorz, xory, color='black', linewidth='1', \
+                 linestyle='dashed')
+        axs.set_xlabel('s (m)')
+        axs.set_ylabel(axl + ' (m)')
+        
 
 
 #--------  Exceptions:

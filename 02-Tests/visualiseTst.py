@@ -12,12 +12,28 @@ Test script for "visualise" class
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
+import os
 
 import visualise as vis
+import BeamLine  as BL
+import Beam      as Bm
+import BeamIO    as bmIO
 
 ##! Start:
 print("========  visualise: tests start  ========")
 
+##! Now create pointer to input data file:
+HOMEPATH = os.getenv('HOMEPATH')
+inputdatafile = os.path.join(HOMEPATH, \
+                             '11-Parameters/Data4Tests.dat')
+
+#.. Open data file and read first record to set up geometry
+ibmIOr = bmIO.BeamIO(None, inputdatafile)
+
+EndOfFile = False
+EndOfFile = ibmIOr.readBeamDataRecord()
+
+print(BL.BeamLine.getinstance())
 
 ##! RPLC tests first
 visualiseTest = 1
@@ -25,18 +41,19 @@ print()
 print("visualiseTest:", visualiseTest, \
       " initialise for RPLC tests")
 
-ivisRPLC = vis.visualise()
+ivisRPLCx = vis.visualise("RPLC", "xs")
+ivisRPLCy = vis.visualise("RPLC", "ys")
 
 ##!Test built in methods:
 print()
 print("     Test built-in methods:")
 #.. __repr__
 print("    __repr__:")
-print("      ---->", repr(ivisRPLC))
+print("      ---->", repr(ivisRPLCx))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-print(ivisRPLC)
+print(ivisRPLCx)
 print("    <---- __str__ done.")
 
 
@@ -46,7 +63,7 @@ print()
 print("visualiseTest:", visualiseTest, \
       " now laboratory coordinate system tests")
 
-ivisLab = vis.visualise()
+ivisLab = vis.visualise("Lab", "xz")
 
 ##!Test built in methods:
 print()
@@ -82,8 +99,15 @@ with PdfPages(plotFILE) as pdf:
     # add an artist, in this case a nice label in the middle...
     Ttl = "Test RPLC visualise"
     fig.suptitle(Ttl, fontdict=font)
+
+    ivisRPLCx.setDebug(True)
+    ivisRPLCx.ReferenceParticle(axs[0])
+    ivisRPLCy.ReferenceParticle(axs[1])
+    ivisRPLCx.setDebug(False)
+    
     pdf.savefig()
     plt.close()
+    exit()
     
 plotFILE = '99-Scratch/visualiseLab.pdf'
 with PdfPages(plotFILE) as pdf:

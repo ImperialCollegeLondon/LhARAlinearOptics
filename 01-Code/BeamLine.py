@@ -145,7 +145,8 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> readDataFile = ", readDataFile)
             if readDataFile:
-                print(" <---- return after init.")
+                if cls.getDebug():
+                    print(" <---- return after init.")
                 return cls.getinstance()
               
             #.. Check and load parameter file
