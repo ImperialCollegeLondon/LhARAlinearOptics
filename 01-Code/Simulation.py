@@ -224,3 +224,4 @@ class Simulation(object):
             self.getiBmIOw().flushNclosedataFile( \
                                     self.getiBmIOw().getdataFILE())
         
+
