@@ -1059,6 +1059,7 @@ class BeamLine(object):
 
     @classmethod
     def readBeamLine(cls, beamlineFILE=None):
+        cls.setDebug(True)
         if cls.getDebug():
             print(" BeamLine.readBeamLine starts.")
 
@@ -1236,6 +1237,7 @@ class BeamLine(object):
         if cls.getDebug():
             print(" <---- BeamLine.writeBeamLine done.")
 
+        cls.setDebug(False)
         return EoF
 
 #--------  Utilities:

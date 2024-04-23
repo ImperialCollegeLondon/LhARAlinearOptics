@@ -137,39 +137,21 @@ class visualise(object):
 
 
 #--------  Visualisation managers:
-    def ReferenceParticle(self, axs):
+    def Particles(self, axs, nPrtcl):
         if self.getDebug():
-            print(" visualise.ReferenceParticle: start")
+            print(" visualise.Particles: start")
             print("     ----> Coordinate system:", \
                   self.getCoordSys())
             print("     ----> Projection:", \
                   self.getProjection())
 
-        irefPrtcl = Prtcl.ReferenceParticle.getinstance()
-        
-        sorz = []
-        xory = []
-        #..  Plotting as a function of s if RPLC or z if laboratory:
-        if self.getCoordSys() == "RPLC":
-            iCrd = 0
-            axl  = "x"
-            if self.getProjection() == "ys":
-                iCrd = 2
-                axl  = "y"
-            sorz = irefPrtcl.getsOut()
-            for TrcSpc in irefPrtcl.getTraceSpace():
-                xory.append(TrcSpc[iCrd])
+        Prtcl.ReferenceParticle.getinstance().visualise( \
+                            self.getCoordSys(), self.getProjection(), axs)
 
-        if self.getDebug():
-            print("     ----> sorz:", sorz)
-            print("     ----> xory:", xory)
-        
-        axs.plot(sorz, xory, color='black', linewidth='1', \
-                 linestyle='dashed')
-        axs.set_xlabel('s (m)')
-        axs.set_ylabel(axl + ' (m)')
-        
-
+        n2plt = min(nPrtcl, len(Prtcl.Particle.getParticleInstances()))
+        for iPrtcl in range(1,n2plt):
+            Prtcl.Particle.getParticleInstances()[iPrtcl+1].visualise( \
+                            self.getCoordSys(), self.getProjection(), axs)
 
 #--------  Exceptions:
 class badParameter(Exception):

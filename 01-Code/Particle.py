@@ -653,7 +653,7 @@ class Particle:
                 if Particle.getDebug():
                     print("         ----> Fill phase space for particle:", \
                           nPrtcl)
-                    Success = iPrtcl.fillPhaseSpace()
+                Success = iPrtcl.fillPhaseSpace()
 
         if cls.getDebug():
             print("     ----> Particle.fillPhaseSpaceAll:", \
@@ -823,7 +823,51 @@ class Particle:
 
         return TrcSpc
 
-    
+    def visualise(self, CoordSys, Projection, axs):
+        self.setDebug(True)
+        if self.getDebug():
+            print(" Particle.visualise: start")
+            print("     ----> Coordinate system:", CoordSys)
+            print("     ----> Projection:", Projection)
+
+        sorz = []
+        xory = []
+        #..  Plotting as a function of s if RPLC or z if laboratory:
+        if CoordSys == "RPLC":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "ys":
+                iCrd = 2
+                axl  = "y"
+            sorz = ReferenceParticle.getinstance().getsOut()
+            for TrcSpc in self.getTraceSpace():
+                xory.append(TrcSpc[iCrd])
+
+        elif CoordSys == "Lab":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "yz":
+                iCrd = 1
+                axl  = "y"
+                
+            for RrOut in self.getLabPhaseSpace():
+                print(RrOut)
+                xory.append(RrOut[0][iCrd])
+                sorz.append(RrOut[0][2])
+            
+        if self.getDebug():
+            print("     ----> sorz:", sorz)
+            print("     ----> xory:", xory)
+
+        if len(sorz) > len(xory):
+            axs.plot(sorz[0:len(xory)], xory, color='red', linewidth='1')
+        else:
+            axs.plot(sorz, xory, color='blue', linewidth='1')
+        axs.set_xlabel('s (m)')
+        axs.set_ylabel(axl + ' (m)')
+        self.setDebug(False)
+
+        
 #--------  I/o methods:
 #                     ----> Write instances:
     @classmethod
@@ -1383,6 +1427,7 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtDrift(self, iBLE=None):
+        self.setDebug(True)
         nRcrds  = len(self.getsIn())
         if self.getDebug():
             print(" --------  --------  --------  //", \
@@ -1490,7 +1535,50 @@ class ReferenceParticle(Particle):
             print(" --------  --------  --------  //", \
                   "  --------  --------  --------")
         
+        self.setDebug(False)
         return Success
+
+    def visualise(self, CoordSys, Projection, axs):
+        if self.getDebug():
+            print(" ReferenceParticle.visualise: start")
+            print("     ----> Coordinate system:", CoordSys)
+            print("     ----> Projection:", Projection)
+
+        sorz = []
+        xory = []
+        
+        #..  Plotting as a function of s if RPLC or z if laboratory:
+        if CoordSys == "RPLC":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "ys":
+                iCrd = 2
+                axl  = "y"
+                
+            sorz = self.getsOut()
+            for TrcSpc in self.getTraceSpace():
+                xory.append(TrcSpc[iCrd])
+
+        elif CoordSys == "Lab":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "yz":
+                iCrd = 1
+                axl  = "y"
+                
+            for RrOut in self.getRrOut():
+                xory.append(RrOut[iCrd])
+                sorz.append(RrOut[2])
+            
+        if self.getDebug():
+            print("     ----> sorz:", sorz)
+            print("     ----> xory:", xory)
+        
+        axs.plot(sorz, xory, color='black', linewidth='1', \
+                 linestyle='dashed')
+        axs.set_xlabel('s (m)')
+        axs.set_ylabel(axl + ' (m)')
+    
     
 #--------  Exceptions:
 class noReferenceParticle(Exception):

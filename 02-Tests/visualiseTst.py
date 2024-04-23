@@ -18,6 +18,7 @@ import visualise as vis
 import BeamLine  as BL
 import Beam      as Bm
 import BeamIO    as bmIO
+import Particle  as Prtcl
 
 ##! Start:
 print("========  visualise: tests start  ========")
@@ -25,7 +26,8 @@ print("========  visualise: tests start  ========")
 ##! Now create pointer to input data file:
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
-                             '11-Parameters/Data4Tests.dat')
+                             '99-Scratch/LhARA-Gauss-Gabor.dat')
+#                             '11-Parameters/Data4Tests.dat')
 
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)
@@ -34,6 +36,13 @@ EndOfFile = False
 EndOfFile = ibmIOr.readBeamDataRecord()
 
 print(BL.BeamLine.getinstance())
+
+print(Prtcl.Particle.getParticleInstances()[0])
+exit()
+
+for i in range(2):
+    ibmIOr.readBeamDataRecord()
+Prtcl.Particle.fillPhaseSpaceAll()
 
 ##! RPLC tests first
 visualiseTest = 1
@@ -63,18 +72,19 @@ print()
 print("visualiseTest:", visualiseTest, \
       " now laboratory coordinate system tests")
 
-ivisLab = vis.visualise("Lab", "xz")
+ivisLabx = vis.visualise("Lab", "xz")
+ivisLaby = vis.visualise("Lab", "yz")
 
 ##!Test built in methods:
 print()
 print("     Test built-in methods:")
 #.. __repr__
 print("    __repr__:")
-print("      ---->", repr(ivisLab))
+print("      ---->", repr(ivisLabx))
 print("    <---- __repr__ done.")
 #.. __str__
 print("    __str__:")
-print(ivisLab)
+print(ivisLabx)
 print("    <---- __str__ done.")
 
 
@@ -101,13 +111,12 @@ with PdfPages(plotFILE) as pdf:
     fig.suptitle(Ttl, fontdict=font)
 
     ivisRPLCx.setDebug(True)
-    ivisRPLCx.ReferenceParticle(axs[0])
-    ivisRPLCy.ReferenceParticle(axs[1])
+    ivisRPLCx.Particles(axs[0], 100)
+    ivisRPLCy.Particles(axs[1], 100)
     ivisRPLCx.setDebug(False)
     
     pdf.savefig()
     plt.close()
-    exit()
     
 plotFILE = '99-Scratch/visualiseLab.pdf'
 with PdfPages(plotFILE) as pdf:
@@ -123,6 +132,12 @@ with PdfPages(plotFILE) as pdf:
     # add an artist, in this case a nice label in the middle...
     Ttl = "Test lab coordinate system visualise"
     fig.suptitle(Ttl, fontdict=font)
+    
+    ivisLabx.setDebug(True)
+    ivisLabx.Particles(axs[0], 100)
+    ivisLaby.Particles(axs[1], 100)
+    ivisLabx.setDebug(False)
+    
     pdf.savefig()
     plt.close()
     
