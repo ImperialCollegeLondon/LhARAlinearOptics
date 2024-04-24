@@ -107,12 +107,13 @@ with PdfPages(plotFILE) as pdf:
     Ttl = "Test RPLC visualise"
     fig.suptitle(Ttl, fontdict=font)
 
-    ivisRPLCx.setDebug(True)
     ivisRPLCx.Particles(axs[0], 1000)
+    """
     ivisRPLCx.setDebug(True)
     ivisRPLCx.BeamLine(axs[0])
-    ivisRPLCy.Particles(axs[1], 1000)    
     ivisRPLCx.setDebug(False)
+    """
+    ivisRPLCy.Particles(axs[1], 1000)    
     
     pdf.savefig()
     plt.close()
