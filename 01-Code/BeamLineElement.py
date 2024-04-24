@@ -139,6 +139,7 @@ Created on Mon 12Jun23: Version history:
 @author: kennethlong
 """
 
+import matplotlib.patches as patches
 import scipy  as sp
 import numpy  as np
 import math   as mth
@@ -609,6 +610,41 @@ class BeamLineElement:
             if cls.getDebug():
                 print(" BeamLineElement.removeInstance: instance", \
                       inst.Name, "not in BeamLineElement.Instances!")
+                
+    def visualise(self, axs):
+        self.setDebug(True)
+        if self.getDebug():
+            print(" BeamLineElement.visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt() + self.getStrt2End()/2.
+        wdth = self.getLength()
+        if wdth == 0.: wdth = 0.1
+        hght = 0.1
+        angl = 0.
+        abt  = 'center'
+        xy   = [cntr[0] - self.getLength()/2., cntr[1]-hght/2.]
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->     xy:", xy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        self.setDebug(False)
+
+        Patch = patches.Rectangle(xy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor='green')
+
+        axs.add_patch(Patch)
+                                   
+        
+                                   
 
 
 #--------  Derived classes  --------  --------  --------  --------  --------
@@ -5369,7 +5405,7 @@ class RPLCswitch(BeamLineElement):
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         self.setStrt2End(np.array([0., 0., 0.]))
-        self.setRot2LbEnd(self.getRot2LbStrt())
+        self.setRot2LbEnd(self.calcRot2LbEnd())
 
         self.set3Drotation(_3Drotation)
         
@@ -5450,7 +5486,40 @@ class RPLCswitch(BeamLineElement):
                                  ])
                              
         self._TrnsMtrx = TrnsMtrx
+
+    def calcRot2LbEnd(self):
+        if self.getDebug():
+            print(" RPLC(BeamLineElement).calcRot2LbEnd; start:")
+
+        iLst  = BeamLineElement.getinstances()[ \
+                                len(BeamLineElement.getinstances())-2 \
+                                               ]
+            
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> vStrt(iLst), vStrt:", \
+                          iLst.getvStrt(), self.getvStrt())
+                
+        PhiLst   = iLst.getvStrt()[0][1]
+        Phi      = self.getvStrt()[0][1]
+        if self.getDebug():
+            print("     ----> PhiLst, Phi:", PhiLst, Phi)
+                
+        dPhi     = Phi - PhiLst
+        cdPhi    = mth.cos(dPhi)
+        sdPhi    = mth.sin(dPhi)
+
+        RotMtrx = np.array([ \
+                             [ cdPhi,   sdPhi, 0.], \
+                             [-sdPhi,   cdPhi, 0.], \
+                             [  0.,        0., 1.] \
+                            ])
         
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rotation matrix: \n", RotMtrx)
+                
+        return RotMtrx
 
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)

@@ -39,7 +39,8 @@ Created on Thu 22Apr24;11:04: Version history:
 @author: kennethlong
 """
 
-import Particle as Prtcl
+import Particle        as Prtcl
+import BeamLineElement as BLE
 
 #--------  visualise class  --------
 class visualise(object):
@@ -150,8 +151,28 @@ class visualise(object):
 
         n2plt = min(nPrtcl, len(Prtcl.Particle.getParticleInstances()))
         for iPrtcl in range(1,n2plt):
-            Prtcl.Particle.getParticleInstances()[iPrtcl+1].visualise( \
+            Prtcl.Particle.getParticleInstances()[iPrtcl].visualise( \
                             self.getCoordSys(), self.getProjection(), axs)
+
+    def BeamLine(self, axs):
+        if self.getDebug():
+            print(" visualise.BeamLine: start")
+            print("     ----> Coordinate system:", \
+                  self.getCoordSys())
+            print("     ----> Projection:", \
+                  self.getProjection())
+
+        for iBLE in BLE.BeamLineElement.getinstances()[1:]:
+            if isinstance(iBLE, BLE.Facility):
+                continue
+            if not isinstance(iBLE, BLE.Source):
+                continue
+            
+            if self.getDebug():
+                print("     ----> Visualise:", iBLE.getName())
+
+            iBLE.visualise(axs)
+        
 
 #--------  Exceptions:
 class badParameter(Exception):

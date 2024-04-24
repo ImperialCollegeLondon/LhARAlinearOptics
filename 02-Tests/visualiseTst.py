@@ -37,10 +37,7 @@ EndOfFile = ibmIOr.readBeamDataRecord()
 
 print(BL.BeamLine.getinstance())
 
-print(Prtcl.Particle.getParticleInstances()[0])
-exit()
-
-for i in range(2):
+for i in range(1001):
     ibmIOr.readBeamDataRecord()
 Prtcl.Particle.fillPhaseSpaceAll()
 
@@ -111,8 +108,10 @@ with PdfPages(plotFILE) as pdf:
     fig.suptitle(Ttl, fontdict=font)
 
     ivisRPLCx.setDebug(True)
-    ivisRPLCx.Particles(axs[0], 100)
-    ivisRPLCy.Particles(axs[1], 100)
+    ivisRPLCx.Particles(axs[0], 1000)
+    ivisRPLCx.setDebug(True)
+    ivisRPLCx.BeamLine(axs[0])
+    ivisRPLCy.Particles(axs[1], 1000)    
     ivisRPLCx.setDebug(False)
     
     pdf.savefig()
@@ -134,8 +133,8 @@ with PdfPages(plotFILE) as pdf:
     fig.suptitle(Ttl, fontdict=font)
     
     ivisLabx.setDebug(True)
-    ivisLabx.Particles(axs[0], 100)
-    ivisLaby.Particles(axs[1], 100)
+    ivisLabx.Particles(axs[0], 1000)
+    ivisLaby.Particles(axs[1], 1000)
     ivisLabx.setDebug(False)
     
     pdf.savefig()

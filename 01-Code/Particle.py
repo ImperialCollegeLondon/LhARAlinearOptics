@@ -680,6 +680,10 @@ class Particle:
             Success = self.setRPLCPhaseSpace(PhsSpc)
 
             RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
+            if self.getDebug():
+                print("         ----> Rotation matrix:", \
+                      RotMtrx)
+            
             drLab   = np.matmul(RotMtrx, PhsSpc[0])
             pLab    = np.matmul(RotMtrx, PhsSpc[1])
 
@@ -824,7 +828,6 @@ class Particle:
         return TrcSpc
 
     def visualise(self, CoordSys, Projection, axs):
-        self.setDebug(True)
         if self.getDebug():
             print(" Particle.visualise: start")
             print("     ----> Coordinate system:", CoordSys)
@@ -851,7 +854,6 @@ class Particle:
                 axl  = "y"
                 
             for RrOut in self.getLabPhaseSpace():
-                print(RrOut)
                 xory.append(RrOut[0][iCrd])
                 sorz.append(RrOut[0][2])
             
@@ -859,13 +861,12 @@ class Particle:
             print("     ----> sorz:", sorz)
             print("     ----> xory:", xory)
 
-        if len(sorz) > len(xory):
+        if len(ReferenceParticle.getinstance().getsOut()) > len(xory):
             axs.plot(sorz[0:len(xory)], xory, color='red', linewidth='1')
         else:
             axs.plot(sorz, xory, color='blue', linewidth='1')
         axs.set_xlabel('s (m)')
         axs.set_ylabel(axl + ' (m)')
-        self.setDebug(False)
 
         
 #--------  I/o methods:
@@ -1427,7 +1428,6 @@ class ReferenceParticle(Particle):
         return Success
 
     def setReferenceParticleAtDrift(self, iBLE=None):
-        self.setDebug(True)
         nRcrds  = len(self.getsIn())
         if self.getDebug():
             print(" --------  --------  --------  //", \
@@ -1456,20 +1456,9 @@ class ReferenceParticle(Particle):
                    "         ---->   sIn:", self.getsIn()[-1])
                 
         RrIn  = self.getRrOut()[nRcrds-1]
-        Mmtm  = mth.sqrt(                             \
-                    self.getPrOut()[nRcrds-1][0]**2 + \
-                    self.getPrOut()[nRcrds-1][1]**2 + \
-                    self.getPrOut()[nRcrds-1][2]**2   \
-                        )
-        cx    = self.getPrOut()[nRcrds-1][0] / Mmtm
-        cy    = self.getPrOut()[nRcrds-1][1] / Mmtm
-        cz    = self.getPrOut()[nRcrds-1][2] / Mmtm
-        RrOut = np.array([ \
-                           RrIn[0] + cx*iBLE.getLength(), \
-                           RrIn[1] + cy*iBLE.getLength(), \
-                           RrIn[2] + cz*iBLE.getLength(), \
-                           0.                             \
-                          ])
+        delR = BLE.BeamLineElement.getinstances()[nRcrds+1].getStrt2End()
+        delR = np.append(delR, 0.)
+        RrOut = RrIn + delR
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1482,8 +1471,10 @@ class ReferenceParticle(Particle):
             print( \
                    "         ----> RrOut:", self.getRrOut()[-1])
         
-        PrIn  = self.getPrOut()[nRcrds-1]
-        PrOut = PrIn
+        PrIn    = self.getPrOut()[nRcrds-1]
+        rot2lab = BLE.BeamLineElement.getinstances()[nRcrds+1].getRot2LbEnd()
+        PrOut   = np.matmul(rot2lab, PrIn[0:3])
+        PrOut   = np.append(PrOut, PrIn[3])
         Success = self.setPrIn(PrIn)
         if not Success:
             raise fail2setReferenceParticle("PrIn")
@@ -1496,8 +1487,10 @@ class ReferenceParticle(Particle):
             print( \
                    "         ----> PrOut:", self.getPrOut()[-1])
         
-        Rot2LabIn  = self.getRot2LabOut()[nRcrds-1]
-        Rot2LabOut = Rot2LabIn
+        Rot2LabIn  = \
+            BLE.BeamLineElement.getinstances()[nRcrds+1].getRot2LbStrt()
+        Rot2LabOut = \
+            BLE.BeamLineElement.getinstances()[nRcrds+1].getRot2LbEnd()
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
@@ -1535,7 +1528,6 @@ class ReferenceParticle(Particle):
             print(" --------  --------  --------  //", \
                   "  --------  --------  --------")
         
-        self.setDebug(False)
         return Success
 
     def visualise(self, CoordSys, Projection, axs):

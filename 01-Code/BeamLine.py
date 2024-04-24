@@ -907,27 +907,12 @@ class BeamLine(object):
         
     def checkConsistency(self):
         ConsChk = False
-        s       = 0.
-        if self._Element[0].getrStrt()[2] != 0.:
-            return
-        for iBLE in BLE.BeamLineElement.getinstances():
-            if isinstance(iBLE, BLE.Drift):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.FocusQuadrupole):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.DefocusQuadrupole):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.Solenoid):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.GaborLens):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.SectorDipole):
-                s += iBLE.getLength()
 
-        iBLElast = BLE.BeamLineElement.getinstances() \
-                            [len(BLE.BeamLineElement.getinstances())-1]
-        dif = iBLElast.getrStrt()[2] + iBLElast.getLength() - s
+        iBLE = BLE.BeamLineElement.getinstances()[-1]
+        iRfP = Prtcl.ReferenceParticle.getinstance()
 
+        dif = iBLE.getrStrt()[2] - iRfP.getRrIn()[-1][2]
+        
         if abs(dif) > 1E-6:
             return ConsChk
 
@@ -1059,7 +1044,6 @@ class BeamLine(object):
 
     @classmethod
     def readBeamLine(cls, beamlineFILE=None):
-        cls.setDebug(True)
         if cls.getDebug():
             print(" BeamLine.readBeamLine starts.")
 
@@ -1237,7 +1221,6 @@ class BeamLine(object):
         if cls.getDebug():
             print(" <---- BeamLine.writeBeamLine done.")
 
-        cls.setDebug(False)
         return EoF
 
 #--------  Utilities:
