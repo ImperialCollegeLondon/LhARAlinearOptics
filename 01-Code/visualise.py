@@ -163,15 +163,14 @@ class visualise(object):
                   self.getProjection())
 
         for iBLE in BLE.BeamLineElement.getinstances()[1:]:
-            if isinstance(iBLE, BLE.Facility):
-                continue
-            if not isinstance(iBLE, BLE.Source):
+            if isinstance(iBLE, BLE.Facility) or \
+               isinstance(iBLE, BLE.Drift):
                 continue
             
             if self.getDebug():
                 print("     ----> Visualise:", iBLE.getName())
 
-            iBLE.visualise(axs)
+            iBLE.visualise(axs, self.getCoordSys(), self.getProjection())
         
 
 #--------  Exceptions:

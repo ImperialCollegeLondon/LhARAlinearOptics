@@ -611,40 +611,52 @@ class BeamLineElement:
                 print(" BeamLineElement.removeInstance: instance", \
                       inst.Name, "not in BeamLineElement.Instances!")
                 
-    def visualise(self, axs):
-        self.setDebug(True)
+    def visualise(self, axs, CoordSys, Proj):
         if self.getDebug():
             print(" BeamLineElement.visualise: start")
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
         cntr = self.getrStrt() + self.getStrt2End()/2.
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
         wdth = self.getLength()
-        if wdth == 0.: wdth = 0.1
-        hght = 0.1
+        if wdth == 0.: wdth = (xlim[1] - xlim[0]) / 100.
+        hght = (ylim[1] - ylim[0]) / 10.
         angl = 0.
         abt  = 'center'
-        xy   = [cntr[0] - self.getLength()/2., cntr[1]-hght/2.]
+            
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "ys":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "yz":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        
 
         if self.getDebug():
             print("     ----> Centre:", cntr)
-            print("     ---->     xy:", xy)
+            print("     ---->    sxy:", sxy)
             print("     ---->   wdth:", wdth)
             print("     ---->   hght:", hght)
             print("     ---->   angl:", angl)
             print("     ---->    abt:", abt)
             
-        self.setDebug(False)
-
-        Patch = patches.Rectangle(xy, wdth, hght, \
+        Patch = patches.Rectangle(sxy, wdth, hght, \
                                   angle=angl, \
                                   rotation_point=abt, \
-                                  facecolor='green')
+                                  facecolor=('green', 0.5), \
+                                  zorder=2)
 
         axs.add_patch(Patch)
                                    
-        
-                                   
+        if self.getDebug():
+            print(" <---- BeamLineElement.visualise: ends.")
 
 
 #--------  Derived classes  --------  --------  --------  --------  --------
@@ -1292,7 +1304,68 @@ class Aperture(BeamLineElement):
             
         return _Rprime
 
-    
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" Aperture(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        ytot  = (ylim[1]-ylim[0])
+        yzero = abs(ylim[0])/ytot
+        if self.getDebug():
+            print("     ----> xlim, ylim:", xlim, ylim)
+            print("     ----> ytot, yzero:", ytot, yzero)
+            
+
+        Typ  = self.getType()
+        xmin = self.getParams()[0]
+        ymin = self.getParams()[0]
+        if Typ == 1:
+            ymin = self.getParams()[1]
+        if self.getDebug():
+            print("     ----> xmin, ymin:", xmin, ymin)
+            
+        if CoordSys == "RPLC": 
+            sz = cntr[2]
+            if Proj == "xs":
+                xyup  = yzero + xmin/ytot
+                xydn  = yzero - xmin/ytot
+            elif Proj == "ys":
+                xyup  = yzero + ymin/ytot
+                xydn  = yzero - ymin/ytot
+        elif CoordSys == "Lab": 
+            sz = cntr[2]
+            if Proj == "xz":
+                xyup  = yzero + xmin/ytot
+                xydn  = yzero - xmin/ytot
+            elif Proj == "yz":
+                xyup  = yzero + ymin/ytot
+                xydn  = yzero - ymin/ytot
+        
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->     sz:", sz)
+            print("     ---->   xyup:", xyup)
+            print("     ---->   xydn:", xydn)
+            
+        axs.axvline(sz, xyup, 1., \
+                    color="black", \
+                    linewidth=1, \
+                    zorder=2)
+        axs.axvline(sz, xydn, 0., \
+                    color="black", \
+                    linewidth=1, \
+                    zorder=2)
+                                   
+        if self.getDebug():
+            print(" <---- Aperture(BeamLineElement).visualise: ends.")
+
+        
 #--------  I/o methods:
     def writeElement(self, dataFILE):
         if self.getDebug():
@@ -1706,7 +1779,51 @@ class FocusQuadrupole(BeamLineElement):
 
         return Strn
     
-    
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" FocusQuadrupole(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = ylim[1]/2.
+        angl = 0.
+        abt  = 'center'
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                sxy   = [cntr[2], 0.]
+            elif Proj == "ys":
+                sxy   = [cntr[2], ylim[0]/2.]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                sxy   = [cntr[2], 0.]
+            elif Proj == "yz":
+                sxy   = [cntr[2], ylim[0]/2.]
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Rectangle(sxy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor=('darkgreen'), \
+                                  zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- FocusQuadrupole(BeamLineElement).visualise: ends.")
+
+        
 #--------  I/o methods:
     def writeElement(self, dataFILE):
         if self.getDebug():
@@ -2094,6 +2211,51 @@ class DefocusQuadrupole(BeamLineElement):
             print(" <---- Done.")
 
         return Strn
+
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" DefocusQuadrupole(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = abs(ylim[0])/2.
+        angl = 0.
+        abt  = 'center'
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                sxy   = [cntr[2], ylim[0]/2.]
+            elif Proj == "ys":
+                sxy   = [cntr[2], 0.]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                sxy   = [cntr[2], ylim[0]/2.]
+            elif Proj == "yz":
+                sxy   = [cntr[2], 0.]
+        
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Rectangle(sxy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor=('darkgreen'), \
+                                  zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- DefocusQuadrupole(BeamLineElement).visualise: ends.")
 
     
 #--------  I/o methods:
@@ -4499,6 +4661,46 @@ class Source(BeamLineElement):
 
         return TrcSpc
 
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" Source(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt() + self.getStrt2End()/2.
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        if wdth == 0.: wdth = (xlim[1] - xlim[0]) / 100.
+        hght = (ylim[1] - ylim[0]) / 10.
+        angl = 0.
+        abt  = 'center'
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                xy   = [cntr[2], cntr[0]]
+            elif Proj == "ys":
+                xy   = [cntr[2], cntr[1]]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                xy   = [cntr[2], cntr[0]]
+            elif Proj == "yz":
+                xy   = [cntr[2], cntr[1]]
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->     xy:", xy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Ellipse(xy, wdth, hght, \
+                                facecolor='gold', \
+                                zorder=2)
+
+        axs.add_patch(Patch)
+                                   
     
 #--------  I/o methods:
     def writeElement(self, dataFILE):

@@ -26,7 +26,8 @@ print("========  visualise: tests start  ========")
 ##! Now create pointer to input data file:
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
-                             '99-Scratch/LhARA-Gauss-Gabor.dat')
+                             '99-Scratch/LION-test.dat')
+#                             '99-Scratch/LhARA-Gauss-Gabor.dat')
 #                             '11-Parameters/Data4Tests.dat')
 
 #.. Open data file and read first record to set up geometry
@@ -108,12 +109,9 @@ with PdfPages(plotFILE) as pdf:
     fig.suptitle(Ttl, fontdict=font)
 
     ivisRPLCx.Particles(axs[0], 1000)
-    """
-    ivisRPLCx.setDebug(True)
     ivisRPLCx.BeamLine(axs[0])
-    ivisRPLCx.setDebug(False)
-    """
     ivisRPLCy.Particles(axs[1], 1000)    
+    ivisRPLCy.BeamLine(axs[1])
     
     pdf.savefig()
     plt.close()
@@ -133,10 +131,10 @@ with PdfPages(plotFILE) as pdf:
     Ttl = "Test lab coordinate system visualise"
     fig.suptitle(Ttl, fontdict=font)
     
-    ivisLabx.setDebug(True)
     ivisLabx.Particles(axs[0], 1000)
+    ivisLabx.BeamLine(axs[0])
     ivisLaby.Particles(axs[1], 1000)
-    ivisLabx.setDebug(False)
+    ivisLaby.BeamLine(axs[1])
     
     pdf.savefig()
     plt.close()
