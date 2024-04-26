@@ -857,21 +857,20 @@ class Particle:
             iAddr = -1
             for RrOut in self.getLabPhaseSpace():
                 xory.append(RrOut[0][iCrd])
+                sorz.append(RrOut[0][2])
 
+                """
                 zPrtcl    = RrOut[0][2]
-                sorzmin   = zPrtcl
                 iAddr    += 1
-                sRefPrtcl = ReferenceParticle.getinstance().getsOut()[iAddr]
-                iBLE0 = BLE.BeamLineElement.getinstances()[iAddr]
-                iBLE1 = BLE.BeamLineElement.getinstances()[iAddr+1]
-                if isinstance(iBLE0, BLE.Aperture):
-                    sorzmin = min(zPrtcl, sRefPrtcl)
-                    print(" sOut:", sRefPrtcl)
-                    print(" BLE i, i+1 name:", iBLE0.getName(), iBLE1.getName())
-                    print(" zPrtcl:", zPrtcl)
-                    print(" sorzmin:", sorzmin)
 
-                sorz.append(sorzmin)
+                iBLE0 = BLE.BeamLineElement.getinstances()[iAddr+1]
+                iBLE1 = None
+                if len(BLE.BeamLineElement.getinstances()) > iAddr+2:
+                    iBLE1 = BLE.BeamLineElement.getinstances()[iAddr+2]
+                if iBLE1 != None:
+                    if zPrtcl > iBLE1.getrStrt()[2]:
+                        zPrtcl = iBLE1.getrStrt()[2]
+                """
 
         if self.getDebug():
             print("     ----> sorz:", sorz)
@@ -879,13 +878,9 @@ class Particle:
 
         if len(ReferenceParticle.getinstance().getsOut()) > len(xory):
             axs.plot(sorz[0:len(xory)], xory, color='red', linewidth='1')
-            if CoordSys == "Lab":
-                if sorz[len(xory)-1] > 1.753133:
-                    print("     ---->", sorz[-1])
-                    print("     ----> sorz:", sorz, len(sorz))
-                    print("     ----> xory:", xory, len(xory))
         else:
             axs.plot(sorz, xory, color='blue', linewidth='1', zorder=2)
+            
         axs.set_xlabel('s (m)')
         axs.set_ylabel(axl + ' (m)')
 
