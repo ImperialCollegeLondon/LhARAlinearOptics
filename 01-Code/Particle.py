@@ -877,9 +877,9 @@ class Particle:
             print("     ----> xory:", xory)
 
         if len(ReferenceParticle.getinstance().getsOut()) > len(xory):
-            axs.plot(sorz[0:len(xory)], xory, color='red', linewidth='1')
+            axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
         else:
-            axs.plot(sorz, xory, color='blue', linewidth='1', zorder=2)
+            axs.plot(sorz, xory, color='darkgray', linewidth='0.5', zorder=2)
             
         axs.set_xlabel('s (m)')
         axs.set_ylabel(axl + ' (m)')
@@ -1582,7 +1582,7 @@ class ReferenceParticle(Particle):
             print("     ----> sorz:", sorz)
             print("     ----> xory:", xory)
         
-        axs.plot(sorz, xory, color='black', linewidth='1', \
+        axs.plot(sorz, xory, color='black', linewidth='0.5', \
                  linestyle='dashed', zorder=3)
         axs.set_xlabel('s (m)')
         axs.set_ylabel(axl + ' (m)')
