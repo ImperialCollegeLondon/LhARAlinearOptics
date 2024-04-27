@@ -130,6 +130,7 @@ with PdfPages(plotFILE) as pdf:
     # add an artist, in this case a nice label in the middle...
     Ttl = "Test lab coordinate system visualise"
     fig.suptitle(Ttl, fontdict=font)
+    axs[1].set_ylim(-1., 6.)
     
     ivisLabx.Particles(axs[0], 1000)
     ivisLabx.BeamLine(axs[0])
