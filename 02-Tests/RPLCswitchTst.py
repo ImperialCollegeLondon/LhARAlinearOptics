@@ -41,13 +41,18 @@ BLE.BeamLineElement.cleaninstances()
 BLI  = BL.BeamLine(filename)
 print(BLI)
 
+RPLCswitchTest += 1
+print()
+print("RPLCswitchTest:", RPLCswitchTest, \
+      " create valid instance.")
+
 #.. Create valid instance:
 rStrt = np.array([0.,0.,0.])
 vStrt = np.array([[np.pi/2.,0.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
 dvStrt = np.array([[0.,0.],[0.,0.]])
 RPLCswtch = BLE.RPLCswitch("ValidRPLCswitch", rStrt, vStrt, drStrt, dvStrt, \
-                           True)
+                           False)
     
 #.. __repr__
 print("    __repr__:")

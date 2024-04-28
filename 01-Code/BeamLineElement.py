@@ -5896,7 +5896,7 @@ class RPLCswitch(BeamLineElement):
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
         self.setStrt2End(np.array([0., 0., 0.]))
-        self.setRot2LbEnd(self.calcRot2LbEnd())
+        self.setRot2LbEnd(self.getRot2LbStrt())
 
         self.set3Drotation(_3Drotation)
         
@@ -5961,7 +5961,8 @@ class RPLCswitch(BeamLineElement):
             PhiLst   = iLst.getvStrt()[0][1]
             Phi      = self.getvStrt()[0][1]
             if self.getDebug():
-                print("     ----> PhiLst, Phi:", PhiLst, Phi)
+                print("     ----> PhiLst:", PhiLst, \
+                      "\n              Phi:", Phi)
                 
             dPhi     = Phi - PhiLst
             cdPhi    = mth.cos(dPhi)
@@ -5976,6 +5977,12 @@ class RPLCswitch(BeamLineElement):
                                   [  0.,    0.,   0.,       0., 0., 1.]  \
                                  ])
                              
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- RPLCswitch(BeamLineElement): ", \
+                      "returns Transfer matrix: \n", \
+                      TrnsMtrx)
+                
         self._TrnsMtrx = TrnsMtrx
 
     def calcRot2LbEnd(self):
@@ -5994,7 +6001,8 @@ class RPLCswitch(BeamLineElement):
         PhiLst   = iLst.getvStrt()[0][1]
         Phi      = self.getvStrt()[0][1]
         if self.getDebug():
-            print("     ----> PhiLst, Phi:", PhiLst, Phi)
+            print("     ----> PhiLst:", PhiLst, \
+                  "              Phi:", Phi)
                 
         dPhi     = Phi - PhiLst
         cdPhi    = mth.cos(dPhi)
@@ -6115,6 +6123,11 @@ class RPLCswitch(BeamLineElement):
                 print(" RPLCswitch(BeamLineElement).Transport: \n", \
                       "     ----> input trace space:", _R)
             print("          ----> Outside:", self.OutsideBeamPipe(_R))
+            print("          ----> 3D-rotatation:", self.get3Drotation())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("         ----> Transfer matrix: \n", \
+                      self.getTransferMatrix())
+
             
         if self.OutsideBeamPipe(_R):
             _Rprime = None

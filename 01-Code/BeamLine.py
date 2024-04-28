@@ -911,10 +911,15 @@ class BeamLine(object):
         iBLE = BLE.BeamLineElement.getinstances()[-1]
         iRfP = Prtcl.ReferenceParticle.getinstance()
 
-        dif = iBLE.getrStrt()[2] - iRfP.getRrIn()[-1][2]
+        if len(iBLE.getrStrt()) < 3 and \
+           isinstance(iRfP.getRrIn(), np.ndarray):
+            dif = iBLE.getrStrt()[2] - iRfP.getRrIn()[-1][2]
         
-        if abs(dif) > 1E-6:
+            if abs(dif) > 1E-6:
+                return ConsChk
+        else:
             return ConsChk
+
 
         return True
 
