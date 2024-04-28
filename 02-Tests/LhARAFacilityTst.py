@@ -29,7 +29,6 @@ print()
 print("LhARAFacilityTest:", LhARAFacilityTest, \
       " check if class is a singleton.")
 LhARAFclty  = BL.BeamLine(filename)
-Prtcl.ReferenceParticle.cleaninstance()
 LhARAFclty1 = BL.BeamLine(filename)
 print("    LhARAFclty singleton test:", id(LhARAFclty), id(LhARAFclty1), \
       id(LhARAFclty)-id(LhARAFclty1))

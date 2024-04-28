@@ -125,7 +125,7 @@ mu0                = constants_instance.mu0()
 class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
-    _SrcTrcSpc    = None
+    _SrcTrcSpc     = None
 
 
 #--------  "Built-in methods":
@@ -599,11 +599,13 @@ class BeamLine(object):
                    kphi   != None:
                     NewElement = True
                     if cls.getDebug():
-                        print("                   <---- jtheta, jphi, ktheta, kphi:", \
+                        print("                   <---- ", \
+                              "jtheta, jphi, ktheta, kphi:", \
                               jtheta, jphi, ktheta, kphi)
                 else:
                     if cls.getDebug():
-                        print("                   ----> jtheta, jphi, ktheta, kphi:", \
+                        print("                   ----> ", \
+                              "jtheta, jphi, ktheta, kphi:", \
                               jtheta, jphi, ktheta, kphi)
                     NewElement = False
                     continue

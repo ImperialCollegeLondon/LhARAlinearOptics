@@ -11,7 +11,7 @@ Tests:
  - BeamLineTst.py                     - OK
  - BeamTst.py                         - OK
  - CylindricalRFCavityTst.py          - OK
- - DRACOfacilityTst.py                - OK (Funny, says BL is inconsisent)
+ - DRACOfacilityTst.py                - OK
  - DefocusQuadTst.py                  - OK
  - DipoleTst.py                       - OK
  - DriftTst.py                        - OK
@@ -19,9 +19,9 @@ Tests:
  - FacilityTst.py                     - OK
  - FocusQuadTst.py                    - OK
  - GaborLensTst.py                    - OK
- - LIONfacilityTst.py                 - OK (Funny, says BL is inconsisent)
- - LaTexTst.py                        -
- - LhARAFacility-from-datafile-Tst.py -
+ - LIONfacilityTst.py                 - OK
+ - LaTexTst.py                        - OK
+ - LhARAFacility-from-datafile-Tst.py - OK
  - LhARAFacilityTst.py                -
  - ParticleTst.py                     -
  - PhysicalConstantsTst.py            -
