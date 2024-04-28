@@ -919,11 +919,13 @@ class BeamLine(object):
             print("     ----> BLE name:", \
                   iBLE.getName(), \
                   iBLE.getrStrt()[2])
-            print("     ----> Ref prtcl RrIn[-1][2]:", \
-                  iRfP.getRrIn()[-1][2])
+            if len(iRfP.getRrIn()) > 0:
+                print("     ----> Ref prtcl RrIn[-1][2]:", \
+                      iRfP.getRrIn()[-1][2])
 
         if len(iBLE.getrStrt()) == 3 and \
-           isinstance(iRfP.getRrIn(), list):
+           isinstance(iRfP.getRrIn(), list) and \
+           len(iRfP.getRrIn()) > 0:
             dif = iBLE.getrStrt()[2] - iRfP.getRrIn()[-1][2]
         
             if self.getDebug():

@@ -22,23 +22,38 @@ Tests:
  - LIONfacilityTst.py                 - OK
  - LaTexTst.py                        - OK
  - LhARAFacility-from-datafile-Tst.py - OK
- - LhARAFacilityTst.py                -
- - ParticleTst.py                     -
- - PhysicalConstantsTst.py            -
- - QuadDoubletTst.py                  -
- - QuadTripletTst.py                  -
- - RPLCswitchTst.py                   -
- - ReferenceParticleTst.py            -
- - RunSimulationTst.py                -
- - SimulationTst.py                   -
- - SolenoidTst.py                     -
- - SourceTst.py                       -
- - TestWrite.py                       -
- - TestRead.py                        -
- - extrapolatedBeamTst.py             -
- - visualiseTst.py                    -
- - testGitRepoId.py                   -
- - OctupoleTst.py                     -
+ - LhARAFacilityTst.py                - OK
+ - ParticleTst.py                     - OK
+ - PhysicalConstantsTst.py            - OK
+ - QuadDoubletTst.py                  - OK
+ - QuadTripletTst.py                  - OK
+ - RPLCswitchTst.py                   - OK
+ - ReferenceParticleTst.py            - OK
+ - RunSimulationTst.py                - OK
+ - SimulationTst.py                   - OK
+ - SolenoidTst.py                     - OK
+ - SourceTst.py                       - OK
+ - TestWrite.py                       - OK
+ - TestRead.py                        - OK
+ - extrapolatedBeamTst.py             - OK
+ - visualiseTst.py                    - OK
+ - testGitRepoId.py                   - Fail
+ - OctupoleTst.py                     - Fail
+ 
+Scripts:
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - plotTrajectory.py       - OK
+ - plotextrapolatedBeam.py - OK
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - Fail
 
 
 --------  --------  --------  --------  --------  --------  --------  --------
