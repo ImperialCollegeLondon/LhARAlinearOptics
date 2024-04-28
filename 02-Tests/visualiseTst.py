@@ -27,8 +27,8 @@ print("========  visualise: tests start  ========")
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
 #                             '99-Scratch/LION-test.dat')
-                             '99-Scratch/LhARA-Gauss-Gabor-back.dat')
-#                             '11-Parameters/Data4Tests.dat')
+#                             '99-Scratch/LhARA-Gauss-Gabor.dat')
+                             '11-Parameters/Data4Tests.dat')
 
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)
