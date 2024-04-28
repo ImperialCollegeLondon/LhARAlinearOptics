@@ -1,0 +1,121 @@
+--------  --------  --------  --------  --------  --------  --------  28Apr24
+Made visualisation work.  Off-axis element handling needs to be generalised.
+Works for vertical bends, but, will not work for horizontal bends.  Now need
+to run through tests and scripts.
+
+Scripts:
+ - runBeamSim.py             - OK
+ - readBeamSim.py            - OK
+ - plotBeam.py               - OK
+ - plotextrapolatedBeam.py   - OK
+ - LhARAMagnetTable.py       - OK
+ - RunDRACOsimulation.py     - OK
+ - RunLIONsimulation.py      - OK
+ - RunLhARAsimulation.py     - OK
+ - ReadDRACOsimu.py          - OK
+ - ReadLIONsimu.py           - OK
+ - ReadLhARAsimu.py          - OK
+ - plotQuadTriplet.py        - Fails
+ - plotTrajectory.py         - Fails
+
+Tests:
+ - ApertureTst.py            - OK
+ - BeamIOTst-wrt.py          - OK
+ - BeamIOTst-rd.py           - OK
+ - BeamLineElementTst.py     - OK
+ - BeamLineTst.py            - OK
+ - BeamTst.py                - OK
+ - CylindricalRFCavityTst.py - OK
+ - DRACOfacilityTst.py       - OK
+ - DefocusQuadTst.py         - OK
+ - DipoleTst.py              - OK
+ - DriftTst.py               - OK
+ - ExpSourceTst.py           - OK
+ - FacilityTst.py            - OK
+ - FocusQuadTst.py           - OK
+ - GaborLensTst.py           - OK
+ - LIONfacilityTst.py        - OK
+ - LaTexTst.py               - OK
+ - LhARAFacilityTst.py       - OK
+ - OctupoleTst.py            - Failed
+ - ParticleTst.py            - OK
+ - PhysicalConstantsTst.py   - OK
+ - QuadDoubletTst.py         - OK
+ - QuadTripletTst.py         - OK
+ - RPLCswitchTst.py          - OK
+ - ReferenceParticleTst.py   - OK
+ - RunSimulationTst.py       - OK
+ - SimulationTst.py          - OK
+ - SolenoidTst.py            - OK
+ - SourceTst.py              - OK
+ - TestWrite.py              - OK
+ - TestRead.py               - OK
+ - extrapolatedBeamTst.py    - OK
+ - testGitRepoId.py          - Fails
+
+--------  --------  --------  --------  --------  --------  --------  17Apr24
+Total pain, worked through the addressing in Beam class.  Think it now works
+OK.  Next need to make same pass through extrapolateBeam derived class.
+
+--------  --------  --------  --------  --------  --------  --------  16Apr24
+Have worked through Beam class initialisation and, I think, corrected the
+addressing issues as far as initialiseSums.  Need to continue with routine
+checks.  Comminicate with Josie.
+
+--------  --------  --------  --------  --------  --------  --------  15Apr24
+Have first version of covariance matrix extrapolation, but, results look wrong.
+Addressing and/or numerical issues.  Go through Beam.py step by step.  Inlist
+Josie's support.
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py                     -
+ - BeamIOTst-rd.py                    -
+ - BeamIOTst-wrt.py                   -
+ - BeamLineElementTst.py              -
+ - BeamLineTst.py                     -
+ - BeamTst.py                         -
+ - CylindricalRFCavityTst.py          -
+ - DRACOfacilityTst.py                -
+ - DefocusQuadTst.py                  -
+ - DipoleTst.py                       -
+ - DriftTst.py                        -
+ - ExpSourceTst.py                    -
+ - FacilityTst.py                     -
+ - FocusQuadTst.py                    -
+ - GaborLensTst.py                    -
+ - LIONfacilityTst.py                 -
+ - LaTexTst.py                        -
+ - LhARAFacility-from-datafile-Tst.py -
+ - LhARAFacilityTst.py                -
+ - ParticleTst.py                     -
+ - PhysicalConstantsTst.py            -
+ - QuadDoubletTst.py                  -
+ - QuadTripletTst.py                  -
+ - RPLCswitchTst.py                   -
+ - ReferenceParticleTst.py            -
+ - RunSimulationTst.py                -
+ - SimulationTst.py                   -
+ - SolenoidTst.py                     -
+ - SourceTst.py                       -
+ - TestWrite.py                       -
+ - TestRead.py                        -
+ - extrapolatedBeamTst.py             -
+ - visualiseTst.py                    -
+ - testGitRepoId.py                   -
+ - OctupoleTst.py                     -
+
+Scripts:
+ - runBeamSim.py           -
+ - readBeamSim.py          -
+ - RunDRACOsimulation.py   -
+ - ReadDRACOsimu.py        -
+ - RunLIONsimulation.py    -
+ - ReadLIONsimu.py         -
+ - RunLhARAsimulation.py   -
+ - ReadLhARAsimu.py        -
+ - plotBeam.py             -
+ - plotTrajectory.py       -
+ - plotextrapolatedBeam.py -
+ - LhARAMagnetTable.py     -
+ - plotQuadTriplet.py      -
