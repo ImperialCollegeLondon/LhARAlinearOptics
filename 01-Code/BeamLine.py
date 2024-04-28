@@ -906,15 +906,32 @@ class BeamLine(object):
         cls._Element.append(iBLE)
         
     def checkConsistency(self):
+        if self.getDebug():
+            print(" BeamLine.checkConsistency: start")
+            
         ConsChk = False
 
         iBLE = BLE.BeamLineElement.getinstances()[-1]
         iRfP = Prtcl.ReferenceParticle.getinstance()
+        if self.getDebug():
+            print("     ----> BLE name:", \
+                  iBLE.getName(), \
+                  iBLE.getrStrt()[2])
+            print("     ----> Ref prtcl RrIn[-1][2]:", \
+                  iRfP.getRrIn()[-1][2])
 
-        if len(iBLE.getrStrt()) < 3 and \
-           isinstance(iRfP.getRrIn(), np.ndarray):
+        if len(iBLE.getrStrt()) == 3 and \
+           isinstance(iRfP.getRrIn(), list):
             dif = iBLE.getrStrt()[2] - iRfP.getRrIn()[-1][2]
         
+            if self.getDebug():
+                print("     ----> BLE name:", \
+                      iBLE.getName(), \
+                      iBLE.getrStrt()[2])
+                print("     ----> Ref prtcl RrIn[-1][2]:", \
+                      iRfP.getRrIn()[-1][2])
+                print("     ----> dif:", dif)
+
             if abs(dif) > 1E-6:
                 return ConsChk
         else:
