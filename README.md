@@ -29,7 +29,12 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
 ## Updating to new install and set-up -- read this:
  * git clone git@github.com:ImperialCollegeLondon/LhARAlinearOptics.git
  * cd LhARAlineaOptics
- * python3 python3 -m venv venv
+ * Set up a virtual environment.  Possible commands:
+   - python3 -m venv venv
+   - virtualenv venv <br />
+   
+   Note that you may need to install the virtualenv package for your linux
+   distribution.
  * source ./venv/bin/activate
  * pip install -r ./requirements.txt
  
