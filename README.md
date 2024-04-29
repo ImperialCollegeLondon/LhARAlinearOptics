@@ -31,6 +31,6 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
  * cd LhARAlineaOptics
  * python3 python3 -m venv venv
  * source ./venv/bin/activate
- * pip install -m ./requirements.txt
+ * pip install -r ./requirements.txt
  
  * source setup.bash                
