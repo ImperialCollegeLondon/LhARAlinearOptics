@@ -25,3 +25,12 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
 
 ## History
  * January 2024:  Code tidied for "users"/co-developers!
+
+## Updating to new install and set-up -- read this:
+ * git clone git@github.com:ImperialCollegeLondon/LhARAlinearOptics.git
+ * cd LhARAlineaOptics
+ * python3 python3 -m venv venv
+ * source ./venv/bin/activate
+ * pip install -m ./requirements.txt
+ 
+ * source setup.bash                
