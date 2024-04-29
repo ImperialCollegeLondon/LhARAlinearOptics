@@ -1,4 +1,58 @@
 --------  --------  --------  --------  --------  --------  --------  17Apr24
+Tidying after completing the rework of the Beam and extrapolatedBeam classes
+which now work.
+
+Scripts:
+ - runBeamSim.py             - OK
+ - readBeamSim.py            - OK
+ - plotBeam.py               - OK
+ - plotextrapolatedBeam.py   - OK
+ - LhARAMagnetTable.py       - OK
+ - RunDRACOsimulation.py     - OK
+ - RunLIONsimulation.py      - OK
+ - RunLhARAsimulation.py     - OK
+ - ReadDRACOsimu.py          - OK
+ - ReadLIONsimu.py           - OK
+ - ReadLhARAsimu.py          - OK
+ - plotQuadTriplet.py        - Fails
+ - plotTrajectory.py         - Fails
+
+Tests:
+ - ApertureTst.py            - OK
+ - BeamIOTst-wrt.py          - OK
+ - BeamIOTst-rd.py           - OK
+ - BeamLineElementTst.py     - OK
+ - BeamLineTst.py            - OK
+ - BeamTst.py                - OK
+ - CylindricalRFCavityTst.py - OK
+ - DRACOfacilityTst.py       - OK
+ - DefocusQuadTst.py         - OK
+ - DipoleTst.py              - OK
+ - DriftTst.py               - OK
+ - ExpSourceTst.py           - OK
+ - FacilityTst.py            - OK
+ - FocusQuadTst.py           - OK
+ - GaborLensTst.py           - OK
+ - LIONfacilityTst.py        - OK
+ - LaTexTst.py               - OK
+ - LhARAFacilityTst.py       - OK
+ - OctupoleTst.py            - Failed
+ - ParticleTst.py            - OK
+ - PhysicalConstantsTst.py   - OK
+ - QuadDoubletTst.py         - OK
+ - QuadTripletTst.py         - OK
+ - RPLCswitchTst.py          - OK
+ - ReferenceParticleTst.py   - OK
+ - RunSimulationTst.py       - OK
+ - SimulationTst.py          - OK
+ - SolenoidTst.py            - OK
+ - SourceTst.py              - OK
+ - TestWrite.py              - OK
+ - TestRead.py               - OK
+ - extrapolatedBeamTst.py    - OK
+ - testGitRepoId.py          - Fails
+
+--------  --------  --------  --------  --------  --------  --------  17Apr24
 Total pain, worked through the addressing in Beam class.  Think it now works
 OK.  Next need to make same pass through extrapolateBeam derived class.
 
@@ -14,49 +68,51 @@ Josie's support.
 
 --------  --------  --------  --------  --------  --------  --------  --------
 Tests:
- - ApertureTst.py            -
- - BeamIOTst-wrt.py          -
- - BeamIOTst-rd.py           -
- - BeamLineElementTst.py     -
- - BeamLineTst.py            -
- - BeamTst.py                -
- - CylindricalRFCavityTst.py -
- - DRACOfacilityTst.py       -
- - DefocusQuadTst.py         -
- - DipoleTst.py              -
- - DriftTst.py               -
- - ExpSourceTst.py           -
- - FacilityTst.py            -
- - FocusQuadTst.py           -
- - GaborLensTst.py           -
- - LIONfacilityTst.py        -
- - LaTexTst.py               -
- - LhARAFacilityTst.py       -
- - OctupoleTst.py            -
- - ParticleTst.py            -
- - PhysicalConstantsTst.py   -
- - QuadDoubletTst.py         -
- - QuadTripletTst.py         -
- - ReferenceParticleTst.py   -
- - RunSimulationTst.py       -
- - SimulationTst.py          -
- - SolenoidTst.py            -
- - SourceTst.py              -
- - TestWrite.py              -
- - TestRead.py               -
- - testGitRepoId.py          -
-
+ - ApertureTst.py            - 
+ - BeamIOTst-wrt.py          - 
+ - BeamIOTst-rd.py           - 
+ - BeamLineElementTst.py     - 
+ - BeamLineTst.py            - 
+ - BeamTst.py                - 
+ - CylindricalRFCavityTst.py - 
+ - DRACOfacilityTst.py       - 
+ - DefocusQuadTst.py         - 
+ - DipoleTst.py              - 
+ - DriftTst.py               - 
+ - ExpSourceTst.py           - 
+ - FacilityTst.py            - 
+ - FocusQuadTst.py           - 
+ - GaborLensTst.py           - 
+ - LIONfacilityTst.py        - 
+ - LaTexTst.py               - 
+ - LhARAFacilityTst.py       - 
+ - OctupoleTst.py            - Failed
+ - ParticleTst.py            - 
+ - PhysicalConstantsTst.py   - 
+ - QuadDoubletTst.py         - 
+ - QuadTripletTst.py         - 
+ - RPLCswitchTst.py          - 
+ - ReferenceParticleTst.py   - 
+ - RunSimulationTst.py       - 
+ - SimulationTst.py          - 
+ - SolenoidTst.py            - 
+ - SourceTst.py              - 
+ - TestWrite.py              - 
+ - TestRead.py               - 
+ - extrapolatedBeamTst.py    -  
+ - testGitRepoId.py          - Failed
 
 Scripts:
- - LhARAMagnetTable.py     - 
- - plotQuadTriplet.py      - 
- - plotTrajectory.py       - 
- - RunDRACOsimulation.py   - 
- - ReadDRACOsimu.py        - 
- - RunLIONsimulation.py    - 
- - ReadLIONsimu.py         - 
- - RunLhARAsimulation.py   - 
- - ReadLhARAsimu.py        - 
- - plotBeam.py             - 
- - runBeamSim.py           -
- - readBeamSim.py          -
+ - runBeamSim.py             - 
+ - readBeamSim.py            - 
+ - plotBeam.py               - 
+ - plotextrapolatedBeam.py   - 
+ - LhARAMagnetTable.py       - 
+ - RunDRACOsimulation.py     - 
+ - RunLIONsimulation.py      - 
+ - RunLhARAsimulation.py     - 
+ - ReadDRACOsimu.py          - 
+ - ReadLIONsimu.py           - 
+ - ReadLhARAsimu.py          - 
+ - plotQuadTriplet.py        - 
+ - plotTrajectory.py         - 

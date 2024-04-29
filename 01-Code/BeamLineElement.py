@@ -139,6 +139,7 @@ Created on Mon 12Jun23: Version history:
 @author: kennethlong
 """
 
+import matplotlib.patches as patches
 import scipy  as sp
 import numpy  as np
 import math   as mth
@@ -304,13 +305,17 @@ class BeamLineElement:
                                " bad vStrt=", np.shape(self.getvStrt()))
 
         jr = np.array( [ \
-              mth.sin(self.getvStrt()[0][0]) * mth.cos(self.getvStrt()[0][1]), \
-              mth.sin(self.getvStrt()[0][0]) * mth.sin(self.getvStrt()[0][1]), \
+              mth.sin(self.getvStrt()[0][0]) * \
+                         mth.cos(self.getvStrt()[0][1]), \
+              mth.sin(self.getvStrt()[0][0]) * \
+                         mth.sin(self.getvStrt()[0][1]), \
               mth.cos(self.getvStrt()[0][0]) \
                          ])
         kr = np.array( [ \
-              mth.sin(self.getvStrt()[1][0]) * mth.cos(self.getvStrt()[1][1]), \
-              mth.sin(self.getvStrt()[1][0]) * mth.sin(self.getvStrt()[1][1]), \
+              mth.sin(self.getvStrt()[1][0]) * \
+                         mth.cos(self.getvStrt()[1][1]), \
+              mth.sin(self.getvStrt()[1][0]) * \
+                         mth.sin(self.getvStrt()[1][1]), \
               mth.cos(self.getvStrt()[1][0]) \
                          ])
         ir = np.cross(jr, kr)
@@ -609,6 +614,53 @@ class BeamLineElement:
             if cls.getDebug():
                 print(" BeamLineElement.removeInstance: instance", \
                       inst.Name, "not in BeamLineElement.Instances!")
+                
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" BeamLineElement.visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt() + self.getStrt2End()/2.
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        if wdth == 0.: wdth = (xlim[1] - xlim[0]) / 100.
+        hght = (ylim[1] - ylim[0]) / 10.
+        angl = 0.
+        abt  = 'center'
+            
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "ys":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "yz":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Rectangle(sxy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor=('green', 0.5), \
+                                  zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- BeamLineElement.visualise: ends.")
 
 
 #--------  Derived classes  --------  --------  --------  --------  --------
@@ -1256,7 +1308,71 @@ class Aperture(BeamLineElement):
             
         return _Rprime
 
-    
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" Aperture(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        ytot  = (ylim[1]-ylim[0])
+        yzero = abs(ylim[0])/ytot
+        if self.getDebug():
+            print("     ----> xlim, ylim:", xlim, ylim)
+            print("     ----> ytot, yzero:", ytot, yzero)
+            
+
+        Typ  = self.getType()
+        xmin = self.getParams()[0]
+        ymin = self.getParams()[0]
+        if Typ == 1:
+            ymin = self.getParams()[1]
+        if self.getDebug():
+            print("     ----> xmin, ymin:", xmin, ymin)
+            
+        max = 1.
+        min = 0.
+        if CoordSys == "RPLC": 
+            sz  = cntr[2]
+            if Proj == "xs":
+                xyup  = yzero + xmin/ytot
+                xydn  = yzero - xmin/ytot
+            elif Proj == "ys":
+                xyup  = yzero + ymin/ytot
+                xydn  = yzero - ymin/ytot
+        elif CoordSys == "Lab": 
+            sz = cntr[2]
+            if Proj == "xz":
+                xyup  = yzero + xmin/ytot
+                xydn  = yzero - xmin/ytot
+            elif Proj == "yz":
+                xyup  = yzero + ymin/ytot
+                xydn  = yzero - ymin/ytot
+                max = xyup + 0.4/ytot
+                min = xydn - 0.4/ytot
+            
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->     sz:", sz)
+            print("     ---->   xyup:", xyup)
+            print("     ---->   xydn:", xydn)
+            
+        axs.axvline(sz, xyup, max, \
+                    color="black", \
+                    linewidth=1, \
+                    zorder=2)
+        axs.axvline(sz, xydn, min, \
+                    color="black", \
+                    linewidth=1, \
+                    zorder=2)
+                                   
+        if self.getDebug():
+            print(" <---- Aperture(BeamLineElement).visualise: ends.")
+
+        
 #--------  I/o methods:
     def writeElement(self, dataFILE):
         if self.getDebug():
@@ -1670,7 +1786,101 @@ class FocusQuadrupole(BeamLineElement):
 
         return Strn
     
-    
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" FocusQuadrupole(BeamLineElement).visualise: start")
+            print("     ----> CoordSys, Proj:", CoordSys, Proj)
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        strt = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = ylim[1]/2.
+        
+        angl = 0.
+        abt  = 'xy'
+        
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                sxy   = [strt[2], 0.]
+            elif Proj == "ys":
+                sxy   = [strt[2], -ylim[1]/2.]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                sxy   = [strt[2], strt[0]]
+            elif Proj == "yz":
+                bbox = axs.get_window_extent()
+                xax, yax = bbox.width, bbox.height
+                xl = xlim[1] - xlim[0]
+                yl = ylim[1] - ylim[0]
+
+                invRot = np.linalg.inv(self.getRot2LbStrt())
+                angl   = mth.atan2(invRot[2][2], invRot[2][1])
+                if angl < 0.:
+                    angl += 2.*mth.pi
+                angl += mth.pi/2.
+                
+                sxy  = [strt[2], strt[1]]
+                hght = 0.4
+                
+                x1 = sxy
+                
+                Dm = np.array([self.getStrt2End()[2], \
+                               self.getStrt2End()[1]])
+                x2 = sxy + Dm
+
+                xscl = xax*yl / (yax*xl)
+                x4 = sxy + np.array([hght*mth.cos(angl)/xscl, \
+                                     hght*mth.sin(angl)*xscl])
+                x3 = x4 + Dm
+
+                x = np.array([])
+                y = np.array([])
+
+                x = np.append(x, x1[0])
+                x = np.append(x, x2[0])
+                x = np.append(x, x3[0])
+                x = np.append(x, x4[0])
+                
+                y = np.append(y, x1[1])
+                y = np.append(y, x2[1])
+                y = np.append(y, x3[1])
+                y = np.append(y, x4[1])
+                
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("     ----> Rot: \n", self.getRot2LbStrt())
+                        print("     ----> Rot: \n", invRot)
+                        print("     ----> Angl:", angl)
+                    
+        if self.getDebug():
+            print("     ----> Start:", strt)
+            print("     ---->   sxy:", sxy)
+            print("     ---->  wdth:", wdth)
+            print("     ---->  hght:", hght)
+            print("     ---->  angl:", angl)
+            print("     ---->   abt:", abt)
+
+        if CoordSys == "Lab" and Proj == "yz":
+            axs.fill(x, y, \
+                     "darkgreen", \
+                     zorder=2)
+        else:
+            Patch = patches.Rectangle(sxy, wdth, hght, \
+                                      angle=angl, \
+                                      rotation_point=abt, \
+                                      facecolor=('darkgreen'), \
+                                      zorder=2)
+            axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- FocusQuadrupole(BeamLineElement).visualise: ends.")
+  
+        
 #--------  I/o methods:
     def writeElement(self, dataFILE):
         if self.getDebug():
@@ -2059,7 +2269,102 @@ class DefocusQuadrupole(BeamLineElement):
 
         return Strn
 
-    
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" DefocusQuadrupole(BeamLineElement).visualise: start")
+            print("     ----> CoordSys, Proj:", CoordSys, Proj)
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        strt = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = abs(ylim[0])/2.
+        angl = 0.
+        abt  = 'xy'
+        
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                sxy   = [strt[2], ylim[0]/2.]
+            elif Proj == "ys":
+                sxy   = [strt[2], 0.]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                sxy   = [strt[2], ylim[0]/2.]
+            elif Proj == "yz":
+                bbox = axs.get_window_extent()
+                xax, yax = bbox.width, bbox.height
+                xl = xlim[1] - xlim[0]
+                yl = ylim[1] - ylim[0]
+
+                invRot = np.linalg.inv(self.getRot2LbStrt())
+                angl   = mth.atan2(invRot[2][2], invRot[2][1])
+                if angl < 0.:
+                    angl += 2.*mth.pi
+                angl += 3.*mth.pi/2.
+                
+                sxy  = [strt[2], strt[1]]
+                hght = 0.4
+                
+                x1 = sxy
+                
+                Dm = np.array([self.getStrt2End()[2], \
+                               self.getStrt2End()[1]])
+                x2 = sxy + Dm
+
+                xscl = xax*yl / (yax*xl)
+                x4 = sxy + np.array([hght*mth.cos(angl)/xscl, \
+                                     hght*mth.sin(angl)*xscl])
+                x3 = x4 + Dm
+
+                x = np.array([])
+                y = np.array([])
+
+                x = np.append(x, x1[0])
+                x = np.append(x, x2[0])
+                x = np.append(x, x3[0])
+                x = np.append(x, x4[0])
+                
+                y = np.append(y, x1[1])
+                y = np.append(y, x2[1])
+                y = np.append(y, x3[1])
+                y = np.append(y, x4[1])
+                
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("     ----> Rot: \n", self.getRot2LbStrt())
+                        print("     ----> Rot: \n", invRot)
+                        print("     ----> Angl:", angl)
+                    
+                sxy  = [strt[2], strt[1]]
+
+        if self.getDebug():
+            print("     ----> Centre:", strt)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        if CoordSys == "Lab" and Proj == "yz":
+            axs.fill(x, y, \
+                     "darkgreen", \
+                     zorder=2)
+        else:
+            Patch = patches.Rectangle(sxy, wdth, hght, \
+                                      angle=angl, \
+                                      rotation_point=abt, \
+                                      facecolor=('darkgreen'), \
+                                      zorder=2)
+            axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- DefocusQuadrupole(BeamLineElement).visualise: ends.")
+
+        
 #--------  I/o methods:
     def writeElement(self, dataFILE):
         if self.getDebug():
@@ -2246,6 +2551,88 @@ class SectorDipole(BeamLineElement):
             "; B = " + str(self.getB())
         return Str
 
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" SectorDipole(BeamLineElement).visualise: start")
+            print("     ----> CoordSys, Proj:", CoordSys, Proj)
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        strt = self.getrStrt()
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = 0.4
+        angl = 0.
+        abt  = 'center'
+            
+        if CoordSys == "RPLC":
+            hght = (ylim[1] - ylim[0]) / 10.
+            sxy   = [ strt[2], -hght/2. ]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                wdth = self.getStrt2End()[2]
+                hght = (ylim[1] - ylim[0]) / 10.
+                sxy   = [ strt[2], strt[0]-hght/2. ]
+            elif Proj == "yz":
+                rRPLC = np.array([-self.getRadius(), 0., 0.])
+                rLab   = np.matmul(self.getRot2LbStrt(), rRPLC)
+                cntr   = strt + rLab
+                vec    = strt - rLab
+                theta1 = mth.atan2(vec[1]-strt[1], vec[2]-strt[2])
+                if theta1 < 0.:
+                    theta1 += 2.*mth.pi
+                theta2 = theta1 + self.getAngle()
+                theta = np.array([theta1*180./mth.pi, theta2*180./mth.pi])
+                
+                sxy   = np.array([cntr[2], cntr[1]])
+                wdth = 0.1
+                
+                if self.getDebug():
+                    print("     ----> Lab:")
+                    with np.printoptions(linewidth=500, \
+                                         precision=7,suppress=True):
+                        print("         ---->  rRPLC:", rRPLC)
+                        print("         ---->   rLab:", rLab)
+                        print("         ---->   cntr:", cntr)
+                        print("         ---->    vec:", vec)
+                        print("         ---->  theta:", theta)
+        
+
+        if self.getDebug():
+            print("     ---->  Start:", strt)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+
+        if CoordSys == "RPLC":
+            Patch = patches.Rectangle(sxy, wdth, hght, \
+                                      angle=angl, \
+                                      rotation_point=abt, \
+                                      facecolor=('mediumvioletred', 1.), \
+                                      zorder=2)
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                Patch = patches.Rectangle(sxy, wdth, hght, \
+                                          angle=angl, \
+                                          rotation_point=abt, \
+                                          facecolor=('mediumvioletred', 1.), \
+                                          zorder=2)
+            elif Proj == "yz":
+                Patch = patches.Wedge(sxy, self.getRadius()+wdth, \
+                                      theta[0], theta[1], \
+                                      width=2.5*wdth, \
+                                      facecolor=('mediumvioletred', 1.), \
+                                      zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- SectorDipole(BeamLineElement).visualise: ends.")
+
 
 # -------- "Set methods"
 #..  Methods believed to be self-documenting(!)
@@ -2357,6 +2744,9 @@ class SectorDipole(BeamLineElement):
 
     def getLength(self):
         return self._Length
+
+    def getRadius(self):
+        return self.getLength() / self.getAngle()
 
 
 #--------  I/o methods:
@@ -3161,7 +3551,55 @@ class GaborLens(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" GaborLens(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt() + self.getStrt2End()/2.
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = 0.4
+        angl = 0.
+        abt  = 'center'
+            
+        if CoordSys == "RPLC":
+            hght = (ylim[1] - ylim[0]) / 10.
+            if Proj == "xs":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "ys":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                hght = (ylim[1] - ylim[0]) / 10.
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "yz":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
         
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Rectangle(sxy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor=('orange', 1.), \
+                                  zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- GaborLens(BeamLineElement).visualise: ends.")
+
+            
 # -------- Get methods:
 #..   Methods believed to be self-documenting(!)
     def getBz(self):
@@ -3678,6 +4116,55 @@ class CylindricalRFCavity(BeamLineElement):
                 print(TrnsMtrx)
 
         self._TrnsMtrx = TrnsMtrx
+
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" CylindricalRFCavity(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt() + self.getStrt2End()/2.
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        hght = 2.*self.getRadius()
+        angl = 0.
+        abt  = 'center'
+            
+        if CoordSys == "RPLC":
+            hght = (ylim[1] - ylim[0]) / 7.5
+            if Proj == "xs":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "ys":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                hght = (ylim[1] - ylim[0]) / 7.5
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+            elif Proj == "yz":
+                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+        
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Rectangle(sxy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor=('slategray', 1.), \
+                                  zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print( \
+                " <---- CylindricalRFCavity(BeamLineElement).visualise: ends.")
 
         
 # -------- "Get methods"
@@ -4463,6 +4950,46 @@ class Source(BeamLineElement):
 
         return TrcSpc
 
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" Source(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        cntr = self.getrStrt() + self.getStrt2End()/2.
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        if wdth == 0.: wdth = (xlim[1] - xlim[0]) / 100.
+        hght = (ylim[1] - ylim[0]) / 10.
+        angl = 0.
+        abt  = 'center'
+        if CoordSys == "RPLC":
+            if Proj == "xs":
+                xy   = [cntr[2], cntr[0]]
+            elif Proj == "ys":
+                xy   = [cntr[2], cntr[1]]
+        elif CoordSys == "Lab":
+            if Proj == "xz":
+                xy   = [cntr[2], cntr[0]]
+            elif Proj == "yz":
+                xy   = [cntr[2], cntr[1]]
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->     xy:", xy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Ellipse(xy, wdth, hght, \
+                                facecolor='gold', \
+                                zorder=2)
+
+        axs.add_patch(Patch)
+                                   
     
 #--------  I/o methods:
     def writeElement(self, dataFILE):
@@ -5356,19 +5883,22 @@ class RPLCswitch(BeamLineElement):
 
 #--------  "Built-in methods":    
     def __init__(self, _Name=None, \
-                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None):
+                 _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
+                 _3Drotation=False):
         if self.getDebug():
             print(' RPLCswitch.__init__: ', \
                   'creating the RPLCswitch object')
             print("     ----> vStrt:", _vStrt)
 
+        RPLCswitch.instances.append(self)
+        
         #.. BeamLineElement class initialisation:
         BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
-        RPLCswitch.instances.append(self)
-        
         self.setStrt2End(np.array([0., 0., 0.]))
         self.setRot2LbEnd(self.getRot2LbStrt())
+
+        self.set3Drotation(_3Drotation)
         
         self.setTransferMatrix()
                 
@@ -5383,6 +5913,7 @@ class RPLCswitch(BeamLineElement):
         print(" RPLCswitch:")
         print(" -----------")
         print("     ----> Debug flag:", RPLCswitch.getDebug())
+        print("     ----> 3Drotation:", self.get3Drotation())
         BeamLineElement.__str__(self)
         return " <---- RPLCswitch parameter dump complete."
 
@@ -5396,25 +5927,98 @@ class RPLCswitch(BeamLineElement):
     @classmethod
     def setDebug(cls, Debug):
         cls.__Debug = Debug
+
+    def set3Drotation(self, _3Drotation):
+        if not isinstance(_3Drotation, bool):
+            raise badParameter()
+
+        self._3Drotation = _3Drotation
         
     def setTransferMatrix(self):
+        if self.getDebug():
+            print(" RPLC(BeamLineElement).setTransferMatrix; start:")
 
         iLst  = BeamLineElement.getinstances()[ \
                                 len(BeamLineElement.getinstances())-2 \
                                                ]
-        invRE = np.linalg.inv(iLst.getRot2LbEnd())
+        if self.get3Drotation():
+            invRE = np.linalg.inv(iLst.getRot2LbEnd())
 
-        effctvRot = np.matmul(invRE, self.getRot2LbStrt())
+            effctvRot = np.matmul(invRE, self.getRot2LbStrt())
 
-        offDiag   = np.zeros((3,3))
+            offDiag   = np.zeros((3,3))
 
-        TrnsMtrx = np.block([ \
-                              [effctvRot, offDiag],  \
-                              [  offDiag, effctvRot] \
-                              ])
+            TrnsMtrx = np.block([ \
+                                  [effctvRot, offDiag],  \
+                                  [  offDiag, effctvRot] \
+                                 ])
+        else:
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ----> vStrt(iLst), vStrt:", \
+                          iLst.getvStrt(), self.getvStrt())
+                    
+            PhiLst   = iLst.getvStrt()[0][1]
+            Phi      = self.getvStrt()[0][1]
+            if self.getDebug():
+                print("     ----> PhiLst:", PhiLst, \
+                      "\n              Phi:", Phi)
+                
+            dPhi     = Phi - PhiLst
+            cdPhi    = mth.cos(dPhi)
+            sdPhi    = mth.sin(dPhi)
+
+            TrnsMtrx = np.array([ \
+                                  [cdPhi,   0., -sdPhi,     0., 0., 0.], \
+                                  [  0., cdPhi,     0., -sdPhi, 0., 0.], \
+                                  [sdPhi,   0.,  cdPhi,     0., 0., 0.], \
+                                  [  0., sdPhi,   0.,    cdPhi, 0., 0.], \
+                                  [  0.,    0.,   0.,       0., 1., 0.], \
+                                  [  0.,    0.,   0.,       0., 0., 1.]  \
+                                 ])
                              
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- RPLCswitch(BeamLineElement): ", \
+                      "returns Transfer matrix: \n", \
+                      TrnsMtrx)
+                
         self._TrnsMtrx = TrnsMtrx
 
+    def calcRot2LbEnd(self):
+        if self.getDebug():
+            print(" RPLC(BeamLineElement).calcRot2LbEnd; start:")
+
+        iLst  = BeamLineElement.getinstances()[ \
+                                len(BeamLineElement.getinstances())-2 \
+                                               ]
+            
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> vStrt(iLst), vStrt:", \
+                          iLst.getvStrt(), self.getvStrt())
+                
+        PhiLst   = iLst.getvStrt()[0][1]
+        Phi      = self.getvStrt()[0][1]
+        if self.getDebug():
+            print("     ----> PhiLst:", PhiLst, \
+                  "              Phi:", Phi)
+                
+        dPhi     = Phi - PhiLst
+        cdPhi    = mth.cos(dPhi)
+        sdPhi    = mth.sin(dPhi)
+
+        RotMtrx = np.array([ \
+                             [ cdPhi,   sdPhi, 0.], \
+                             [-sdPhi,   cdPhi, 0.], \
+                             [  0.,        0., 1.] \
+                            ])
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rotation matrix: \n", RotMtrx)
+                
+        return RotMtrx
 
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)
@@ -5424,6 +6028,48 @@ class RPLCswitch(BeamLineElement):
     
     def getLength(self):
         return 0.
+
+    def get3Drotation(self):
+        return self._3Drotation
+
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" RPLCswitch(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        if CoordSys == "Lab":
+            return
+
+
+        cntr = self.getrStrt()
+        ylim = axs.get_ylim()
+
+        if self.getDebug():
+            print("     ----> ylim:", ylim)
+
+        sz = cntr[2]
+        xyup  = ylim[1]
+        xydn  = ylim[0]
+        
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->     sz:", sz)
+            print("     ---->   xyup:", xyup)
+            print("     ---->   xydn:", xydn)
+
+        axs.axvline(sz, xyup, 1., \
+                    color="seagreen", \
+                    linewidth=0.2, \
+                    zorder=2)
+        axs.axvline(sz, xydn, 0., \
+                    color="seagreen", \
+                    linewidth=0.2, \
+                    zorder=2)
+                                   
+        if self.getDebug():
+            print(" RPLCswitch(BeamLineElement).visualise: start")
 
     
 #--------  I/o methods:               <--------  Here
@@ -5453,7 +6099,6 @@ class RPLCswitch(BeamLineElement):
         
     @classmethod
     def readElement(cls, dataFILE):
-        cls.setDebug(True)
         if cls.getDebug():
             print(" RPLCswitch(BeamLineElement).readElement starts.")
 
@@ -5462,7 +6107,6 @@ class RPLCswitch(BeamLineElement):
         if cls.getDebug():
             print(" <---- end of file, return.")
             
-        cls.setDebug(False)
         return EoF
 
 
@@ -5479,20 +6123,31 @@ class RPLCswitch(BeamLineElement):
                 print(" RPLCswitch(BeamLineElement).Transport: \n", \
                       "     ----> input trace space:", _R)
             print("          ----> Outside:", self.OutsideBeamPipe(_R))
+            print("          ----> 3D-rotatation:", self.get3Drotation())
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("         ----> Transfer matrix: \n", \
+                      self.getTransferMatrix())
+
             
         if self.OutsideBeamPipe(_R):
             _Rprime = None
         else:
-            phsSpc      = \
-                Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
-            if self.getDebug():
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("     ----> PhaseSpace      :", phsSpc) 
-            phsSpcprime = self.getTransferMatrix().dot(phsSpc)
-            if self.getDebug():
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("     ----> PhaseSpace prime:", phsSpcprime)
-            _Rprime     = Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
+            if self.get3Drotation():
+                phsSpc      = \
+                    Prtcl.Particle.RPLCTraceSpace2PhaseSpace(_R).reshape(6)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("     ----> PhaseSpace      :", phsSpc) 
+                phsSpcprime = self.getTransferMatrix().dot(phsSpc)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7, \
+                                         suppress=True):
+                        print("     ----> PhaseSpace prime:", phsSpcprime)
+                _Rprime     = \
+                    Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
+            else:
+                _Rprime = self.getTransferMatrix().dot(_R)
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):

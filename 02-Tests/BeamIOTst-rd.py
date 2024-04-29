@@ -23,9 +23,6 @@ print("========  BeamIO (read): tests start  ========")
 
 ##! First check can read data format version 1:
 HOMEPATH = os.getenv('HOMEPATH')
-filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-BLI  = BL.BeamLine(filename)
 
 BeamIOTest = 1
 print()

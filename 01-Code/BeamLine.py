@@ -125,7 +125,7 @@ mu0                = constants_instance.mu0()
 class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
-    _SrcTrcSpc    = None
+    _SrcTrcSpc     = None
 
 
 #--------  "Built-in methods":
@@ -145,7 +145,8 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> readDataFile = ", readDataFile)
             if readDataFile:
-                print(" <---- return after init.")
+                if cls.getDebug():
+                    print(" <---- return after init.")
                 return cls.getinstance()
               
             #.. Check and load parameter file
@@ -598,11 +599,13 @@ class BeamLine(object):
                    kphi   != None:
                     NewElement = True
                     if cls.getDebug():
-                        print("                   <---- jtheta, jphi, ktheta, kphi:", \
+                        print("                   <---- ", \
+                              "jtheta, jphi, ktheta, kphi:", \
                               jtheta, jphi, ktheta, kphi)
                 else:
                     if cls.getDebug():
-                        print("                   ----> jtheta, jphi, ktheta, kphi:", \
+                        print("                   ----> ", \
+                              "jtheta, jphi, ktheta, kphi:", \
                               jtheta, jphi, ktheta, kphi)
                     NewElement = False
                     continue
@@ -905,30 +908,39 @@ class BeamLine(object):
         cls._Element.append(iBLE)
         
     def checkConsistency(self):
+        if self.getDebug():
+            print(" BeamLine.checkConsistency: start")
+            
         ConsChk = False
-        s       = 0.
-        if self._Element[0].getrStrt()[2] != 0.:
-            return
-        for iBLE in BLE.BeamLineElement.getinstances():
-            if isinstance(iBLE, BLE.Drift):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.FocusQuadrupole):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.DefocusQuadrupole):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.Solenoid):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.GaborLens):
-                s += iBLE.getLength()
-            elif isinstance(iBLE, BLE.SectorDipole):
-                s += iBLE.getLength()
 
-        iBLElast = BLE.BeamLineElement.getinstances() \
-                            [len(BLE.BeamLineElement.getinstances())-1]
-        dif = iBLElast.getrStrt()[2] + iBLElast.getLength() - s
+        iBLE = BLE.BeamLineElement.getinstances()[-1]
+        iRfP = Prtcl.ReferenceParticle.getinstance()
+        if self.getDebug():
+            print("     ----> BLE name:", \
+                  iBLE.getName(), \
+                  iBLE.getrStrt()[2])
+            if len(iRfP.getRrIn()) > 0:
+                print("     ----> Ref prtcl RrIn[-1][2]:", \
+                      iRfP.getRrIn()[-1][2])
 
-        if abs(dif) > 1E-6:
+        if len(iBLE.getrStrt()) == 3 and \
+           isinstance(iRfP.getRrIn(), list) and \
+           len(iRfP.getRrIn()) > 0:
+            dif = iBLE.getrStrt()[2] - iRfP.getRrIn()[-1][2]
+        
+            if self.getDebug():
+                print("     ----> BLE name:", \
+                      iBLE.getName(), \
+                      iBLE.getrStrt()[2])
+                print("     ----> Ref prtcl RrIn[-1][2]:", \
+                      iRfP.getRrIn()[-1][2])
+                print("     ----> dif:", dif)
+
+            if abs(dif) > 1E-6:
+                return ConsChk
+        else:
             return ConsChk
+
 
         return True
 

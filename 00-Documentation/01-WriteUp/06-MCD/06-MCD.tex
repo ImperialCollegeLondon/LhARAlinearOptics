@@ -1318,117 +1318,88 @@ The \texttt{BEamLine} class has no utilities.
 
 \FloatBarrier
 
-\subsection{\texttt{Beam}}
+\subsection{Particle and reference particle}
+\label{SubSect:BLE:ParticleReferenceParticle}
 
-The \texttt{Beam} class provides methods to calculate the parameters
-describing the beam passing through an instance of the BeamLine class.
-The covariance matrix is calculated at the various locations defined
-in the \texttt{BeamLine} instance.
-The calculation is performed either by calculating the covariance
-matrices particle by particle or by using transfer matrices to
-propagate the covariance matrix from the source.
-The latter (propogation of the covariance matrix) is not yet
-implemented.
+The \texttt{Particle} class provides methods to transport particles
+through the beam line.
+The trace and phase space is recorded at the start and end of each
+element.
+The \texttt{ReferenceParticle} derived class is a singleton and
+records the trajectory of the reference particle.
 
-\subsubsection{Instantiation} ~\newline
+\subsubsection{\texttt{Particle}} ~\newline
+\label{SubSubSect:BLE:Particle}
+
+\paragraph{Instantiation}  ~\newline
 \noindent
-The call to instantiate the \texttt{BeamElenent} class is:
+The call to instantiate the \texttt{Particle} class is:
 \begin{center}
-  \texttt{Beam(readDataFile, nEvtMax, outputCSVfile, beamlineSpecificationCSVfile)}
+  \texttt{Particle(Species)}
 \end{center}
-\texttt{readDataFile}, the path to the \texttt{BeamIO} file containing
-the particles tht form the beam, is required.
-\texttt{nEvtMax} (optional) defines the number of particles to be
-read; id it is not given, all particles in \texttt{readDataFile} will
-be read.
-A CSV file at \texttt{outputCSVfile} will be created containing a
-summary of the beam parameters if this parameter is given.
-\texttt{beamlineSpecificationCSVfile} (the full path of the CSV file
-containing the beam-line specificiation) is not required if version 2
-or later of the \texttt{BeamIO} data-file format is being used.
-The optional argument is retained for backward compatibility.
+\texttt{Species}, the type of particle to be propagated, is a string
+containing the particle name.
+At present valid particle \texttt{species} are proton, pion, and
+muon.
 
-\subsubsection{Instance attributes and access methods} ~\newline
-\label{SubSubSect:BLE:InstAttr}
+\paragraph{Instance attributes and access methods} ~\newline
+\label{Para:BLE:InstAttr}
 \noindent
-The instance attributes are presented in table~\ref{Tab:B:Attributes}
-and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
+The instance attributes are presented in table~\ref{Tab:P:Attributes}
+and the access methods are summarised in table~\ref{Tab:P:AccessMethods}.
 \begin{table}[h]
   \caption{
-    Definition of attributes of instances of
-    the \texttt{Beam} class.
-    The attributes marked $^*$ above the dividing line are required in
-    the call to instantiate the element.
-    The attributes marked $^\dagger$ below the dividing line are
-    calculated.
+    Definition of attributes of instances of the \texttt{Particle} class.
   }
-  \label{Tab:B:Attributes}
+  \label{Tab:P:Attributes}
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
       \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
       \hline
-      \texttt{InputDataFile}$^*$ & path & Path to BeamIO data file containing events to be read (required).                    \\
-      \texttt{nEvtMax}$^*$       & int  & Maximum number of events to read, if not set, read all events (optional).            \\
-      \texttt{outputCSVfile}$^*$ & path & Path to csv file in which summary of beam processing will be written (optional).     \\
- \texttt{beamlineSpecificationCVSfile}$^*$ &
-                                   path & Kept for backward compatibility (optional).
-                                          Path to csv file containing specification of beam line.                              \\
-      \hline
-      \texttt{Element[]}             & list  & List of instances of \texttt{BeamElement} class containing
-                                                              pointers to the elements that make up the beam line.           \\
-      \texttt{Location[]}$^{\dagger}$    & str   & Name of location where parameters are recorded.                             \\
-      \texttt{s[]}$^{\dagger}$           & float & $s$ coordinate at which parameters are recorded.                            \\
-      \texttt{CovSums[][]}$^{\dagger}$   & list  & Sums required to calculate covariance matrix by location.  Stored as list of $6\times6$ np.ndarrays.     \\
-      \texttt{nParticles[]}$^{\dagger}$  & list  & Number of particles arriving at location.                                       \\
-      \texttt{CovMtrx[][]}$^{\dagger}$   & list  & Covariance matrix by location.  Stored as list of $6\times6$ np.ndarrays.     \\
-      \texttt{sigmaxy[][]}$^{\dagger}$   & list  & RMS x and y by location.  \texttt{[iLoc][0]} $\sigma_x$, \texttt{[iloc][1]} $\sigma_y$. \\
-      \texttt{emittance[][]}$^{\dagger}$ & list  & Emittance by location; calculated from \texttt{CovMtrx}. \texttt{[iloc][0]} $\varepsilon_x$,
-                                                  \texttt{[iloc][1]} $\varepsilon_y$, \texttt{[iloc][2]} $\varepsilon_\perp$, \texttt{[iloc][3]} $\varepsilon_{xy}$
-                                                  \texttt{[iloc][4]} $\varepsilon_{6D}$ \\
-      \texttt{Twiss[][][]}$^{\dagger}$   & list  & Twiss parameters by location.
-                                                  \texttt{[iloc][0][0]} $\alpha_x$, \texttt{[iloc][0][1]} $\beta_x$, \texttt{[iloc][0][2]} $\gamma_x$, 
-                                                  \texttt{[iloc][1][0]} $\alpha_y$, \texttt{[iloc][1][1]} $\beta_y$, \texttt{[iloc][1][2]} $\gamma_y$. \\ 
+      \texttt{Species}       & str   & Particle species; proton, muon or pion.                                                     \\
+      \texttt{Location}      & list  & List of strings containing the unique \texttt{Name} of the \texttt{BeamLineElement} at
+                                       the particle position is reported.                                                          \\
+      \texttt{s}             & list  & List of floats recording $s$ coordinate at which particle position is reported.             \\
+      \texttt{TraceSpace}    & list  & List of \texttt{np.ndarray} containing 6D trace space of particle at \texttt{s}.            \\
+      \texttt{PhaseSpace}    & list  & List of \texttt{np.ndarray} containing 6D phase space (RPLC) of particle at \texttt{s}.     \\
+      \texttt{LabPhaseSpace} & list  & List of \texttt{np.ndarray} containing 6D phase space (Lab) of particle at \texttt{s}.      \\
       \hline
     \end{tabular}
   \end{center}
 \end{table}
 \begin{table}[h]
   \caption{
-    Definition of access methods for the \texttt{Beam}
+    Definition of access methods for the \texttt{Particle}
     class. 
   }
-  \label{Tab:B:AccessMethods}
+  \label{Tab:P:AccessMethods}
   \begin{center}
     \begin{tabular}{|c|c|p{7cm}|}
       \hline
-      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                             \\
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
       \hline
-      \texttt{setInputDataFile} & \texttt{getInputDataFile} & Set/get input \texttt{BeamIO} data file.                          \\
-      \texttt{setoutputCSVfile} & \texttt{getoutputCSVfile} & Set/get output \texttt{csv} file.                                 \\
-      \texttt{setbeamlineSpecificationCSVfile} & \texttt{getbeamlineSpecificationCSVfile} & Set/get beam-line specification CSV
-                                                                                            file.                               \\
-      \texttt{setnEvtMax}      & \texttt{getnEvtMax}   & Set/get maximum number of events to ready.                             \\
-      \texttt{setLocation}     & \texttt{setLocation}  & Set/get location where paramters are stored.                           \\
-      \texttt{sets}            & \texttt{gets}         & Set/get list of $s$ positions where parameters are stored.             \\
-      \texttt{setsigmaxy}      & \texttt{getsigmaxy}   & Set/get list of $\sigma_x$ and $\sigma_y$.                             \\
-      \texttt{setEmittance}    & \texttt{getEmittance} & Set/get list of emittance lists.                                       \\
-      \texttt{setTwiss}        & \texttt{getTwiss}     & Set/get list of sets of Twiss paramters.                               \\
+      \texttt{setSpecies}        & \texttt{getSpecies}        & Set/get particle species.                                \\
+      \texttt{setLocation}       & \texttt{getLocation}       & Set/get list of locations location.                      \\
+      \texttt{sets}              & \texttt{gets}              & Set/get list of $s$ coordinates.                         \\
+      \texttt{setTraceSpace}     & \texttt{getTraceSpace}     & Set/get list of trace-space vectors.                     \\
+      \texttt{setRPLCPhaseSpace} & \texttt{setRPLCPhaseSpace} & Set/get list of phase-space vectirs in RPLC coordinates. \\
+      \texttt{setLabPhaseSpace}  & \texttt{getLabPhaseSpace}  & Set/get list of phase-space vectirs in Lab coordinates.  \\
       \hline
     \end{tabular}
   \end{center}
 \end{table}
 
-\subsubsection{Processing methods} ~\newline
+\paragraph{Processing methods} ~\newline % Here!
 \noindent
-Table~\ref{Tab:B:ProcMethods} presents the processing methods provided
-in the \texttt{Beam} class.
+Table~\ref{Tab:P:ProcMethods} presents the processing methods provided
+in the \texttt{Particle} class.
 \begin{table}[h]
   \caption{
-    Processing methods provided by the \texttt{Beam}
+    Processing methods provided by the \texttt{Particle}
     class. 
   }
-  \label{Tab:B:ProcMethods}
+  \label{Tab:P:ProcMethods}
   \begin{center}
     \begin{tabular}{|l|c|c|p{7cm}|}
       \hline
@@ -1443,20 +1414,20 @@ in the \texttt{Beam} class.
   \end{center}
 \end{table}
 
-\subsubsection{I/o methods} ~\newline
+\paragraph{I/o methods} ~\newline
 \noindent
-The \texttt{Beam} class has no i/o methods.
+The \texttt{Particle} class has no i/o methods.
 
-\subsubsection{Utilities} ~\newline
+\paragraph{Utilities} ~\newline
 \noindent
-The utilities provided by the \texttt{Beam} class are listed in
-table~\ref{Tab:B:UtilMethods}.
+The utilities provided by the \texttt{Particle} class are listed in
+table~\ref{Tab:P:UtilMethods}.
 \begin{table}[h]
   \caption{
-    Utilities provided by the \texttt{Beam}
+    Utilities provided by the \texttt{Particle}
     class. 
   }
-  \label{Tab:B:UtilMethods}
+  \label{Tab:P:UtilMethods}
   \begin{center}
     \begin{tabular}{|l|c|c|p{7cm}|}
       \hline

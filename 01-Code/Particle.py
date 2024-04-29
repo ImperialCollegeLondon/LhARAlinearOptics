@@ -144,6 +144,7 @@ Created on Mon 03Jul23: Version history:
 @author: kennethlong
 """
 
+from copy import deepcopy
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
@@ -350,10 +351,6 @@ class Particle:
         return cls.instances
 
     def getSpecies(self):
-        if self._Species != "proton":
-            x=1.
-            y=0.
-            z=x/y
         return self._Species
             
     def getLocation(self):
@@ -372,9 +369,260 @@ class Particle:
         return self._PhsSpc
     
     def getLabPhaseSpace(self):
-        return self._LabPhsSpc
+        return deepcopy(self._LabPhsSpc)
 
             
+#--------  Processing methods:
+    @classmethod
+    def fillPhaseSpaceAll(cls):
+        Success = False
+        if cls.getDebug():
+            print(" Particle.fillPhaseSpaceAll, start:")
+            print("     ----> fill phase space for", \
+                  len(cls.getParticleInstances()), \
+                  "particle instances.")
+
+        nPrtcl = 0
+        for iPrtcl in cls.getParticleInstances():
+            nPrtcl += 1
+            if cls.getDebug():
+                print("     ----> Particle:", nPrtcl)
+            
+            #if not isinstance(iPrtcl, ReferenceParticle):
+            if Particle.getDebug():
+                print("         ----> Fill phase space for particle:", \
+                      nPrtcl)
+            Success = iPrtcl.fillPhaseSpace()
+
+        if cls.getDebug():
+            print("     ----> Particle.fillPhaseSpaceAll:", \
+                  "fill phase space Success =", Success)
+            print(" <----  Particle.fillPhaseSpaceAll, compete.")
+            
+        return Success
+    
+    def fillPhaseSpace(self):
+        Success = False
+        if self.getDebug():
+            print(" Particle.fillPhaseSpace, start:")
+            print("     ----> fill phase space for particle with", \
+                  len(self.getLocation()), "records.")
+
+        iRefPrtcl = ReferenceParticle.getinstance()
+
+        nLoc = 0
+        for iLoc in self.getLocation():
+            if self.getDebug():
+                print("         ----> Convert at location:", \
+                      iLoc)
+            PhsSpc  = self.calcRPLCPhaseSpace(nLoc)
+            Success = self.setRPLCPhaseSpace(PhsSpc)
+
+            RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
+            if self.getDebug():
+                print("         ----> Rotation matrix:", \
+                      RotMtrx)
+            
+            drLab   = np.matmul(RotMtrx, PhsSpc[0])
+            pLab    = np.matmul(RotMtrx, PhsSpc[1])
+
+            rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
+
+            LabPhsSpc = [rLab, pLab]
+            Success   = self.setLabPhaseSpace(LabPhsSpc)
+
+            nLoc  += 1
+
+        if nLoc == len(self.getLocation()):
+            Success = True
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Particle.fillPhaseSpace: RPLC phase space:", \
+                      PhsSpc)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Particle.fillPhaseSpace:  Lab phase space:", \
+                      LabPhsSpc)
+            print(" <----  Particle.fillPhaseSpace, compete.", \
+                  "Success:", Success)
+
+        return Success
+
+    def calcRPLCPhaseSpace(self, nLoc=None):
+        if self.getDebug():
+            print(" Particle.calcRPLCPhaseSpace for nLoc:", \
+                  nLoc, "start:")
+            
+        PhsSpc = self.RPLCTraceSpace2PhaseSpace(self.getTraceSpace()[nLoc])
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Return phase space:", PhsSpc)
+
+        return PhsSpc
+
+    @classmethod
+    def RPLCTraceSpace2PhaseSpace(cls, TrcSpc):
+        if cls.getDebug():
+            print(" Particle.RPLCTraceSpace2PhaseSpace:")
+            
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> trace space:", TrcSpc)
+
+        species      = Prtcl.ReferenceParticle.getinstance().getSpecies()
+        particleMASS = iPhysclCnstnts.getparticleMASS(species)
+
+        p0 = BL.BeamLine.getElement()[0].getp0()
+        E0 = np.sqrt(particleMASS**2 + p0**2)
+        b0 = p0/E0
+        E  = E0 + TrcSpc[5]*p0
+        p  = mth.sqrt(E**2 - particleMASS**2)
+        if cls.getDebug():
+            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
+            K0 = E0 - particleMASS
+            K  = E  - particleMASS
+            print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
+        
+        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
+
+        px    = TrcSpc[1]*p0
+        py    = TrcSpc[3]*p0
+        p2    = p**2 - px**2 - py**2
+        if p2 < 0.:
+            print(" Crashing!")
+            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
+            K0 = E0 - particleMASS
+            K  = E  - particleMASS
+            print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
+            print("     ----> p2, px, py, p:", p2, px, py, p)
+            print("     ----> species, particleMASS, p0, E0, b0:", \
+                  species, particleMASS, p0, E0, b0)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> TrcSpc:", TrcSpc)
+            print("     ----> Reference particle: \n", \
+                  Prtcl.ReferenceParticle.getinstance())
+        pz    = mth.sqrt(p2)
+        pRPLC = np.array([px, py, pz])
+                
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> position:", rRPLC)
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Mmtm    :", pRPLC)
+            Etmp = mth.sqrt(particleMASS**2 + np.dot(pRPLC, pRPLC))
+            print("     ----> Energy  :", Etmp)
+
+        PhsSpc = np.array([rRPLC, pRPLC])
+
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Return phase space:", PhsSpc)
+
+        return PhsSpc
+
+    @classmethod
+    def RPLCPhaseSpace2TraceSpace(cls, PhsSpc):
+        if cls.getDebug():
+            print(" Particle.RPLCPhaseSpace2TraceSpace: start.")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> PhsSpx:", PhsSpc)
+            
+        species      = Prtcl.ReferenceParticle.getinstance().getSpecies()
+        particleMASS = iPhysclCnstnts.getparticleMASS(species)
+
+        p0        = BL.BeamLine.getElement()[0].getp0()
+        E0        = mth.sqrt( particleMASS**2 + p0**2)
+        b0        = p0/E0
+        if cls.getDebug():
+            print("     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, \
+                  "(", E0-particleMASS, ")")
+
+        E = mth.sqrt(particleMASS**2 + np.dot(PhsSpc[3:],PhsSpc[3:]))
+        if cls.getDebug():
+            print("     ----> E:", E)
+        
+        x      = PhsSpc[0]
+        y      = PhsSpc[1]
+        
+        xPrime = PhsSpc[3] / p0
+        yPrime = PhsSpc[4] / p0
+
+        if cls.getDebug():
+            print("     ----> xPrime, yPrime:", 
+                  xPrime, yPrime)
+
+        z      = PhsSpc[2] / b0
+        delta  = (E - E0) / p0
+        
+        if cls.getDebug():
+            print("     ----> z, E, delta:", z, E, delta)
+
+        TrcSpc = np.array([x, xPrime, y, yPrime, z, delta])
+
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Trace space:", TrcSpc)
+
+        return TrcSpc
+
+    def visualise(self, CoordSys, Projection, axs):
+        if self.getDebug():
+            print(" Particle.visualise: start")
+            print("     ----> Coordinate system:", CoordSys)
+            print("     ----> Projection:", Projection)
+
+        sorz = []
+        xory = []
+        #..  Plotting as a function of s if RPLC or z if laboratory:
+        if CoordSys == "RPLC":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "ys":
+                iCrd = 2
+                axl  = "y"
+            sorz = ReferenceParticle.getinstance().getsOut()
+            for TrcSpc in self.getTraceSpace():
+                xory.append(TrcSpc[iCrd])
+
+        elif CoordSys == "Lab":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "yz":
+                iCrd = 1
+                axl  = "y"
+
+            iAddr = -1
+            for RrOut in self.getLabPhaseSpace():
+                xory.append(RrOut[0][iCrd])
+                sorz.append(RrOut[0][2])
+
+                """
+                zPrtcl    = RrOut[0][2]
+                iAddr    += 1
+
+                iBLE0 = BLE.BeamLineElement.getinstances()[iAddr+1]
+                iBLE1 = None
+                if len(BLE.BeamLineElement.getinstances()) > iAddr+2:
+                    iBLE1 = BLE.BeamLineElement.getinstances()[iAddr+2]
+                if iBLE1 != None:
+                    if zPrtcl > iBLE1.getrStrt()[2]:
+                        zPrtcl = iBLE1.getrStrt()[2]
+                """
+
+        if self.getDebug():
+            print("     ----> sorz:", sorz)
+            print("     ----> xory:", xory)
+
+        if len(ReferenceParticle.getinstance().getsOut()) > len(xory):
+            axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
+        else:
+            axs.plot(sorz, xory, color='darkgray', linewidth='0.5', zorder=2)
+            
+        axs.set_xlabel('s (m)')
+        axs.set_ylabel(axl + ' (m)')
+
+        
 #--------  Utilities:
     @classmethod
     def cleanAllParticles(cls):
@@ -637,197 +885,6 @@ class Particle:
                 plt.close()
             
 
-#--------  Processing methods:
-    @classmethod
-    def fillPhaseSpaceAll(cls):
-        Success = False
-        if cls.getDebug():
-            print(" Particle.fillPhaseSpaceAll, start:")
-            print("     ----> fill phase space for", \
-                  len(cls.getParticleInstances()), \
-                  "particle instances.")
-
-        nPrtcl = 0
-        for iPrtcl in cls.getParticleInstances():
-            nPrtcl += 1
-            if cls.getDebug():
-                print("     ----> Particle:", nPrtcl)
-            
-            if not isinstance(iPrtcl, ReferenceParticle):
-                if Particle.getDebug():
-                    print("         ----> Fill phase space for particle:", \
-                          nPrtcl)
-                    Success = iPrtcl.fillPhaseSpace()
-
-        if cls.getDebug():
-            print("     ----> Particle.fillPhaseSpaceAll:", \
-                  "fill phase space Success =", Success)
-            print(" <----  Particle.fillPhaseSpaceAll, compete.")
-            
-        return Success
-    
-    def fillPhaseSpace(self):
-        Success = False
-        if self.getDebug():
-            print(" Particle.fillPhaseSpace, start:")
-            print("     ----> fill phase space for particle with", \
-                  len(self.getLocation()), "records.")
-
-        iRefPrtcl = ReferenceParticle.getinstance()
-
-        nLoc = 0
-        for iLoc in self.getLocation():
-            if self.getDebug():
-                print("         ----> Convert at location:", \
-                      iLoc)
-            PhsSpc  = self.calcRPLCPhaseSpace(nLoc)
-            Success = self.setRPLCPhaseSpace(PhsSpc)
-
-            RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
-            drLab   = np.matmul(RotMtrx, PhsSpc[0])
-            pLab    = np.matmul(RotMtrx, PhsSpc[1])
-
-            rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
-
-            LabPhsSpc = [rLab, pLab]
-            Success   = self.setLabPhaseSpace(LabPhsSpc)
-
-            nLoc  += 1
-
-        if nLoc == len(self.getLocation()):
-            Success = True
-        
-        if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Particle.fillPhaseSpace: RPLC phase space:", \
-                      PhsSpc)
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Particle.fillPhaseSpace:  Lab phase space:", \
-                      LabPhsSpc)
-            print(" <----  Particle.fillPhaseSpace, compete.", \
-                  "Success:", Success)
-
-        return Success
-
-    def calcRPLCPhaseSpace(self, nLoc=None):
-        if self.getDebug():
-            print(" Particle.calcRPLCPhaseSpace for nLoc:", \
-                  nLoc, "start:")
-            
-        PhsSpc = self.RPLCTraceSpace2PhaseSpace(self.getTraceSpace()[nLoc])
-
-        if self.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(" <---- Return phase space:", PhsSpc)
-
-        return PhsSpc
-
-    @classmethod
-    def RPLCTraceSpace2PhaseSpace(cls, TrcSpc):
-        if cls.getDebug():
-            print(" Particle.RPLCTraceSpace2PhaseSpace:")
-            
-        if cls.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> trace space:", TrcSpc)
-
-        species      = Prtcl.ReferenceParticle.getinstance().getSpecies()
-        particleMASS = iPhysclCnstnts.getparticleMASS(species)
-
-        p0 = BL.BeamLine.getElement()[0].getp0()
-        E0 = np.sqrt(particleMASS**2 + p0**2)
-        b0 = p0/E0
-        E  = E0 + TrcSpc[5]*p0
-        p  = mth.sqrt(E**2 - particleMASS**2)
-        if cls.getDebug():
-            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
-            K0 = E0 - particleMASS
-            K  = E  - particleMASS
-            print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
-        
-        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
-
-        px    = TrcSpc[1]*p0
-        py    = TrcSpc[3]*p0
-        p2    = p**2 - px**2 - py**2
-        if p2 < 0.:
-            print(" Crashing!")
-            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
-            K0 = E0 - particleMASS
-            K  = E  - particleMASS
-            print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
-            print("     ----> p2, px, py, p:", p2, px, py, p)
-            print("     ----> species, particleMASS, p0, E0, b0:", \
-                  species, particleMASS, p0, E0, b0)
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> TrcSpc:", TrcSpc)
-            print("     ----> Reference particle: \n", \
-                  Prtcl.ReferenceParticle.getinstance())
-        pz    = mth.sqrt(p2)
-        pRPLC = np.array([px, py, pz])
-                
-        if cls.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> position:", rRPLC)
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Mmtm    :", pRPLC)
-            Etmp = mth.sqrt(particleMASS**2 + np.dot(pRPLC, pRPLC))
-            print("     ----> Energy  :", Etmp)
-
-        PhsSpc = np.array([rRPLC, pRPLC])
-
-        if cls.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(" <---- Return phase space:", PhsSpc)
-
-        return PhsSpc
-
-    @classmethod
-    def RPLCPhaseSpace2TraceSpace(cls, PhsSpc):
-        if cls.getDebug():
-            print(" Particle.RPLCPhaseSpace2TraceSpace: start.")
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> PhsSpx:", PhsSpc)
-            
-        species      = Prtcl.ReferenceParticle.getinstance().getSpecies()
-        particleMASS = iPhysclCnstnts.getparticleMASS(species)
-
-        p0        = BL.BeamLine.getElement()[0].getp0()
-        E0        = mth.sqrt( particleMASS**2 + p0**2)
-        b0        = p0/E0
-        if cls.getDebug():
-            print("     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, \
-                  "(", E0-particleMASS, ")")
-
-        E = mth.sqrt(particleMASS**2 + np.dot(PhsSpc[3:],PhsSpc[3:]))
-        if cls.getDebug():
-            print("     ----> E:", E)
-        
-        x      = PhsSpc[0]
-        y      = PhsSpc[1]
-        
-        xPrime = PhsSpc[3] / p0
-        yPrime = PhsSpc[4] / p0
-
-        if cls.getDebug():
-            print("     ----> xPrime, yPrime:", 
-                  xPrime, yPrime)
-
-        z      = PhsSpc[2] / b0
-        delta  = (E - E0) / p0
-        
-        if cls.getDebug():
-            print("     ----> z, E, delta:", z, E, delta)
-
-        TrcSpc = np.array([x, xPrime, y, yPrime, z, delta])
-
-        if cls.getDebug():
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Trace space:", TrcSpc)
-
-        return TrcSpc
-
-    
 #--------  I/o methods:
 #                     ----> Write instances:
     @classmethod
@@ -1415,20 +1472,9 @@ class ReferenceParticle(Particle):
                    "         ---->   sIn:", self.getsIn()[-1])
                 
         RrIn  = self.getRrOut()[nRcrds-1]
-        Mmtm  = mth.sqrt(                             \
-                    self.getPrOut()[nRcrds-1][0]**2 + \
-                    self.getPrOut()[nRcrds-1][1]**2 + \
-                    self.getPrOut()[nRcrds-1][2]**2   \
-                        )
-        cx    = self.getPrOut()[nRcrds-1][0] / Mmtm
-        cy    = self.getPrOut()[nRcrds-1][1] / Mmtm
-        cz    = self.getPrOut()[nRcrds-1][2] / Mmtm
-        RrOut = np.array([ \
-                           RrIn[0] + cx*iBLE.getLength(), \
-                           RrIn[1] + cy*iBLE.getLength(), \
-                           RrIn[2] + cz*iBLE.getLength(), \
-                           0.                             \
-                          ])
+        delR = BLE.BeamLineElement.getinstances()[nRcrds+1].getStrt2End()
+        delR = np.append(delR, 0.)
+        RrOut = RrIn + delR
         Success = self.setRrIn(RrIn)
         if not Success:
             raise fail2setReferenceParticle("RrIn")
@@ -1441,8 +1487,10 @@ class ReferenceParticle(Particle):
             print( \
                    "         ----> RrOut:", self.getRrOut()[-1])
         
-        PrIn  = self.getPrOut()[nRcrds-1]
-        PrOut = PrIn
+        PrIn    = self.getPrOut()[nRcrds-1]
+        rot2lab = BLE.BeamLineElement.getinstances()[nRcrds+1].getRot2LbEnd()
+        PrOut   = np.matmul(rot2lab, PrIn[0:3])
+        PrOut   = np.append(PrOut, PrIn[3])
         Success = self.setPrIn(PrIn)
         if not Success:
             raise fail2setReferenceParticle("PrIn")
@@ -1455,8 +1503,10 @@ class ReferenceParticle(Particle):
             print( \
                    "         ----> PrOut:", self.getPrOut()[-1])
         
-        Rot2LabIn  = self.getRot2LabOut()[nRcrds-1]
-        Rot2LabOut = Rot2LabIn
+        Rot2LabIn  = \
+            BLE.BeamLineElement.getinstances()[nRcrds+1].getRot2LbStrt()
+        Rot2LabOut = \
+            BLE.BeamLineElement.getinstances()[nRcrds+1].getRot2LbEnd()
         Success = self.setRot2LabIn(Rot2LabIn)
         if not Success:
             raise fail2setReferenceParticle("Rot2LabIn")
@@ -1495,6 +1545,48 @@ class ReferenceParticle(Particle):
                   "  --------  --------  --------")
         
         return Success
+
+    def visualise(self, CoordSys, Projection, axs):
+        if self.getDebug():
+            print(" ReferenceParticle.visualise: start")
+            print("     ----> Coordinate system:", CoordSys)
+            print("     ----> Projection:", Projection)
+
+        sorz = []
+        xory = []
+        
+        #..  Plotting as a function of s if RPLC or z if laboratory:
+        if CoordSys == "RPLC":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "ys":
+                iCrd = 2
+                axl  = "y"
+                
+            sorz = self.getsOut()
+            for TrcSpc in self.getTraceSpace():
+                xory.append(TrcSpc[iCrd])
+
+        elif CoordSys == "Lab":
+            iCrd = 0
+            axl  = "x"
+            if Projection == "yz":
+                iCrd = 1
+                axl  = "y"
+                
+            for RrOut in self.getRrOut():
+                xory.append(RrOut[iCrd])
+                sorz.append(RrOut[2])
+            
+        if self.getDebug():
+            print("     ----> sorz:", sorz)
+            print("     ----> xory:", xory)
+        
+        axs.plot(sorz, xory, color='black', linewidth='0.5', \
+                 linestyle='dashed', zorder=3)
+        axs.set_xlabel('s (m)')
+        axs.set_ylabel(axl + ' (m)')
+    
     
 #--------  Exceptions:
 class noReferenceParticle(Exception):
