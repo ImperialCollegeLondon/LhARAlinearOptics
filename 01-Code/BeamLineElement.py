@@ -621,10 +621,8 @@ class BeamLineElement:
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
-        cntr = self.getrStrt() + self.getStrt2End()/2.
-        xlim = axs.get_xlim()
-        ylim = axs.get_ylim()
-
+        xlim  = axs.get_xlim()
+        ylim  = axs.get_ylim()
         wdth = self.getLength()
         if wdth == 0.: wdth = (xlim[1] - xlim[0]) / 100.
         hght = (ylim[1] - ylim[0]) / 10.
@@ -632,19 +630,33 @@ class BeamLineElement:
         abt  = 'center'
             
         if CoordSys == "RPLC":
-            if Proj == "xs":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
-            elif Proj == "ys":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+
+            sxy   = [ sStrt, -hght/2. ]
+                
         elif CoordSys == "Lab":
+            if self.getDebug():
+                print("     ----> Lab:")
+                
+            cntr  = self.getrStrt()
+            if self.getDebug():
+                print("         ----> Centre:", cntr)
+
             if Proj == "xz":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+                sxy   = [ cntr[2], cntr[0]-hght/2. ]
             elif Proj == "yz":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+                sxy   = [ cntr[2], cntr[1]-hght/2. ]
         
 
         if self.getDebug():
-            print("     ----> Centre:", cntr)
             print("     ---->    sxy:", sxy)
             print("     ---->   wdth:", wdth)
             print("     ---->   hght:", hght)
@@ -1311,19 +1323,19 @@ class Aperture(BeamLineElement):
     def visualise(self, axs, CoordSys, Proj):
         if self.getDebug():
             print(" Aperture(BeamLineElement).visualise: start")
+            print("     ---->        CoordSys:", CoordSys)
+            print("     ---->            Proj:", Proj)
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
-        cntr = self.getrStrt()
-        xlim = axs.get_xlim()
-        ylim = axs.get_ylim()
+        xlim  = axs.get_xlim()
+        ylim  = axs.get_ylim()
 
         ytot  = (ylim[1]-ylim[0])
         yzero = abs(ylim[0])/ytot
         if self.getDebug():
             print("     ----> xlim, ylim:", xlim, ylim)
             print("     ----> ytot, yzero:", ytot, yzero)
-            
 
         Typ  = self.getType()
         xmin = self.getParams()[0]
@@ -1333,38 +1345,55 @@ class Aperture(BeamLineElement):
         if self.getDebug():
             print("     ----> xmin, ymin:", xmin, ymin)
             
-        max = 1.
-        min = 0.
         if CoordSys == "RPLC": 
-            sz  = cntr[2]
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+                
+            sz  = sStrt
+
             if Proj == "xs":
                 xyup  = yzero + xmin/ytot
                 xydn  = yzero - xmin/ytot
             elif Proj == "ys":
                 xyup  = yzero + ymin/ytot
                 xydn  = yzero - ymin/ytot
+                
         elif CoordSys == "Lab": 
+            if self.getDebug():
+                print("     ----> Lab:")
+                
+            cntr  = self.getrStrt()
+            if self.getDebug():
+                print("         ----> Centre:", cntr)
             sz = cntr[2]
+            
             if Proj == "xz":
                 xyup  = yzero + xmin/ytot
                 xydn  = yzero - xmin/ytot
             elif Proj == "yz":
                 xyup  = yzero + ymin/ytot
                 xydn  = yzero - ymin/ytot
-                max = xyup + 0.4/ytot
-                min = xydn - 0.4/ytot
+                
+        amax = min(1., xyup + 1.0/ytot)
+        amin = max(0., xydn - 1.0/ytot)
             
         if self.getDebug():
-            print("     ----> Centre:", cntr)
             print("     ---->     sz:", sz)
             print("     ---->   xyup:", xyup)
             print("     ---->   xydn:", xydn)
             
-        axs.axvline(sz, xyup, max, \
+        axs.axvline(sz, xyup, amax, \
                     color="black", \
                     linewidth=1, \
                     zorder=2)
-        axs.axvline(sz, xydn, min, \
+        axs.axvline(sz, xydn, amin, \
                     color="black", \
                     linewidth=1, \
                     zorder=2)
@@ -2568,16 +2597,63 @@ class SectorDipole(BeamLineElement):
         abt  = 'center'
             
         if CoordSys == "RPLC":
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+
+            sxy   = [ sStrt, -hght/2. ]
+            
             hght = (ylim[1] - ylim[0]) / 10.
             sxy   = [ strt[2], -hght/2. ]
+            
         elif CoordSys == "Lab":
-            if Proj == "xz":
+            if self.getDebug():
+                print("     ----> Lab:")
+
+            BndPln = "xz"
+            if abs(self.getStrt2End()[0]) < abs(self.getStrt2End()[1]):
+                BndPln = "yz"
+            if self.getDebug():
+                print("         ----> Bending plane:", BndPln)
+                
+                
+            if Proj == "xz" and BndPln == "yz":
                 wdth = self.getStrt2End()[2]
                 hght = (ylim[1] - ylim[0]) / 10.
                 sxy   = [ strt[2], strt[0]-hght/2. ]
-            elif Proj == "yz":
+            elif Proj == "xz" and BndPln == "xz":
                 rRPLC = np.array([-self.getRadius(), 0., 0.])
                 rLab   = np.matmul(self.getRot2LbStrt(), rRPLC)
+                cntr   = strt + rLab
+                vec    = strt - rLab
+                theta1 = mth.atan2(vec[0]-strt[0], vec[2]-strt[2])
+                if theta1 < 0.:
+                    theta1 += 2.*mth.pi
+                theta2 = theta1 - self.getAngle()
+                theta = np.array([theta2*180./mth.pi, theta1*180./mth.pi])
+                
+                sxy   = np.array([cntr[2], cntr[0]])
+                wdth = 0.1
+                
+                if self.getDebug():
+                    print("     ----> Lab:")
+                    with np.printoptions(linewidth=500, \
+                                         precision=7,suppress=True):
+                        print("         ---->  rRPLC:", rRPLC)
+                        print("         ---->   rLab:", rLab)
+                        print("         ---->   cntr:", cntr)
+                        print("         ---->    vec:", vec)
+                        print("         ---->  theta:", theta)
+            elif Proj == "yz" and BndPln == "yz":
+                rRPLC = np.array([-self.getRadius(), 0., 0.])
+                rLab   = np.matmul(self.getRot2LbStrt(), rRPLC)
+                print(np.linalg.inv(self.getRot2LbStrt()))
                 cntr   = strt + rLab
                 vec    = strt - rLab
                 theta1 = mth.atan2(vec[1]-strt[1], vec[2]-strt[2])
@@ -2598,6 +2674,10 @@ class SectorDipole(BeamLineElement):
                         print("         ---->   cntr:", cntr)
                         print("         ---->    vec:", vec)
                         print("         ---->  theta:", theta)
+            elif Proj == "yz" and BndPln == "xz":
+                wdth = self.getStrt2End()[2]
+                hght = (ylim[1] - ylim[0]) / 10.
+                sxy   = [ strt[2], strt[1]-hght/2. ]
         
 
         if self.getDebug():
@@ -2615,13 +2695,19 @@ class SectorDipole(BeamLineElement):
                                       facecolor=('mediumvioletred', 1.), \
                                       zorder=2)
         elif CoordSys == "Lab":
-            if Proj == "xz":
+            if Proj == "xz" and BndPln == "xz":
+                Patch = patches.Wedge(sxy, self.getRadius()+wdth, \
+                                      theta[0], theta[1], \
+                                      width=2.5*wdth, \
+                                      facecolor=('mediumvioletred', 1.), \
+                                      zorder=2)
+            elif Proj == "yz" and BndPln == "xz":
                 Patch = patches.Rectangle(sxy, wdth, hght, \
                                           angle=angl, \
                                           rotation_point=abt, \
                                           facecolor=('mediumvioletred', 1.), \
                                           zorder=2)
-            elif Proj == "yz":
+            elif Proj == "yz" and BndPln == "yz":
                 Patch = patches.Wedge(sxy, self.getRadius()+wdth, \
                                       theta[0], theta[1], \
                                       width=2.5*wdth, \
@@ -3100,7 +3186,67 @@ class Solenoid(BeamLineElement):
 
         self._TrnsMtrx = TrnsMtrx
 
-        
+    def visualise(self, axs, CoordSys, Proj):
+        if self.getDebug():
+            print(" Solenoid(BeamLineElement).visualise: start")
+            print("     ----> self.getrStrt():", self.getrStrt())
+            print("     ----> self.getStrt2End():", self.getStrt2End())
+
+        xlim = axs.get_xlim()
+        ylim = axs.get_ylim()
+
+        wdth = self.getLength()
+        angl = 0.
+        abt  = 'center'
+            
+        hght = min(0.4, (ylim[1] - ylim[0]) / 10.)
+
+        if CoordSys == "RPLC":
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+
+            sxy   = [ sStrt, -hght/2. ]
+            
+        elif CoordSys == "Lab":
+            if self.getDebug():
+                print("     ----> Lab:")
+            
+            cntr = self.getrStrt()
+            if self.getDebug():
+                print("         ----> Cntr:", Cntr)
+
+            if Proj == "xz":
+                sxy   = [ cntr[2], cntr[0]-hght/2. ]
+            elif Proj == "yz":
+                sxy   = [ cntr[2], cntr[1]-hght/2. ]
+
+        if self.getDebug():
+            print("     ----> Centre:", cntr)
+            print("     ---->    sxy:", sxy)
+            print("     ---->   wdth:", wdth)
+            print("     ---->   hght:", hght)
+            print("     ---->   angl:", angl)
+            print("     ---->    abt:", abt)
+            
+        Patch = patches.Rectangle(sxy, wdth, hght, \
+                                  angle=angl, \
+                                  rotation_point=abt, \
+                                  facecolor=('orange', 1.), \
+                                  zorder=2)
+
+        axs.add_patch(Patch)
+                                   
+        if self.getDebug():
+            print(" <---- Solenoid(BeamLineElement).visualise: ends.")
+
+            
 # -------- Get methods:
 #..   Methods believed to be self-documenting(!)
     @classmethod
@@ -4123,7 +4269,6 @@ class CylindricalRFCavity(BeamLineElement):
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
-        cntr = self.getrStrt() + self.getStrt2End()/2.
         xlim = axs.get_xlim()
         ylim = axs.get_ylim()
 
@@ -4131,19 +4276,34 @@ class CylindricalRFCavity(BeamLineElement):
         hght = 2.*self.getRadius()
         angl = 0.
         abt  = 'center'
+
+        hght = min(2.*self.getRadius(), (ylim[1] - ylim[0]) / 7.5)
             
         if CoordSys == "RPLC":
-            hght = (ylim[1] - ylim[0]) / 7.5
-            if Proj == "xs":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
-            elif Proj == "ys":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+
+            sxy   = [ sStrt, -hght/2. ]
+            
         elif CoordSys == "Lab":
+            if self.getDebug():
+                print("     ----> Lab:")
+                
+            cntr = self.getrStrt()
+            if self.getDebug():
+                print("         ----> cntr:", cntr)
+                
             if Proj == "xz":
-                hght = (ylim[1] - ylim[0]) / 7.5
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
+                sxy   = [ cntr[2], cntr[0]-hght/2. ]
             elif Proj == "yz":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+                sxy   = [ cntr[2], cntr[1]-hght/2. ]
         
 
         if self.getDebug():
