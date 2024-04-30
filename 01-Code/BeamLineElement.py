@@ -1816,13 +1816,14 @@ class FocusQuadrupole(BeamLineElement):
         return Strn
     
     def visualise(self, axs, CoordSys, Proj):
+        self.setDebug(True)
+            
         if self.getDebug():
             print(" FocusQuadrupole(BeamLineElement).visualise: start")
             print("     ----> CoordSys, Proj:", CoordSys, Proj)
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
-        strt = self.getrStrt()
         xlim = axs.get_xlim()
         ylim = axs.get_ylim()
 
@@ -1833,11 +1834,27 @@ class FocusQuadrupole(BeamLineElement):
         abt  = 'xy'
         
         if CoordSys == "RPLC":
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
             if Proj == "xs":
-                sxy   = [strt[2], 0.]
+                sxy   = [sStrt, 0.]
             elif Proj == "ys":
-                sxy   = [strt[2], -ylim[1]/2.]
+                sxy   = [sStrt, -hght]
         elif CoordSys == "Lab":
+            if self.getDebug():
+                print("     ----> RPLC:")
+            
+            strt = self.getrStrt()
+            if self.getDebug():
+                print("         ----> strt:", strt)
+                
             if Proj == "xz":
                 sxy   = [strt[2], strt[0]]
             elif Proj == "yz":
@@ -1887,7 +1904,6 @@ class FocusQuadrupole(BeamLineElement):
                         print("     ----> Angl:", angl)
                     
         if self.getDebug():
-            print("     ----> Start:", strt)
             print("     ---->   sxy:", sxy)
             print("     ---->  wdth:", wdth)
             print("     ---->  hght:", hght)
@@ -1908,6 +1924,8 @@ class FocusQuadrupole(BeamLineElement):
                                    
         if self.getDebug():
             print(" <---- FocusQuadrupole(BeamLineElement).visualise: ends.")
+            
+        self.setDebug(False)
   
         
 #--------  I/o methods:
@@ -2315,13 +2333,24 @@ class DefocusQuadrupole(BeamLineElement):
         abt  = 'xy'
         
         if CoordSys == "RPLC":
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+
             if Proj == "xs":
-                sxy   = [strt[2], ylim[0]/2.]
+                sxy   = [sStrt, -hght]
             elif Proj == "ys":
-                sxy   = [strt[2], 0.]
+                sxy   = [sStrt, 0.]
+
         elif CoordSys == "Lab":
             if Proj == "xz":
-                sxy   = [strt[2], ylim[0]/2.]
+                sxy   = [strt[2], -hght]
             elif Proj == "yz":
                 bbox = axs.get_window_extent()
                 xax, yax = bbox.width, bbox.height
@@ -2607,11 +2636,9 @@ class SectorDipole(BeamLineElement):
                 print("         ----> self.getName(), iAddr, sStrt:", \
                       self.getName(), iAddr, sStrt)
 
-            sxy   = [ sStrt, -hght/2. ]
-            
             hght = (ylim[1] - ylim[0]) / 10.
-            sxy   = [ strt[2], -hght/2. ]
-            
+            sxy   = [ sStrt, -hght/2. ]
+
         elif CoordSys == "Lab":
             if self.getDebug():
                 print("     ----> Lab:")
