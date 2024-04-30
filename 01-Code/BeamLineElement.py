@@ -1816,8 +1816,6 @@ class FocusQuadrupole(BeamLineElement):
         return Strn
     
     def visualise(self, axs, CoordSys, Proj):
-        self.setDebug(True)
-            
         if self.getDebug():
             print(" FocusQuadrupole(BeamLineElement).visualise: start")
             print("     ----> CoordSys, Proj:", CoordSys, Proj)
@@ -1843,21 +1841,77 @@ class FocusQuadrupole(BeamLineElement):
             if self.getDebug():
                 print("         ----> self.getName(), iAddr, sStrt:", \
                       self.getName(), iAddr, sStrt)
+                
             if Proj == "xs":
                 sxy   = [sStrt, 0.]
             elif Proj == "ys":
                 sxy   = [sStrt, -hght]
+                
         elif CoordSys == "Lab":
             if self.getDebug():
                 print("     ----> RPLC:")
             
+            BndPln = "xz"
+            if abs(self.getStrt2End()[0]) < abs(self.getStrt2End()[1]):
+                BndPln = "yz"
+            if self.getDebug():
+                print("         ----> Bending plane:", BndPln)
+                
             strt = self.getrStrt()
             if self.getDebug():
                 print("         ----> strt:", strt)
                 
-            if Proj == "xz":
+            if Proj == "xz" and BndPln == "yz":
                 sxy   = [strt[2], strt[0]]
-            elif Proj == "yz":
+            elif Proj == "xz" and BndPln == "xz":
+                bbox = axs.get_window_extent()
+                xax, yax = bbox.width, bbox.height
+                xl = xlim[1] - xlim[0]
+                yl = ylim[1] - ylim[0]
+
+                invRot = np.linalg.inv(self.getRot2LbStrt())
+                angl   = mth.atan2(invRot[2][2], invRot[2][0])
+                if angl < 0.:
+                    angl += 2.*mth.pi
+                angl += mth.pi/2.
+                
+                sxy  = [strt[2], strt[0]]
+                hght = 0.4
+                
+                x1 = sxy
+                
+                Dm = np.array([self.getStrt2End()[2], \
+                               self.getStrt2End()[0]])
+                x2 = sxy + Dm
+
+                xscl = xax*yl / (yax*xl)
+                x4 = sxy + np.array([hght*mth.cos(angl)/xscl, \
+                                     hght*mth.sin(angl)*xscl])
+                x3 = x4 + Dm
+
+                x = np.array([])
+                y = np.array([])
+
+                x = np.append(x, x1[0])
+                x = np.append(x, x2[0])
+                x = np.append(x, x3[0])
+                x = np.append(x, x4[0])
+                
+                y = np.append(y, x1[1])
+                y = np.append(y, x2[1])
+                y = np.append(y, x3[1])
+                y = np.append(y, x4[1])
+                
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("     ----> Rot: \n", self.getRot2LbStrt())
+                        print("     ----> Rot: \n", invRot)
+                        print("     ----> Angl:", angl)
+
+                sxy  = [strt[2], strt[0]]
+                        
+            elif Proj == "yz" and BndPln == "yz":
                 bbox = axs.get_window_extent()
                 xax, yax = bbox.width, bbox.height
                 xl = xlim[1] - xlim[0]
@@ -1902,7 +1956,12 @@ class FocusQuadrupole(BeamLineElement):
                         print("     ----> Rot: \n", self.getRot2LbStrt())
                         print("     ----> Rot: \n", invRot)
                         print("     ----> Angl:", angl)
-                    
+
+                sxy  = [strt[2], strt[1]]
+
+            elif Proj == "yz" and BndPln == "xz":
+                sxy   = [strt[2], strt[1]]
+                        
         if self.getDebug():
             print("     ---->   sxy:", sxy)
             print("     ---->  wdth:", wdth)
@@ -1910,10 +1969,19 @@ class FocusQuadrupole(BeamLineElement):
             print("     ---->  angl:", angl)
             print("     ---->   abt:", abt)
 
-        if CoordSys == "Lab" and Proj == "yz":
-            axs.fill(x, y, \
-                     "darkgreen", \
-                     zorder=2)
+        if CoordSys == "Lab":
+            if Proj == "yz" and BndPln == "yz" or \
+               Proj == "xz" and BndPln == "xz":
+                axs.fill(x, y, \
+                         "darkgreen", \
+                         zorder=2)
+            elif Proj == "yz" and BndPln == "xz":
+                Patch = patches.Rectangle(sxy, wdth, hght, \
+                                          angle=angl, \
+                                          rotation_point=abt, \
+                                          facecolor=('darkgreen'), \
+                                          zorder=2)
+                axs.add_patch(Patch)
         else:
             Patch = patches.Rectangle(sxy, wdth, hght, \
                                       angle=angl, \
@@ -1925,8 +1993,6 @@ class FocusQuadrupole(BeamLineElement):
         if self.getDebug():
             print(" <---- FocusQuadrupole(BeamLineElement).visualise: ends.")
             
-        self.setDebug(False)
-  
         
 #--------  I/o methods:
     def writeElement(self, dataFILE):
@@ -2323,12 +2389,12 @@ class DefocusQuadrupole(BeamLineElement):
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
-        strt = self.getrStrt()
         xlim = axs.get_xlim()
         ylim = axs.get_ylim()
 
         wdth = self.getLength()
-        hght = abs(ylim[0])/2.
+        hght = min(0.4, abs(ylim[0])/2.)
+        
         angl = 0.
         abt  = 'xy'
         
@@ -2349,9 +2415,70 @@ class DefocusQuadrupole(BeamLineElement):
                 sxy   = [sStrt, 0.]
 
         elif CoordSys == "Lab":
-            if Proj == "xz":
+            if self.getDebug():
+                print("     ----> RPLC:")
+            
+            BndPln = "xz"
+            if abs(self.getStrt2End()[0]) < abs(self.getStrt2End()[1]):
+                BndPln = "yz"
+            if self.getDebug():
+                print("         ----> Bending plane:", BndPln)
+                
+            strt = self.getrStrt()
+            if self.getDebug():
+                print("         ----> strt:", strt)
+                
+            if Proj == "xz" and BndPln == "yz":
                 sxy   = [strt[2], -hght]
-            elif Proj == "yz":
+            elif Proj == "xz" and BndPln == "xz":
+                bbox = axs.get_window_extent()
+                xax, yax = bbox.width, bbox.height
+                xl = xlim[1] - xlim[0]
+                yl = ylim[1] - ylim[0]
+
+                invRot = np.linalg.inv(self.getRot2LbStrt())
+                angl   = mth.atan2(invRot[2][2], invRot[2][0])
+                if angl < 0.:
+                    angl += 2.*mth.pi
+                angl += mth.pi/2.
+                
+                sxy  = [strt[2], strt[0]]
+                hght = 0.4
+                
+                x1 = sxy
+                
+                Dm = np.array([self.getStrt2End()[2], \
+                               self.getStrt2End()[0]])
+                x2 = sxy + Dm
+
+                xscl = xax*yl / (yax*xl)
+                x4 = sxy + np.array([-hght*mth.cos(angl)/xscl, \
+                                     -hght*mth.sin(angl)*xscl])
+                x3 = x4 + Dm
+
+                x = np.array([])
+                y = np.array([])
+
+                x = np.append(x, x2[0])
+                x = np.append(x, x1[0])
+                x = np.append(x, x4[0])
+                x = np.append(x, x3[0])
+                
+                y = np.append(y, x2[1])
+                y = np.append(y, x1[1])
+                y = np.append(y, x4[1])
+                y = np.append(y, x3[1])
+                
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("     ----> Rot: \n", self.getRot2LbStrt())
+                        print("     ----> Rot: \n", invRot)
+                        print("     ----> Angl:", angl)
+
+                sxy  = [strt[2], strt[0]]
+                        
+            elif Proj == "yz" and BndPln == "yz":
                 bbox = axs.get_window_extent()
                 xax, yax = bbox.width, bbox.height
                 xl = xlim[1] - xlim[0]
@@ -2373,22 +2500,22 @@ class DefocusQuadrupole(BeamLineElement):
                 x2 = sxy + Dm
 
                 xscl = xax*yl / (yax*xl)
-                x4 = sxy + np.array([hght*mth.cos(angl)/xscl, \
-                                     hght*mth.sin(angl)*xscl])
+                x4 = sxy + np.array([-hght*mth.cos(angl)/xscl, \
+                                     -hght*mth.sin(angl)*xscl])
                 x3 = x4 + Dm
 
                 x = np.array([])
                 y = np.array([])
 
-                x = np.append(x, x1[0])
                 x = np.append(x, x2[0])
-                x = np.append(x, x3[0])
+                x = np.append(x, x1[0])
                 x = np.append(x, x4[0])
+                x = np.append(x, x3[0])
                 
-                y = np.append(y, x1[1])
                 y = np.append(y, x2[1])
-                y = np.append(y, x3[1])
+                y = np.append(y, x1[1])
                 y = np.append(y, x4[1])
+                y = np.append(y, x3[1])
                 
                 if self.getDebug():
                     with np.printoptions(linewidth=500,precision=7, \
@@ -2399,6 +2526,9 @@ class DefocusQuadrupole(BeamLineElement):
                     
                 sxy  = [strt[2], strt[1]]
 
+            elif Proj == "yz" and BndPln == "xz":
+                sxy   = [strt[2], strt[1]]
+                
         if self.getDebug():
             print("     ----> Centre:", strt)
             print("     ---->    sxy:", sxy)
@@ -2407,10 +2537,19 @@ class DefocusQuadrupole(BeamLineElement):
             print("     ---->   angl:", angl)
             print("     ---->    abt:", abt)
             
-        if CoordSys == "Lab" and Proj == "yz":
-            axs.fill(x, y, \
-                     "darkgreen", \
-                     zorder=2)
+        if CoordSys == "Lab":
+            if Proj == "yz" and BndPln == "yz" or \
+               Proj == "xz" and BndPln == "xz":
+                axs.fill(x, y, \
+                         "darkgreen", \
+                         zorder=2)
+            elif Proj == "yz" and BndPln == "xz":
+                Patch = patches.Rectangle(sxy, wdth, -hght, \
+                                          angle=angl, \
+                                          rotation_point=abt, \
+                                          facecolor=('darkgreen'), \
+                                          zorder=2)
+                axs.add_patch(Patch)
         else:
             Patch = patches.Rectangle(sxy, wdth, hght, \
                                       angle=angl, \
