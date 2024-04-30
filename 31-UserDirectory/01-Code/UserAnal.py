@@ -97,6 +97,9 @@ class UserAnal:
 
             
 #--------  Utilities:
+    def EventLoop(self):
+        print(" In event loop:")
+        
     @classmethod
     def plotSomething(cls):
 

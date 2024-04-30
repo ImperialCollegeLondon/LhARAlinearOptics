@@ -62,16 +62,16 @@ class visualise(object):
         self.setProjection(_Projection)
 
         """
-        if self.getProjection().find('s') > 0:
+        if self.getProjection().find('s') >= 0:
             axs.set_xlabel('s (m)')
-        elif self.getProjection().find('z') > 0:
+        elif self.getProjection().find('z') >= 0:
             axs.set_xlabel('z (m)')
         else:
             axs.set_xlabel('Not given')
             
-        if self.getProjection().find('x') > 0:
+        if self.getProjection().find('x') >= 0:
             axs.set_ylabel('x (m)')
-        elif self.getProjection().find('y') > 0:
+        elif self.getProjection().find('y') >= 0:
             axs.set_ylabel('y (m)')
         else:
             axs.set_ylabel('Not given')

@@ -72,6 +72,9 @@ def main(argv):
               os.path.dirname(outputfile), "does not exist.")
     else:
         print("                   Output file not implemented.")
+
+    iUsrAnl = UsrAnl.UserAnal()
+    print(iUsrAnl)
     
     print("     <---- Initialisation complete.")
 
@@ -92,6 +95,9 @@ def main(argv):
                 if iCnt == 10:
                     iCnt = 1
                     Scl  = Scl * 10
+
+        iUsrAnl.EventLoop()
+        
         if iEvt <0:
             print(Prtcl.Particle.getParticleInstances()[iEvt])
         if nEvts != None and iEvt == nEvts:
@@ -102,7 +108,7 @@ def main(argv):
     print(" <---- Data-file reading done.")
         
     print(" User analysis:")
-    UsrAnl.UserAnal.plotSomething()
+    iUsrAnl.plotSomething()
     print(" <---- Done.")
     
     print(" readBEAMsim: ends")
