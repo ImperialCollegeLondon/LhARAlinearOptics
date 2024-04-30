@@ -2329,7 +2329,6 @@ class DefocusQuadrupole(BeamLineElement):
         return Strn
 
     def visualise(self, axs, CoordSys, Proj):
-        self.setDebug(True)
         if self.getDebug():
             print(" DefocusQuadrupole(BeamLineElement).visualise: start")
             print("     ----> CoordSys, Proj:", CoordSys, Proj)
@@ -2464,8 +2463,6 @@ class DefocusQuadrupole(BeamLineElement):
                                    
         if self.getDebug():
             print(" <---- DefocusQuadrupole(BeamLineElement).visualise: ends.")
-
-        self.setDebug(False)
 
         
 #--------  I/o methods:
@@ -2693,25 +2690,27 @@ class SectorDipole(BeamLineElement):
                 BndPln = "yz"
             if self.getDebug():
                 print("         ----> Bending plane:", BndPln)
+
+            iCoord = 0
+            if Proj == "yz": iCoord = 1
                 
-                
-            if Proj == "xz" and BndPln == "yz":
+            if Proj != BndPln:
                 wdth = self.getStrt2End()[2]
                 hght = (ylim[1] - ylim[0]) / 10.
-                sxy   = [ strt[2], strt[0]-hght/2. ]
+                sxy   = [ strt[2], strt[iCoord]-hght/2. ]
                 
-            elif Proj == "xz" and BndPln == "xz":
+            elif Proj == BndPln:
                 rRPLC = np.array([-self.getRadius(), 0., 0.])
                 rLab   = np.matmul(self.getRot2LbStrt(), rRPLC)
                 cntr   = strt + rLab
                 vec    = strt - rLab
-                theta1 = mth.atan2(vec[0]-strt[0], vec[2]-strt[2])
+                theta1 = mth.atan2(vec[iCoord]-strt[iCoord], vec[2]-strt[2])
                 if theta1 < 0.:
                     theta1 += 2.*mth.pi
                 theta2 = theta1 - self.getAngle()
                 theta = np.array([theta2*180./mth.pi, theta1*180./mth.pi])
                 
-                sxy   = np.array([cntr[2], cntr[0]])
+                sxy   = np.array([cntr[2], cntr[iCoord]])
                 wdth = 0.1
                 
                 if self.getDebug():
@@ -2723,35 +2722,6 @@ class SectorDipole(BeamLineElement):
                         print("         ---->   cntr:", cntr)
                         print("         ---->    vec:", vec)
                         print("         ---->  theta:", theta)
-            elif Proj == "yz" and BndPln == "yz":
-                rRPLC = np.array([-self.getRadius(), 0., 0.])
-                rLab   = np.matmul(self.getRot2LbStrt(), rRPLC)
-                print(np.linalg.inv(self.getRot2LbStrt()))
-                cntr   = strt + rLab
-                vec    = strt - rLab
-                theta1 = mth.atan2(vec[1]-strt[1], vec[2]-strt[2])
-                if theta1 < 0.:
-                    theta1 += 2.*mth.pi
-                theta2 = theta1 + self.getAngle()
-                theta = np.array([theta1*180./mth.pi, theta2*180./mth.pi])
-                
-                sxy   = np.array([cntr[2], cntr[1]])
-                wdth = 0.1
-                
-                if self.getDebug():
-                    print("     ----> Lab:")
-                    with np.printoptions(linewidth=500, \
-                                         precision=7,suppress=True):
-                        print("         ---->  rRPLC:", rRPLC)
-                        print("         ---->   rLab:", rLab)
-                        print("         ---->   cntr:", cntr)
-                        print("         ---->    vec:", vec)
-                        print("         ---->  theta:", theta)
-            elif Proj == "yz" and BndPln == "xz":
-                wdth = self.getStrt2End()[2]
-                hght = (ylim[1] - ylim[0]) / 10.
-                sxy   = [ strt[2], strt[1]-hght/2. ]
-        
 
         if self.getDebug():
             print("     ---->  Start:", strt)
@@ -2761,29 +2731,24 @@ class SectorDipole(BeamLineElement):
             print("     ---->   angl:", angl)
             print("     ---->    abt:", abt)
 
-        if CoordSys == "RPLC":
-            Patch = patches.Rectangle(sxy, wdth, hght, \
-                                      angle=angl, \
-                                      rotation_point=abt, \
-                                      facecolor=('mediumvioletred', 1.), \
-                                      zorder=2)
-        elif CoordSys == "Lab":
-            if Proj == "xz" and BndPln == "xz":
+
+        if CoordSys == "Lab":
+            if Proj == BndPln:
                 Patch = patches.Wedge(sxy, self.getRadius()+wdth, \
                                       theta[0], theta[1], \
                                       width=2.5*wdth, \
                                       facecolor=('mediumvioletred', 1.), \
                                       zorder=2)
-            elif Proj == "yz" and BndPln == "xz":
+            elif Proj != BndPln:
                 Patch = patches.Rectangle(sxy, wdth, hght, \
                                           angle=angl, \
                                           rotation_point=abt, \
                                           facecolor=('mediumvioletred', 1.), \
                                           zorder=2)
-            elif Proj == "yz" and BndPln == "yz":
-                Patch = patches.Wedge(sxy, self.getRadius()+wdth, \
-                                      theta[0], theta[1], \
-                                      width=2.5*wdth, \
+        else:
+            Patch = patches.Rectangle(sxy, wdth, hght, \
+                                      angle=angl, \
+                                      rotation_point=abt, \
                                       facecolor=('mediumvioletred', 1.), \
                                       zorder=2)
 
