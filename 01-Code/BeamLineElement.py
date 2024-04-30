@@ -3741,7 +3741,6 @@ class GaborLens(BeamLineElement):
             print("     ----> self.getrStrt():", self.getrStrt())
             print("     ----> self.getStrt2End():", self.getStrt2End())
 
-        cntr = self.getrStrt() + self.getStrt2End()/2.
         xlim = axs.get_xlim()
         ylim = axs.get_ylim()
 
@@ -3751,17 +3750,32 @@ class GaborLens(BeamLineElement):
         abt  = 'center'
             
         if CoordSys == "RPLC":
+            if self.getDebug():
+                print("     ----> RPLC:")
+                
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iAddr     = iRefPrtcl.getLocation().index(self.getName())
+            sStrt = iRefPrtcl.gets()[iAddr-1]
+            if self.getDebug():
+                print("         ----> self.getName(), iAddr, sStrt:", \
+                      self.getName(), iAddr, sStrt)
+
+            sxy   = [ sStrt, -hght/2. ]
             hght = (ylim[1] - ylim[0]) / 10.
-            if Proj == "xs":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
-            elif Proj == "ys":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+            
         elif CoordSys == "Lab":
-            if Proj == "xz":
-                hght = (ylim[1] - ylim[0]) / 10.
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[0]-hght/2. ]
-            elif Proj == "yz":
-                sxy   = [ cntr[2]-self.getLength()/2., cntr[1]-hght/2. ]
+            if self.getDebug():
+                print("     ----> Lab:")
+
+            iCoord = 0
+            if Proj == "yz": iCoord = 1
+
+            cntr = self.getrStrt()
+            if self.getDebug():
+                print("         ----> cntr:", cntr)
+            
+            hght = (ylim[1] - ylim[0]) / 10.
+            sxy   = [ cntr[2], cntr[iCoord]-hght/2. ]
         
 
         if self.getDebug():
