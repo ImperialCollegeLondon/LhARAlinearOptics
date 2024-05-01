@@ -30,6 +30,7 @@ inputdatafile = os.path.join(HOMEPATH, \
 #                             '99-Scratch/LhARA-Gauss-Gabor.dat')
 #                             '11-Parameters/Data4Tests.dat')
                              '99-Scratch/HorizRight.dat')
+#                             '99-Scratch/VerticalUp.dat')
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)
 
@@ -139,10 +140,10 @@ with PdfPages(plotFILE) as pdf:
     axs[1].set_ylim(-1., 18.)
     axs[1].set_ylim(-6., 6.)
     
-    ivisLaby.Particles(axs[0], 1000)
-    ivisLaby.BeamLine(axs[0])
     ivisLabx.Particles(axs[1], 1000)
     ivisLabx.BeamLine(axs[1])
+    ivisLaby.Particles(axs[0], 1000)
+    ivisLaby.BeamLine(axs[0])
     
     pdf.savefig()
     plt.close()

@@ -1859,7 +1859,10 @@ class FocusQuadrupole(BeamLineElement):
                 print("         ----> strt:", strt)
                 
             if Proj != BndPln:
-                sxy   = [strt[2], strt[iCoord]]
+                if Proj == "xz":
+                    sxy   = [strt[2], 0.]
+                elif Proj == "yz":
+                    sxy   = [strt[2], -hght]
                 
             elif Proj == BndPln:
                 bbox = axs.get_window_extent()
@@ -1916,25 +1919,18 @@ class FocusQuadrupole(BeamLineElement):
             print("     ---->  angl:", angl)
             print("     ---->   abt:", abt)
 
-        if CoordSys == "Lab":
-            if Proj == BndPln:
-                axs.fill(x, y, \
-                         "darkgreen", \
-                         zorder=2)
-            elif Proj == "yz" and BndPln == "xz":
-                Patch = patches.Rectangle(sxy, wdth, hght, \
-                                          angle=angl, \
-                                          rotation_point=abt, \
-                                          facecolor=('darkgreen'), \
-                                          zorder=2)
-                axs.add_patch(Patch)
-        else:
+        if CoordSys == "RPLC" or \
+           (CoordSys == "Lab" and Proj != BndPln):
             Patch = patches.Rectangle(sxy, wdth, hght, \
                                       angle=angl, \
                                       rotation_point=abt, \
                                       facecolor=('darkgreen'), \
                                       zorder=2)
             axs.add_patch(Patch)
+        else:
+            axs.fill(x, y, \
+                     "darkgreen", \
+                     zorder=2)
                                    
         if self.getDebug():
             print(" <---- FocusQuadrupole(BeamLineElement).visualise: ends.")
@@ -2344,10 +2340,6 @@ class DefocusQuadrupole(BeamLineElement):
         angl = 0.
         abt  = 'xy'
 
-        BndPln = "xz"
-        if abs(self.getStrt2End()[0]) < abs(self.getStrt2End()[1]):
-            BndPln = "yz"
-        
         if CoordSys == "RPLC":
             if self.getDebug():
                 print("     ----> RPLC:")
@@ -2367,23 +2359,28 @@ class DefocusQuadrupole(BeamLineElement):
         elif CoordSys == "Lab":
             if self.getDebug():
                 print("     ----> RPLC:")
-            
+                
+            BndPln = "xz"
+            if abs(self.getStrt2End()[0]) < abs(self.getStrt2End()[1]):
+                BndPln = "yz"
             if self.getDebug():
                 print("         ----> Bending plane:", BndPln)
                 
             strt = self.getrStrt()
+            
+            iCoord = 0
+            if Proj.find("y") >=0: iCoord = 1
+            
             if self.getDebug():
                 print("         ----> strt:", strt)
                 
-            if Proj == "xz" and BndPln == "yz":
-                sxy   = [strt[2], -hght]
-            elif Proj == "yz" and BndPln == "xz":
-                sxy   = [strt[2], strt[1]]
+            if Proj != BndPln:
+                if Proj == "xz":
+                    sxy   = [strt[2], -hght]
+                elif Proj == "yz":
+                    sxy   = [strt[2], 0.]
 
             elif Proj ==BndPln:
-                iCoord = 0
-                if Proj == "yz": iCoord = 1
-                
                 bbox = axs.get_window_extent()
                 xax, yax = bbox.width, bbox.height
                 xl = xlim[1] - xlim[0]
@@ -2440,26 +2437,19 @@ class DefocusQuadrupole(BeamLineElement):
             print("     ---->   hght:", hght)
             print("     ---->   angl:", angl)
             print("     ---->    abt:", abt)
-            
-        if CoordSys == "Lab":
-            if Proj == BndPln:
-                axs.fill(x, y, \
-                         "darkgreen", \
-                         zorder=2)
-            elif Proj != BndPln:
-                Patch = patches.Rectangle(sxy, wdth, -hght, \
-                                          angle=angl, \
-                                          rotation_point=abt, \
-                                          facecolor=('darkgreen'), \
-                                          zorder=2)
-                axs.add_patch(Patch)
-        else:
+
+        if CoordSys == "RPLC" or \
+           (CoordSys == "Lab" and Proj != BndPln):
             Patch = patches.Rectangle(sxy, wdth, hght, \
                                       angle=angl, \
                                       rotation_point=abt, \
                                       facecolor=('darkgreen'), \
                                       zorder=2)
             axs.add_patch(Patch)
+        else:
+            axs.fill(x, y, \
+                     "darkgreen", \
+                     zorder=2)
                                    
         if self.getDebug():
             print(" <---- DefocusQuadrupole(BeamLineElement).visualise: ends.")
@@ -2707,8 +2697,12 @@ class SectorDipole(BeamLineElement):
                 theta1 = mth.atan2(vec[iCoord]-strt[iCoord], vec[2]-strt[2])
                 if theta1 < 0.:
                     theta1 += 2.*mth.pi
-                theta2 = theta1 - self.getAngle()
-                theta = np.array([theta2*180./mth.pi, theta1*180./mth.pi])
+                theta2 = theta1 + \
+                    self.getAngle()*mth.copysign(1.,rLab[iCoord])
+                if theta1 < theta2:
+                    theta = np.array([theta1*180./mth.pi, theta2*180./mth.pi])
+                else:
+                    theta = np.array([theta2*180./mth.pi, theta1*180./mth.pi])
                 
                 sxy   = np.array([cntr[2], cntr[iCoord]])
                 wdth = 0.1
@@ -3760,8 +3754,8 @@ class GaborLens(BeamLineElement):
                 print("         ----> self.getName(), iAddr, sStrt:", \
                       self.getName(), iAddr, sStrt)
 
-            sxy   = [ sStrt, -hght/2. ]
             hght = (ylim[1] - ylim[0]) / 10.
+            sxy   = [ sStrt, -hght/2. ]
             
         elif CoordSys == "Lab":
             if self.getDebug():
