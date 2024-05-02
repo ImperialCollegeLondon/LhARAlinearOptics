@@ -6,6 +6,16 @@ Class UserAnal:
 
   Dummy class created to help user develop their own analysis.
 
+  Out of the box provides three "user hooks":
+
+   UserInit: called at instanitation to allow user to initialise.
+
+   UserAnal: called in the event loop to allow user to do whatever is needed
+             for their analysis.
+
+    UserEnd: called at the end of execution before termination to allow
+             user to dump summaries, statistics, plots etc.
+
   Class attributes:
   -----------------
     instances : List of instances of Particle class
@@ -96,12 +106,8 @@ class UserAnal:
         return cls.instances
 
             
-#--------  Utilities:
+#--------  Processing methods:
     def EventLoop(self):
-        print(" In event loop:")
-        
-    @classmethod
-    def plotSomething(cls):
 
         nPrtcl = 0
         for iPrtcl in Prtcl.Particle.getParticleInstances():
@@ -114,7 +120,22 @@ class UserAnal:
             if nPrtcl < 10:
                 iPrtcl.printProgression()
 
-        print(" UserAnal done, number of particles read:", nPrtcl)
+        print(" UserAnal.EventLoop done, number of particles read:", nPrtcl)
+
+        self.UserEnd()
+
+        
+#--------  UserHooks:
+    def UserInit(self):
+        print(" UserAnal.UserInit: initialsation")
+
+        print(" <---- UserAnal.UserInit; done.")
+
+    def UserEnd(self):
+        print(" UserEnd.UserEnd: called in event loop:")
+
+        print(" <---- UserEnd.UserEnd; done.")
+
 
 #--------  Exceptions:
 class noReferenceParticle(Exception):

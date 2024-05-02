@@ -73,6 +73,7 @@ def main(argv):
     else:
         print("                   Output file not implemented.")
 
+    #.. ----> Instanciate user analysis:
     iUsrAnl = UsrAnl.UserAnal()
     print(iUsrAnl)
     
@@ -108,7 +109,7 @@ def main(argv):
     print(" <---- Data-file reading done.")
         
     print(" User analysis:")
-    iUsrAnl.plotSomething()
+    iUsrAnl.UserEnd()
     print(" <---- Done.")
     
     print(" readBEAMsim: ends")
