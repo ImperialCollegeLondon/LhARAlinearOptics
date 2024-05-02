@@ -29,8 +29,10 @@ inputdatafile = os.path.join(HOMEPATH, \
 #                             '99-Scratch/LION-test.dat')
 #                             '99-Scratch/LhARA-Gauss-Gabor.dat')
 #                             '11-Parameters/Data4Tests.dat')
-                             '99-Scratch/HorizRight.dat')
+                             '99-Scratch/HorizLeft.dat')
+#                             '99-Scratch/HorizRight.dat')
 #                             '99-Scratch/VerticalUp.dat')
+#                             '99-Scratch/VerticalDown.dat')
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)
 

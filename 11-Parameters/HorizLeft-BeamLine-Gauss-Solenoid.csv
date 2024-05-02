@@ -62,8 +62,8 @@
 1,Matching,Gabor lens,"Length, strength",Strength,1.16596749,rad/m,
 1,Matching,Drift,,Length,0.15,m,Drift out of Gabor lens
 1,Arc,Drift,,Length,0.2,m,
-1,Arc,RPLCswitch,j,theta,1.570796327,rad,
-1,Arc,RPLCswitch,j,phi,3.141592654,rad,
+1,Arc,RPLCswitch,j,theta,4.71238898,rad,
+1,Arc,RPLCswitch,j,phi,1.570796327,rad,
 1,Arc,RPLCswitch,k,theta,0,rad,
 1,Arc,RPLCswitch,k,phi,0,rad,
 1,Arc,Dipole,"Sector (Length, angle)",Length,0.8,m,

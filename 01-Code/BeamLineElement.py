@@ -406,6 +406,12 @@ class BeamLineElement:
         return self._Rot2LbEnd
 
     def getvEnd(self):
+        if self.getDebug():
+            print(" BeamLineElement.getvEnd; start.")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> self.getRot2LbEnd() \n", \
+                      self.getRot2LbEnd())
+            
         kx = self.getRot2LbEnd()[0][2]
         ky = self.getRot2LbEnd()[1][2]
         kz = self.getRot2LbEnd()[2][2]
@@ -427,6 +433,8 @@ class BeamLineElement:
             kcphi = 1.
             ksphi = 0.
 
+        if self.getDebug():
+            print("     ----> jx, jy, sjtheta:", jx, jy, sjtheta)
         jcphi   = jx/sjtheta
         jsphi   = jy/sjtheta
 
