@@ -21,8 +21,7 @@ print("========  LhARAFacility-from-datafile: tests start  ========")
 ##! Now create pointer to input data file:
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
-                             '99-Scratch/LhARA-Gauss-Gabor.dat')
-#                             '11-Parameters/Data4Tests.dat')
+                             '11-Parameters/LhARAdata4tests.dat')
 
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)

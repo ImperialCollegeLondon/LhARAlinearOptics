@@ -134,7 +134,9 @@ class BeamIO:
 
         if not isinstance(self.getdataFILE(), io.BufferedReader):
             raise noFILE( \
-                    " BeamIO.readBeamDataRecord: file does not exist.")
+                          " BeamIO.readBeamDataRecord: " + \
+                          str(self.getdataFILE()) + \
+                          " file does not exist.")
 
         EoF = False
 
