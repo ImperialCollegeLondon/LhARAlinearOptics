@@ -57,7 +57,6 @@ Scripts:
  - LhARAMagnetTable.py     - OK
  - plotQuadTriplet.py      - Fails
 
-
 --------  --------  --------  --------  --------  --------  --------  28Apr24
 Made visualisation work.  Off-axis element handling needs to be generalised.
 Works for vertical bends, but, will not work for horizontal bends.  Now need

@@ -23,6 +23,7 @@ HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
                              '11-Parameters/LhARAdata4tests.dat')
 
+
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)
 

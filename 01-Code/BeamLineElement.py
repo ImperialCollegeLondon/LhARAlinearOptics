@@ -631,6 +631,7 @@ class BeamLineElement:
 
         xlim  = axs.get_xlim()
         ylim  = axs.get_ylim()
+
         wdth = self.getLength()
         if wdth == 0.: wdth = (xlim[1] - xlim[0]) / 100.
         hght = (ylim[1] - ylim[0]) / 10.
@@ -1891,6 +1892,7 @@ class FocusQuadrupole(BeamLineElement):
                 
                 Dm = np.array([self.getStrt2End()[2], \
                                self.getStrt2End()[iCoord]])
+
                 x2 = sxy + Dm
 
                 xscl = xax*yl / (yax*xl)
@@ -1929,6 +1931,7 @@ class FocusQuadrupole(BeamLineElement):
 
         if CoordSys == "RPLC" or \
            (CoordSys == "Lab" and Proj != BndPln):
+
             Patch = patches.Rectangle(sxy, wdth, hght, \
                                       angle=angl, \
                                       rotation_point=abt, \
@@ -2448,6 +2451,7 @@ class DefocusQuadrupole(BeamLineElement):
 
         if CoordSys == "RPLC" or \
            (CoordSys == "Lab" and Proj != BndPln):
+    
             Patch = patches.Rectangle(sxy, wdth, hght, \
                                       angle=angl, \
                                       rotation_point=abt, \
@@ -2732,7 +2736,6 @@ class SectorDipole(BeamLineElement):
             print("     ---->   hght:", hght)
             print("     ---->   angl:", angl)
             print("     ---->    abt:", abt)
-
 
         if CoordSys == "Lab":
             if Proj == BndPln:
@@ -3777,8 +3780,7 @@ class GaborLens(BeamLineElement):
                 print("         ----> cntr:", cntr)
             
             hght = (ylim[1] - ylim[0]) / 10.
-            sxy   = [ cntr[2], cntr[iCoord]-hght/2. ]
-        
+            sxy   = [ cntr[2], cntr[iCoord]-hght/2. ]        
 
         if self.getDebug():
             print("     ----> Centre:", cntr)
@@ -4358,8 +4360,6 @@ class CylindricalRFCavity(BeamLineElement):
                 sxy   = [ cntr[2], cntr[0]-hght/2. ]
             elif Proj == "yz":
                 sxy   = [ cntr[2], cntr[1]-hght/2. ]
-        
-
         if self.getDebug():
             print("     ----> Centre:", cntr)
             print("     ---->    sxy:", sxy)
