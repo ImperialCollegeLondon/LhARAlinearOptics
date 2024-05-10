@@ -27,8 +27,12 @@ print("========  visualise: tests start  ========")
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
 #                             '99-Scratch/LION-test.dat')
-#                             '99-Scratch/LhARA-Gauss-Gabor.dat')
-                             '11-Parameters/Data4Tests.dat')
+                             '11-Parameters/LhARAdata4tests.dat')
+#                             '11-Parameters/Data4Tests.dat')
+#                             '99-Scratch/HorizLeft.dat')
+#                             '99-Scratch/HorizRight.dat')
+#                             '99-Scratch/VerticalUp.dat')
+#                             '99-Scratch/VerticalDown.dat')
 
 #.. Open data file and read first record to set up geometry
 ibmIOr = bmIO.BeamIO(None, inputdatafile)
@@ -107,6 +111,10 @@ with PdfPages(plotFILE) as pdf:
     # add an artist, in this case a nice label in the middle...
     Ttl = "Test RPLC visualise"
     fig.suptitle(Ttl, fontdict=font)
+    axs[0].set_xlim(-1., 22.)
+    axs[0].set_ylim(-0.05, 0.05)
+    axs[1].set_xlim(-1., 22.)
+    axs[1].set_ylim(-0.05, 0.05)
 
     ivisRPLCx.Particles(axs[0], 1000)
     ivisRPLCx.BeamLine(axs[0])
@@ -130,7 +138,12 @@ with PdfPages(plotFILE) as pdf:
     # add an artist, in this case a nice label in the middle...
     Ttl = "Test lab coordinate system visualise"
     fig.suptitle(Ttl, fontdict=font)
-    axs[1].set_ylim(-1., 6.)
+
+    axs[0].set_xlim(-1., 18.)
+    axs[0].set_ylim(-0.05, 0.05)
+    axs[1].set_ylim(-1., 18.)
+    axs[1].set_ylim(-1.1, 6.)
+
     
     ivisLabx.Particles(axs[0], 1000)
     ivisLabx.BeamLine(axs[0])

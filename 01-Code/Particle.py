@@ -618,8 +618,11 @@ class Particle:
             axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
         else:
             axs.plot(sorz, xory, color='darkgray', linewidth='0.5', zorder=2)
-            
-        axs.set_xlabel('s (m)')
+
+        if CoordSys == "RPLC":
+            axs.set_xlabel('s (m)')
+        elif CoordSys == "Lab":
+            axs.set_xlabel('z (m)')
         axs.set_ylabel(axl + ' (m)')
 
         

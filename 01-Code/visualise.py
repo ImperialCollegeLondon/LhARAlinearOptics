@@ -61,6 +61,22 @@ class visualise(object):
         self.setCoordSys(_CoordSys)
         self.setProjection(_Projection)
 
+        """
+        if self.getProjection().find('s') >= 0:
+            axs.set_xlabel('s (m)')
+        elif self.getProjection().find('z') >= 0:
+            axs.set_xlabel('z (m)')
+        else:
+            axs.set_xlabel('Not given')
+            
+        if self.getProjection().find('x') >= 0:
+            axs.set_ylabel('x (m)')
+        elif self.getProjection().find('y') >= 0:
+            axs.set_ylabel('y (m)')
+        else:
+            axs.set_ylabel('Not given')
+        """
+        
         if self.getDebug():
             self.print()
 
