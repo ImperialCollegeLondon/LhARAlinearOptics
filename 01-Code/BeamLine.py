@@ -112,6 +112,7 @@ import struct as strct
 
 import Particle        as Prtcl
 import BeamLineElement as BLE
+import Simulation      as Smltn
 
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
@@ -946,7 +947,8 @@ class BeamLine(object):
 
     @classmethod
     def trackBeam(cls, NEvts=0, ParticleFILE=None):
-        if cls.getDebug() or NEvts > 1:
+        if (cls.getDebug() or NEvts > 1) and \
+           Smltn.Simulation.getProgressPrint():
             print("     ----> BeamLine.trackBeam for", NEvts, " events.")
         Scl  = 10
         iCnt = 1
@@ -955,7 +957,8 @@ class BeamLine(object):
 
         for iEvt in range(1, NEvts):
             if (iEvt % Scl) == 0:
-                if cls.getDebug() or NEvts > 1:
+                if (cls.getDebug() or NEvts > 1) and \
+                   Smltn.Simulation.getProgressPrint():
                     print("         ----> Generating event ", iEvt)
                 iCnt += 1
                 if iCnt == 10:
@@ -1036,7 +1039,8 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     <---- Finished handling beam line.")
                 
-        if cls.getDebug() or NEvts > 1:
+        if (cls.getDebug() or NEvts > 1) and \
+        Smltn.Simulation.getProgressPrint():
             print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
 
