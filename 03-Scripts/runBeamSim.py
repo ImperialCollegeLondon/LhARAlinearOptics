@@ -3,8 +3,6 @@
 
 import os
 import sys, getopt
-import struct
-import math as mth
 
 import Simulation as Simu
 import Particle as Prtcl

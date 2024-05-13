@@ -946,7 +946,8 @@ class BeamLine(object):
         return True
 
     @classmethod
-    def trackBeam(cls, NEvts=0, ParticleFILE=None):
+    def trackBeam(cls, NEvts=0, ParticleFILE=None, \
+                  iParticle=None, LocStrt=None):
         if (cls.getDebug() or NEvts > 1) and \
            Smltn.Simulation.getProgressPrint():
             print("     ----> BeamLine.trackBeam for", NEvts, " events.")
@@ -955,7 +956,7 @@ class BeamLine(object):
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-        for iEvt in range(1, NEvts):
+        for iEvt in range(0, NEvts):
             if (iEvt % Scl) == 0:
                 if (cls.getDebug() or NEvts > 1) and \
                    Smltn.Simulation.getProgressPrint():
@@ -968,29 +969,60 @@ class BeamLine(object):
                 
             #.. Create particle instance to store progression through
             #   beam line
-            PrtclInst   = Prtcl.Particle()
             if cls.getDebug():
-                print("     ----> Created new Particle instance")
+                if iParticle == None:
+                    print("        ----> iParticle:", iParticle)
+                else:
+                    print("        ----> iParticle:", id(iParticle))
+                    
+            if iParticle != None:
+                PrtclInst   = iParticle
 
-            #.. Generate particle:
-            if isinstance(cls.getSrcTrcSpc(), np.ndarray):
                 if cls.getDebug():
-                    print("     ----> Start using:", iEvt)
-                Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
-                       + "Source:User"
-                SrcTrcSpc = cls.getSrcTrcSpc()
+                    print("            ----> LocStrt:", LocStrt)
+                    print("                   Length:", \
+                          len(PrtclInst.getTraceSpace()))
+                iLoc = 1
+                if LocStrt != None: iLoc = LocStrt
+                if LocStrt >= len(PrtclInst.getTraceSpace()):
+                    continue
+                
+                del PrtclInst.getLocation() \
+                    [LocStrt-1:len(PrtclInst.getLocation())]
+                del PrtclInst.getz()[LocStrt-1:len(PrtclInst.getz())]
+                del PrtclInst.gets()[LocStrt-1:len(PrtclInst.gets())]
+                del PrtclInst.getTraceSpace() \
+                    [LocStrt-1:len(PrtclInst.getTraceSpace())]
+                del PrtclInst.getRPLCPhaseSpace()\
+                    [LocStrt-1:len(PrtclInst.getRPLCPhaseSpace())]
+                del PrtclInst.getLabPhaseSpace()\
+                    [LocStrt-1:len(PrtclInst.getLabPhaseSpace())]
+                SrcTrcSpc = PrtclInst.getTraceSpace()[LocStrt-2]
             else:
+                PrtclInst   = Prtcl.Particle()
                 if cls.getDebug():
-                    print("     ----> Start by calling getSourceTraceSpace")
-                Name = cls.getElement()[1].getName()
-                SrcTrcSpc = \
-                    cls.getElement()[1].getParticleFromSource()
-            Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
-            if cls.getDebug():
-                print("     ----> Event", iEvt)
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("         ----> trace space at source     :", \
-                          SrcTrcSpc)
+                    print("     ----> Created new Particle instance")
+
+                #.. Generate particle:
+                if isinstance(cls.getSrcTrcSpc(), np.ndarray):
+                    if cls.getDebug():
+                        print("     ----> Start using:", iEvt)
+                    Name = BLE.BeamLineElement.getinstances()[0].getName() + \
+                        ":Source:User"
+                    SrcTrcSpc = cls.getSrcTrcSpc()
+                else:
+                    if cls.getDebug():
+                        print("     ----> Start by calling getSourceTraceSpace")
+                    Name = cls.getElement()[1].getName()
+                    SrcTrcSpc = \
+                        cls.getElement()[1].getParticleFromSource()
+                Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
+                if cls.getDebug():
+                    print("     ----> Event", iEvt)
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ----> trace space at source     :", \
+                              SrcTrcSpc)
 
             #.. Track through beam line:
             TrcSpc_i = SrcTrcSpc
@@ -998,9 +1030,12 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> Transport through beam line")
             iLoc = -1
+            nLocStrt = -1
+            if LocStrt != None: nLocStrt = LocStrt
             for iBLE in BLE.BeamLineElement.getinstances():
                 iLoc += 1
-                if isinstance(iBLE, BLE.Source) or \
+                if iLoc < nLocStrt or \
+                   isinstance(iBLE, BLE.Source) or \
                    isinstance(iBLE, BLE.Facility):
                     continue
                 if cls.getDebug():
@@ -1044,7 +1079,7 @@ class BeamLine(object):
             print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
 
-
+            
 #--------  I/o methods:
     def csv2pandas(_filename):
         ParamsPandas = pnds.read_csv(_filename)
