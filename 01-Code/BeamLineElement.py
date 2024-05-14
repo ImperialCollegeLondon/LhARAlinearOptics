@@ -4649,15 +4649,17 @@ class Source(BeamLineElement):
     instances  = []
     __Debug    = False
 
-    ModeList   = [0, 1, 2]
-    ModeText   = ["Parameterised laser driven", "Gaussian", "Flat"]
+    ModeList   = [0, 1, 2, 3]
+    ModeText   = ["Parameterised laser driven", "Gaussian", "Flat", \
+                  "Read from file"]
     #ParamList  = [ [float, float, float, float, float, int], \
     #               [float, float, float, float, float],      \
     #               [float, float, float, float, float] ]
     ParamList  = [ [float, float, float, float, float, int, \
                     float, float, float, float, float, float, float], \
                    [float, float, float, float, float],      \
-                   [float, float, float, float, float] ]
+                   [float, float, float, float, float], \
+                   [] ]
 
     Lsrdrvng_E = None
     LsrDrvnIni = False
@@ -5257,7 +5259,6 @@ class Source(BeamLineElement):
         
         if self.getDebug():
             print(" <---- Source(BeamLineElement).writeElement done.")
-    
                             
     @classmethod
     def readElement(cls, dataFILE):

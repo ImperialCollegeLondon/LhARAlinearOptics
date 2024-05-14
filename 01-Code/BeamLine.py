@@ -472,12 +472,15 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             MinCTheta = float( \
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+        elif SrcMode == 3:
+            pass
 
-        SigmaX  = float( \
-            pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
-        SigmaY  = float( \
-            pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
-
+        if SrcMode != 3:
+            SigmaX  = float( \
+                pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
+            SigmaY  = float( \
+                pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
+        
         if cls.getDebug():
             print("                         ----> SigmaX, SigmaY:", \
                   SigmaX, SigmaY)
@@ -504,6 +507,8 @@ class BeamLine(object):
 
         elif SrcMode == 2:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax]
+        elif SrcMode == 3:
+            SrcParam = []
 
         Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                        + str(pndsSource["Stage"].iloc[0]) + ":" \
@@ -984,7 +989,7 @@ class BeamLine(object):
                           len(PrtclInst.getTraceSpace()))
                 iLoc = 1
                 if LocStrt != None: iLoc = LocStrt
-                if iLoc >= len(PrtclInst.getTraceSpace()):
+                if iLoc-1 >= len(PrtclInst.getTraceSpace()):
                     continue
                 
                 del PrtclInst.getLocation() \
@@ -1068,7 +1073,7 @@ class BeamLine(object):
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 PrtclInst.writeParticle(ParticleFILE)
-                Prtcl.Particle.cleanParticles()
+                #Prtcl.Particle.cleanParticles()
                 #del PrtclInst
             
             if cls.getDebug():
@@ -1079,7 +1084,6 @@ class BeamLine(object):
             print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
 
-            
 #--------  I/o methods:
     def csv2pandas(_filename):
         ParamsPandas = pnds.read_csv(_filename)

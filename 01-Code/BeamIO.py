@@ -12,9 +12,15 @@ Class BeamIO:
 import io
 import os
 import struct as strct
+import numpy  as np
+import math   as mth
 
 import BeamLine as BL
 import Particle as Prtcl
+import PhysicalConstants as PhysCnst
+
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
 
 class BeamIO:
     instances = []
@@ -22,7 +28,7 @@ class BeamIO:
 
 #--------  "Built-in methods":
     def __init__(self, _datafilePATH=None, _datafileNAME=None, \
-                 _create=False):
+                 _create=False, _BDSIMfile=False):
         if self.getDebug():
             print(' BeamIO.__init__: ', \
                   'creating BeamIO object')
@@ -56,10 +62,11 @@ class BeamIO:
             pathFILE = _datafileNAME
 
         if self.getDebug():
-            print("     ----> Proced with data file:", pathFILE)
+            print("     ----> Proceed with data file:", pathFILE)
 
-        #.. open file; if file doesnt exist or _create is true, create it:
-        if not os.path.isfile(pathFILE) or _create:
+        #.. open file; if file doesnt exist and _create is true, create it:
+        #if not os.path.isfile(pathFILE) or _create:
+        if _create:
             dataFILE = open(pathFILE, "wb")
             if self.getDebug():
                 print("         ----> File opened for write.")
@@ -84,7 +91,11 @@ class BeamIO:
                 print("         ----> Version:", bversion.decode('utf-8'))
 
         else:
-            dataFILE = open(pathFILE, "rb")
+            if _BDSIMfile:
+                self.setBDSIMfile(True)
+                dataFILE = open(pathFILE, "r")
+            else:
+                dataFILE = open(pathFILE, "rb")
             if self.getDebug():
                 print("         ----> File opened for read.")
 
@@ -132,13 +143,37 @@ class BeamIO:
             print("     ----> Read first record:", \
                   self.getReadFirstRecord())
 
-        if not isinstance(self.getdataFILE(), io.BufferedReader):
+        if not isinstance(self.getdataFILE(), io.BufferedReader) and \
+           not isinstance(self.getdataFILE(), io.TextIOWrapper):
             raise noFILE( \
                           " BeamIO.readBeamDataRecord: " + \
                           str(self.getdataFILE()) + \
                           " file does not exist.")
 
         EoF = False
+
+        #.. Deal with BDSIM file read first:
+        if self.getBDSIMfile():
+            record = self.getdataFILE().readline()
+            if record == '':
+                EoF = True
+                return EoF
+            
+            record = record.lstrip()
+            record = record.rstrip('\n')
+            TrcSpc = np.asarray(record.split(' '), dtype=float)
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            E0        = iRefPrtcl.getPrOut()[0][3]
+            p0        = mth.sqrt(E0**2 - protonMASS**2)
+            TrcSpc[5] = (1000.*TrcSpc[5] - E0) / p0
+            
+            iPrtcl = Prtcl.Particle()
+            iPrtcl.recordParticle('Source', 0., 0., TrcSpc)
+            if self.getDebug():
+                print("     <---- BeamIO.readBeamDataRecord BDSIM particle read.")
+                print(" <---- BeamIO.readBeamDataRecord Done.")
+
+            return EoF
 
         #.. First record identifies first version of data format:
         if not self.getReadFirstRecord():
@@ -215,6 +250,7 @@ class BeamIO:
         self._dataFile        = None
         self._Rd1stRcrd       = False
         self._dataFILEversion = None
+        self._BDSIMfile       = None
 
     @classmethod
     def resetinstances(cls):
@@ -232,6 +268,11 @@ class BeamIO:
         if not isinstance(dataFILEversion, int):
             raise badArgument()
         self._dataFILEversion = dataFILEversion
+
+    def setBDSIMfile(self, _BDSIMfile):
+        if not isinstance(_BDSIMfile, bool):
+            raise badArgument()
+        self._BDSIMfile = _BDSIMfile
 
         
 #--------  "Get methods" only; version, reference, and constants
@@ -252,6 +293,9 @@ class BeamIO:
 
     def getdataFILEversion(self):
         return self._dataFILEversion
+
+    def getBDSIMfile(self):
+        return self._BDSIMfile
 
 
 #--------  Utilities:

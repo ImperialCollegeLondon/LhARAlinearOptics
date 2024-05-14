@@ -657,7 +657,6 @@ class Particle:
     
     @classmethod
     def plotTraceSpaceProgression(cls):
-
         font = {'family': 'serif', \
                 'color':  'darkred', \
                 'weight': 'normal', \
@@ -776,6 +775,7 @@ class Particle:
         
                 pdf.savefig()
                 plt.close()
+        cls.setDebug(True)
             
 
     def printProgression(self):
@@ -957,7 +957,7 @@ class Particle:
                 print("         ----> z, s, trace space:", \
                       strct.unpack(">8d",record))
         
-        Cleaned = self.cleanParticles()
+        #Cleaned = self.cleanParticles()
         
     @classmethod
     def flushNcloseParticleFile(cls, ParticleFILE=None):
