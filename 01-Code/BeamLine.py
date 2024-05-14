@@ -984,20 +984,20 @@ class BeamLine(object):
                           len(PrtclInst.getTraceSpace()))
                 iLoc = 1
                 if LocStrt != None: iLoc = LocStrt
-                if LocStrt >= len(PrtclInst.getTraceSpace()):
+                if iLoc >= len(PrtclInst.getTraceSpace()):
                     continue
                 
                 del PrtclInst.getLocation() \
-                    [LocStrt-1:len(PrtclInst.getLocation())]
-                del PrtclInst.getz()[LocStrt-1:len(PrtclInst.getz())]
-                del PrtclInst.gets()[LocStrt-1:len(PrtclInst.gets())]
+                    [iLoc:len(PrtclInst.getLocation())]
+                del PrtclInst.getz()[iLoc:len(PrtclInst.getz())]
+                del PrtclInst.gets()[iLoc:len(PrtclInst.gets())]
                 del PrtclInst.getTraceSpace() \
-                    [LocStrt-1:len(PrtclInst.getTraceSpace())]
+                    [iLoc:len(PrtclInst.getTraceSpace())]
                 del PrtclInst.getRPLCPhaseSpace()\
-                    [LocStrt-1:len(PrtclInst.getRPLCPhaseSpace())]
+                    [iLoc:len(PrtclInst.getRPLCPhaseSpace())]
                 del PrtclInst.getLabPhaseSpace()\
-                    [LocStrt-1:len(PrtclInst.getLabPhaseSpace())]
-                SrcTrcSpc = PrtclInst.getTraceSpace()[LocStrt-2]
+                    [iLoc:len(PrtclInst.getLabPhaseSpace())]
+                SrcTrcSpc = PrtclInst.getTraceSpace()[iLoc-1]
             else:
                 PrtclInst   = Prtcl.Particle()
                 if cls.getDebug():
