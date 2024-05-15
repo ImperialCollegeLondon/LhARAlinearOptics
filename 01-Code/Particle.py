@@ -775,8 +775,6 @@ class Particle:
         
                 pdf.savefig()
                 plt.close()
-        cls.setDebug(True)
-            
 
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
@@ -914,7 +912,7 @@ class Particle:
 
         return ParticleFILE
 
-    def writeParticle(self, ParticleFILE=None):
+    def writeParticle(self, ParticleFILE=None, CleanAfterWrite=True):
         if self.getDebug():
             print("Particle.writeParticle starts.")
 
@@ -957,7 +955,8 @@ class Particle:
                 print("         ----> z, s, trace space:", \
                       strct.unpack(">8d",record))
         
-        #Cleaned = self.cleanParticles()
+        if CleanAfterWrite:
+            Cleaned = self.cleanParticles()
         
     @classmethod
     def flushNcloseParticleFile(cls, ParticleFILE=None):
