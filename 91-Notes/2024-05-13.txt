@@ -1,3 +1,62 @@
+--------  --------  --------  --------  --------  --------  --------  15May24
+Mods to include reading of BDSim file and restart from particular position
+in read-in file.  Needing to recheck all this more carefully.  So, redo
+tests and scriots.
+
+Tests:
+ - ApertureTst.py                     - 
+ - BeamIOTst-wrt.py                   - OK
+ - BeamIOTst-rd.py                    - OK
+ - BeamIOTst-rd-BDSIM.py              - OK 
+ - BeamLineElementTst.py              - 
+ - BeamLineTst.py                     - 
+ - BeamTst.py                         - 
+ - CylindricalRFCavityTst.py          -
+ - DRACOfacilityTst.py                - 
+ - DefocusQuadTst.py                  - 
+ - DipoleTst.py                       - 
+ - DriftTst.py                        - 
+ - ExpSourceTst.py                    - 
+ - FacilityTst.py                     - 
+ - FocusQuadTst.py                    - 
+ - GaborLensTst.py                    - 
+ - LIONfacilityTst.py                 - 
+ - LaTexTst.py                        - 
+ - LhARAFacility-from-datafile-Tst.py - 
+ - LhARAFacilityTst.py                - 
+ - ParticleTst.py                     - 
+ - PhysicalConstantsTst.py            - 
+ - QuadDoubletTst.py                  - 
+ - QuadTripletTst.py                  - 
+ - RPLCswitchTst.py                   - 
+ - ReferenceParticleTst.py            - 
+ - RunSimulationTst.py                - 
+ - SimulationTst.py                   - 
+ - SolenoidTst.py                     - 
+ - SourceTst.py                       - 
+ - TestWrite.py                       - 
+ - TestRead.py                        - 
+ - extrapolatedBeamTst.py             - 
+ - visualiseTst.py                    - 
+ - testGitRepoId.py                   - Fails
+ - OctupoleTst.py                     - Fails
+
+Scripts:
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - plotTrajectory.py       - OK
+ - plotextrapolatedBeam.py - OK
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - Fails
+
+
 --------  --------  --------  --------  --------  --------  --------  13May24
 Made some mods to help Josie and Rehanah, so, need to go through tests etc.
 before moving on.
@@ -53,7 +112,7 @@ Scripts:
  - plotextrapolatedBeam.py - OK
  - LhARAMagnetTable.py     - OK
  - plotQuadTriplet.py      - Fails
-
+ 
 
 --------  --------  --------  --------  --------  --------  --------  --------
 Tests:

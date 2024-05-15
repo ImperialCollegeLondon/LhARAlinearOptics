@@ -3,7 +3,6 @@ Your branch is up to date with 'origin/main'.
 
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
-	new file:   02-Tests/BeamIOTst-rd-BDSIM.py
 	new file:   11-Parameters/BDSIM-Data4Tests.dat
 	new file:   11-Parameters/LhARA-Stage1-BeamDelivery.csv
 	new file:   11-Parameters/LhARA-Stage1-BeamDelivery.xlsx
@@ -11,8 +10,6 @@ Changes to be committed:
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-	modified:   01-Code/BeamIO.py
-	modified:   01-Code/BeamLine.py
 	modified:   01-Code/BeamLineElement.py
 	modified:   01-Code/Particle.py
 

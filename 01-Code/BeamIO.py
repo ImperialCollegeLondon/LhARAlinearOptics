@@ -170,7 +170,8 @@ class BeamIO:
             iPrtcl = Prtcl.Particle()
             iPrtcl.recordParticle('Source', 0., 0., TrcSpc)
             if self.getDebug():
-                print("     <---- BeamIO.readBeamDataRecord BDSIM particle read.")
+                print("     <---- ", \
+                      "BeamIO.readBeamDataRecord BDSIM particle read.")
                 print(" <---- BeamIO.readBeamDataRecord Done.")
 
             return EoF
