@@ -1302,6 +1302,27 @@ class BeamLine(object):
         if cls.getDebug():
             print(' BeamLine.cleaninstance: instance removed.')
 
+    @classmethod
+    def fixsz(self):
+        PosEnd = np.array([0., 0., 0.])
+        for iLoc in range(1, len(BLE.BeamLineElement.getinstances())):
+            lastBLE = BLE.BeamLineElement.getinstances()[iLoc-1]
+            iBLE    = BLE.BeamLineElement.getinstances()[iLoc]
+            PosEnd  = lastBLE.getrStrt() + lastBLE.getStrt2End()
+            if iBLE.getrStrt()[2] != PosEnd[2]:
+                if self.getDebug():
+                    print(iBLE.getName(), " \n", \
+                      "     ---->            PosEnd:", PosEnd, \
+                      "     ---->   iBLE.getrStrt():", iBLE.getrStrt(), \
+                      "     ----> iBLE.getStrt2End():", lastBLE.getStrt2End())
+                    
+                PosStrt = lastBLE.getrStrt() + lastBLE.getStrt2End()
+                iBLE.setrStrt(PosStrt)
+                
+                if self.getDebug():
+                    print("     Corrected: \n", \
+                      "     ---->   iBLE.getrStrt():", iBLE.getrStrt())
+
 
 #--------  Exceptions:
 class badParameter(Exception):

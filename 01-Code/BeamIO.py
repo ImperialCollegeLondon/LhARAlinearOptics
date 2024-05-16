@@ -102,6 +102,7 @@ class BeamIO:
         if self.getDebug():
             print("     <---- File ready.")
 
+        self.setpathFILE(pathFILE)
         self.setdataFILE(dataFILE)
         
         if self.__Debug:
@@ -257,6 +258,9 @@ class BeamIO:
     def resetinstances(cls):
         cls.instances = []
         
+    def setpathFILE(self, _pathFILE):
+        self._pathFILE = _pathFILE
+
     def setdataFILE(self, _dataFILE):
         self._dataFILE = _dataFILE
 
@@ -288,6 +292,9 @@ class BeamIO:
 
     def getdataFILE(self):
         return self._dataFILE
+
+    def getpathFILE(self):
+        return self._pathFILE
 
     def getReadFirstRecord(self):
         return self._Rd1stRcrd
