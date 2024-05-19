@@ -88,7 +88,6 @@ def main(argv):
         
     print("     ----> Plot beam progression:")
 
-    iBm.setDebug(True)
     iBm.plotBeamProgression()
 
     print("     <---- Beam progression plot done.")

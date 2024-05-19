@@ -144,6 +144,7 @@ import math   as     mth
 import numpy  as     np
 import os
 
+import visualise         as vis
 import Particle          as Prtcl
 import BeamLine          as BL
 import BeamLineElement   as BLE
@@ -687,7 +688,7 @@ class Beam:
                           self.getCovarianceMatrix()[iAddr]) 
 
     def evaluateBeam(self):
-        print(" Beam.evaluateBeam: perform sums to get covariance matrices")
+        print(" Beam.evaluateBeam: perform` sums to get covariance matrices")
         
         EndOfFile = False
         iEvt = 0
@@ -696,6 +697,11 @@ class Beam:
 
         ParticleFILE = self.getInputDataFile()
         print("     ----: event loop")
+        
+        nEvtMax = self.getnEvtMax()
+        if nEvtMax == None:
+            nEvtMax = 1000
+        iEvtStopClean = max(0, nEvtMax-1000)
         while not EndOfFile:
             EndOfFile = self.getBeamIOread().readBeamDataRecord()
             if not EndOfFile:
@@ -707,10 +713,12 @@ class Beam:
                         iCnt = 1
                         Scl  = Scl * 10
 
-                iPrtcl = Prtcl.Particle.getParticleInstances()[1]
+                iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
                 self.incrementSums(iPrtcl)
 
-                Cleaned = Prtcl.Particle.cleanParticles()
+                #.. Keep a few particles for plotting:
+                if iEvt < iEvtStopClean:
+                    Cleaned = Prtcl.Particle.cleanParticles()
             
             if self.getDebug():
                 print("     ----> Cleaned:", Cleaned)
@@ -848,6 +856,7 @@ class Beam:
         sy    = []
         ex    = []
         ey    = []
+        exy   = []
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
@@ -861,17 +870,18 @@ class Beam:
                   len(self.getLocation()))
         
         for iLoc in range(iLocMin, \
-                          len(BLE.BeamLineElement.getinstances())-1):
+                          len(BLE.BeamLineElement.getinstances())):
             iAddr = iLoc - iLocMin
             s.append(iRefPrtcl.getsOut()[iLoc-1])
             sx.append(self.getsigmaxy()[iAddr][0])
             sy.append(self.getsigmaxy()[iAddr][1])
             ex.append(self.getemittance()[iAddr][0])
             ey.append(self.getemittance()[iAddr][1])
+            exy.append(self.getemittance()[iAddr][3])
             
             if self.getDebug():
                 print("     ----> iLoc, s, sx, sy:", \
-                      iLoc, self.getLocation()[iLoc], \
+                      iLoc, self.getLocation()[iAddr], \
                       s[iAddr], sx[iAddr], sy[iAddr])
 
         plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
@@ -881,7 +891,16 @@ class Beam:
             # add an artist, in this case a nice label in the middle...
             Ttl = "Test"
             fig.suptitle(Ttl, fontdict=font)
+
+            ivisRPLCy = vis.visualise("RPLC", "ys")
+            axs[0].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+            axs[0].set_ylim(-0.05, 0.05)
+            ivisRPLCy.Particles(axs[0], 1000)
+            ivisRPLCy.BeamLine(axs[0])
         
+            axs[1].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
             axs[1].plot(s, sx, color='b', marker='o', markersize=4, \
                         label='s_x')
             axs[1].plot(s, sy, color='r', marker='s', markersize=4, \
@@ -890,15 +909,22 @@ class Beam:
             axs[1].set_xlabel('s (m)')
             axs[1].set_ylabel('s_{xy} (m)')
 
+            axs[2].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
             axs[2].plot(s, ex, color='b', marker='o', markersize=4, \
                         label='e_x')
             axs[2].plot(s, ey, color='r', marker='s', markersize=4, 
                         label='e_y')
-            axs[2].legend()
+            axs[2].legend(loc='upper left')
             axs[2].set_xlabel('s (m)')
             axs[2].set_ylabel('e_{xy} (m)')
 
-            
+            ax2 = axs[2].twinx()
+            ax2.plot(s, exy, color='g', marker='d', markersize=4, \
+                     linestyle='dashed', label='e_(xy)')
+            ax2.legend()
+            ax2.set_ylabel('e_(xy) (m)')
+
             pdf.savefig()
             plt.close()
             
@@ -1145,11 +1171,11 @@ class extrapolateBeam(Beam):
             iAddr       = iLoc - iLocMin 
             iPhsSpcRcrd = iLoc - 1
             if self.getDebug():
-                print("         ---->            Location:", jLoc)
-                print("         ---->   Previous location:", iLoc)
-                print("         ----> Traces-space record:", iPhsSpcRcrd)
-                print("         ---->               jAddr:", jAddr)
-                print("         ---->               iAddr:", iAddr)
+                print("         ---->           Location:", jLoc)
+                print("         ---->  Previous location:", iLoc)
+                print("         ----> Trace-space record:", iPhsSpcRcrd)
+                print("         ---->              jAddr:", jAddr)
+                print("         ---->              iAddr:", iAddr)
                           
             jBLE  = BLE.BeamLineElement.getinstances()[jLoc]
             iBLE  = BLE.BeamLineElement.getinstances()[iLoc]
@@ -1206,6 +1232,11 @@ class extrapolateBeam(Beam):
 
         ParticleFILE = self.getInputDataFile()
         print("     ----: event loop")
+
+        nEvtMax = self.getnEvtMax()
+        if nEvtMax == None:
+            nEvtMax = 1000
+        iEvtStopClean = max(0, nEvtMax-1000)
         while not EndOfFile:
             EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
             if not EndOfFile:
@@ -1217,10 +1248,12 @@ class extrapolateBeam(Beam):
                         iCnt = 1
                         Scl  = Scl * 10
 
-                iPrtcl = Prtcl.Particle.getParticleInstances()[1]
+                iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
                 self.incrementSums(iPrtcl)
 
-                Cleaned = Prtcl.Particle.cleanParticles()
+                #.. Keep a few particles for plotting:
+                if iEvt < iEvtStopClean:
+                    Cleaned = Prtcl.Particle.cleanParticles()
             
             if self.getDebug():
                 print("     ----> Cleaned:", Cleaned)

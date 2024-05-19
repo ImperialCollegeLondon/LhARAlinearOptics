@@ -89,7 +89,6 @@ def main(argv):
         
     print("     ----> Plot beam progression:")
 
-    iexBm.setDebug(True)
     iexBm.plotBeamProgression()
 
     print("     <---- Beam progression plot done.")
