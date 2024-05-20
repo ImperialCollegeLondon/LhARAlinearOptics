@@ -826,7 +826,6 @@ class Beam:
         return DataList
     
     def createReport(self):
-
         if self.getoutputCSVfile() == None:
             print(" Beam.createReport: no data file given, skip.")
         else:
@@ -838,7 +837,6 @@ class Beam:
                 print(iRprt)
 
             iRprt.asCSV()
-
 
     def plotBeamProgression(self):
         if self.getDebug():
@@ -857,6 +855,13 @@ class Beam:
         ex    = []
         ey    = []
         exy   = []
+
+        ax    = []
+        ay    = []
+        bx    = []
+        by    = []
+        gx    = []
+        gy    = []
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
@@ -878,6 +883,13 @@ class Beam:
             ex.append(self.getemittance()[iAddr][0])
             ey.append(self.getemittance()[iAddr][1])
             exy.append(self.getemittance()[iAddr][3])
+
+            bx.append(self.getTwiss()[iAddr][0][1])
+            by.append(self.getTwiss()[iAddr][1][1])
+            ax.append(self.getTwiss()[iAddr][0][0])
+            ay.append(self.getTwiss()[iAddr][1][0])
+            gx.append(self.getTwiss()[iAddr][0][2])
+            gy.append(self.getTwiss()[iAddr][1][2])
             
             if self.getDebug():
                 print("     ----> iLoc, s, sx, sy:", \
@@ -886,7 +898,7 @@ class Beam:
 
         plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
-            fig, axs = plt.subplots(nrows=3, ncols=1, \
+            fig, axs = plt.subplots(nrows=5, ncols=1, \
                                     layout="constrained")
             # add an artist, in this case a nice label in the middle...
             Ttl = "Test"
@@ -899,12 +911,25 @@ class Beam:
             ivisRPLCy.Particles(axs[0], 1000)
             ivisRPLCy.BeamLine(axs[0])
         
+            gs     = axs[2].get_gridspec()
+            axs[2].remove()
+            gs     = axs[1].get_gridspec()
+            axs[1].remove()
+            
+            axs[1] = fig.add_subplot(gs[1:3])
+
+            gs     = axs[4].get_gridspec()
+            axs[4].remove()
+            gs     = axs[3].get_gridspec()
+            axs[3].remove()
+            axs[2] = fig.add_subplot(gs[3:])
+    
             axs[1].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
             axs[1].plot(s, sx, color='b', marker='o', markersize=4, \
                         label='s_x')
             axs[1].plot(s, sy, color='r', marker='s', markersize=4, \
-                        label='s_y')
+                        linestyle='dashed', label='s_y')
             axs[1].legend()
             axs[1].set_xlabel('s (m)')
             axs[1].set_ylabel('s_{xy} (m)')
@@ -914,16 +939,91 @@ class Beam:
             axs[2].plot(s, ex, color='b', marker='o', markersize=4, \
                         label='e_x')
             axs[2].plot(s, ey, color='r', marker='s', markersize=4, 
-                        label='e_y')
+                        linestyle='dashed', label='e_y')
             axs[2].legend(loc='upper left')
             axs[2].set_xlabel('s (m)')
             axs[2].set_ylabel('e_{xy} (m)')
 
             ax2 = axs[2].twinx()
             ax2.plot(s, exy, color='g', marker='d', markersize=4, \
-                     linestyle='dashed', label='e_(xy)')
+                     linestyle='dotted', label='e_(xy)')
             ax2.legend()
             ax2.set_ylabel('e_(xy) (m)')
+
+            pdf.savefig()
+            plt.close()
+
+            # Twiss parameters and dispersion
+            
+            fig, axs = plt.subplots(nrows=7, ncols=1, \
+                                    layout="constrained")
+            # add an artist, in this case a nice label in the middle...
+            Ttl = "Test"
+            fig.suptitle(Ttl, fontdict=font)
+
+            ivisRPLCy = vis.visualise("RPLC", "ys")
+            axs[0].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+            axs[0].set_ylim(-0.05, 0.05)
+            ivisRPLCy.Particles(axs[0], 1000)
+            ivisRPLCy.BeamLine(axs[0])
+        
+            gs     = axs[2].get_gridspec()
+            axs[2].remove()
+            gs     = axs[1].get_gridspec()
+            axs[1].remove()
+            
+            axs[1] = fig.add_subplot(gs[1:3])
+
+            gs     = axs[4].get_gridspec()
+            axs[4].remove()
+            gs     = axs[3].get_gridspec()
+            axs[3].remove()
+            
+            axs[2] = fig.add_subplot(gs[3:5])
+    
+            gs     = axs[6].get_gridspec()
+            axs[6].remove()
+            gs     = axs[5].get_gridspec()
+            axs[5].remove()
+            
+            axs[3] = fig.add_subplot(gs[5:])
+    
+            axs[1].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+            axs[1].plot(s, bx, color='b', marker='o', markersize=4, \
+                        label='b_x')
+            axs[1].plot(s, by, color='r', marker='s', markersize=4, \
+                        linestyle='dashed', label='b_y')
+            axs[1].legend(loc='upper center')
+            axs[1].set_xlabel('s (m)')
+            axs[1].set_ylabel('b_{xy} (m)')
+
+            ax1 = axs[1].twinx()
+            ax1.plot(s, exy, color='g', marker='d', markersize=4, \
+                     linestyle='dotted', label='e_(xy)')
+            ax1.legend()
+            ax1.set_ylabel('e_(xy) (m)')
+
+            axs[2].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+            axs[2].plot(s, ax, color='b', marker='o', markersize=4, \
+                        label='a_x')
+            axs[2].plot(s, ay, color='r', marker='s', markersize=4, 
+                        linestyle='dashed', label='a_y')
+            axs[2].legend()
+            axs[2].set_xlabel('s (m)')
+            axs[2].set_ylabel('a_{xy}')
+
+            axs[3].set_xlim(-0.5, \
+                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+            axs[3].plot(s, gx, color='b', marker='o', markersize=4, \
+                        label='g_x')
+            axs[3].plot(s, gy, color='r', marker='s', markersize=4, \
+                        linestyle="dashed", label='g_y')
+            axs[3].legend()
+            axs[3].set_xlabel('s (m)')
+            axs[3].set_ylabel('g_{xy}')
 
             pdf.savefig()
             plt.close()
