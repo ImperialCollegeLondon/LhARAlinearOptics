@@ -938,17 +938,19 @@ class Beam:
 
             axs[2].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[2].plot(s, ex, color='b', marker='o', markersize=4, \
-                        label='e_x')
-            axs[2].plot(s, ey, color='r', marker='s', markersize=4, 
-                        linestyle='dashed', label='e_y')
+            axs[2].plot(s(1:len(self.getemittance()), ex, \
+                          color='b', marker='o', markersize=4, label='e_x')
+            axs[2].plot(s(1:len(self.getemittance()), ey, \
+                          color='r', marker='s', markersize=4, 
+                          linestyle='dashed', label='e_y')
             axs[2].legend(loc='upper left')
             axs[2].set_xlabel('s (m)')
             axs[2].set_ylabel('e_{xy} (m)')
 
             ax2 = axs[2].twinx()
-            ax2.plot(s, exy, color='g', marker='d', markersize=4, \
-                     linestyle='dotted', label='e_(xy)')
+            ax2.plot(s(1:len(self.getemittance()), exy, \
+                       color='g', marker='d', markersize=4, \
+                       linestyle='dotted', label='e_(xy)')
             ax2.legend()
             ax2.set_ylabel('e_(xy) (m)')
 
@@ -993,10 +995,12 @@ class Beam:
     
             axs[1].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[1].plot(s, bx, color='b', marker='o', markersize=4, \
-                        label='b_x')
-            axs[1].plot(s, by, color='r', marker='s', markersize=4, \
-                        linestyle='dashed', label='b_y')
+            axs[1].plot(s(1:len(self.getemittance()), bx, \
+                          color='b', marker='o', markersize=4, \
+                          label='b_x')
+            axs[1].plot(s(1:len(self.getemittance()), by, \
+                          color='r', marker='s', markersize=4, \
+                          linestyle='dashed', label='b_y')
             axs[1].legend(loc='upper center')
             axs[1].set_xlabel('s (m)')
             axs[1].set_ylabel('b_{xy} (m)')
@@ -1009,8 +1013,9 @@ class Beam:
 
             axs[2].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[2].plot(s, ax, color='b', marker='o', markersize=4, \
-                        label='a_x')
+            axs[2].plot(s(1:len(self.getemittance()), ax, \
+                          color='b', marker='o', markersize=4, \
+                          label='a_x')
             axs[2].plot(s, ay, color='r', marker='s', markersize=4, 
                         linestyle='dashed', label='a_y')
             axs[2].legend()
@@ -1019,8 +1024,9 @@ class Beam:
 
             axs[3].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[3].plot(s, gx, color='b', marker='o', markersize=4, \
-                        label='g_x')
+            axs[3].plot(s(1:len(self.getemittance()), gx, \
+                          color='b', marker='o', markersize=4, \
+                          label='g_x')
             axs[3].plot(s, gy, color='r', marker='s', markersize=4, \
                         linestyle="dashed", label='g_y')
             axs[3].legend()
