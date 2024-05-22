@@ -881,17 +881,17 @@ class Beam:
             s.append(iRefPrtcl.getsOut()[iLoc-1])
             sx.append(self.getsigmaxy()[iAddr][0])
             sy.append(self.getsigmaxy()[iAddr][1])
-            print(" Here: getemittance:", len(self.getemittance()), iAddr)
-            ex.append(self.getemittance()[iAddr][0])
-            ey.append(self.getemittance()[iAddr][1])
-            exy.append(self.getemittance()[iAddr][3])
+            if IAddr < len(self.getemittance()):
+                ex.append(self.getemittance()[iAddr][0])
+                ey.append(self.getemittance()[iAddr][1])
+                exy.append(self.getemittance()[iAddr][3])
 
-            bx.append(self.getTwiss()[iAddr][0][1])
-            by.append(self.getTwiss()[iAddr][1][1])
-            ax.append(self.getTwiss()[iAddr][0][0])
-            ay.append(self.getTwiss()[iAddr][1][0])
-            gx.append(self.getTwiss()[iAddr][0][2])
-            gy.append(self.getTwiss()[iAddr][1][2])
+                bx.append(self.getTwiss()[iAddr][0][1])
+                by.append(self.getTwiss()[iAddr][1][1])
+                ax.append(self.getTwiss()[iAddr][0][0])
+                ay.append(self.getTwiss()[iAddr][1][0])
+                gx.append(self.getTwiss()[iAddr][0][2])
+                gy.append(self.getTwiss()[iAddr][1][2])
             
             if self.getDebug():
                 print("     ----> iLoc, s, sx, sy:", \
