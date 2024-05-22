@@ -436,8 +436,8 @@ class Beam:
                                      mth.sqrt(e2X), \
                                      mth.sqrt(e2Y), \
                                      mth.sqrt(e2L), \
-                                     mth.sqrt(e24), \
-                                     mth.sqrt(e26)])
+                                     mth.pow(e24, 0.25), \
+                                     mth.pow(e26, 1./6.)])
             
             if self.getDebug():
                 print(" Beam.getEmittance:")
