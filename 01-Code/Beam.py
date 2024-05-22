@@ -881,7 +881,7 @@ class Beam:
             s.append(iRefPrtcl.getsOut()[iLoc-1])
             sx.append(self.getsigmaxy()[iAddr][0])
             sy.append(self.getsigmaxy()[iAddr][1])
-            if IAddr < len(self.getemittance()):
+            if iAddr < len(self.getemittance()):
                 ex.append(self.getemittance()[iAddr][0])
                 ey.append(self.getemittance()[iAddr][1])
                 exy.append(self.getemittance()[iAddr][3])
