@@ -839,6 +839,7 @@ class Beam:
             iRprt.asCSV()
 
     def plotBeamProgression(self):
+        self.setDebug(True)
         if self.getDebug():
             print(" Beam.plotBeamProgression: start")
 
@@ -1030,6 +1031,7 @@ class Beam:
             
         if self.getDebug():
             print(" <----  Beam.plotBeamProgression done.")
+        self.setDebug(False)
 
                 
 """
