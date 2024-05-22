@@ -938,9 +938,9 @@ class Beam:
 
             axs[2].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[2].plot(s(1:len(self.getemittance()), ex, \
+            axs[2].plot(s[1:len(self.getemittance()], ex, \
                           color='b', marker='o', markersize=4, label='e_x')
-            axs[2].plot(s(1:len(self.getemittance()), ey, \
+            axs[2].plot(s[1:len(self.getemittance()], ey, \
                           color='r', marker='s', markersize=4, 
                           linestyle='dashed', label='e_y')
             axs[2].legend(loc='upper left')
@@ -948,7 +948,7 @@ class Beam:
             axs[2].set_ylabel('e_{xy} (m)')
 
             ax2 = axs[2].twinx()
-            ax2.plot(s(1:len(self.getemittance()), exy, \
+            ax2.plot(s[1:len(self.getemittance()], exy, \
                        color='g', marker='d', markersize=4, \
                        linestyle='dotted', label='e_(xy)')
             ax2.legend()
@@ -995,10 +995,10 @@ class Beam:
     
             axs[1].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[1].plot(s(1:len(self.getemittance()), bx, \
+            axs[1].plot(s[1:len(self.getemittance()], bx, \
                           color='b', marker='o', markersize=4, \
                           label='b_x')
-            axs[1].plot(s(1:len(self.getemittance()), by, \
+            axs[1].plot(s[1:len(self.getemittance()], by, \
                           color='r', marker='s', markersize=4, \
                           linestyle='dashed', label='b_y')
             axs[1].legend(loc='upper center')
@@ -1013,7 +1013,7 @@ class Beam:
 
             axs[2].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[2].plot(s(1:len(self.getemittance()), ax, \
+            axs[2].plot(s[1:len(self.getemittance()], ax, \
                           color='b', marker='o', markersize=4, \
                           label='a_x')
             axs[2].plot(s, ay, color='r', marker='s', markersize=4, 
@@ -1024,7 +1024,7 @@ class Beam:
 
             axs[3].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[3].plot(s(1:len(self.getemittance()), gx, \
+            axs[3].plot(s[1:len(self.getemittance()], gx, \
                           color='b', marker='o', markersize=4, \
                           label='g_x')
             axs[3].plot(s, gy, color='r', marker='s', markersize=4, \
