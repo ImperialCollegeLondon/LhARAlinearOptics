@@ -205,19 +205,23 @@ class Beam:
 
 #--------  Open input data file, read first record, initialise sums:  -----
 
-        _ibmIOr = bmIO.BeamIO(None, _InputDataFile)
+        if isinstance(_InputDataFile, bmIO.BeamIO):
+            _ibmIOr = _InputDataFile
+        else:
+            _ibmIOr = bmIO.BeamIO(None, _InputDataFile)
         self.setBeamIOread(_ibmIOr)
         ParticleFILE = self.getBeamIOread().getdataFILE()
         self.setInputDataFile(ParticleFILE)
 
-        EndOfFile = False
-        EndOfFile = self.getBeamIOread().readBeamDataRecord()
+        if BL.BeamLine.getinstance() == None:
+            EndOfFile = False
+            EndOfFile = self.getBeamIOread().readBeamDataRecord()
 
         if BL.BeamLine.getinstance() == None:
             self.setbeamlineSpecificationCSVfile( \
                                         _beamlineSpecificationCSVfile)
             iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
-        
+
         for iBLE in BLE.BeamLineElement.getinstances():
             if not isinstance(iBLE, BLE.Facility):
                 self.setLocation(iBLE.getName())
@@ -230,8 +234,7 @@ class Beam:
                                       "not first in particle list.")
 
 #--------  <---- Open input data file and load reference particle: done.  --
-
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> New Beam instance: \n", \
                   Beam.__str__(self))
             print(" Beam.__init__: no maximum number of events requested,", \
@@ -1230,7 +1233,7 @@ class extrapolateBeam(Beam):
                           startlocation, \
                           iPrtcl.getTraceSpace()[startlocation-1])
 
-        if len(iPrtcl.getTraceSpace()) > startlocation:
+        if len(iPrtcl.getTraceSpace()) >= startlocation:
             
             iAddr = 0
             if self.getDebug():
@@ -1349,6 +1352,7 @@ class extrapolateBeam(Beam):
         if nEvtMax == None:
             nEvtMax = 1000
         iEvtStopClean = max(0, nEvtMax-1000)
+        Cleaned       = None
         while not EndOfFile:
             EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
             if not EndOfFile:
