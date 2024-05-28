@@ -490,6 +490,11 @@ class Particle:
         py    = TrcSpc[3]*p0
         p2    = p**2 - px**2 - py**2
         if p2 < 0.:
+            px    = TrcSpc[1]*p
+            py    = TrcSpc[3]*p
+            p2    = p**2 - px**2 - py**2
+            
+        if p2 < 0.:
             print(" Crashing!")
             print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
             K0 = E0 - particleMASS
