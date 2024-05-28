@@ -246,7 +246,7 @@ class Particle:
     @classmethod
     def setDebug(cls, Debug=False):
         if cls.__Debug:
-            print(" Particle.setdebug: ", Debug)
+            print(" Particle.setDebug: ", Debug)
         cls.__Debug = Debug
 
     @classmethod

@@ -143,6 +143,7 @@ class Simulation(object):
     def __str__(self):
         self.__repr__()
         self.print()
+        return " Simulation.__str__ done."
 
             
 #--------  "Get methods" only; version, reference, and constants
@@ -198,7 +199,7 @@ class Simulation(object):
 #--------  Utilities:
     def print(self):
         print(" Simulation.print:")
-        print("                        Version:", self.CdVrsn(self))
+        print("                        Version:", self.CdVrsn())
         print("      State of random generator:", self.__Rnd.getstate()[0])
         print("   Number of events to generate:", self._NEvt)
         print("   Beam line specification file:", self._ParamFileName)
