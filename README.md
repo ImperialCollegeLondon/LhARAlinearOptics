@@ -37,5 +37,27 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
    distribution.
  * source ./venv/bin/activate
  * pip install -r ./requirements.txt
- 
+
+To execute code from this, the source, directory tree execute:
  * source setup.bash                
+
+## User environment:
+
+Utilities are provided to allow users to use the package and to develop their own analyses.  To set this up:
+
+ * Copy 31-UserDirectory/UserDirectory.tar.gz to your local directory;
+ * Unpack the files using:
+   * gunzip UserDirectory.tar.gz
+   * tar xvf UserDirectort.tar
+ * Set-up the environment variables by executing:
+  * source setup.bash -p <path to LhARAlinearOptics>
+ * Commands from the repository can now be run using:
+  * $LhARAopticsPATH/03-Scripts/...
+  Scrtipts in the 03-Scripts directory run "standalone" or print a hint on how they are to be run if they are executed without input arguments.
+ * A couple of tips:
+  * $LhARAopticsPATH/03-Scripts/runBeamSim.py -- runs simulation of particular beam configuration.  Reference configuration files are stored in $LhARAopticsPATH/11-Parameters
+  * $LhARAopticsPATH/03-Scripts/readBeamSim.py -- reads simulation file and produces phase space plots in 99-Scratch
+  * $LhARAopticsPATH/03-Scripts/plotBeam.py -- plots the beam envelopes by calculating the covariance matrix at the end of each beam-line element
+  * $LhARAopticsPATH/03-Scripts/plotextrapolatedBeam -- makes teh same beam-envelope plots, but, propagates the covariance matrices starting from a given location
+  * 
+
