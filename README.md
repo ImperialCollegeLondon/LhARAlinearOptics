@@ -10,6 +10,14 @@ Execute "startup.bash" from this directory (i.e. run the bash command "source st
   * Set up "LhARAOpticsPATH"; and
   * Add "01-Code" to the PYTHONPATH.  The scripts in "02-Tests" may then be run with the command "python 02-Tests/<filename>.py".
 
+## Documentation:
+Documentation is being developed.  The top of the documentation directory tree is:
+ * 00-Documentation
+ * Rudimentary documentation to "set up and run" is available in the subdirectory:
+  * 00-Documentation/00-Setup-n-run
+ * The write-up of methods, data structure, etc. is being developed in:
+  * 00-Documentation/01-WriteUp
+
 ## Directories:
  * Python classes and "library" code stored in "01-Code"
  * Test scripts stored in "02-Tests"
