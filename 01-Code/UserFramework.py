@@ -97,7 +97,7 @@ def handleFILES(inputfile, outputfile):
    
     return Success, ibmIOr
 
-def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvts):
+def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvts, Clean=True):
     if iUsrAnl.getIter() == 0:
         print(" UserAnal.EventLoop start:")
     Success = False
@@ -120,7 +120,7 @@ def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvts):
                     iCnt = 1
                     Scl  = Scl * 10
 
-            iUsrAnl.EventLoop(ibmIOw)
+            iUsrAnl.EventLoop(ibmIOw, Clean)
 
         if iEvt <0:
             print(Prtcl.Particle.getParticleInstances()[iEvt])
