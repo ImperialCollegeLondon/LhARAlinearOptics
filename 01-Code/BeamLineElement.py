@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 To do:
@@ -460,6 +461,41 @@ class BeamLineElement:
             Outside = True
         return Outside
 
+    def ExpansionParameterFail(self, _R):
+        self.setDebug(True)
+        if self.getDebug():
+            print(" Particle.ExpansionParameterFail: start")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> TraceSpace:", _R)
+                iLctnSelf = BeamLineElement.getinstances().index(self)
+                print("     ----> iLctnSelf:", iLctnSelf, self.getName())
+                
+        Fail = False
+        
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        
+        iLctn = BeamLineElement.getinstances().index(self) - 1
+        
+        p0    = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iLctn][:3], \
+                                iRefPrtcl.getPrOut()[iLctn][:3]))
+        E0    = iRefPrtcl.getPrOut()[iLctn][3]
+        b0    = p0/E0
+        D     = mth.sqrt(1. + \
+                         2.*_R[5]/b0 +
+                         _R[5]**2)
+        eps   = ( _R[1]**2 + _R[3]**2  ) / (2.*D**2)
+        if self.getDebug():
+            print("     ----> Epsilon:", eps)
+
+        if eps > 0.005:
+            Fail = True
+
+        if self.getDebug():
+            print(" <----> Return, Fail:", Fail)
+
+        self.setDebug(False)
+        return Fail
+
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
@@ -473,8 +509,12 @@ class BeamLineElement:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
+            print("     ----> Expansion paramter fail:", \
+                  self.ExpansionParameterFail(_R))
             
-        if self.OutsideBeamPipe(_R):
+        if self.OutsideBeamPipe(_R) or \
+           self.ExpansionParameterFail(_R) or \
+           abs(_R[4]) > 5.:
             _Rprime = None
         else:
             if isinstance(self, DefocusQuadrupole) or \
@@ -1878,46 +1918,69 @@ class FocusQuadrupole(BeamLineElement):
                 xax, yax = bbox.width, bbox.height
                 xl = xlim[1] - xlim[0]
                 yl = ylim[1] - ylim[0]
-
-                invRot = np.linalg.inv(self.getRot2LbStrt())
-                angl   = mth.atan2(invRot[2][2], invRot[2][iCoord])
-                if angl < 0.:
-                    angl += 2.*mth.pi
-                angl += mth.pi/2.
-                
-                sxy  = [strt[2], strt[iCoord]]
-                hght = 0.4
-                
-                x1 = sxy
-                
-                Dm = np.array([self.getStrt2End()[2], \
-                               self.getStrt2End()[iCoord]])
-
-                x2 = sxy + Dm
-
                 xscl = xax*yl / (yax*xl)
-                x4 = sxy + np.array([hght*mth.cos(angl)/xscl, \
-                                     hght*mth.sin(angl)*xscl])
-                x3 = x4 + Dm
+                if self.getDebug():
+                    print("         ----> xax, yax:", xax, yax)
+                    print("         ---->   xy, yl:", xl, yl)
+                    print("         ---->     xscl:", xscl)
+
+                qVec1Lab  = self.getStrt2End()
+                invRot    = np.linalg.inv(self.getRot2LbStrt())
+                qVec1RPLC = np.matmul(invRot, qVec1Lab)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ---->  qVec1Lab:", qVec1Lab)
+                        print("     ----> InvRot: \n", invRot)
+                        print("         ----> qVec1RPLC:", qVec1RPLC)
+                
+                hght = min(0.4, yl/4./xscl)
+                if Proj == "xz":
+                    qVec2RPLC = np.array([hght, 0., 0.])
+                elif Proj == "yz":
+                    qVec2RPLC = np.array([hght, 0., 0.])
+                
+                qVec2Lab = np.matmul(self.getRot2LbStrt(), qVec2RPLC)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ----> qVec2RPLC:", qVec2RPLC)
+                        print("     ----> Rot: \n", self.getRot2LbStrt())
+                        print("         ---->  qVec2Lab:", qVec2Lab)
+
+                qVec2Lab[iCoord] = qVec2Lab[iCoord] * xscl
+                qVec2Lab[2]      = qVec2Lab[2]      / xscl
+                
+                crnr1 = self.getrStrt()
+                crnr2 = crnr1 + qVec2Lab
+                crnr3 = crnr2 + qVec1Lab
+                crnr4 = crnr3 - qVec2Lab
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ----> crnr1:", crnr1)
+                        print("         ----> crnr2:", crnr2)
+                        print("         ----> crnr3:", crnr3)
+                        print("         ----> crnr4:", crnr4)
 
                 x = np.array([])
                 y = np.array([])
 
-                x = np.append(x, x1[0])
-                x = np.append(x, x2[0])
-                x = np.append(x, x3[0])
-                x = np.append(x, x4[0])
+                x = np.append(x, crnr1[2])
+                x = np.append(x, crnr2[2])
+                x = np.append(x, crnr3[2])
+                x = np.append(x, crnr4[2])
                 
-                y = np.append(y, x1[1])
-                y = np.append(y, x2[1])
-                y = np.append(y, x3[1])
-                y = np.append(y, x4[1])
-                
+                y = np.append(y, crnr1[iCoord])
+                y = np.append(y, crnr2[iCoord])
+                y = np.append(y, crnr3[iCoord])
+                y = np.append(y, crnr4[iCoord])
+
                 if self.getDebug():
                     with np.printoptions(linewidth=500,precision=7,\
                                          suppress=True):
                         print("     ----> Rot: \n", self.getRot2LbStrt())
-                        print("     ----> Rot: \n", invRot)
+                        print("     ----> Inv: \n", invRot)
                         print("     ----> Angl:", angl)
 
                 sxy  = [strt[2], strt[iCoord]]
@@ -1945,7 +2008,7 @@ class FocusQuadrupole(BeamLineElement):
                                    
         if self.getDebug():
             print(" <---- FocusQuadrupole(BeamLineElement).visualise: ends.")
-            
+
         
 #--------  I/o methods:
     def writeElement(self, dataFILE):
@@ -2383,7 +2446,8 @@ class DefocusQuadrupole(BeamLineElement):
             if Proj.find("y") >=0: iCoord = 1
             
             if self.getDebug():
-                print("         ----> strt:", strt)
+                print("         ---->  strt:", strt)
+                print("         ----> iCoord:", iCoord)
                 
             if Proj != BndPln:
                 if Proj == "xz":
@@ -2396,45 +2460,71 @@ class DefocusQuadrupole(BeamLineElement):
                 xax, yax = bbox.width, bbox.height
                 xl = xlim[1] - xlim[0]
                 yl = ylim[1] - ylim[0]
-
-                invRot = np.linalg.inv(self.getRot2LbStrt())
-                angl   = mth.atan2(invRot[2][2], invRot[2][iCoord])
-                if angl < 0.:
-                    angl += 2.*mth.pi
-                angl += mth.pi/2.
-                
-                sxy  = [strt[2], strt[iCoord]]
-                hght = 0.4
-                
-                x1 = sxy
-                
-                Dm = np.array([self.getStrt2End()[2], \
-                               self.getStrt2End()[iCoord]])
-                x2 = sxy + Dm
-
                 xscl = xax*yl / (yax*xl)
-                x4 = sxy + np.array([-hght*mth.cos(angl)/xscl, \
-                                     -hght*mth.sin(angl)*xscl])
-                x3 = x4 + Dm
+                if self.getDebug():
+                    print("         ----> xax, yax:", xax, yax)
+                    print("         ---->   xy, yl:", xl, yl)
+                    print("         ---->     xscl:", xscl)
+
+                qVec1Lab  = self.getStrt2End()
+                invRot    = np.linalg.inv(self.getRot2LbStrt())
+                qVec1RPLC = np.matmul(invRot, qVec1Lab)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ---->  qVec1Lab:", qVec1Lab)
+                        print("     ----> InvRot: \n", invRot)
+                        print("         ----> qVec1RPLC:", qVec1RPLC)
+                
+                hght = min(0.4, yl/4./xscl)
+                if Proj == "xz":
+                    qVec2RPLC = np.array([-hght, 0., 0.])
+                elif Proj == "yz":
+                    qVec2RPLC = np.array([-hght, 0., 0.])
+                
+                qVec2Lab = np.matmul(self.getRot2LbStrt(), qVec2RPLC)
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ----> qVec2RPLC:", qVec2RPLC)
+                        print("     ----> Rot: \n", self.getRot2LbStrt())
+                        print("         ---->  qVec2Lab:", qVec2Lab)
+
+                qVec2Lab[iCoord] = qVec2Lab[iCoord] * xscl
+                qVec2Lab[2]      = qVec2Lab[2]      / xscl
+                
+                crnr1 = self.getrStrt()
+                crnr2 = crnr1 + qVec2Lab
+                crnr3 = crnr2 + qVec1Lab
+                crnr4 = crnr3 - qVec2Lab
+                if self.getDebug():
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ----> crnr1:", crnr1)
+                        print("         ----> crnr2:", crnr2)
+                        print("         ----> crnr3:", crnr3)
+                        print("         ----> crnr4:", crnr4)
 
                 x = np.array([])
                 y = np.array([])
 
-                x = np.append(x, x2[0])
-                x = np.append(x, x1[0])
-                x = np.append(x, x4[0])
-                x = np.append(x, x3[0])
+                x = np.append(x, crnr1[2])
+                x = np.append(x, crnr2[2])
+                x = np.append(x, crnr3[2])
+                x = np.append(x, crnr4[2])
                 
-                y = np.append(y, x2[1])
-                y = np.append(y, x1[1])
-                y = np.append(y, x4[1])
-                y = np.append(y, x3[1])
+                y = np.append(y, crnr1[iCoord])
+                y = np.append(y, crnr2[iCoord])
+                y = np.append(y, crnr3[iCoord])
+                y = np.append(y, crnr4[iCoord])
                 
                 if self.getDebug():
                     with np.printoptions(linewidth=500,precision=7,\
                                          suppress=True):
                         print("     ----> Rot: \n", self.getRot2LbStrt())
+                        """
                         print("     ----> Rot: \n", invRot)
+                        """
                         print("     ----> Angl:", angl)
 
                 sxy  = [strt[2], strt[iCoord]]
@@ -2465,7 +2555,6 @@ class DefocusQuadrupole(BeamLineElement):
                                    
         if self.getDebug():
             print(" <---- DefocusQuadrupole(BeamLineElement).visualise: ends.")
-
         
 #--------  I/o methods:
     def writeElement(self, dataFILE):
@@ -4460,7 +4549,9 @@ class CylindricalRFCavity(BeamLineElement):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
             
-        if self.OutsideBeamPipe(_R):
+        if self.OutsideBeamPipe(_R) or \
+           self.ExpansionParameterFail(_R) or \
+           abs(_R[4]) > 5.:
             _Rprime = None
         else:
             _Rprime = self.getTransferMatrix().dot(_R) + self.getmrf()
@@ -4649,15 +4740,17 @@ class Source(BeamLineElement):
     instances  = []
     __Debug    = False
 
-    ModeList   = [0, 1, 2]
-    ModeText   = ["Parameterised laser driven", "Gaussian", "Flat"]
+    ModeList   = [0, 1, 2, 3]
+    ModeText   = ["Parameterised laser driven", "Gaussian", "Flat", \
+                  "Read from file"]
     #ParamList  = [ [float, float, float, float, float, int], \
     #               [float, float, float, float, float],      \
     #               [float, float, float, float, float] ]
     ParamList  = [ [float, float, float, float, float, int, \
                     float, float, float, float, float, float, float], \
                    [float, float, float, float, float],      \
-                   [float, float, float, float, float] ]
+                   [float, float, float, float, float], \
+                   [] ]
 
     Lsrdrvng_E = None
     LsrDrvnIni = False
@@ -5257,7 +5350,6 @@ class Source(BeamLineElement):
         
         if self.getDebug():
             print(" <---- Source(BeamLineElement).writeElement done.")
-    
                             
     @classmethod
     def readElement(cls, dataFILE):
@@ -6343,7 +6435,9 @@ class RPLCswitch(BeamLineElement):
                       self.getTransferMatrix())
 
             
-        if self.OutsideBeamPipe(_R):
+        if self.OutsideBeamPipe(_R) or \
+           self.ExpansionParameterFail(_R) or \
+           abs(_R[4]) > 2.5:
             _Rprime = None
         else:
             if self.get3Drotation():

@@ -246,7 +246,7 @@ class Particle:
     @classmethod
     def setDebug(cls, Debug=False):
         if cls.__Debug:
-            print(" Particle.setdebug: ", Debug)
+            print(" Particle.setDebug: ", Debug)
         cls.__Debug = Debug
 
     @classmethod
@@ -451,7 +451,7 @@ class Particle:
     def calcRPLCPhaseSpace(self, nLoc=None):
         if self.getDebug():
             print(" Particle.calcRPLCPhaseSpace for nLoc:", \
-                  nLoc, "start:")
+                  nLoc, self.getLocation()[nLoc], "start:")
             
         PhsSpc = self.RPLCTraceSpace2PhaseSpace(self.getTraceSpace()[nLoc])
 
@@ -489,6 +489,11 @@ class Particle:
         px    = TrcSpc[1]*p0
         py    = TrcSpc[3]*p0
         p2    = p**2 - px**2 - py**2
+        if p2 < 0.:
+            px    = TrcSpc[1]*p
+            py    = TrcSpc[3]*p
+            p2    = p**2 - px**2 - py**2
+            
         if p2 < 0.:
             print(" Crashing!")
             print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
@@ -657,7 +662,6 @@ class Particle:
     
     @classmethod
     def plotTraceSpaceProgression(cls):
-
         font = {'family': 'serif', \
                 'color':  'darkred', \
                 'weight': 'normal', \
@@ -776,7 +780,6 @@ class Particle:
         
                 pdf.savefig()
                 plt.close()
-            
 
     def printProgression(self):
         for iLoc in range(len(self.getLocation())):
@@ -914,7 +917,7 @@ class Particle:
 
         return ParticleFILE
 
-    def writeParticle(self, ParticleFILE=None):
+    def writeParticle(self, ParticleFILE=None, CleanAfterWrite=True):
         if self.getDebug():
             print("Particle.writeParticle starts.")
 
@@ -957,7 +960,8 @@ class Particle:
                 print("         ----> z, s, trace space:", \
                       strct.unpack(">8d",record))
         
-        Cleaned = self.cleanParticles()
+        if CleanAfterWrite:
+            Cleaned = self.cleanParticles()
         
     @classmethod
     def flushNcloseParticleFile(cls, ParticleFILE=None):

@@ -112,6 +112,7 @@ import struct as strct
 
 import Particle        as Prtcl
 import BeamLineElement as BLE
+import Simulation      as Smltn
 
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
@@ -471,12 +472,15 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             MinCTheta = float( \
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+        elif SrcMode == 3:
+            pass
 
-        SigmaX  = float( \
-            pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
-        SigmaY  = float( \
-            pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
-
+        if SrcMode != 3:
+            SigmaX  = float( \
+                pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
+            SigmaY  = float( \
+                pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
+        
         if cls.getDebug():
             print("                         ----> SigmaX, SigmaY:", \
                   SigmaX, SigmaY)
@@ -503,6 +507,8 @@ class BeamLine(object):
 
         elif SrcMode == 2:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax]
+        elif SrcMode == 3:
+            SrcParam = []
 
         Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                        + str(pndsSource["Stage"].iloc[0]) + ":" \
@@ -945,49 +951,82 @@ class BeamLine(object):
         return True
 
     @classmethod
-    def trackBeam(cls, NEvts=0, ParticleFILE=None):
-        if cls.getDebug() or NEvts > 1:
+    def trackBeam(cls, NEvts=0, ParticleFILE=None, \
+                  iParticle=None, LocStrt=None, CleanAfterWrite=True):
+        if (cls.getDebug() or NEvts > 1) and \
+           Smltn.Simulation.getProgressPrint():
             print("     ----> BeamLine.trackBeam for", NEvts, " events.")
         Scl  = 10
         iCnt = 1
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-        for iEvt in range(1, NEvts):
+        for iEvt in range(0, NEvts):
             if (iEvt % Scl) == 0:
-                if cls.getDebug() or NEvts > 1:
+                if (cls.getDebug() or NEvts > 1) and \
+                   Smltn.Simulation.getProgressPrint():
                     print("         ----> Generating event ", iEvt)
-                iCnt += 1
                 if iCnt == 10:
                     iCnt = 1
                     Scl  = Scl * 10
-
+                iCnt += 1
                 
             #.. Create particle instance to store progression through
             #   beam line
-            PrtclInst   = Prtcl.Particle()
             if cls.getDebug():
-                print("     ----> Created new Particle instance")
+                if iParticle == None:
+                    print("        ----> iParticle:", iParticle)
+                else:
+                    print("        ----> iParticle:", id(iParticle))
+                    
+            if iParticle != None:
+                PrtclInst   = iParticle
 
-            #.. Generate particle:
-            if isinstance(cls.getSrcTrcSpc(), np.ndarray):
                 if cls.getDebug():
-                    print("     ----> Start using:", iEvt)
-                Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
-                       + "Source:User"
-                SrcTrcSpc = cls.getSrcTrcSpc()
+                    print("            ----> LocStrt:", LocStrt)
+                    print("                   Length:", \
+                          len(PrtclInst.getTraceSpace()))
+                iLoc = 1
+                if LocStrt != None: iLoc = LocStrt
+                if iLoc-1 >= len(PrtclInst.getTraceSpace()):
+                    continue
+                
+                del PrtclInst.getLocation() \
+                    [iLoc:len(PrtclInst.getLocation())]
+                del PrtclInst.getz()[iLoc:len(PrtclInst.getz())]
+                del PrtclInst.gets()[iLoc:len(PrtclInst.gets())]
+                del PrtclInst.getTraceSpace() \
+                    [iLoc:len(PrtclInst.getTraceSpace())]
+                del PrtclInst.getRPLCPhaseSpace()\
+                    [iLoc:len(PrtclInst.getRPLCPhaseSpace())]
+                del PrtclInst.getLabPhaseSpace()\
+                    [iLoc:len(PrtclInst.getLabPhaseSpace())]
+                SrcTrcSpc = PrtclInst.getTraceSpace()[iLoc-1]
             else:
+                PrtclInst   = Prtcl.Particle()
                 if cls.getDebug():
-                    print("     ----> Start by calling getSourceTraceSpace")
-                Name = cls.getElement()[1].getName()
-                SrcTrcSpc = \
-                    cls.getElement()[1].getParticleFromSource()
-            Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
-            if cls.getDebug():
-                print("     ----> Event", iEvt)
-                with np.printoptions(linewidth=500,precision=7,suppress=True):
-                    print("         ----> trace space at source     :", \
-                          SrcTrcSpc)
+                    print("     ----> Created new Particle instance")
+
+                #.. Generate particle:
+                if isinstance(cls.getSrcTrcSpc(), np.ndarray):
+                    if cls.getDebug():
+                        print("     ----> Start using:", iEvt)
+                    Name = BLE.BeamLineElement.getinstances()[0].getName() + \
+                        ":Source:User"
+                    SrcTrcSpc = cls.getSrcTrcSpc()
+                else:
+                    if cls.getDebug():
+                        print("     ----> Start by calling getSourceTraceSpace")
+                    Name = cls.getElement()[1].getName()
+                    SrcTrcSpc = \
+                        cls.getElement()[1].getParticleFromSource()
+                Success = PrtclInst.recordParticle(Name, 0., 0., SrcTrcSpc)
+                if cls.getDebug():
+                    print("     ----> Event", iEvt)
+                    with np.printoptions(linewidth=500,precision=7,\
+                                         suppress=True):
+                        print("         ----> trace space at source     :", \
+                              SrcTrcSpc)
 
             #.. Track through beam line:
             TrcSpc_i = SrcTrcSpc
@@ -995,33 +1034,43 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> Transport through beam line")
             iLoc = -1
+            nLocStrt = -1
+            if LocStrt != None: nLocStrt = LocStrt
             for iBLE in BLE.BeamLineElement.getinstances():
                 iLoc += 1
-                if isinstance(iBLE, BLE.Source) or \
+                if iLoc < nLocStrt or \
+                   isinstance(iBLE, BLE.Source) or \
                    isinstance(iBLE, BLE.Facility):
                     continue
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
 
-                #.. KL: consider trap on expansion paramter here.
                 TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
                                 linewidth=500,precision=7,suppress=True):
                         print("             ----> Updated trace space   :", \
                               TrcSpc)
+                        
                 if not isinstance(TrcSpc, np.ndarray):
                     if cls.getDebug():
                         print("              ---->", \
                               " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd    = -999999.
-                    sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
-                    Success = PrtclInst.recordParticle(iBLE.getName(), \
-                                                       zEnd, \
-                                                       sEnd, \
-                                                       TrcSpc)
+                    if iBLE.ExpansionParameterFail(TrcSpc):
+                        if cls.getDebug():
+                            print("              ---->", \
+                                " Particle fails expansion parameter test")
+                        TrcSpc = None
+                        break
+                    else:
+                        zEnd    = -999999.
+                        sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
+                        Success = PrtclInst.recordParticle(iBLE.getName(), \
+                                                           zEnd, \
+                                                           sEnd, \
+                                                           TrcSpc)
                 TrcSpc_i = TrcSpc
 
             if cls.getDebug():
@@ -1030,16 +1079,17 @@ class BeamLine(object):
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 PrtclInst.writeParticle(ParticleFILE)
-                Prtcl.Particle.cleanParticles()
+                if CleanAfterWrite:
+                    Prtcl.Particle.cleanParticles()
                 #del PrtclInst
             
             if cls.getDebug():
                 print("     <---- Finished handling beam line.")
                 
-        if cls.getDebug() or NEvts > 1:
+        if (cls.getDebug() or NEvts > 1) and \
+        Smltn.Simulation.getProgressPrint():
             print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
-
 
 #--------  I/o methods:
     def csv2pandas(_filename):
@@ -1258,6 +1308,27 @@ class BeamLine(object):
 
         if cls.getDebug():
             print(' BeamLine.cleaninstance: instance removed.')
+
+    @classmethod
+    def fixsz(self):
+        PosEnd = np.array([0., 0., 0.])
+        for iLoc in range(1, len(BLE.BeamLineElement.getinstances())):
+            lastBLE = BLE.BeamLineElement.getinstances()[iLoc-1]
+            iBLE    = BLE.BeamLineElement.getinstances()[iLoc]
+            PosEnd  = lastBLE.getrStrt() + lastBLE.getStrt2End()
+            if iBLE.getrStrt()[2] != PosEnd[2]:
+                if self.getDebug():
+                    print(iBLE.getName(), " \n", \
+                      "     ---->            PosEnd:", PosEnd, \
+                      "     ---->   iBLE.getrStrt():", iBLE.getrStrt(), \
+                      "     ----> iBLE.getStrt2End():", lastBLE.getStrt2End())
+                    
+                PosStrt = lastBLE.getrStrt() + lastBLE.getStrt2End()
+                iBLE.setrStrt(PosStrt)
+                
+                if self.getDebug():
+                    print("     Corrected: \n", \
+                      "     ---->   iBLE.getrStrt():", iBLE.getrStrt())
 
 
 #--------  Exceptions:
