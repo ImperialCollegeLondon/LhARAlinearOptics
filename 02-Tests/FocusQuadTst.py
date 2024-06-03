@@ -56,13 +56,6 @@ BLE.BeamLineElement.cleaninstances()
 BLI  = BL.BeamLine(filename)
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-print(" ----> Reference particle:")
-pz = 194.7585262
-E0 = mth.sqrt(protonMASS**2 + pz**2)
-p0 = np.array([0., 0., pz, E0])
-iRefPrtcl.setPrIn(p0)
-iRefPrtcl.setPrOut(p0)
-
 print("     ----> Reference particle set:")
 print("         ----> In:", iRefPrtcl.getPrIn())
 print("              Out:", iRefPrtcl.getPrOut())
@@ -73,10 +66,14 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-FQuad = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
+FQuada = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
                             0.1, 100.)
-FQuad = BLE.FocusQuadrupole("ValidQuad1", rStrt, vStrt, drStrt, dvStrt, \
+print(" Set reference particle phase space for:", FQuada.getName())
+refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(FQuada)
+FQuad  = BLE.FocusQuadrupole("ValidQuad2", rStrt, vStrt, drStrt, dvStrt, \
                             0.1, None, 153.93033817278908)
+print(" Set reference particle phase space for:", FQuad.getName())
+refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(FQuad)
             
 #.. __repr__
 print("    __repr__:")
@@ -99,6 +96,7 @@ FocusQuadrupoleTest += 1
 print()
 print("FocusQuadrupoleTest:", FocusQuadrupoleTest, \
       " test transport through focusing quadrupole.")
+
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = FQuad.Transport(R)
 with np.printoptions(linewidth=500,precision=5,suppress=True): \

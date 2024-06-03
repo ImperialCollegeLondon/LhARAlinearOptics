@@ -56,13 +56,6 @@ BLE.BeamLineElement.cleaninstances()
 BLI  = BL.BeamLine(filename)
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-print(" ----> Reference particle:")
-pz = 194.7585262
-E0 = mth.sqrt(protonMASS**2 + pz**2)
-p0 = np.array([0., 0., pz, E0])
-iRefPrtcl.setPrIn(p0)
-iRefPrtcl.setPrOut(p0)
-
 print("     ----> Reference particle set:")
 print("         ----> In:", iRefPrtcl.getPrIn())
 print("              Out:", iRefPrtcl.getPrOut())
@@ -73,10 +66,14 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
           iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
 
 #.. Create valid instance:
-DfQuad = BLE.DefocusQuadrupole("ValidDquad1", rStrt, vStrt, drStrt, dvStrt, \
+DfQuada = BLE.DefocusQuadrupole("ValidDquad1", rStrt, vStrt, drStrt, dvStrt, \
                                0.1, 100.)
+print(" Set reference particle phase space for:", DfQuada.getName())
+refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(DfQuada)
 DfQuad = BLE.DefocusQuadrupole("ValidDquad2", rStrt, vStrt, drStrt, dvStrt, \
                                0.1, None, 153.93033817278908)
+print(" Set reference particle phase space for:", DfQuad.getName())
+refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(DfQuad)
     
 #.. __repr__
 print("    __repr__:")
