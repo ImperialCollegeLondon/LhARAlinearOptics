@@ -486,7 +486,7 @@ class BeamLineElement:
         eps   = ( _R[1]**2 + _R[3]**2  ) / (2.*D**2)
         if self.getDebug():
             print("     ----> Epsilon:", eps)
-
+            
         if eps > 1.0:
             Fail = True
 
@@ -526,7 +526,9 @@ class BeamLineElement:
                 self.setTransferMatrix(_R)
 
             detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
-            print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+            error         = abs(1. - abs(detTrnsfrMtrx))
+            if error > 1.E-6:
+                print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
             
             _Rprime = self.getTransferMatrix().dot(_R)
 

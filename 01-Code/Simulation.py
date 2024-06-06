@@ -8,10 +8,11 @@ Class Simulation
 
   Class attributes:
   -----------------
-  __instance : Set on creation of first (and only) instance.
-  __Debug    : Debug flag
-__RandomSeed : Seed for random number, set to time at load of class.  
-__Facility : Address of instance of a facility
+  __instance   : Set on creation of first (and only) instance.
+  __Debug      : Debug flag
+  __PrgrssPrnt : Flag to set printing of progress (defalt True)
+__RandomSeed   : Seed for random number, set to time at load of class.  
+__Facility     : Address of instance of a facility
 
   Packages loaded:
   ----------------
@@ -101,8 +102,9 @@ class Simulation(object):
     
     __RandomSeed = __T.time()
 
-    __Debug     = False
-    __instance  = None
+    __Debug      = False
+    __PrgrssPrnt = True
+    __instance   = None
 
 
 #--------  "Built-in methods":
@@ -141,6 +143,7 @@ class Simulation(object):
     def __str__(self):
         self.__repr__()
         self.print()
+        return " Simulation.__str__ done."
 
             
 #--------  "Get methods" only; version, reference, and constants
@@ -161,6 +164,14 @@ class Simulation(object):
         cls.__Debug = _Debug
 
     @classmethod
+    def getProgressPrint(cls):
+        return cls.__PrgrssPrnt
+
+    @classmethod
+    def setProgressPrint(cls, _PrgrssPrnt=True):
+        cls.__PrgrssPrnt = _PrgrssPrnt
+
+    @classmethod
     def getFacility(cls):
         return cls._Facility
 
@@ -178,10 +189,17 @@ class Simulation(object):
     def getiBmIOw(self):
         return self._iBmIOw
 
+    def setiBmIOw(self, _iBmIOw):
+        self._iBmIOw = _iBmIOw
+
+    @classmethod
+    def getInstance(cls):
+        return cls.__instance
+
 #--------  Utilities:
     def print(self):
         print(" Simulation.print:")
-        print("                        Version:", self.CdVrsn(self))
+        print("                        Version:", self.CdVrsn())
         print("      State of random generator:", self.__Rnd.getstate()[0])
         print("   Number of events to generate:", self._NEvt)
         print("   Beam line specification file:", self._ParamFileName)

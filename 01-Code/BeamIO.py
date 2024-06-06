@@ -23,7 +23,6 @@ class BeamIO:
 #--------  "Built-in methods":
     def __init__(self, _datafilePATH=None, _datafileNAME=None, \
                  _create=False):
-        self.setDebug(True)
         if self.getDebug():
             print(' BeamIO.__init__: ', \
                   'creating BeamIO object')
@@ -98,8 +97,6 @@ class BeamIO:
             print("     ----> New BeamIO instance: \n", \
                   BeamIO.__str__(self))
             print(" <---- BeamIO instance created.")
-            
-        self.setDebug(True)
             
     def __repr__(self):
         return "BeamIO(<data file path>, <data file name>)"

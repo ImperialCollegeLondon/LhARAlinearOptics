@@ -850,7 +850,14 @@ class Beam:
 
             iRprt.asCSV()
 
-    def plotBeamProgression(self):
+    def plotBeamProgression(self, \
+                            plotFILE='99-Scratch/BeamProgressionPlot.pdf'):
+        pathNAME = os.path.split(plotFILE)
+        if not os.path.exists(pathNAME[0]):
+            raise noPath4plotFILE( \
+                          " Beam.plotBeamProgression:", \
+                          " path for plotFILE does not exist!")
+
         if self.getDebug():
             print(" Beam.plotBeamProgression: start")
 
@@ -910,7 +917,6 @@ class Beam:
                       iLoc, self.getLocation()[iAddr], \
                       s[iAddr], sx[iAddr], sy[iAddr])
 
-        plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(nrows=5, ncols=1, \
                                     layout="constrained")
@@ -1447,3 +1453,5 @@ class badParameter(Exception):
 class badTraceSpace(Exception):
     pass
 
+class noPath4plotFILE(Exception):
+    pass

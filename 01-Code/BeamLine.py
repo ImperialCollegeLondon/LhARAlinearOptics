@@ -1078,7 +1078,7 @@ class BeamLine(object):
 
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
-                PrtclInst.writeParticle(ParticleFILE)
+                PrtclInst.writeParticle(ParticleFILE, CleanAfterWrite)
                 if CleanAfterWrite:
                     Prtcl.Particle.cleanParticles()
                 #del PrtclInst
