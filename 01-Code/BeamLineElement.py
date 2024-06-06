@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 To do:
@@ -460,6 +461,40 @@ class BeamLineElement:
             Outside = True
         return Outside
 
+    def ExpansionParameterFail(self, _R):
+        iLctn = BeamLineElement.getinstances().index(self)
+        iAddr = iLctn - 1
+        
+        if self.getDebug():
+            print(" Particle.ExpansionParameterFail: start")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> TraceSpace:", _R)
+                print("     ----> iLctn:", iLctn, self.getName())
+                print("     ----> iAddr:", iAddr)
+                
+        Fail = False
+        
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+
+        p0    = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[iAddr][:3], \
+                                iRefPrtcl.getPrIn()[iAddr][:3]))
+        E0    = iRefPrtcl.getPrOut()[iAddr][3]
+        b0    = p0/E0
+        D     = mth.sqrt(1. + \
+                         2.*_R[5]/b0 +
+                         _R[5]**2)
+        eps   = ( _R[1]**2 + _R[3]**2  ) / (2.*D**2)
+        if self.getDebug():
+            print("     ----> Epsilon:", eps)
+            
+        if eps > 1.0:
+            Fail = True
+
+        if self.getDebug():
+            print(" <----> Return, Fail:", Fail)
+
+        return Fail
+
     def Transport(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
@@ -473,8 +508,12 @@ class BeamLineElement:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
-            
-        if self.OutsideBeamPipe(_R):
+            print("     ----> Expansion parameter fail:", \
+                  self.ExpansionParameterFail(_R))
+
+        if self.OutsideBeamPipe(_R) or \
+           self.ExpansionParameterFail(_R) or \
+           abs(_R[4]) > 5.:
             _Rprime = None
         else:
             if isinstance(self, DefocusQuadrupole) or \
@@ -483,8 +522,14 @@ class BeamLineElement:
                isinstance(self, SectorDipole)      or \
                isinstance(self, GaborLens)         or \
                isinstance(self, QuadDoublet)       or \
-               isinstance(self, QuadTriplet):
+               isinstance(self, QuadTriplet):         \
                 self.setTransferMatrix(_R)
+
+            detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
+            error         = abs(1. - abs(detTrnsfrMtrx))
+            if error > 1.E-6:
+                print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+            
             _Rprime = self.getTransferMatrix().dot(_R)
 
         if self.getDebug():
@@ -1322,6 +1367,9 @@ class Aperture(BeamLineElement):
             #print(" Aperture cut: RadX2, RapY2:", RadX2, RadY2)
             if (RadX2+RadY2) >= 1.:
                 NotCut = False
+
+        detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
+        print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
 
         _Rprime = None
         if NotCut:
@@ -4509,9 +4557,15 @@ class CylindricalRFCavity(BeamLineElement):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
             
-        if self.OutsideBeamPipe(_R):
+        if self.OutsideBeamPipe(_R) or \
+           self.ExpansionParameterFail(_R) or \
+           abs(_R[4]) > 5.:
             _Rprime = None
         else:
+
+            detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
+            print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+            
             _Rprime = self.getTransferMatrix().dot(_R) + self.getmrf()
 
         if self.getDebug():
@@ -6393,7 +6447,9 @@ class RPLCswitch(BeamLineElement):
                       self.getTransferMatrix())
 
             
-        if self.OutsideBeamPipe(_R):
+        if self.OutsideBeamPipe(_R) or \
+           self.ExpansionParameterFail(_R) or \
+           abs(_R[4]) > 2.5:
             _Rprime = None
         else:
             if self.get3Drotation():
@@ -6411,6 +6467,9 @@ class RPLCswitch(BeamLineElement):
                 _Rprime     = \
                     Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
             else:
+
+                detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
+                print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
                 _Rprime = self.getTransferMatrix().dot(_R)
 
         if self.getDebug():

@@ -266,11 +266,10 @@ class Beam:
               self.getstartlocation())
         print("     ----> Beam parameters by location:")
         
-        for iLoc in range(self.getstartlocation(), len(self.getLocation())):
-            iAddr = iLoc - self.getstartlocation()
+        for iAddr in range(self.getstartlocation(), len(self.getLocation())):
+            print("         ----> iLoc:", iAddr, self.getLocation()[iAddr])
             if len(self.getnParticles()) > iAddr:
-                print("         ----> iLoc, location:", \
-                      iLoc, self.getLocation()[iLoc], \
+                print("             ----> Number of particles:", \
                       " nParticles:", int(self.getnParticles()[iAddr]))
             if len(self.getsigmaxy()) > iAddr:
                 print("             ---->   sigma_x,   sigma_y:", \
@@ -691,7 +690,9 @@ class Beam:
                           self.getCovarianceMatrix()[iAddr]) 
 
     def evaluateBeam(self):
-        print(" Beam.evaluateBeam: perform` sums to get covariance matrices")
+        if self.getDebug():
+            print(" Beam.evaluateBeam: ", \
+                  "perform` sums to get covariance matrices")
         
         EndOfFile = False
         iEvt = 0
@@ -699,7 +700,8 @@ class Beam:
         Scl  = 1
 
         ParticleFILE = self.getInputDataFile()
-        print("     ----: event loop")
+        if self.getDebug():
+            print("     ----: event loop")
         
         nEvtMax = self.getnEvtMax()
         if nEvtMax == None:
@@ -710,7 +712,8 @@ class Beam:
             if not EndOfFile:
                 iEvt += 1
                 if (iEvt % Scl) == 0:
-                    print("         ----> Read event ", iEvt)
+                    if self.getDebug():
+                        print("         ----> Read event ", iEvt)
                     iCnt += 1
                     if iCnt == 10:
                         iCnt = 1
@@ -729,20 +732,26 @@ class Beam:
             if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
                 break
             
-        print("     <----", iEvt, "events read")
+        if self.getDebug():
+            print("     <----", iEvt, "events read")
 
-        print("     ----> calculate covariance matrix:")
+        if self.getDebug():
+            print("     ----> calculate covariance matrix:")
         self.calcCovarianceMatrix()
-        print("     <---- done.")
-        print("     ----> calculate sigma x, y:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> calculate sigma x, y:")
         self.setsigmaxy()
-        print("     <---- done.")
-        print("     ----> calculate emittances:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> calculate emittances:")
         self.setEmittance()
-        print("     <---- done.")
-        print("     ----> Twiss paramters:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> Twiss paramters:")
         self.setTwiss()
-        print("     <---- done.")
+        if self.getDebug():
+            print("     <---- done.")
         
         
 #--------  Utilities:
@@ -841,8 +850,14 @@ class Beam:
 
             iRprt.asCSV()
 
-    def plotBeamProgression(self):
-        self.setDebug(True)
+    def plotBeamProgression(self, \
+                            plotFILE='99-Scratch/BeamProgressionPlot.pdf'):
+        pathNAME = os.path.split(plotFILE)
+        if not os.path.exists(pathNAME[0]):
+            raise noPath4plotFILE( \
+                          " Beam.plotBeamProgression:", \
+                          " path for plotFILE does not exist!")
+
         if self.getDebug():
             print(" Beam.plotBeamProgression: start")
 
@@ -869,7 +884,8 @@ class Beam:
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
-        print(BL.BeamLine.getinstance())
+        if self.getDebug():
+            print(BL.BeamLine.getinstance())
         
         iLocMin = self.getstartlocation()
 
@@ -901,7 +917,6 @@ class Beam:
                       iLoc, self.getLocation()[iAddr], \
                       s[iAddr], sx[iAddr], sy[iAddr])
 
-        plotFILE = '99-Scratch/BeamProgressionPlot.pdf'
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(nrows=5, ncols=1, \
                                     layout="constrained")
@@ -1338,7 +1353,8 @@ class extrapolateBeam(Beam):
                           self.getCovMtrx()[jAddr])
 
     def extrapolateBeam(self):
-        print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
+        if self.getDebug():
+            print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
         
         EndOfFile = False
         iEvt = 0
@@ -1346,54 +1362,69 @@ class extrapolateBeam(Beam):
         Scl  = 1
 
         ParticleFILE = self.getInputDataFile()
-        print("     ----: event loop")
 
-        nEvtMax = self.getnEvtMax()
-        if nEvtMax == None:
-            nEvtMax = 1000
-        iEvtStopClean = max(0, nEvtMax-1000)
-        Cleaned       = None
-        while not EndOfFile:
-            EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
-            if not EndOfFile:
-                iEvt += 1
-                if (iEvt % Scl) == 0:
-                    print("         ----> Read event ", iEvt)
-                    iCnt += 1
-                    if iCnt == 10:
-                        iCnt = 1
-                        Scl  = Scl * 10
-
-                iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
-                self.incrementSums(iPrtcl)
-
-                #.. Keep a few particles for plotting:
-                if iEvt < iEvtStopClean:
-                    Cleaned = Prtcl.Particle.cleanParticles()
-            
+        #.. if ParticleFILE is closed, assume dont need to make initial
+        #   covariance matrix
+        if ParticleFILE.closed:
+            pass
+        else:
             if self.getDebug():
-                print("     ----> Cleaned:", Cleaned)
+                print("     ----: event loop")
 
-            if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
-                break
+            nEvtMax = self.getnEvtMax()
+            if nEvtMax == None:
+                nEvtMax = 1000
+            iEvtStopClean = max(0, nEvtMax-1000)
+            Cleaned       = None
+            while not EndOfFile:
+                EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+                if not EndOfFile:
+                    iEvt += 1
+                    if (iEvt % Scl) == 0:
+                        if self.getDebug():
+                            print("         ----> Read event ", iEvt)
+                        iCnt += 1
+                        if iCnt == 10:
+                            iCnt = 1
+                            Scl  = Scl * 10
+
+                    iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
+                    self.incrementSums(iPrtcl)
+
+                    #.. Keep a few particles for plotting:
+                    if iEvt < iEvtStopClean:
+                        Cleaned = Prtcl.Particle.cleanParticles()
             
-        print("     <----", iEvt, "events read")
+                    if self.getDebug():
+                        print("     ----> Cleaned:", Cleaned)
 
-        print("     ----> calculate covariance matrix:")
+                    if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
+                        break
+            
+        if self.getDebug():
+            print("     <----", iEvt, "events read")
+
+        if self.getDebug():
+            print("     ----> calculate covariance matrix:")
         self.calcCovarianceMatrix()
-        print("     <---- done.")
-        print("     ----> extrapolate covariance matrix:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> extrapolate covariance matrix:")
         self.extrapolateCovarianceMatrix()
-        print("     <---- done.")
-        print("     ----> calculate sigma x, y:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> calculate sigma x, y:")
         self.setsigmaxy()
-        print("     <---- done.")
-        print("     ----> calculate emittances:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> calculate emittances:")
         self.setEmittance()
-        print("     <---- done.")
-        print("     ----> Twiss paramters:")
+        if self.getDebug():
+            print("     <---- done.")
+            print("     ----> Twiss paramters:")
         self.setTwiss()
-        print("     <---- done.")
+        if self.getDebug():
+            print("     <---- done.")
         
 
 #--------  Utilities:
@@ -1423,3 +1454,5 @@ class badParameter(Exception):
 class badTraceSpace(Exception):
     pass
 
+class noPath4plotFILE(Exception):
+    pass

@@ -424,7 +424,10 @@ class Particle:
                       RotMtrx)
             
             drLab   = np.matmul(RotMtrx, PhsSpc[0])
-            pLab    = np.matmul(RotMtrx, PhsSpc[1])
+            if PhsSpc[1][2] != None:
+                pLab    = np.matmul(RotMtrx, PhsSpc[1])
+            else:
+                pLab    = np.array([None, None, None])
 
             rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
 
@@ -451,7 +454,7 @@ class Particle:
     def calcRPLCPhaseSpace(self, nLoc=None):
         if self.getDebug():
             print(" Particle.calcRPLCPhaseSpace for nLoc:", \
-                  nLoc, "start:")
+                  nLoc, self.getLocation()[nLoc], "start:")
             
         PhsSpc = self.RPLCTraceSpace2PhaseSpace(self.getTraceSpace()[nLoc])
 
@@ -477,25 +480,31 @@ class Particle:
         E0 = np.sqrt(particleMASS**2 + p0**2)
         b0 = p0/E0
         E  = E0 + TrcSpc[5]*p0
-        p  = mth.sqrt(E**2 - particleMASS**2)
+
+        D     = mth.sqrt(1. + \
+                         2.*TrcSpc[5]/b0 +
+                         TrcSpc[5]**2)
+        eps   = ( TrcSpc[1]**2 + TrcSpc[3]**2  ) / (2.*D**2)
+        
         if cls.getDebug():
-            print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
+            print("     ---->       p0, E0, b0, E:", p0, E0, b0, E)
             K0 = E0 - particleMASS
             K  = E  - particleMASS
             print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
+            print("     ---->          D, epsilon:", D, eps)
+        
+        p  = mth.sqrt(E**2 - particleMASS**2)
         
         rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
 
         px    = TrcSpc[1]*p0
         py    = TrcSpc[3]*p0
         p2    = p**2 - px**2 - py**2
-        if p2 < 0.:
-            px    = TrcSpc[1]*p
-            py    = TrcSpc[3]*p
-            p2    = p**2 - px**2 - py**2
             
         if p2 < 0.:
-            print(" Crashing!")
+            #.. Report issue and expansion parameter:
+            print(" Particle.RPLCTraceSpace2PhaseSpace:", \
+                  " unphysical phase space, set pz=None:")
             print("     ----> p0, E0, b0, E:", p0, E0, b0, E)
             K0 = E0 - particleMASS
             K  = E  - particleMASS
@@ -503,19 +512,25 @@ class Particle:
             print("     ----> p2, px, py, p:", p2, px, py, p)
             print("     ----> species, particleMASS, p0, E0, b0:", \
                   species, particleMASS, p0, E0, b0)
+            print("     ---->          D, epsilon:", D, eps)
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> TrcSpc:", TrcSpc)
-            print("     ----> Reference particle: \n", \
-                  Prtcl.ReferenceParticle.getinstance())
-        pz    = mth.sqrt(p2)
-        pRPLC = np.array([px, py, pz])
+                
+            pz    = None
+
+        else:
+            pz    = mth.sqrt(p2)
+            pRPLC = np.array([px, py, pz])
                 
         if cls.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> position:", rRPLC)
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> Mmtm    :", pRPLC)
-            Etmp = mth.sqrt(particleMASS**2 + np.dot(pRPLC, pRPLC))
+            if pRPLC[2] != None:
+                Etmp = mth.sqrt(particleMASS**2 + np.dot(pRPLC, pRPLC))
+            else:
+                Etmp = None
             print("     ----> Energy  :", Etmp)
 
         PhsSpc = np.array([rRPLC, pRPLC])
@@ -525,6 +540,7 @@ class Particle:
                 print(" <---- Return phase space:", PhsSpc)
 
         return PhsSpc
+
 
     @classmethod
     def RPLCPhaseSpace2TraceSpace(cls, PhsSpc):
