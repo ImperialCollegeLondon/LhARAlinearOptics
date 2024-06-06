@@ -14,12 +14,13 @@ def main(argv):
     """
        Parse input arguments:
     """
-    opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
-                               ["ifile=","nEvts", "ofile=","bfile"])
+    opts, args = getopt.getopt(argv,"hdi:o:b:n:l:",\
+                               ["ifile=","nEvts", "ofile=","bfile", "iLoc"])
 
     beamlinefile = None
     inputfile    = None
     outputfile   = None
+    strtloc      = None
     Debug        = False
     nEvts        = None
     for opt, arg in opts:
@@ -27,7 +28,7 @@ def main(argv):
             print ( \
                     'plotBeam.py '  + \
                     ' -i <inputfile> -n <nEvts> -o <outputfile>' + \
-                    ' [-b <beamlinefile>]')
+                    ' -l <startlocation> [-b <beamlinefile>]')
             sys.exit()
         if opt == '-d':
             Debug = True
@@ -39,12 +40,14 @@ def main(argv):
             outputfile = arg
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
+        elif opt in ("-l", "--iLoc"):
+            strtloc = int(arg)
 
     if inputfile    == None:
         print ( \
                 'plotBeam.py '  + \
                 ' -i <inputfile> -n <nEvts> -o <outputfile>' + \
-                ' [-b <beamlinefile>]')
+                ' -l <startlocation> [-b <beamlinefile>]')
         sys.exit()
 
     print(" plotBEAM: start")
@@ -70,7 +73,7 @@ def main(argv):
         CSVoutputFILE = os.path.join(HOMEPATH, outputfile)
         print("         ----> Write beamline summary file to:", CSVoutputFILE)
     
-    iBm = Bm.Beam(particlefile, nEvts, CSVoutputFILE)
+    iBm = Bm.Beam(particlefile, nEvts, CSVoutputFILE, strtloc)
 
     print("     <---- Beam instance initialised.")
 
@@ -88,7 +91,6 @@ def main(argv):
         
     print("     ----> Plot beam progression:")
 
-    iBm.setDebug(True)
     iBm.plotBeamProgression()
 
     print("     <---- Beam progression plot done.")

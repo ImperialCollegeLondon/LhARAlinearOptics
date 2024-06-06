@@ -39,6 +39,7 @@ def startAnalysis(argv):
             print ( \
                     'UserAnal.py -i <inputfile> -o <outputfile>' + \
                     ' -n <nEvts>')
+            print("     ----> <output file> not yet implemented.>")
             sys.exit()
         if opt == '-d':
             Debug = True

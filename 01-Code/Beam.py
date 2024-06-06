@@ -1059,6 +1059,7 @@ class Beam:
             
         if self.getDebug():
             print(" <----  Beam.plotBeamProgression done.")
+        self.setDebug(False)
 
                 
 """
