@@ -520,7 +520,8 @@ class Particle:
 
         else:
             pz    = mth.sqrt(p2)
-            pRPLC = np.array([px, py, pz])
+            
+        pRPLC = np.array([px, py, pz])
                 
         if cls.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
