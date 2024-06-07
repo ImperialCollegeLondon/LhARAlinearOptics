@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Start with methods used in analysis main that should be standard for all
+analyses.
+
+"""
+
+import UserFramework as UFw
+
+"""
 Class UserAnal:
 ===============
 
@@ -45,22 +53,58 @@ Created on Tue 27Feb24: Version history:
 @author: kennethlong
 """
 
+import io
+
 import Particle as Prtcl
+import BeamLine as BL
 
 class UserAnal:
+
+        
+#--------  UserHooks:
+    def UserInit(self):
+        print(" UserAnal.UserInit: initialsation")
+        print("     ----> Default UserInit.")
+
+        if not UserAnal.InitCalled:
+            print(BL.BeamLine.getinstance())
+
+        print("\n <---- Default UserInit complete.")
+        
+    def UserEvent(self, iPrtcl): 
+        print(" UserAnal.UserEvent: user particle-by-particle processing")
+        print("     ----> Default UserEvent.")
+       
+        print("\n <---- Default UserEvent complete.")
+
+    def UserEnd(self, d0_new=None, d1_new=None, sp_new=None, d4_new=None):
+        print(" UserAnal.UserEnd: end of processing")
+        print("     ----> Default UserEnd.")
+
+        print("\n <---- Default UserEnd complete.")
+
+
+#--------  "Standard" UserAnal: no need to edit ...
+
     instances  = []
-    __Debug    = False
+    __Debug    = True
+    InitCalled = False
+
+    Iter = 0
 
 
 #--------  "Built-in methods":
-    def __init__(self):
-        if self.__Debug:
+    def __init__(self, Debug=False):
+        self.setDebug(Debug)
+        if self.getDebug():
             print(' UserAnal.__init__: ', \
                   'creating the user analysis object object')
 
         UserAnal.instances.append(self)
 
         self.setAll2None()
+
+        self.UserInit()
 
         if self.__Debug:
             print("     ----> New UserAnal instance: \n", \
@@ -105,9 +149,13 @@ class UserAnal:
     def getUserAnalInstances(cls):
         return cls.instances
 
-            
+    @classmethod
+    def getIter(cls):
+        return cls.Iter
+
+
 #--------  Processing methods:
-    def EventLoop(self):
+    def EventLoop(self, ibmIOw):
 
         nPrtcl = 0
         for iPrtcl in Prtcl.Particle.getParticleInstances():
@@ -117,27 +165,13 @@ class UserAnal:
                 continue
             iLoc = -1
 
-            if nPrtcl < 10:
-                iPrtcl.printProgression()
+            self.UserEvent(iPrtcl)
 
-        print(" UserAnal.EventLoop done, number of particles read:", nPrtcl)
-
-        self.UserEnd()
-
+            if isinstance(ibmIOw, io.BufferedWriter):
+                iPrtcl.writeParticle(ibmIOw)
         
-#--------  UserHooks:
-    def UserInit(self):
-        print(" UserAnal.UserInit: initialsation")
-
-        print(" <---- UserAnal.UserInit; done.")
-
-    def UserEnd(self):
-        print(" UserEnd.UserEnd: called in event loop:")
-
-        print(" <---- UserEnd.UserEnd; done.")
-
+        Prtcl.Particle.cleanParticles()
+        
 
 #--------  Exceptions:
-class noReferenceParticle(Exception):
-    pass
 

@@ -98,8 +98,6 @@ print("visualiseTest:", visualiseTest, \
       
 font = {'family': 'serif', \
         'color':  'darkred', \
-        'weight': 'normal', \
-        'size': 16, \
         }
 
 plt.rcParams["figure.figsize"] = (10., 7.5)

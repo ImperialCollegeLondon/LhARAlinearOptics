@@ -679,10 +679,13 @@ class Particle:
     @classmethod
     def plotTraceSpaceProgression(cls):
         font = {'family': 'serif', \
-                'color':  'darkred', \
+                'color':  'darkred' \
+                }
+        """
                 'weight': 'normal', \
                 'size': 16, \
-                }
+        """
+
         plt.rcParams["figure.figsize"] = (7.5, 10.)
         
         nLoc   = []
@@ -809,8 +812,6 @@ class Particle:
 
         font = {'family': 'serif', \
                 'color':  'darkred', \
-                'weight': 'normal', \
-                'size': 16, \
                 }
         plt.rcParams["figure.figsize"] = (7.5, 10.)
         
