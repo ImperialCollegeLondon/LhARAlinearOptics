@@ -53,6 +53,8 @@ drStrt = np.array([0.,0.,0.])
 dvStrt = np.array([[0.,0.],[0.,0.]])
 RPLCswtch = BLE.RPLCswitch("ValidRPLCswitch", rStrt, vStrt, drStrt, dvStrt, \
                            False)
+refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+refPrtclSet = refPrtcl.setReferenceParticleAtDrift(RPLCswtch)
     
 #.. __repr__
 print("    __repr__:")
@@ -131,6 +133,8 @@ Prtcl.Particle.cleanAllParticles()
 BLI  = BL.BeamLine(filename)
 print(BLI)
 RPLCswtch = BLE.RPLCswitch("ValidRPLCswitch", rStrt, vStrt, drStrt, dvStrt)
+refPrtcl    = Prtcl.ReferenceParticle.getinstance()
+refPrtclSet = refPrtcl.setReferenceParticleAtDrift(RPLCswtch)
 Rprime = RPLCswtch.Transport(R)
 with np.printoptions(linewidth=500,precision=7,suppress=True):
     print("     ----> Transported phase-space vector:", Rprime)

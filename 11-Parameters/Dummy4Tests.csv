@@ -1,6 +1,6 @@
 ﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
-0,Facility,Global,Name,Name,LhARA,,
-1,Facility,Global,Reference particle,Kinetic energy,20,MeV,
+0,Facility,Global,Name,Name,Dummy,,
+0,Facility,Global,Reference particle,Kinetic energy,20,MeV,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.75,m,
 1,Source,Source,Gaussian,SourceMode,1,,Gaussian kinetic energy
 1,Source,Source,Gaussian,SigmaX,0.000004,m,"Gaussian width, x"

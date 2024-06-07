@@ -528,7 +528,8 @@ class BeamLineElement:
             detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
             error         = abs(1. - abs(detTrnsfrMtrx))
             if error > 1.E-6:
-                print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+                print(" BeamLineElement.Transport: detTrnsfrMtrx:", \
+                      detTrnsfrMtrx)
             
             _Rprime = self.getTransferMatrix().dot(_R)
 
@@ -1369,7 +1370,10 @@ class Aperture(BeamLineElement):
                 NotCut = False
 
         detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
-        print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+        error         = abs(1. - abs(detTrnsfrMtrx))
+        if error > 1.E-6:
+            print(" Aperture(BeamLineElement).Transport: detTrnsfrMtrx:", \
+                  detTrnsfrMtrx)
 
         _Rprime = None
         if NotCut:
@@ -4562,9 +4566,11 @@ class CylindricalRFCavity(BeamLineElement):
            abs(_R[4]) > 5.:
             _Rprime = None
         else:
-
             detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
-            print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+            error         = abs(1. - abs(detTrnsfrMtrx))
+            if error > 1.E-6:
+                print(" CylindricalRFCavity(BeamLineElement).Transport:(3):" \
+                      " detTrnsfrMtrx:", detTrnsfrMtrx)
             
             _Rprime = self.getTransferMatrix().dot(_R) + self.getmrf()
 
@@ -6467,9 +6473,11 @@ class RPLCswitch(BeamLineElement):
                 _Rprime     = \
                     Prtcl.Particle.RPLCPhaseSpace2TraceSpace(phsSpcprime)
             else:
-
                 detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
-                print(" HereTest: detTrnsfrMtrx:", detTrnsfrMtrx)
+                error         = abs(1. - abs(detTrnsfrMtrx))
+                if error > 1.E-6:
+                    print(" RPLCswitch(BeamLineElement).Transport:(4):" \
+                          " detTrnsfrMtrx:", detTrnsfrMtrx)
                 _Rprime = self.getTransferMatrix().dot(_R)
 
         if self.getDebug():

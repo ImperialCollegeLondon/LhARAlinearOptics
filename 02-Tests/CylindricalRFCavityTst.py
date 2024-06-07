@@ -49,6 +49,10 @@ except:
     print('      ----> Correctly trapped no Cylindrical', \
           ' RF cavity parameters exception.')
 
+#.. Clean:
+BLE.BeamLineElement.cleaninstances()
+
+BL.BeamLine.setDebug(True)
 BLI  = BL.BeamLine(filename)
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
 
