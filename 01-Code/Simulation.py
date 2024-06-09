@@ -8,10 +8,11 @@ Class Simulation
 
   Class attributes:
   -----------------
-  __instance : Set on creation of first (and only) instance.
-  __Debug    : Debug flag
-__RandomSeed : Seed for random number, set to time at load of class.  
-__Facility : Address of instance of a facility
+  __instance   : Set on creation of first (and only) instance.
+  __Debug      : Debug flag
+  __PrgrssPrnt : Flag to set printing of progress (defalt True)
+__RandomSeed   : Seed for random number, set to time at load of class.  
+__Facility     : Address of instance of a facility
 
   Packages loaded:
   ----------------
@@ -70,6 +71,7 @@ import random as __Rnd
 import numpy as np
 import sys
 
+import BeamIO   as BmIO
 import BeamLine as BL
 import Particle as Prtcl
 
@@ -100,16 +102,18 @@ class Simulation(object):
     
     __RandomSeed = __T.time()
 
-    __Debug     = False
-    __instance  = None
+    __Debug      = False
+    __PrgrssPrnt = True
+    __instance   = None
 
 
 #--------  "Built-in methods":
     def __new__(cls, NEvt=5, filename=None, 
                 _dataFileDir=None, _dataFileName=None):
         if cls.__instance is None:
-            print('Simulation.__new__: creating the Simulation object')
-            print('-------------------')
+            if cls.getDebug():
+                print('Simulation.__new__: creating the Simulation object')
+                print('-------------------')
             cls.__instance = super(Simulation, cls).__new__(cls)
             
             cls.__Rnd.seed(int(cls.__RandomSeed))
@@ -122,8 +126,14 @@ class Simulation(object):
             # Create Facility instance:
             cls._Facility = BL.BeamLine(filename)
 
+            # Open file for write:
+            cls._iBmIOw = None
+            if _dataFileDir != None or _dataFileName != None:
+                cls._iBmIOw = BmIO.BeamIO(_dataFileDir, _dataFileName, True)
+            
             # Summarise initialisation
-            cls.print(cls)
+            if cls.getDebug():
+                cls.print(cls)
 
         return cls.__instance
 
@@ -153,6 +163,14 @@ class Simulation(object):
         cls.__Debug = _Debug
 
     @classmethod
+    def getProgressPrint(cls):
+        return cls.__PrgrssPrnt
+
+    @classmethod
+    def setProgressPrint(cls, _PrgrssPrnt=True):
+        cls.__PrgrssPrnt = _PrgrssPrnt
+
+    @classmethod
     def getFacility(cls):
         return cls._Facility
 
@@ -167,6 +185,16 @@ class Simulation(object):
     def getNEvt(self):
         return self._NEvt
 
+    def getiBmIOw(self):
+        return self._iBmIOw
+
+    def setiBmIOw(self, _iBmIOw):
+        self._iBmIOw = _iBmIOw
+
+    @classmethod
+    def getInstance(cls):
+        return cls.__instance
+
 #--------  Utilities:
     def print(self):
         print(" Simulation.print:")
@@ -176,31 +204,41 @@ class Simulation(object):
         print("   Beam line specification file:", self._ParamFileName)
         print(" data file directory for output:", self._dataFileDir)
         print("       data filename for output:", self._dataFileName)
+        print(" BeamIO output file instance id:", id(self.getiBmIOw()))
 
         
 #--------  Simulation run methods
     def RunSim(self):
-        print()
-        print('Simulation.RunSim: simulation begins')
-        print('-----------------')
+        if self.getDebug():
+            print()
+            print('Simulation.RunSim: simulation begins')
+            print('-----------------')
 
-        runNumber =  26                   # set run number
-        
+        """
         #.. Open file to store events:
-        print(" Here:", self.getdataFileDir())
-        print("      ", self.getdataFileName())
         ParticleFILE = None
         if self.getdataFileDir()  != None and \
            self.getdataFileName() != None:
             ParticleFILE = Prtcl.Particle.createParticleFile( \
                                             self.getdataFileDir(), \
                                             self.getdataFileName() )
+        """
+
+        #.. Write facility:
+        if self.getiBmIOw() != None:
+            BL.BeamLine.getinstance().writeBeamLine( \
+                                        self.getiBmIOw().getdataFILE())
 
         #.. Transport particles through facility:
-        
-        nEvt = self.getFacility().trackBeam(self.getNEvt(), ParticleFILE)
+
+        dataFILE = None
+        if self.getiBmIOw() != None:
+            dataFILE = self.getiBmIOw().getdataFILE()
+        nEvt = self.getFacility().trackBeam(self.getNEvt(), dataFILE)
 
         #.. Flush and close particle file:
-        if ParticleFILE != None:
-            Prtcl.Particle.flushNcloseParticleFile(ParticleFILE)
+        if self.getiBmIOw() != None:
+            self.getiBmIOw().flushNclosedataFile( \
+                                    self.getiBmIOw().getdataFILE())
         
+

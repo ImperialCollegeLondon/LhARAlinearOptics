@@ -1,7 +1,18 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
 
-\bibitem{2021:nuSIM:Doc.01}
-Kyberd, P and Long, K, nuSIM: parameters for first simulation of neutrino spectra, number = nuSIM-2021-01
+\bibitem{Aymar:2020drr}
+G.~Aymar, T.~Becker, {\em et~al.}, ``LhARA: The Laser-hybrid Accelerator for
+  Radiobiological Applications,''
+  \href{https://dx.doi.org/10.3389/fphy.2020.567738}{{\em Frontiers in Physics}
+  {\bfseries 8} (2020) }.
+  \url{https://www.frontiersin.org/articles/10.3389/fphy.2020.567738}.
+
+\bibitem{LhARA:pre-CDR}
+{The LhARA consortium}, ``The Laser-hybrid Accelerator for Radiobiological
+  Applications,'' Tech. Rep. CCAP-TN-01, The Centre for the Clinical
+  Application of Particles, Imperial College London, 2020.
+\newblock
+  \url{https://ccap.hep.ph.ic.ac.uk/trac/raw-attachment/wiki/Communication/Notes/CCAP-TN-01.pdf}.
 
 \bibitem{Wolski:2014}
 A.~Wolski, {\em Beam dynamics in high energy particle accelerators}.
@@ -9,12 +20,22 @@ A.~Wolski, {\em Beam dynamics in high energy particle accelerators}.
   9HE, 2014.
 
 \bibitem{10.1038/nphys199}
-Fuchs, J., Antici, P., d’Humières, E. et al. Laser-driven proton scaling laws and new paths towards energy increase. Nature Phys 2, 48–54 (2006). https://doi.org/10.1038/nphys199
+J.~Fuchs, P.~Antici, {\em et~al.}, ``Laser-driven proton scaling laws and new
+  paths towards energy increase,''
+  \href{https://dx.doi.org/10.1038/nphys199}{{\em Nature Physics} {\bfseries 2}
+  (01, 2006) }.
 
 \bibitem{10.1103/PhysRevLett.97.045005}
-Schreiber J, Bell F, Grüner F, Schramm U, Geissler M, Schnürer M, Ter-Avetisyan S, Hegelich BM, Cobble J, Brambrink E, Fuchs J, Audebert P, Habs D. Analytical model for ion acceleration by high-intensity laser pulses. Phys Rev Lett. 2006 Jul 28;97(4):045005. doi: 10.1103/PhysRevLett.97.045005. Epub 2006 Jul 28. PMID: 16907584.
+J.~Schreiber, F.~Bell, {\em et~al.}, ``Analytical Model for Ion Acceleration by
+  High-Intensity Laser Pulses,''
+  \href{https://dx.doi.org/10.1103/PhysRevLett.97.045005}{{\em Physical review
+  letters} {\bfseries 97} (08, 2006) 045005}.
 
 \bibitem{10.1038/s41598-019-41705-0}
-Casolaro, P., Campajola, L., Breglio, G. et al. Real-time dosimetry with radiochromic films. Sci Rep 9, 5307 (2019). https://doi.org/10.1038/s41598-019-41705-0
+P.~Casolaro, L.~Campajola, G.~Breglio, S.~Buontempo, M.~Consales, A.~Cusano,
+  A.~Cutolo, F.~Di~Capua, F.~Fienga, and P.~Vaiano, ``Real-time dosimetry with
+  radiochromic films,''
+  \href{https://dx.doi.org/10.1038/s41598-019-41705-0}{{\em Scientific Reports}
+  {\bfseries 9} (03, 2019) }.
 
 \end{thebibliography}\endgroup

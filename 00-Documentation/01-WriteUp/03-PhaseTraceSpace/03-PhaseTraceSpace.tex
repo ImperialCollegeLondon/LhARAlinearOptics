@@ -2,41 +2,49 @@
 
 \section{Phase space and trace space}
 
-Para 1:
-\begin{itemize}
-  \item Quantum effects required to describe, e.g., development of
-    polarisation in electron storage rings;
-  \item Description of beam dynamics largely done using classical,
-    Hamiltonian, mechanics;
-  \item In classical mechanics, the equations of motion are solved to
-    give the evolution of the position, momentum, and energy of a
-    particle as a function of time;
-  \item Check Goldstein, time as parameter.
-\end{itemize}
+The motion of particles passing through an accelerator is most often
+described using classical Hamiltonian mechanics; quantum mechanics
+being required only in particular cases such as the description of
+spin polarisation in a storage ring.
+In classical Hamiltonian mechanics the equations of motion are solved
+to give the evolution of the position, momentum, and energy as
+functions of a single independent parameter.
+The independent parameter is often taken to be time.
 
-Para 2:
-\begin{itemize}
-  \item Relativistic mechanics exploits four-vector position
-    ($\underline{R} = (\bm{r}, ct)$) and four-vector momentum
-    ($\underline{P} = (\bm{p}, E)$); 
-  \item Hamiltonian mechanics uses time as a paramter, i.e.
-    $\underline{R} = \underline{R}(t)$ and
-    $\underline{P} = \underline{P}(t)$;
-  \item Time, or a quantity directly related to time such as the path
-    length, $s$, is therefore a paramter.
-    In addition, $E$ and $\bm{p}$ are related by the invariant mass of
-    particle.
-\end{itemize}
+Relativistic mechanics exploits four-vector position,
+$\underline{\cal{R}} = (\bm{r}, ct)$), and four-vector momentum  
+$\underline{\cal{P}} = (c\bm{p}, E)$.
+In the Hamiltonian description of particle dynamics, these four
+vectors become functions of the independent variable, i.e.
+$\underline{\cal{R}} = \underline{\cal{R}}(t)$ and
+$\underline{\cal{P}} = \underline{\cal{P}}(t)$.
+In the laboratory system, the position of the reference particle along
+its trajectory is directly related to the time coordinate by
+$t = c \beta_0 s$.
+This allows $s$ to be taken as the independent variable and for the
+motion of particles in the beam to be derived as function of $s$.
 
-Para 3:
-\begin{itemize}
-  \item Phase space is the position of the particle in coordinate and
-    and momentun space;
-  \item Six phase-space coordinates are required and are usually to
-    taken to be $\bm{r}$ and $\bm{p}$;
-  \item This section defines the 6-dimensional spaces used to describe
-    particle phase space in the linear optics code.
-\end{itemize}
+The 6D phase-space coordinates of a particle as a function of $s$ are
+given by the position and momentum three vectors.
+The particle energy may be determined from the invariant mass and the
+time coordinate from the invariant interval between the origin and the
+the position represented by $s$.
+
+The ``trace-space'' coordinates of a particle are defined relative to
+the reference particle.
+Usually, a beam is understood to contain particles which follow
+trajectories that differ rather little from that of the reference
+particle.
+Trace space is defined such that the position, ``momentum'', and
+``energy'' coordinates are small for particles which follow
+trajectories close to that of the reference particle.
+The utility of this approach is that trace-space coordinates may be
+used to perform Taylor expansions of the Hamiltonian which may readily
+be solved to yield a description of particle transport using functions
+that are linear in the trace-space coordinates.
+
+The notation used for the 6D phase and trace spaces are defined in
+this section.
 
 \subsection{Phase space}
 
@@ -47,8 +55,8 @@ position and three vector momentum as:
   \begin{bmatrix} \begin{pmatrix} x   \\   y \\ z   \end{pmatrix} \\
                   \begin{pmatrix} p_x \\ p_y \\ p_z \end{pmatrix} \end{bmatrix}
 \end{equation}
-The trajectory of the particle is evaluated as a function of time,
-$t$ or $s$.
+The trajectory of the particle may be evaluated as a function of time
+or $s$.
 
 \subsection{Trace space}
 
@@ -75,13 +83,10 @@ where:
 \begin{eqnarray}
   x\prime_{\rm\,RPLC}  & = & \frac{\partial x}{\partial s} = \frac{cp_{x\,{\rm\,RPLC}}}{cp_0} \, ; \\
   y\prime_{\rm\,RPLC}  & = & \frac{\partial y}{\partial s} = \frac{cp_{y\,{\rm\,RPLC}}}{cp_0} \, ; \\
-  z_{\rm\,RPLC}        & = & \frac{s}{\beta_0} - ct = \frac{\Delta s}{\beta_0}                    \, ; \\
-  \delta_{\rm\,RPLC}   & = & \frac{E}{c p_0} - \frac{1}{\beta_0} = \frac{\Delta E}{cp_0}          \, {\rm ; and}
+  z_{\rm\,RPLC}        & = & \frac{s}{\beta_0} - ct = \frac{\Delta s}{\beta_0}                    \, {\rm ; and} \\
+  \delta_{\rm\,RPLC}   & = & \frac{E}{c p_0} - \frac{1}{\beta_0} = \frac{\Delta E}{cp_0}          \, .    
 \end{eqnarray}
-$\Delta s$ and $\Delta E$ are the differences between the reference
-particle position, $s_0$, and its energy, $E_0$, and the position and
-energy of the test particle, $s$ and $E$ respectively.  
-$\Delta s$ and $\Delta E$ are given by $\Delta s = s - s_0$ and
-$\Delta E = E - E_0$.
-
-
+Here $\Delta s = s - s_0$ and $\Delta E = E - E_0$, where $s_0$ and
+$E_0$ are the reference particle position and energy respectively; $E$
+and $s$ are the energy and position of a particular particle in the
+beam.

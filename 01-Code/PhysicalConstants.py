@@ -46,6 +46,7 @@ Class PhysicalConstants
 Created on Mon 12Jun23: Version history:
 ----------------------------------------
  1.0: 12Jun23: First implementation
+ 1.1: 21Mar24: Add mass of the pion and mass of the muon
 
 @author: kennethlong
 """
@@ -57,6 +58,7 @@ import scipy.constants
 class PhysicalConstants(object):
     __instance = None
     __Debug    = False
+    _Species   = ["proton", "pion", "muon", "neutrino"]
 
 #--------  "Built-in methods":
     def __new__(cls):
@@ -116,11 +118,45 @@ class PhysicalConstants(object):
     def SoL(self):
         return sp.constants.c
 
+    @classmethod
+    def getSpecies(cls):
+        return cls._Species
+
+    def getparticleMASS(self, _Species):
+        particleMASS = None
+        if not isinstance(_Species, str):
+            raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
+                               _Species + " not a string!")
+        if _Species.lower() in PhysicalConstants.getSpecies():
+            if   _Species.lower() == "proton":
+                particleMASS = self.mp()
+            elif _Species.lower() == "pion":
+                particleMASS = self.mPion()
+            elif _Species.lower() == "muon":
+                particleMASS = self.mMuon()
+            elif _Species.lower() == "neutrino":
+                particleMASS = 0.
+        else:
+            raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
+                               _Species + " not allowed!")
+        return particleMASS
+    
     def mp(self):
         return 938.27208816
+
+    def mPion(self):
+        return 139.57061
+
+    def mMuon(self):
+        return 105.6583745
 
     def mu0(self):
         return sp.constants.mu_0
 
 
 #--------  Utilities:
+
+
+#--------  Exceptions:
+class badParameter(Exception):
+    pass
