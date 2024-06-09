@@ -1,0 +1,85 @@
+--------  --------  --------  --------  --------  --------  --------  22Feb24
+Created reference plot directory that includes present output from the
+scripts.  Made a few minor mods along the way.  Have pushed, now nede to run
+through all tests to make sure nothing is broken before merging into main.
+
+Tests:
+ - BeamLineElementTst.py   - OK
+ - BeamLineTst.py          - OK
+ - CylindricalRFCavityTst  - OK
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DRACOfacilityTst.py     - OK	
+ - DriftTst.py             - OK
+ - ExpSourceTst.py         - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LaTexTst.py             - OK
+ - LhARAFacilityTst.py     - OK
+ - LIONfacilityTst.py      - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - QuadDoubletTst.py       - OK
+ - QuadTripletTst.py       - OK
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK -- had to fix the i/p to lsrdrvn source in tst
+ - TestWrite.py            - OK
+ - TestRead.py             - OK
+
+Scripts:
+ - All assumed OK since I just made the long set of runs.
+
+
+--------  --------  --------  --------  --------  --------  --------  20Feb24
+Implemented cylindrical cavity in LhARA laser-driven spread.  Spreadsheets now
+a bit inconsistent.  Need to clean this up.
+
+While doing the update for cylindrical RF cavity, I noticed a bug in
+addBeamLine which meant that s was not updated when a dipole was added.  This
+is now fixed.
+
+Decided to push fixes and let users know.  Need to run through all tests,
+but LhARA scripts seem to work.
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamLineElementTst.py   - 
+ - BeamLineTst.py          - 
+ - CylindricalRFCavityTst  -
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DRACOfacilityTst.py     - 	
+ - DriftTst.py             -
+ - ExpSourceTst.py         -
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         -
+ - LaTexTst.py             -
+ - LhARAFacilityTst.py     - 
+ - LIONfacilityTst.py      - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          -
+ - PhysicalConstantsTst.py - 
+ - QuadDoubletTst.py       -
+ - QuadTripletTst.py       -
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestRead.py             - 
+ - TestWrite.py            - 
+
+Scripts:
+ - LhARAMagnetTable.py     -
+ - plotQuadTriplet.py      -
+ - plotTrajectory.py       -
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 

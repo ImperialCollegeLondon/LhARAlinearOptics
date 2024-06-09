@@ -1,0 +1,75 @@
+--------  --------  --------  --------  --------  --------  --------  03Feb24
+Fix position at which particle phase space is recorded reported by Paul K.
+Turned out to be bugs in updating of s in addBeamLine.
+
+Do tests etc:
+
+Tests:
+ - BeamLineTst.py          - OK
+ - BeamLineElementTst.py   - OK
+ - DRACOfacilityTst.py     - OK	
+ - DefocusQuadTst.py       - OK
+ - DipoleTst.py            - OK
+ - DriftTst.py             - OK
+ - FocusQuadTst.py         - OK
+ - GaborLensTst.py         - OK
+ - LIONfacilityTst.py      - OK
+ - LhARAFacilityTst.py     - OK
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - OK
+ - PhysicalConstantsTst.py - OK
+ - RFCavityTst.py          - Fails.
+ - ReferenceParticleTst.py - OK
+ - RunSimulationTst.py     - OK
+ - SimulationTst.py        - OK
+ - SolenoidTst.py          - OK
+ - SourceTst.py            - OK
+ - TestRead.py             - OK
+ - TestWrite.py            - OK
+
+Scripts:
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotQuadTriplet.py      - OK
+ - plotTrajectory.py       - OK -- had to fix getz->gets
+ - LhARAMagnetTable.py     - OK
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - BeamLineTst.py          - 
+ - BeamLineElementTst.py   - 
+ - DRACOfacilityTst.py     - 	
+ - DefocusQuadTst.py       - 
+ - DipoleTst.py            - 
+ - DriftTst.py             - 
+ - FocusQuadTst.py         - 
+ - GaborLensTst.py         - 
+ - LIONfacilityTst.py      - 
+ - LhARAFacilityTst.py     - 
+ - OctupoleTst.py          - Fails.
+ - ParticleTst.py          - 
+ - PhysicalConstantsTst.py - 
+ - RFCavityTst.py          - Fails.
+ - ReferenceParticleTst.py - 
+ - RunSimulationTst.py     - 
+ - SimulationTst.py        - 
+ - SolenoidTst.py          - 
+ - SourceTst.py            - 
+ - TestRead.py             - 
+ - TestWrite.py            - 
+
+Scripts:
+ - RunDRACOsimulation.py   - 
+ - ReadDRACOsimu.py        - 
+ - RunLIONsimulation.py    - 
+ - ReadLIONsimu.py         - 
+ - RunLhARAsimulation.py   - 
+ - ReadLhARAsimu.py        - 
+ - plotQuadTriplet.py      - 
+ - plotTrajectory.py       - 
+ - LhARAMagnetTable.py     - 
+
