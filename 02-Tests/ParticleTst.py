@@ -85,6 +85,34 @@ Prtcl.Particle.setDebug(True)
 print(PrtcltInst)
 Prtcl.Particle.setDebug(False)
 
+ParticleTest = 5
+print("ParticleTest:", ParticleTest, " check particle is pion.")
+PionInst = Prtcl.Particle("pion")
+Prtcl.Particle.setDebug(True)
+print(PionInst)
+Prtcl.Particle.setDebug(False)
+
+ParticleTest = 6
+print("ParticleTest:", ParticleTest, " check particle is muon.")
+MuonInst = Prtcl.Particle("Muon")
+Prtcl.Particle.setDebug(True)
+print(MuonInst)
+Prtcl.Particle.setDebug(False)
+
+ParticleTest = 7
+print("ParticleTest:", ParticleTest, " check explicit particle proton.")
+ProtonInst = Prtcl.Particle("proton")
+Prtcl.Particle.setDebug(True)
+print(ProtonInst)
+Prtcl.Particle.setDebug(False)
+
+ParticleTest = 8
+print("ParticleTest:", ParticleTest, " check response to unknown particle type.")
+uKInst = Prtcl.Particle("neutrino")
+Prtcl.Particle.setDebug(True)
+print(uKInst)
+Prtcl.Particle.setDebug(False)
+
 """
 Legacy; wont work as delete instances after generating ... needs to check
         fillPhaseSpaceAll

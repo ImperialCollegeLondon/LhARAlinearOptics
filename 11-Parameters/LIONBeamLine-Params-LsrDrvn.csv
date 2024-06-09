@@ -9,17 +9,17 @@
 1,Source,Source,Parameterised TNSA,Emax,25,MeV,Maximum of energy distribution
 1,Source,Source,Parameterised TNSA,nPnts,1000,,Number of points to sample for integration of PDF
 1,Source,Source,Parameterised TNSA,MinCTheta,0.999691155,,Maximum theta for flat cos theta
-1,Source,Source,Parameterised TNSA,Power,2.50E+15,W,Laser power
+1,Source,Source,Parameterised TNSA,Power,2.5E+15,W,Laser power
 1,Source,Source,Parameterised TNSA,Energy,70,J,Laser energy
 1,Source,Source,Parameterised TNSA,Wavelength,0.8,um,Laser wavelength
 1,Source,Source,Parameterised TNSA,Duration,2.80E-14,s,Laser pulse duration
-1,Source,Source,Parameterised TNSA,Thickness,4.00E-07,m,Target thickness
+1,Source,Source,Parameterised TNSA,Thickness,0.0000004,m,Target thickness
 1,Source,Source,Parameterised TNSA,Intensity,4.00E+20,W/cm2,Laser intensity
 1,Source,Source,Parameterised TNSA,DivAngle,25,degrees,Electron divergence angle
-1,Capture,Drift,,Length,0.06034,m,Length of first drift
+1,Capture,Drift,,Length,0.04034,m,Length of first drift
 1,Capture,Aperture,Elliptical,RadiusX,0.003,m,Half aperture in x of elliptical colimator
 1,Capture,Aperture,Elliptical,RadiusY,0.0015,m,Half aperture in y of ellipseof elliptical colimator
-1,Capture,Drift,,Length,0.001,m,Gap between colimator and first quad
+1,Capture,Drift,,Length,0,m,Gap between colimator and first quad
 1,Capture,Fquad,,Length,0.04,m,Length of focusing quad
 1,Capture,Fquad,,Strength,332,T/m,Strength of focusing quad
 1,Capture,Aperture,Circular,Radius,0.005,m,Aperture of quad
@@ -27,7 +27,7 @@
 1,Capture,Dquad,,Length,0.02,m,Length of defocusing quad
 1,Capture,Dquad,,Strength,318.5,T/m,Strength of defocusing quad
 1,Capture,Aperture,Circular,Radius,0.005,m,Aperture of quad
-1,Delivery,Drift,,Length,1.72859,m,Main drift from last quad to kapton/aluminium foils
-1,Delivery,Drift,,Length,0.01,m,Drift from kapton/aluminium foils to collimator
+1,Delivery,Drift,,Length,1.728652,m,Main drift from last quad to kapton/aluminium foils
+1,Delivery,Drift,,Length,0.015,m,Drift from kapton/aluminium foils to collimator
 1,Delivery,Aperture,Circular,Radius,0.0015,m,"Collimator before ""end station"""
 1,Delivery,Drift,,Length,0.02,m,Final drift

@@ -25,8 +25,8 @@ rootfilename = os.path.join(LhARAOpticsPATH, \
                             '99-Scratch/LhARA-Simulation-tst.root')
 print(filename)
 print(rootfilename)
-Smltn  = Simu.Simulation(100, filename, rootfilename)
-Smltn1 = Simu.Simulation(100, filename, rootfilename)
+Smltn  = Simu.Simulation(100, filename, None, rootfilename)
+Smltn1 = Simu.Simulation(100, filename, None, rootfilename)
 print("---->Smltn singleton test:", id(Smltn), id(Smltn1), \
       id(Smltn)-id(Smltn1))
 if Smltn != Smltn1:

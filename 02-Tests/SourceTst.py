@@ -41,9 +41,9 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     Src = BLE.Source(rStrt, vStrt, drStrt, dvStrt)
 except:
@@ -51,8 +51,8 @@ except:
 
 #.. Create valid instance:
 Mode  = 0
-Param = [0.000004, 0.000004, 0.998,    \
-          1., 25., 1000]
+Param = [0.000004, 0.000004, 0.999691155, 1., 25., 1000, 2.5E+15, 70., \
+         0.8, 2.80E-14, 0.0000004, 4.00E+20, 25.]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
@@ -73,7 +73,7 @@ print()
 print("BeamLineElement(Source)Test:", SourceTest, \
       " test gaussian source distribution.")
 BLE.Source.setDebug(False)
-BLE.Source.cleanInstances()
+BLE.Source.cleaninstances()
 Src = BLE.Source("Source1", rStrt, vStrt, drStrt, dvStrt, \
                  1, [0.000004, 0.000004, 0.998, 20., 0.3])
 x, y, K, cTheta, Phi = Src.getParticle()
@@ -208,7 +208,8 @@ print("SourceTest:", SourceTest, \
       " test parameterised laser-driven source distribution ", \
       "check.")
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
-                  0, [0.000004, 0.000004, 0.998, 1., 25., 1000])
+                  0, [0.000004, 0.000004, 0.999691155, 1., 25., 1000, \
+                      2.5E+15, 70., 0.8, 2.80E-14, 0.0000004, 4.00E+20, 25.])
 print(Src1)
 print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \

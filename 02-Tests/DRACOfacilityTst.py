@@ -39,10 +39,8 @@ print()
 print("     ----> DRACOFacilityTest:", DRACOFacilityTest, \
       " create facility instance.")
 
-BL.BeamLine.setDebug(True)
 DRACObI  = BL.BeamLine(filename)
 print(DRACObI)
-BL.BeamLine.setDebug(False)
 
 print()
 print("     <---- DRACOFacilityTest:", DRACOFacilityTest, \
@@ -55,10 +53,8 @@ print("     ----> DRACOFacilityTest:", DRACOFacilityTest, \
       " check generation/tracking.")
 
 print("         ----> First using hard-coded trace space at source.")
-DRACObI.setDebug(True)
 DRACObI.setSrcTrcSpc(np.array([0.0001, -0.0001, 0.0002, 0.0001, 0., 20.]))
 OK = DRACObI.trackBeam(1)
-DRACObI.setDebug(False)
 
 print("         ----> Second using generated beam:")
 DRACObI.setSrcTrcSpc()

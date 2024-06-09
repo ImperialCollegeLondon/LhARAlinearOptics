@@ -41,9 +41,9 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     Src = BLE.Source(rStrt, vStrt, drStrt, dvStrt)
 except:
@@ -94,7 +94,7 @@ SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
 for i in range(10000):
-    X, Y, KE, cTheta, Phi = Src1.getParticle()
+    X, Y, KE, cTheta, Phi, g_E, E_max_MeV = Src1.getParticle()
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
@@ -135,6 +135,48 @@ plt.yscale("log")
 plt.title('LsrDrvnSrc: Energy distribution')
 plt.savefig('99-Scratch/SourceTst_plot13.pdf')
 plt.close()
+
+
+
+
+
+n, bins, patches = plt.hist(PrtclKE, \
+                            bins=100, color='y', \
+                            log=False, label='Generated Distribution')
+E = np.linspace(0,E_max_MeV,1000)
+#plt.plot(E, g_E, color='k', label='Required Distribution')
+
+# Match the heights
+max_g_height = max(g_E)
+hist_heights, bin_edges = np.histogram(PrtclKE, bins=100)   
+max_generated_height = max(hist_heights)
+
+# Determine the scaling factor based on the larger histogram's height
+bins = 100
+scaling_factor = max_g_height / max_generated_height
+scaling_factor = scaling_factor / np.sqrt(bins)
+g_scaled = g_E / scaling_factor
+
+# Scale the required distribution curve
+g_scaled = g_E / scaling_factor
+plt.plot(E, g_scaled, color='k', label='Required Distribution', linewidth=2)
+
+E_max_cutoff_index = np.argmin(np.abs(E - E_max_MeV))
+y_max_cutoff = g_scaled[E_max_cutoff_index] 
+plt.vlines(x=E_max_MeV, ymin=0, ymax=y_max_cutoff, color='k', linestyle='-', linewidth=2)  # [MeV]
+
+plt.xlabel('Energy (MeV)')
+plt.ylabel('Entries')
+plt.yscale("log")
+plt.legend(loc="best")
+plt.title('LsrDrvnSrc: Energy distribution')
+plt.savefig('99-Scratch/SourceTst_plot13_Dist.pdf')
+plt.close()
+
+
+
+
+
 
 n, bins, patches = plt.hist(PrtclcT, \
                             bins=50, color='y', \

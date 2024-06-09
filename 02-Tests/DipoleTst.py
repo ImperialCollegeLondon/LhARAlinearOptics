@@ -41,9 +41,9 @@ try:
 except:
     print('      ----> Correctly trapped no argument exception.')
 rStrt = np.array([0.,0.,0.])
-vStrt = np.array([0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([0.,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
 try:
     Dpl = BLE.SectorDipole("NoAngle", rStrt, vStrt, drStrt, dvStrt)
 except:
@@ -55,7 +55,7 @@ except:
     print('      ----> Correctly trapped no field exception.')
 
 #--------> Clean instances and restart:
-BLE.BeamLineElement.cleanInstances()
+BLE.BeamLineElement.cleaninstances()
 
 BLI  = BL.BeamLine(filename)
 iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
