@@ -1,5 +1,5 @@
 # LhARAlinearOptics
-Linear optics code for LhARA
+Linear optics code for LhARA -- Tag1
 
 The code in this repository provides linear beam-line optics code and implemetations of the DRACO, LION< and LhARA Stage 1 beamlines.  
 
@@ -25,3 +25,17 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
 
 ## History
  * January 2024:  Code tidied for "users"/co-developers!
+
+## Updating to new install and set-up -- read this:
+ * git clone git@github.com:ImperialCollegeLondon/LhARAlinearOptics.git
+ * cd LhARAlineaOptics
+ * Set up a virtual environment.  Possible commands:
+   - python3 -m venv venv
+   - virtualenv venv <br />
+   
+   Note that you may need to install the virtualenv package for your linux
+   distribution.
+ * source ./venv/bin/activate
+ * pip install -r ./requirements.txt
+ 
+ * source setup.bash                
