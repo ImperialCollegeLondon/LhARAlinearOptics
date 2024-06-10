@@ -4867,7 +4867,7 @@ class Source(BeamLineElement):
 
         #.. Generate initial particle:
         #x, y, K, cTheta, Phi = self.getParticle()
-        x, y, K, cTheta, Phi, g_E, E_max_MeV = self.getParticle()
+        x, y, K, cTheta, Phi, g_E, E_max_MeV, ne_0, c_s, s_sheath, T_e = self.getParticle()
         if self.__Debug:
             print("     ----> x, y, K, cTheta, Phi:", \
                   x, y, K, cTheta, Phi)
@@ -4895,6 +4895,7 @@ class Source(BeamLineElement):
                   self.getMode(), self.getParameters())
 
         if self._Mode == 0:
+
             P_L = self.getParameters()[6]
             E_laser = self.getParameters()[7]
             lamda = self.getParameters()[8]
@@ -4903,8 +4904,14 @@ class Source(BeamLineElement):
             I = self.getParameters()[11]
             theta_degrees = self.getParameters()[12]
 
+            ne_0 = self.parameters()[0]      # Hot electron density [pp/m^3]
+            c_s = self.parameters()[1]       # Ion-acoustic velocity [m/s]
+            s_sheath = self.parameters()[2]  # Area over which electrons are accelerated and spread [m^2]
+            T_e = self.parameters()[3]       # Hot electron temperature [J]
+            #E_max = self.parameters()[4]    # Maximum ion energy [J]
+
             KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[0]  # [MeV]
-            E_max         = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[4]                  # [J]
+            E_max         = self.parameters()[4]                  # [J]
             E_max_MeV       = E_max/1e6/1.6e-19                                                                    # [MeV]
             g_E           = self.getLaserDrivenProtonEnergy(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[1]  # [MeV] 
 
@@ -4942,7 +4949,7 @@ class Source(BeamLineElement):
             print(" <---- BeamLineElement(Source).getParticle, done.", \
                   '  --------  --------  --------  --------  --------')
             
-        return X, Y, KE, cosTheta, Phi, g_E, E_max_MeV
+        return X, Y, KE, cosTheta, Phi, g_E, E_max_MeV, ne_0, c_s, s_sheath, T_e
     
     def getFlatThetaPhi(self):
         cosTheta = rnd.uniform(self.getParameters()[2], 1.)
@@ -5013,7 +5020,15 @@ class Source(BeamLineElement):
     
 
     # Calculates the rest of the parameters needed for the parametrisation
-    def parameters(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
+    def parameters(self):
+
+        P_L = self._Param[6]
+        E_laser = self._Param[7]
+        lamda = self._Param[8]
+        t_laser = self._Param[9]
+        d = self._Param[10]
+        I = self._Param[11]
+        theta_degrees = self._Param[12]
 
         c = 3e8               # Speed of light in vacuum [m/s]
         m_e = 9.11e-31        # Electron mass [Kg]
@@ -5067,8 +5082,6 @@ class Source(BeamLineElement):
         E_max = E_i_inf*(X**2)  # [J]
 
         return ne_0, c_s, s_sheath, T_e, E_max
-
-
     
     # Generates energy values for the distribution
     def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
@@ -5079,20 +5092,8 @@ class Source(BeamLineElement):
                     " initialise")
             Source.LsrDrvnIni = True
 
-        P_L = self._Param[6]
-        E_laser = self._Param[7]
-        lamda = self._Param[8]
-        t_laser = self._Param[9]
-        d = self._Param[10]
-        I = self._Param[11]
-        theta_degrees = self._Param[12]
+        ne_0, c_s, s_sheath, T_e, E_max = self.parameters()
 
-        ne_0 = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[0]      # Hot electron density [pp/m^3]
-        c_s = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[1]       # Ion-acoustic velocity [m/s]
-        s_sheath = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[2]  # Area over which electrons are accelerated and spread [m^2]
-        T_e = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[3]       # Hot electron temperature [J]
-        E_max = self.parameters(P_L, E_laser, lamda, t_laser, d, I, theta_degrees)[4]     # Maximum ion energy [J]
-        
         E_min = 0.00001*1.6e-19*1e6        # [J]
         E = np.linspace(E_min,E_max,1000)  # [J]
 

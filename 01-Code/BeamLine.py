@@ -1045,25 +1045,32 @@ class BeamLine(object):
                 if cls.getDebug():
                     print("         ---->", iBLE.getName())
 
-                #.. KL: consider trap on expansion paramter here.
                 TrcSpc     = iBLE.Transport(TrcSpc_i)
                 if cls.getDebug():
                     with np.printoptions(\
                                 linewidth=500,precision=7,suppress=True):
                         print("             ----> Updated trace space   :", \
                               TrcSpc)
+                        
                 if not isinstance(TrcSpc, np.ndarray):
                     if cls.getDebug():
                         print("              ---->", \
                               " partice outside acceptance(1)")
                     break
                 else:
-                    zEnd    = -999999.
-                    sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
-                    Success = PrtclInst.recordParticle(iBLE.getName(), \
-                                                       zEnd, \
-                                                       sEnd, \
-                                                       TrcSpc)
+                    if iBLE.ExpansionParameterFail(TrcSpc):
+                        if cls.getDebug():
+                            print("              ---->", \
+                                " Particle fails expansion parameter test")
+                        TrcSpc = None
+                        break
+                    else:
+                        zEnd    = -999999.
+                        sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
+                        Success = PrtclInst.recordParticle(iBLE.getName(), \
+                                                           zEnd, \
+                                                           sEnd, \
+                                                           TrcSpc)
                 TrcSpc_i = TrcSpc
 
             if cls.getDebug():
@@ -1071,7 +1078,7 @@ class BeamLine(object):
 
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
-                PrtclInst.writeParticle(ParticleFILE)
+                PrtclInst.writeParticle(ParticleFILE, CleanAfterWrite)
                 if CleanAfterWrite:
                     Prtcl.Particle.cleanParticles()
                 #del PrtclInst
