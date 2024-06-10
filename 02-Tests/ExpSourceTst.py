@@ -94,7 +94,8 @@ SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
 for i in range(10000):
-    X, Y, KE, cTheta, Phi, g_E, E_max_MeV = Src1.getParticle()
+    X, Y, KE, cTheta, Phi, g_E, E_max_MeV, ne_0, c_s, s_sheath, T_e = Src1.getParticle()
+    
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
@@ -136,10 +137,6 @@ plt.title('LsrDrvnSrc: Energy distribution')
 plt.savefig('99-Scratch/SourceTst_plot13.pdf')
 plt.close()
 
-
-
-
-
 n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='y', \
                             log=False, label='Generated Distribution')
@@ -172,11 +169,6 @@ plt.legend(loc="best")
 plt.title('LsrDrvnSrc: Energy distribution')
 plt.savefig('99-Scratch/SourceTst_plot13_Dist.pdf')
 plt.close()
-
-
-
-
-
 
 n, bins, patches = plt.hist(PrtclcT, \
                             bins=50, color='y', \
