@@ -213,9 +213,10 @@ class Beam:
         ParticleFILE = self.getBeamIOread().getdataFILE()
         self.setInputDataFile(ParticleFILE)
 
+        EndOfFile = False
         if BL.BeamLine.getinstance() == None:
-            EndOfFile = False
             EndOfFile = self.getBeamIOread().readBeamDataRecord()
+
 
         if BL.BeamLine.getinstance() == None:
             self.setbeamlineSpecificationCSVfile( \
@@ -265,9 +266,13 @@ class Beam:
         print("     ----> Start location:", \
               self.getstartlocation())
         print("     ----> Beam parameters by location:")
-        
-        for iAddr in range(self.getstartlocation(), len(self.getLocation())):
-            print("         ----> iLoc:", iAddr, self.getLocation()[iAddr])
+
+        print("         ----> start location, locations:",
+              self.getstartlocation(), len(self.getLocation()))
+        for iLoc in range(self.getstartlocation(), len(self.getLocation())):
+            iAddr = iLoc - 1
+            print("         ----> iLoc, iAddr:", iLoc, iAddr)
+            print("         ----> iLoc:", iLoc, self.getLocation()[iAddr])
             if len(self.getnParticles()) > iAddr:
                 print("             ----> Number of particles:", \
                       " nParticles:", int(self.getnParticles()[iAddr]))
@@ -723,6 +728,7 @@ class Beam:
                 self.incrementSums(iPrtcl)
 
                 #.. Keep a few particles for plotting:
+                Cleaned = False
                 if iEvt < iEvtStopClean:
                     Cleaned = Prtcl.Particle.cleanParticles()
             
@@ -895,25 +901,33 @@ class Beam:
         for iLoc in range(iLocMin, \
                           len(BLE.BeamLineElement.getinstances())):
             iAddr = iLoc - iLocMin
-            s.append(iRefPrtcl.getsOut()[iLoc-1])
-            sx.append(self.getsigmaxy()[iAddr][0])
-            sy.append(self.getsigmaxy()[iAddr][1])
-            if iAddr < len(self.getemittance()):
-                ex.append(self.getemittance()[iAddr][0])
-                ey.append(self.getemittance()[iAddr][1])
-                exy.append(self.getemittance()[iAddr][3])
+            if self.getDebug():
+                print("         ----> start location, locations:",
+                      self.getstartlocation(), len(self.getLocation()))
+                print("         ----> iLoc, iAddr:", iLoc, iAddr)
 
-                bx.append(self.getTwiss()[iAddr][0][1])
-                by.append(self.getTwiss()[iAddr][1][1])
-                ax.append(self.getTwiss()[iAddr][0][0])
-                ay.append(self.getTwiss()[iAddr][1][0])
-                gx.append(self.getTwiss()[iAddr][0][2])
-                gy.append(self.getTwiss()[iAddr][1][2])
+                  
+            s.append(iRefPrtcl.getsOut()[iLoc-1])
+            if iAddr < len(self.getsigmaxy()):
+                sx.append(self.getsigmaxy()[iAddr][0])
+                sy.append(self.getsigmaxy()[iAddr][1])
+                if iAddr < len(self.getemittance()):
+                    ex.append(self.getemittance()[iAddr][0])
+                    ey.append(self.getemittance()[iAddr][1])
+                    exy.append(self.getemittance()[iAddr][3])
+
+                    bx.append(self.getTwiss()[iAddr][0][1])
+                    by.append(self.getTwiss()[iAddr][1][1])
+                    ax.append(self.getTwiss()[iAddr][0][0])
+                    ay.append(self.getTwiss()[iAddr][1][0])
+                    gx.append(self.getTwiss()[iAddr][0][2])
+                    gy.append(self.getTwiss()[iAddr][1][2])
             
             if self.getDebug():
-                print("     ----> iLoc, s, sx, sy:", \
-                      iLoc, self.getLocation()[iAddr], \
-                      s[iAddr], sx[iAddr], sy[iAddr])
+                if iAddr < len(self.getsigmaxy()[0]):
+                    print("     ----> iLoc, s, sx, sy:", \
+                          iLoc, self.getLocation()[iAddr], \
+                          s[iAddr], sx[iAddr], sy[iAddr])
 
         with PdfPages(plotFILE) as pdf:
             fig, axs = plt.subplots(nrows=5, ncols=1, \
@@ -941,12 +955,12 @@ class Beam:
             gs     = axs[3].get_gridspec()
             axs[3].remove()
             axs[2] = fig.add_subplot(gs[3:])
-    
+
             axs[1].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[1].plot(s, sx, color='b', marker='o', markersize=4, \
-                        label='s_x')
-            axs[1].plot(s, sy, color='r', marker='s', markersize=4, \
+            axs[1].plot(s[0:len(sx)], sx, \
+                color='b', marker='o', markersize=4, label='s_x')
+            axs[1].plot(s[0:len(sy)], sy, color='r', marker='s', markersize=4, \
                         linestyle='dashed', label='s_y')
             axs[1].legend()
             axs[1].set_xlabel('s (m)')
@@ -954,9 +968,9 @@ class Beam:
 
             axs[2].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[2].plot(s[0:len(self.getemittance())], ex, \
+            axs[2].plot(s[0:len(ex)], ex, \
                           color='b', marker='o', markersize=4, label='e_x')
-            axs[2].plot(s[0:len(self.getemittance())], ey, \
+            axs[2].plot(s[0:len(ey)], ey, \
                           color='r', marker='s', markersize=4, 
                           linestyle='dashed', label='e_y')
             axs[2].legend(loc='upper left')
@@ -964,7 +978,7 @@ class Beam:
             axs[2].set_ylabel('e_{xy} (m)')
 
             ax2 = axs[2].twinx()
-            ax2.plot(s[0:len(self.getemittance())], exy, \
+            ax2.plot(s[0:len(exy)], exy, \
                        color='g', marker='d', markersize=4, \
                        linestyle='dotted', label='e_(xy)')
             ax2.legend()
@@ -1011,10 +1025,10 @@ class Beam:
     
             axs[1].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[1].plot(s[0:len(self.getemittance())], bx, \
+            axs[1].plot(s[0:len(bx)], bx, \
                           color='b', marker='o', markersize=4, \
                           label='b_x')
-            axs[1].plot(s[0:len(self.getemittance())], by, \
+            axs[1].plot(s[0:len(by)], by, \
                           color='r', marker='s', markersize=4, \
                           linestyle='dashed', label='b_y')
             axs[1].legend(loc='upper center')
@@ -1022,7 +1036,7 @@ class Beam:
             axs[1].set_ylabel('b_{xy} (m)')
 
             ax1 = axs[1].twinx()
-            ax1.plot(s[0:len(self.getemittance())], exy, \
+            ax1.plot(s[0:len(exy)], exy, \
                      color='g', marker='d', markersize=4, \
                      linestyle='dotted', label='e_(xy)')
             ax1.legend()
@@ -1030,10 +1044,10 @@ class Beam:
 
             axs[2].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[2].plot(s [0:len(self.getemittance())], ax, \
+            axs[2].plot(s[0:len(ax)], ax, \
                           color='b', marker='o', markersize=4, \
                           label='a_x')
-            axs[2].plot(s[0:len(self.getemittance())], ay, \
+            axs[2].plot(s[0:len(ay)], ay, \
                         color='r', marker='s', markersize=4, 
                         linestyle='dashed', label='a_y')
             axs[2].legend()
@@ -1042,10 +1056,10 @@ class Beam:
 
             axs[3].set_xlim(-0.5, \
                 Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
-            axs[3].plot(s[0:len(self.getemittance())], gx, \
+            axs[3].plot(s[0:len(gx)], gx, \
                           color='b', marker='o', markersize=4, \
                           label='g_x')
-            axs[3].plot(s[0:len(self.getemittance())], gy, \
+            axs[3].plot(s[0:len(gy)], gy, \
                         color='r', marker='s', markersize=4, \
                         linestyle="dashed", label='g_y')
             axs[3].legend()
@@ -1375,7 +1389,11 @@ class extrapolateBeam(Beam):
             iEvtStopClean = max(0, nEvtMax-1000)
             Cleaned       = None
             while not EndOfFile:
-                EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+                try:
+                    EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
+                except:
+                    EndOfFile = self.getBeamIOread().readBeamDataRecord()
+                    
                 if not EndOfFile:
                     iEvt += 1
                     if (iEvt % Scl) == 0:

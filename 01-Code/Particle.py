@@ -1029,7 +1029,7 @@ class Particle:
 
         if not isinstance(ParticleFILE, io.BufferedReader):
             raise noFILE( \
-                    " Particle.writeParticle: file does not exist.")
+                    " Particle.readParticle: file does not exist.")
 
         brecord = ParticleFILE.read(4)
         if brecord == b'':

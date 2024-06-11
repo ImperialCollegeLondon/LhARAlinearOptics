@@ -424,7 +424,8 @@ class BeamLine(object):
                                                   ]
 
         if pndsSource.empty:
-            print(" Beamline.parseSource: empty source, return.")
+            if cls.getDebug():
+                print(" Beamline.parseSource: empty source, return.")
             return None, None, None
             
         SrcMode = int( \
@@ -533,7 +534,8 @@ class BeamLine(object):
                                                   ]
 
         if pndsBeamline.empty:
-            print(" BeamLine.addBeamline: empty beam line, return.")
+            if cls.getDebug():
+                print(" BeamLine.addBeamline: empty beam line, return.")
             return
             
         Section    = ""
@@ -1340,4 +1342,3 @@ class badTraceSpaceVector(Exception):
                 
 class noFILE(Exception):
     pass
-
