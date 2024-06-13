@@ -269,7 +269,7 @@ class Beam:
 
         print("         ----> start location, locations:",
               self.getstartlocation(), len(self.getLocation()))
-        for iLoc in range(self.getstartlocation(), len(self.getLocation())):
+        for iLoc in range(self.getstartlocation(), len(self.getLocation())+1):
             iAddr = iLoc - 1
             print("         ----> iLoc, iAddr:", iLoc, iAddr)
             print("         ----> iLoc:", iLoc, self.getLocation()[iAddr])
@@ -612,8 +612,7 @@ class Beam:
             
         if self.getDebug():
             print(" Beam.incrementSums start:")
-            print("     ----> Start location:", \
-                  startlocation)
+            print("     ----> Start location:", startlocation)
             print("     ----> Number of locations:", \
                   len(self.getCovSums()))
             print("     ----> Particle trace space:")
@@ -629,12 +628,12 @@ class Beam:
             iLoc  = iPhsSpcRcrd + 1
             iAddr = iLoc - startlocation
             if self.getDebug():
-                print("         ----> Phs, iLoc, iAddr:", \
-                      iPhsSpcRcrd, iLoc, iAddr, \
-                      iPrtcl.getTraceSpace()[iPhsSpcRcrd])
-                print("         ----> Location:", iLoc)
                 with np.printoptions(linewidth=500,precision=10,\
                                      suppress=True):
+                    print("         ----> Phs, iLoc, iAddr:", \
+                      iPhsSpcRcrd, iLoc, iAddr, \
+                      iPrtcl.getTraceSpace()[iPhsSpcRcrd])
+                    print("         ----> Location:", iLoc)
                     print("                CovSums_(i): \n", \
                           self.getCovSums()[iAddr])
                     print("         ----> iAddr, startlocation, ", \
@@ -694,10 +693,11 @@ class Beam:
                     print("                CovMtrx: \n", \
                           self.getCovarianceMatrix()[iAddr]) 
 
-    def evaluateBeam(self):
+    def evaluateBeam(self, TrackBeam=False):
         if self.getDebug():
             print(" Beam.evaluateBeam: ", \
                   "perform` sums to get covariance matrices")
+            print("     ----> TrackBeam:", TrackBeam)
         
         EndOfFile = False
         iEvt = 0
@@ -725,8 +725,11 @@ class Beam:
                         Scl  = Scl * 10
 
                 iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
+                if TrackBeam:
+                    nEvtGen = BL.BeamLine.getinstance().trackBeam( \
+                            1, None, iPrtcl, self.getstartlocation(), False)
+                    
                 self.incrementSums(iPrtcl)
-
                 #.. Keep a few particles for plotting:
                 Cleaned = False
                 if iEvt < iEvtStopClean:
@@ -890,6 +893,7 @@ class Beam:
 
         if self.getDebug():
             print(BL.BeamLine.getinstance())
+            print(self)
         
         iLocMin = self.getstartlocation()
 
@@ -924,7 +928,7 @@ class Beam:
                     gy.append(self.getTwiss()[iAddr][1][2])
             
             if self.getDebug():
-                if iAddr < len(self.getsigmaxy()[0]):
+                if iAddr < len(self.getsigmaxy()):
                     print("     ----> iLoc, s, sx, sy:", \
                           iLoc, self.getLocation()[iAddr], \
                           s[iAddr], sx[iAddr], sy[iAddr])

@@ -955,6 +955,17 @@ class BeamLine(object):
     @classmethod
     def trackBeam(cls, NEvts=0, ParticleFILE=None, \
                   iParticle=None, LocStrt=None, CleanAfterWrite=True):
+        if cls.getDebug():
+            print(" BeamLine.trackBeam start")
+            print("     ----> NEvts:", NEvts)
+            print("     ----> ParticleFILE:", ParticleFILE)
+            if iParticle == None:
+                print("     ----> iParticle:", iParticle)
+            else:
+                print("     ----> iParticle:", id(iParticle))
+            print("     ----> LocStrt:", LocStrt)
+            print("     ----> CleanAfterWrite:", CleanAfterWrite)
+            
         if (cls.getDebug() or NEvts > 1) and \
            Smltn.Simulation.getProgressPrint():
             print("     ----> BeamLine.trackBeam for", NEvts, " events.")
@@ -975,12 +986,6 @@ class BeamLine(object):
                 
             #.. Create particle instance to store progression through
             #   beam line
-            if cls.getDebug():
-                if iParticle == None:
-                    print("        ----> iParticle:", iParticle)
-                else:
-                    print("        ----> iParticle:", id(iParticle))
-                    
             if iParticle != None:
                 PrtclInst   = iParticle
 
