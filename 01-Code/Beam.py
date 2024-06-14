@@ -378,7 +378,9 @@ class Beam:
                       iAddr, sx1, sy1)
                 
             self._sigmaxy.append([sx1, sy1])
-        
+
+        if len(self._sigmaxy) >= len(BLE.BeamLineElement.getinstances()):
+            raise BadCovMtrx(" too many sigmaxy!")
         if self.getDebug():
             print(" <---- Beam.setsigmaxy: done.")
 
@@ -1371,6 +1373,8 @@ class extrapolateBeam(Beam):
     def extrapolateBeam(self):
         if self.getDebug():
             print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
+            print(" BeamLine: nBLs:", id(BL.BeamLine.getinstance()))
+            print(BL.BeamLine.getinstance())
         
         EndOfFile = False
         iEvt = 0
@@ -1382,6 +1386,9 @@ class extrapolateBeam(Beam):
         #.. if ParticleFILE is closed, assume dont need to make initial
         #   covariance matrix
         if ParticleFILE.closed:
+            if self.getDebug():
+                print("     ----> Particle file closed, so continue from", \
+                      " stored source covariance matrix.")
             pass
         else:
             if self.getDebug():
@@ -1475,4 +1482,7 @@ class badTraceSpace(Exception):
     pass
 
 class noPath4plotFILE(Exception):
+    pass
+
+class BadCovMtrx(Exception):
     pass
