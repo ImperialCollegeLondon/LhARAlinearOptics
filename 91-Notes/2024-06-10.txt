@@ -1,0 +1,110 @@
+--------  --------  --------  --------  --------  --------  --------  15Jun24
+Summary update ... many minor updates to make Bayesian optimisation work.
+Clos-out at the w/e to run through tests and scripts.
+
+Tests:
+ - ApertureTst.py                     - OK
+ - BeamIOTst-wrt.py                   - OK
+ - BeamIOTst-rd.py                    - OK
+ - BeamIOTst-rd-BDSIM.py              - OK 
+ - BeamLineElementTst.py              - OK
+ - BeamLineTst.py                     - OK
+ - BeamTst.py                         - OK
+ - CylindricalRFCavityTst.py          - OK
+ - DRACOfacilityTst.py                - OK
+ - DefocusQuadTst.py                  - OK
+ - DipoleTst.py                       - OK
+ - DriftTst.py                        - OK
+ - ExpSourceTst.py                    - OK
+ - FacilityTst.py                     - OK
+ - FocusQuadTst.py                    - OK
+ - GaborLensTst.py                    - OK
+ - LIONfacilityTst.py                 - OK
+ - LaTexTst.py                        - OK
+ - LhARAFacility-from-datafile-Tst.py - OK
+ - LhARAFacilityTst.py                - OK
+ - ParticleTst.py                     - OK
+ - PhysicalConstantsTst.py            - OK
+ - QuadDoubletTst.py                  - OK
+ - QuadTripletTst.py                  - OK
+ - RPLCswitchTst.py                   - OK
+ - ReferenceParticleTst.py            - OK
+ - RunSimulationTst.py                - OK
+ - SimulationTst.py                   - OK
+ - SolenoidTst.py                     - OK
+ - SourceTst.py                       - OK
+ - TestWrite.py                       - OK
+ - TestRead.py                        - OK
+ - extrapolatedBeamTst.py             - OK
+ - visualiseTst.py                    - OK
+ - testGitRepoId.py                   - OK, but, rubbish!
+ - OctupoleTst.py                     - Fails
+
+Scripts:
+ - runBeamSim.py           - OK
+ - readBeamSim.py          - OK
+ - RunDRACOsimulation.py   - OK
+ - ReadDRACOsimu.py        - OK
+ - RunLIONsimulation.py    - OK
+ - ReadLIONsimu.py         - OK
+ - RunLhARAsimulation.py   - OK
+ - ReadLhARAsimu.py        - OK
+ - plotBeam.py             - OK
+ - plotTrajectory.py       - OK
+ - plotextrapolatedBeam.py - OK
+ - LhARAMagnetTable.py     - OK
+ - plotQuadTriplet.py      - Fails
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py                     -
+ - BeamIOTst-wrt.py                   -
+ - BeamIOTst-rd.py                    -
+ - BeamLineElementTst.py              -
+ - BeamLineTst.py                     -
+ - BeamTst.py                         -
+ - CylindricalRFCavityTst.py          -
+ - DRACOfacilityTst.py                -
+ - DefocusQuadTst.py                  -
+ - DipoleTst.py                       -
+ - DriftTst.py                        -
+ - ExpSourceTst.py                    -
+ - FacilityTst.py                     -
+ - FocusQuadTst.py                    -
+ - GaborLensTst.py                    -
+ - LIONfacilityTst.py                 -
+ - LaTexTst.py                        -
+ - LhARAFacility-from-datafile-Tst.py -
+ - LhARAFacilityTst.py                -
+ - ParticleTst.py                     -
+ - PhysicalConstantsTst.py            -
+ - QuadDoubletTst.py                  -
+ - QuadTripletTst.py                  -
+ - RPLCswitchTst.py                   -
+ - ReferenceParticleTst.py            -
+ - RunSimulationTst.py                -
+ - SimulationTst.py                   -
+ - SolenoidTst.py                     -
+ - SourceTst.py                       -
+ - TestWrite.py                       -
+ - TestRead.py                        -
+ - extrapolatedBeamTst.py             -
+ - visualiseTst.py                    -
+ - testGitRepoId.py                   -
+ - OctupoleTst.py                     -
+
+Scripts:
+ - runBeamSim.py           -
+ - readBeamSim.py          -
+ - RunDRACOsimulation.py   -
+ - ReadDRACOsimu.py        -
+ - RunLIONsimulation.py    -
+ - ReadLIONsimu.py         -
+ - RunLhARAsimulation.py   -
+ - ReadLhARAsimu.py        -
+ - plotBeam.py             -
+ - plotTrajectory.py       -
+ - plotextrapolatedBeam.py -
+ - LhARAMagnetTable.py     -
+ - plotQuadTriplet.py      -

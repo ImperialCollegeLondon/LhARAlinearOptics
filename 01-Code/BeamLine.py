@@ -1102,6 +1102,53 @@ class BeamLine(object):
     def csv2pandas(_filename):
         ParamsPandas = pnds.read_csv(_filename)
         return ParamsPandas
+
+    def pandasBeamLine(self):
+        if self.getDebug():
+            print(" BeamLine.pandasBeamLine starts.")
+
+        """
+        if not os.path.isdir(os.path.dirname(csvFILE)):
+            raise noFILE( \
+                    " BeamLine.pandasBeamLine: Directory for CSV file", \
+                    os.path.dirname(CSVfile), "does not exist.")
+        """
+        
+        Lines = []
+            
+        if self.getDebug():
+            nBLE = len(BLE.BeamLineElement.getinstances())
+            print("     ----> Number of locations to store:", nBLE)
+
+        Lines.append(self.getHeader())
+        if self.getDebug():
+            print("     ----> Header:", Lines[0])
+        
+        for iBLE in BLE.BeamLineElement.getinstances():
+            if self.getDebug():
+                print("         ----> Write element:", iBLE.getName())
+            iBLElines = iBLE.getLines()
+            for Line in iBLElines:
+                Lines.append(Line)
+                if self.getDebug():
+                    print("             ", Lines[-1])
+                
+        DataFrame = pnds.DataFrame(Lines, \
+                                   columns=self.getHeader())
+        if self.getDebug():
+            print("     ----> Dump data frame:")
+            print(DataFrame)
+        
+        if self.getDebug():
+            print(" <---- BeamLine.writeBeamLine done.")
+        
+        return DataFrame
+
+    def getHeader(self):
+        HeaderList = ["Stage", "Section", "Element", "Type", "Parameter", \
+	              "Value", "Unit", "Comment"]
+        return HeaderList
+
         
     def writeBeamLine(self, beamlineFILE=None):
         if self.getDebug():

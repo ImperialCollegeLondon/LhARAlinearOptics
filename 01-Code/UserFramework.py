@@ -32,7 +32,7 @@ def startAnalysis(argv):
     prsr.add_argument("-i", "--inputfile", \
                       help="input file (.dat)")    
     prsr.add_argument("-o", "--outputfile", \
-                      help="input file (.dat)")
+                      help="output file (.dat)")
 
     prsr.add_argument("-n", "--nEvents", help="number of events", \
                       default=1000, type=int)

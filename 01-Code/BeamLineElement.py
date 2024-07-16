@@ -452,6 +452,10 @@ class BeamLineElement:
     def getTransferMatrix(self):
         return self._TrnsMtrx
 
+    def getLines(self):
+        Lines = []
+        return Lines
+
 
 #--------  Processing methods:
     def OutsideBeamPipe(self, _R):
@@ -900,6 +904,40 @@ class Facility(BeamLineElement):
         return self._VCMVr
     
 #--------  I/o methods:
+    def getLines(self):
+        Lines = []
+
+        Stage   = 0
+        Section = "Facility"
+        Element = "Global"
+        Type    = "Name"
+        Param   = "Name"
+        Value   = self.getName()
+        Unit    = ""
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        Type    = "Reference particle"
+        Param   = "Kinetic energy"
+        p0      = self.getp0()
+        E       = mth.sqrt( protonMASS**2 + p0**2)
+        K       = E - protonMASS
+        Value   = K
+        Unit    = "MeV"
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        Type    = "Vacuum chamber"
+        Param   = "Mother volume radius"
+        VCMVr   = self.getVCMVr()
+        Value   = VCMVr
+        Unit    = "m"
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        return Lines
+
     def writeElement(self, dataFILE):
         if self.getDebug():
             print(" Facility(BeamLineElement).writeElement starts.")
@@ -1107,6 +1145,25 @@ class Drift(BeamLineElement):
     
         
 #--------  I/o methods:
+    def getLines(self):
+        Lines = []
+
+        Fields  = self.getName().split(":")
+        
+        Stage   = Fields[1]
+        Section = Fields[2]
+        Element = Fields[3]
+        Type    = ""
+        
+        Param   = "Length"
+        Value   = self.getLength()
+        Unit    = "m"
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        return Lines
+    
     def writeElement(self, dataFILE):
         if self.getDebug():
             print(" Drift(BeamLineElement).writeElement starts.")
@@ -2023,6 +2080,32 @@ class FocusQuadrupole(BeamLineElement):
 
         
 #--------  I/o methods:
+    def getLines(self):
+        Lines = []
+
+        Fields  = self.getName().split(":")
+        
+        Stage   = Fields[1]
+        Section = Fields[2]
+        Element = "Fquad"
+        Type    = ""
+        
+        Param   = "Length"
+        Value   = self.getLength()
+        Unit    = "m"
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        Param   = "Strength"
+        Value   = self.getStrength()
+        Unit    = "m"
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        return Lines
+    
     def writeElement(self, dataFILE):
         if self.getDebug():
             print( \
@@ -2569,6 +2652,32 @@ class DefocusQuadrupole(BeamLineElement):
             print(" <---- DefocusQuadrupole(BeamLineElement).visualise: ends.")
         
 #--------  I/o methods:
+    def getLines(self):
+        Lines = []
+
+        Fields  = self.getName().split(":")
+        
+        Stage   = Fields[1]
+        Section = Fields[2]
+        Element = "Dquad"
+        Type    = ""
+        
+        Param   = "Length"
+        Value   = self.getLength()
+        Unit    = "m"
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        Param   = "Strength"
+        Value   = self.getStrength()
+        Unit    = "m"
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        return Lines
+    
     def writeElement(self, dataFILE):
         if self.getDebug():
             print( \
@@ -4764,6 +4873,13 @@ class Source(BeamLineElement):
     #ParamList  = [ [float, float, float, float, float, int], \
     #               [float, float, float, float, float],      \
     #               [float, float, float, float, float] ]
+    ParamUnit  = [ [], \
+                   ["m", "m", "MeV", "MeV", ""], \
+                   [] ]
+    ParamText  = [ [], \
+                   ["SigmaX", "SigmaY", "MinCTheta", \
+                    "MeanEnergy", "SigmaEnergy"],    \
+                   [] ]
     ParamList  = [ [float, float, float, float, float, int, \
                     float, float, float, float, float, float, float], \
                    [float, float, float, float, float],      \
@@ -4813,7 +4929,9 @@ class Source(BeamLineElement):
 
         self.setMode(_Mode)
         self.setModeText(Source.ModeText[_Mode])
+        self.setParameterText(Source.ParamText[_Mode])
         self.setParameters(_Param)
+        self.setParameterUnit(Source.ParamUnit[_Mode])
                 
         if self.__Debug:
             print("     ----> New Source instance: \n", \
@@ -4842,9 +4960,10 @@ class Source(BeamLineElement):
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)
     def setAll2None(self):
-        self._Mode     = None
-        self._ModeText = None
-        self._Param    = None
+        self._Mode         = None
+        self._ModeText     = None
+        self._Param        = None
+        self._derivedParam = []
         
     def setMode(self, _Mode):
         if self.getDebug():
@@ -4856,11 +4975,21 @@ class Source(BeamLineElement):
             print(" Source.setParamters; Mode:", _ModeText)
         self._ModeText = _ModeText
 
+    def setParameterText(self, _ParameterText):
+        if self.getDebug():
+            print(" Source.setParamters; Parameter:", _ParameterText)
+        self._ParameterText = _ParameterText
+
     def setParameters(self, _Param):
         if self.getDebug():
             print(" Source.setParamters; Parameters:", _Param)
         self._Param = _Param
          
+    def setParameterUnit(self, _ParameterUnit):
+        if self.getDebug():
+            print(" Source.setParamters; Parameter:", _ParameterUnit)
+        self._ParameterUnit = _ParameterUnit
+
         
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)
@@ -4870,8 +4999,17 @@ class Source(BeamLineElement):
     def getModeText(self):
         return self._ModeText
     
+    def getParameterText(self):
+        return self._ParameterText
+    
     def getParameters(self):
         return self._Param
+    
+    def getderivedParameters(self):
+        return self._derivedParam
+    
+    def getParameterUnit(self):
+        return self._ParameterUnit
     
         
 #--------  Utilities:
@@ -5003,16 +5141,7 @@ class Source(BeamLineElement):
                   self.getMode(), self.getParameters())
 
         if self._Mode == 0:
-            P_L = self.getParameters()[6]
-            E_laser = self.getParameters()[7]
-            lamda = self.getParameters()[8]
-            t_laser = self.getParameters()[9]
-            d = self.getParameters()[10]
-            I = self.getParameters()[11]
-            theta_degrees = self.getParameters()[12]
-
-            KE            = self.getLaserDrivenProtonEnergy(P_L, E_laser, \
-                                lamda, t_laser, d, I, theta_degrees)  # [MeV]
+            KE            = self.getLaserDrivenProtonEnergy()  # [MeV]
             
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
@@ -5179,58 +5308,111 @@ class Source(BeamLineElement):
 
 
     # Generates energy values for the distribution
-    def getLaserDrivenProtonEnergy(self,P_L, E_laser, lamda, t_laser, \
-                                   d, I, theta_degrees):
-
+    def getLaserDrivenProtonEnergy(self):
         if not Source.LsrDrvnIni:
             if self.__Debug:
-                print(" BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
+                print( \
+                    " BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
                     " initialise")
             Source.LsrDrvnIni = True
 
-        P_L = self._Param[6]
-        E_laser = self._Param[7]
-        lamda = self._Param[8]
-        t_laser = self._Param[9]
-        d = self._Param[10]
-        I = self._Param[11]
-        theta_degrees = self._Param[12]
+        if len(self.getderivedParameters()) == 0:
+            P_L = self.getParameters()[6]
+            E_laser = self.getParameters()[7]
+            lamda = self.getParameters()[8]
+            t_laser = self.getParameters()[9]
+            d = self.getParameters()[10]
+            I = self.getParameters()[11]
+            theta_degrees = self.getParameters()[12]
 
-        ne_0 = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
-                        theta_degrees)[0]      # Hot electron density [pp/m^3]
-        c_s = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
-                         theta_degrees)[1]       # Ion-acoustic velocity [m/s]
-        s_sheath = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
-            theta_degrees)[2]  # Area over which electrons are 
-                               # accelerated and spread [m^2]
-        T_e = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
-                        theta_degrees)[3]       # Hot electron temperature [J]
-        E_max = self.parameters(P_L, E_laser, lamda, t_laser, d, I, \
-                                theta_degrees)[4]     # Maximum ion energy [J]
+            derivedPARAMETERS = self.parameters(P_L, E_laser, \
+                                                lamda, t_laser, \
+                                                d, I, \
+                                                theta_degrees)
+            
+            self.getderivedParameters().append(derivedPARAMETERS[0])
+            self.getderivedParameters().append(derivedPARAMETERS[1])
+            self.getderivedParameters().append(derivedPARAMETERS[2])
+            self.getderivedParameters().append(derivedPARAMETERS[3])
+            self.getderivedParameters().append(derivedPARAMETERS[4])
+            E_min = 1.*1.6e-19*1e6
+            self.getderivedParameters().append(E_min)
+
+            self.getLaserCumProbParam()
+
+            if self.getDebug():
+                print("     ----> First call, set paramters:")
+                print("           P_L
+                print("           E_laser
+                print("           lamda
+                print("           t_laser
+                print("           d
+                print("           I
+                print("           theta (degrees)
+                print("           n_e
+                print("           c_s
+                print("           s_sheath
+                print("           T_e
+                print("           E_max
+                print("           E_min
+                print("           Nrm
+                print("           eta
+
+        E_max    = self.getderivedParameters()[4]
+        E_min    = self.getderivedParameters()[5]
+
+        iCnt = 0
+        while iCnt < 100000:
+            iCnt += 1
+            E     = (E_max - E_min) * rnd.random()
+            GE    = self.getLaserCumProb(E)
+
+            rP = rnd.random()
+            if self.getDebug():
+                print(iCnt, rP, GE)
+            if rP > GE:
+                E /= (1.6e-19 * 1e6)         # [MeV]
+                return E
+
+        if iCnt == 100000:
+            raise failtogetLsrDrvnSrcE()
         
-        E_min = 1.*1.6e-19*1e6        # [J] -- KL fix
-        E = np.linspace(E_min,E_max,1000)  # [J]
+    def getLaserCumProbParam(self):
+        t_laser = self.getParameters()[9]
+        
+        ne_0     = self.getderivedParameters()[0]
+        c_s      = self.getderivedParameters()[1]
+        s_sheath = self.getderivedParameters()[2]
+        T_e      = self.getderivedParameters()[3]
+        E_max    = self.getderivedParameters()[4]
+        
+        eta = ne_0 * c_s * t_laser * s_sheath
 
-        # Required distribution
-        g_E = (ne_0 * c_s * t_laser * s_sheath / np.sqrt(2 * E * T_e)) * \
-            np.exp(-np.sqrt(2 * E / T_e))
-        g_E /= np.sum(g_E)   # Normalize the probability distribution
+        gam = mth.sqrt(2.*E_max/T_e)
+        Gam = 1. - mth.exp(-gam)
 
-        # Generate random numbers from the distribution using inverse \
-        # transform sampling
-        cumulative_prob = np.cumsum(g_E)     # Computes the cumulative \
-                                             # probability distribution
-        random_numbers = np.random.random()  # Generates a random number \
-                                             # between 0 and 1
-        sampled_indices = np.searchsorted(cumulative_prob, random_numbers)
-        # Finds the index in cumulative_prob
-        sampled_data = E[sampled_indices]    # Selects the energy value
-                                             # corresponding to this index
+        Nrm = eta * Gam
+        
+        self.getderivedParameters().append(Nrm)
+        self.getderivedParameters().append(eta)
+        
+    def getLaserCumProb(self, E):
+        CumProb = 1.
+        if E >= self.getderivedParameters()[4]:
+            return CumProb
 
-        E = sampled_data/1.6e-19/1e6         # [MeV]
+        T_e      = self.getderivedParameters()[3]
+        
+        gam = mth.sqrt(2.*E/T_e)
+        Gam = 1. - mth.exp(-gam)
 
-        return E
+        Nrm = self.getderivedParameters()[6]
+        eta = self.getderivedParameters()[7]
 
+        CumProb = eta * Gam / Nrm
+        
+        return CumProb
+        
     def getTraceSpace(self, x, y, K, cTheta, Phi):
         if self.getDebug():
             print(" Source(BeamLineElement).getTraceSpace: start.")
@@ -5317,6 +5499,36 @@ class Source(BeamLineElement):
                                    
     
 #--------  I/o methods:
+    def getLines(self):
+        Lines = []
+
+        Fields  = self.getName().split(":")
+        Mode    = self.getMode()
+        Text    = self.getModeText()
+        Param   = self.getParameters()
+        
+        Stage   = Fields[1]
+        Section = Fields[2]
+        Element = Fields[2]
+
+        Type    = Text
+        Param   = "SourceMode"
+        Value   = Mode
+        Unit    = ""
+        Comment = ""
+        Lines.append([Stage, Section, Element, Type, \
+                      Param, Value, Unit, Comment])
+
+        for iPrm in range(len(self.getParameters())):
+            Param = self.getParameterText()[iPrm]
+            Value = self.getParameters()[iPrm]
+            Unit  = self.getParameterUnit()[iPrm]
+            Lines.append([Stage, Section, Element, Type, \
+                          Param, Value, Unit, Comment])
+            
+
+        return Lines
+    
     def writeElement(self, dataFILE):
         if self.getDebug():
             print(" Source(BeamLineElement).writeElement starts.")
@@ -6513,4 +6725,7 @@ class FailToCreateTraceSpaceAtSource(Exception):
     pass
 
 class KillInfiniteLoop(Exception):
+    pass
+
+class failtogetLsrDrvnSrcE(Exception):
     pass
