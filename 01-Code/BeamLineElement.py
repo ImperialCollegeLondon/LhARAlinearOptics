@@ -4877,11 +4877,11 @@ class Source(BeamLineElement):
     #               [float, float, float, float, float] ]
     ParamUnit  = [ [], \
                    ["m", "m", "MeV", "MeV", ""], \
-                   [] ]
+                   [], [] ]
     ParamText  = [ [], \
                    ["SigmaX", "SigmaY", "MinCTheta", \
                     "MeanEnergy", "SigmaEnergy"],    \
-                   [] ]
+                   [], [] ]
     ParamList  = [ [float, float, float, float, float, int, \
                     float, float, float, float, float, float, float], \
                    [float, float, float, float, float],      \
@@ -5442,8 +5442,6 @@ class Source(BeamLineElement):
         E_min     = self.getderivedParameters()[5]
         
         E  = np.linspace(E_min,E_max,100)  # [J]
-        print(" In getLaserDrivenProtonEnergyProbDensity:", \
-              " E_min, E_max:", E_min,E_max)
         dE2 = (E_max - E_min) / 100. / 2.
 
         # Approximate required distribution:

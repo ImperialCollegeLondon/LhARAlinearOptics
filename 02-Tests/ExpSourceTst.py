@@ -147,7 +147,6 @@ n, bins, patches = plt.hist(PrtclKE, \
 
 Ee, g_E = Src1.getLaserDrivenProtonEnergyProbDensity()
 E   = np.linspace(E_min_MeV,E_max_MeV,100)
-print(" In ExpSource: E_min_MeV,E_max_MeV:", E_min_MeV,E_max_MeV)
 
 # Normalise:
 hist_heights, bin_edges = np.histogram(PrtclKE, bins=100)
