@@ -92,54 +92,14 @@ SrcXp    = np.array([])
 SrcYp    = np.array([])
 SrcE     = np.array([])
 
-g_E       = Src1.getLaserDrivenProtonEnergyProbDensity()
 E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
 print("     ----> Generate many particles:")
-for i in range(100000):
+for i in range(1000000):
     X, Y, KE, cTheta, Phi = Src1.getParticle()
     
-    PrtclX   = np.append(PrtclX , X)
-    PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
-    PrtclcT  = np.append(PrtclcT , cTheta)
-    PrtclPhi = np.append(PrtclPhi, Phi)
-
-    TrcSpcFrmSrc = Src1.getParticleFromSource()
-    SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
-    SrcY         = np.append(SrcY,  TrcSpcFrmSrc[2])
-    SrcXp        = np.append(SrcXp, TrcSpcFrmSrc[1])
-    SrcYp        = np.append(SrcYp, TrcSpcFrmSrc[3])
-    SrcE         = np.append(SrcE,  TrcSpcFrmSrc[5])
-    
-n, bins, patches = plt.hist(PrtclX, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('X (m)')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: X position distribution')
-plt.savefig('99-Scratch/SourceTst_plot11.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclY, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Y (m)')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Y position distribution')
-plt.savefig('99-Scratch/SourceTst_plot12.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclKE, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Entries')
-plt.yscale("log")
-plt.title('LsrDrvnSrc: Energy distribution')
-plt.savefig('99-Scratch/SourceTst_plot13.pdf')
-plt.close()
 
 n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='y', \
@@ -181,70 +141,7 @@ plt.ylabel('Cumulative probability')
 plt.yscale("linear")
 plt.legend(loc="best")
 plt.title('LsrDrvnSrc: cumulative probability')
-plt.savefig('99-Scratch/SourceTst_plot13_cumulative.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclcT, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('cos(theta)')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: (cos) polar angle distribution')
-plt.savefig('99-Scratch/SourceTst_plot14.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclPhi, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Phi')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Azimuthal; angle distribution')
-plt.savefig('99-Scratch/SourceTst_plot15.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcX, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('X')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: X position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot16.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcY, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Y')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Y position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot17.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcXp, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('X-prime')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: X-prime position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot18.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcYp, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Y-prime')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Y-prime position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot19.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcE, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('delta')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: delta at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot20.pdf')
+plt.savefig('99-Scratch/SourceTst_plot14_Dist.pdf')
 plt.close()
 
 

@@ -92,14 +92,9 @@ SrcXp    = np.array([])
 SrcYp    = np.array([])
 SrcE     = np.array([])
 
-g_E       = Src1.getLaserDrivenProtonEnergyProbDensity()
-E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
-E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
-
 print("     ----> Generate many particles:")
-for i in range(100000):
+for i in range(10000):
     X, Y, KE, cTheta, Phi = Src1.getParticle()
-    
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
@@ -139,49 +134,6 @@ plt.ylabel('Entries')
 plt.yscale("log")
 plt.title('LsrDrvnSrc: Energy distribution')
 plt.savefig('99-Scratch/SourceTst_plot13.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclKE, \
-                            bins=100, color='y', \
-                            log=False, label='Generated Distribution')
-
-Ee, g_E = Src1.getLaserDrivenProtonEnergyProbDensity()
-E   = np.linspace(E_min_MeV,E_max_MeV,100)
-print(" In ExpSource: E_min_MeV,E_max_MeV:", E_min_MeV,E_max_MeV)
-
-# Normalise:
-hist_heights, bin_edges = np.histogram(PrtclKE, bins=100)
-histCntnts = np.sum(hist_heights)
-g_scaled   = g_E * histCntnts
-
-# Plot required distribution:
-plt.plot(Ee, g_scaled, color='k', label='Required Distribution', linewidth=2)
-
-E_max_cutoff_index = np.argmin(np.abs(E - E_max_MeV))
-y_max_cutoff = g_scaled[E_max_cutoff_index]
-dE2          = (E_max_MeV - E_min_MeV) / 100. / 2.
-plt.vlines(x=E_max_MeV+dE2, ymin=0, ymax=y_max_cutoff, color='k', \
-           linestyle='-', linewidth=2)  # [MeV]
-
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Entries')
-plt.yscale("log")
-plt.legend(loc="best")
-plt.title('LsrDrvnSrc: Energy distribution')
-plt.savefig('99-Scratch/SourceTst_plot13_Dist.pdf')
-plt.close()
-
-cumPROB = []
-for eps in E:
-    eps1 = eps * (1.6e-19 * 1e6)
-    cumPROB.append(Src1.getLaserCumProb(eps1))
-plt.plot(E, cumPROB, color='k', label='Required Distribution', linewidth=2)
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Cumulative probability')
-plt.yscale("linear")
-plt.legend(loc="best")
-plt.title('LsrDrvnSrc: cumulative probability')
-plt.savefig('99-Scratch/SourceTst_plot13_cumulative.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(PrtclcT, \

@@ -4781,8 +4781,10 @@ Derived class Source:
              [0] - Sigma of x gaussian - m
              [1] - Sigma of y gaussian - m
              [2] - Minimum cos theta to generate
-             [3] - E_min: min energy to generate
-             [4] - E_max: max energy to generate
+             [3] - E_min: MeV min energy to generate
+             [4] - E_max: MeV max energy to generate;
+                     overwritten when calculated in
+                     getLaserDrivenParticleEnergy
              [5] - nPnts: Number of points to sample for integration of PDF
              [6] - P_L: Laser power [W]             [7] - E_L: Laser energy [J]
              [8] - lamda: Laser wavelength [um]
@@ -5316,7 +5318,6 @@ class Source(BeamLineElement):
                     " initialise")
             Source.LsrDrvnIni = True
 
-        if len(self.getderivedParameters()) == 0:
             P_L = self.getParameters()[6]
             E_laser = self.getParameters()[7]
             lamda = self.getParameters()[8]
@@ -5335,84 +5336,133 @@ class Source(BeamLineElement):
             self.getderivedParameters().append(derivedPARAMETERS[2])
             self.getderivedParameters().append(derivedPARAMETERS[3])
             self.getderivedParameters().append(derivedPARAMETERS[4])
-            E_min = 1.*1.6e-19*1e6
+            self.getParameters()[4] = derivedPARAMETERS[4] / (1.6e-19*1e6)
+            E_min = self.getParameters()[3] * 1.6e-19*1e6
             self.getderivedParameters().append(E_min)
 
             self.getLaserCumProbParam()
 
             if self.getDebug():
                 print("     ----> First call, set paramters:")
-                print("           P_L
-                print("           E_laser
-                print("           lamda
-                print("           t_laser
-                print("           d
-                print("           I
-                print("           theta (degrees)
-                print("           n_e
-                print("           c_s
-                print("           s_sheath
-                print("           T_e
-                print("           E_max
-                print("           E_min
-                print("           Nrm
-                print("           eta
+                print("                        P_L:", P_L)
+                print("                    E_laser:", E_laser)
+                print("                      lamda:", lamda)
+                print("                    t_laser:" , t_laser)
+                print("                          d:", d)
+                print("                          I:", I)
+                print("           theta (degrees):", theta_degrees)
+                print("                      ne_0:", \
+                      self.getderivedParameters()[0])
+                print("                       c_s:", \
+                      self.getderivedParameters()[1])
+                print("                  s_sheath:", \
+                      self.getderivedParameters()[2])
+                print("                       T_e:", \
+                      self.getderivedParameters()[3])
+                
+                print("                     E_max:", \
+                      self.getderivedParameters()[4])
+                print("                     E_min:", \
+                      self.getderivedParameters()[5])
+                
+                print("                     Gamma:", \
+                      self.getderivedParameters()[6])
 
-        E_max    = self.getderivedParameters()[4]
-        E_min    = self.getderivedParameters()[5]
+        E_max = self.getderivedParameters()[4]
+        E_min = self.getderivedParameters()[5]
 
-        iCnt = 0
-        while iCnt < 100000:
-            iCnt += 1
-            E     = (E_max - E_min) * rnd.random()
-            GE    = self.getLaserCumProb(E)
+        T_e   = self.getderivedParameters()[3]
+        Gamma = self.getderivedParameters()[6]
 
-            rP = rnd.random()
-            if self.getDebug():
-                print(iCnt, rP, GE)
-            if rP > GE:
-                E /= (1.6e-19 * 1e6)         # [MeV]
-                return E
+        if self.getDebug():
+            print("     ----> Get E:")
+            
+        GE = rnd.random()
 
-        if iCnt == 100000:
-            raise failtogetLsrDrvnSrcE()
+        if self.getDebug():
+            print("         ----> E_min, GE, Gamma:", E_min, GE, Gamma)
+            
+        sqrtE = ( mth.sqrt(E_min) - mth.sqrt(T_e/2.) * mth.log(1.-GE/Gamma))
+        E     = sqrtE**2
+        if self.getDebug():
+            print("     <---- E:", E, " J")
+            
+        E    /= (1.6e-19*1.e6)
+        if self.getDebug():
+            print("     <---- E:", E, " MeV")
         
+        return E
+
     def getLaserCumProbParam(self):
-        t_laser = self.getParameters()[9]
-        
-        ne_0     = self.getderivedParameters()[0]
-        c_s      = self.getderivedParameters()[1]
-        s_sheath = self.getderivedParameters()[2]
+
         T_e      = self.getderivedParameters()[3]
         E_max    = self.getderivedParameters()[4]
+        E_min    = self.getderivedParameters()[5]
         
-        eta = ne_0 * c_s * t_laser * s_sheath
+        gamMAX = mth.sqrt(2./T_e)*(mth.sqrt(E_max) - mth.sqrt(E_min))
+        GamMAX = 1. - mth.exp(-gamMAX)
 
-        gam = mth.sqrt(2.*E_max/T_e)
-        Gam = 1. - mth.exp(-gam)
+        Gamma  = 1./GamMAX
 
-        Nrm = eta * Gam
-        
-        self.getderivedParameters().append(Nrm)
-        self.getderivedParameters().append(eta)
-        
+        self.getderivedParameters().append(Gamma)
+    
     def getLaserCumProb(self, E):
         CumProb = 1.
         if E >= self.getderivedParameters()[4]:
             return CumProb
 
         T_e      = self.getderivedParameters()[3]
+        E_min    = self.getderivedParameters()[5]
         
-        gam = mth.sqrt(2.*E/T_e)
+        gam = mth.sqrt(2./T_e)*(mth.sqrt(E) - mth.sqrt(E_min))
         Gam = 1. - mth.exp(-gam)
 
-        Nrm = self.getderivedParameters()[6]
-        eta = self.getderivedParameters()[7]
+        Gamma = self.getderivedParameters()[6]
 
-        CumProb = eta * Gam / Nrm
-        
+        CumProb = Gamma * Gam
+
         return CumProb
         
+    def getLaserDrivenProtonEnergyProbDensity(self):
+
+        P_L = self.getParameters()[6]
+        E_laser = self.getParameters()[7]
+        lamda = self.getParameters()[8]
+        t_laser = self.getParameters()[9]
+        d = self.getParameters()[10]
+        I = self.getParameters()[11]
+        theta_degrees = self.getParameters()[12]
+        
+        ne_0      = self.getderivedParameters()[0]
+        c_s       = self.getderivedParameters()[1]
+        s_sheath  = self.getderivedParameters()[2]
+        T_e       = self.getderivedParameters()[3]
+        
+        E_max     = self.getderivedParameters()[4]
+        E_min     = self.getderivedParameters()[5]
+        
+        E  = np.linspace(E_min,E_max,100)  # [J]
+        print(" In getLaserDrivenProtonEnergyProbDensity:", \
+              " E_min, E_max:", E_min,E_max)
+        dE2 = (E_max - E_min) / 100. / 2.
+
+        # Approximate required distribution:
+        eta = ne_0 * c_s * t_laser * s_sheath
+        g_E = []
+        Ee  = []
+        for iE in range(len(E)):
+            Ee.append( E[iE] + dE2 )
+            
+            g_E_val = (eta / mth.sqrt(2. * Ee[-1] * T_e)) * \
+                      mth.exp(-mth.sqrt(2. * Ee[-1] / T_e))
+
+            Ee[-1] /= ( 1.6E-19 * 1.E6 )
+            g_E.append( g_E_val )
+
+        g_E /= np.sum(g_E)   # Normalize the probability distribution
+
+        return Ee, g_E
+    
     def getTraceSpace(self, x, y, K, cTheta, Phi):
         if self.getDebug():
             print(" Source(BeamLineElement).getTraceSpace: start.")
@@ -5553,7 +5603,7 @@ class Source(BeamLineElement):
         record = strct.pack(">i", len(self.getParameters()))
         dataFILE.write(record)
         if self.getDebug():
-            print("     ----> Number of paramters:", \
+            print("     ----> Number of parameters:", \
                   strct.unpack(">i", record))
 
         iPrm = 0
@@ -5636,7 +5686,7 @@ To do:
 Derived class QuadDoublet:
 ==========================
 
-  QuadDoublet class derived from BeamLineElement to contain paramters
+  QuadDoublet class derived from BeamLineElement to contain parameters
   for an quad doublet.
 
 
@@ -5949,7 +5999,7 @@ class QuadDoublet(BeamLineElement):
 Derived class QuadTriplet:
 ==========================
 
-  QuadTriplet class derived from BeamLineElement to contain paramters
+  QuadTriplet class derived from BeamLineElement to contain parameters
   for an quad doublet.
 
 
@@ -6725,7 +6775,4 @@ class FailToCreateTraceSpaceAtSource(Exception):
     pass
 
 class KillInfiniteLoop(Exception):
-    pass
-
-class failtogetLsrDrvnSrcE(Exception):
     pass
