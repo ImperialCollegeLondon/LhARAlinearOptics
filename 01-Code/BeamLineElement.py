@@ -4894,6 +4894,9 @@ class Source(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Mode=None, _Param=[]):
+        
+        Source.LsrDrvnIni = False
+        
         if self.__Debug:
             print(' Source.__init__: ', \
                   'creating the Source object')
