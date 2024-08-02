@@ -633,8 +633,10 @@ class Particle:
                 """
 
         if self.getDebug():
-            print("     ----> sorz:", sorz)
-            print("     ----> xory:", xory)
+            print("     ----> len, sorz:", len(sorz), sorz)
+            print("     ----> len, xory:", len(xory), xory)
+            print("     ----> len ref. prtcl.:", \
+                  len(ReferenceParticle.getinstance().getsOut()))
 
         if len(ReferenceParticle.getinstance().getsOut()) > len(xory):
             axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')

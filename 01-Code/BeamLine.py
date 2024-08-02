@@ -648,14 +648,22 @@ class BeamLine(object):
             elif iLine.Element == "Aperture":
                 if iLine.Type == "Circular":
                     Param = [0, float(iLine.Value)]
-                elif iLine.Type == "Elliptical":
+                elif iLine.Type == "Elliptical" or \
+                     iLine.Type == "Rectangular":
                     if NewElement:
-                        Param      = [1, float(iLine.Value)]
+                        iMode = 1
+                        if iLine.Type == "Rectangular": iMode = 2
+                        Param      = [iMode, float(iLine.Value)]
                         NewElement = False
                         continue
                     else:
                         Param.append(float(iLine.Value))
                         NewElement = True
+                else:
+                    raise BLEnotvalid(" Aperture " + \
+                                      str(iLine.Type) + \
+                                      " not recognised.")
+
                 nAperture += 1
                 Name       = Name + iLine.Type + ":" + str(nAperture)
                 if cls.getDebug():
@@ -965,7 +973,8 @@ class BeamLine(object):
                 print("     ----> iParticle:", id(iParticle))
             print("     ----> LocStrt:", LocStrt)
             print("     ----> CleanAfterWrite:", CleanAfterWrite)
-            
+
+        if isinstance(iParticle, Prtcl.Particle): NEvts = 1
         if (cls.getDebug() or NEvts > 1) and \
            Smltn.Simulation.getProgressPrint():
             print("     ----> BeamLine.trackBeam for", NEvts, " events.")
@@ -1045,7 +1054,7 @@ class BeamLine(object):
             if LocStrt != None: nLocStrt = LocStrt
             for iBLE in BLE.BeamLineElement.getinstances():
                 iLoc += 1
-                if iLoc < nLocStrt or \
+                if iLoc <= nLocStrt or \
                    isinstance(iBLE, BLE.Source) or \
                    isinstance(iBLE, BLE.Facility):
                     continue
@@ -1393,4 +1402,7 @@ class badTraceSpaceVector(Exception):
     pass
                 
 class noFILE(Exception):
+    pass
+
+class BLEnotvalid(Exception):
     pass

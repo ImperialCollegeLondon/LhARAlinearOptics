@@ -1249,9 +1249,13 @@ Derived class Aperture:
   _Type      : Type of aperture:
                = 0: circular
                = 1: Elliptical
+               = 2: Rectangular
  _Params     : Circular:
                _Params[0]: Radius of circular aperture
                Elliptical:
+               _Params[0]: Radius of ellipse in horizontal (x) direction
+               _Params[1]: Radius of ellipse in horizontal (y) direction
+               Rectangular:
                _Params[0]: Radius of ellipse in horizontal (x) direction
                _Params[1]: Radius of ellipse in horizontal (y) direction
 
@@ -1298,7 +1302,8 @@ class Aperture(BeamLineElement):
         Aperture.instances.append(self)
         
         #.. BeamLineElement class initialisation:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+        BeamLineElement.__init__(self, _Name, \
+                                 _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if len(_Param) < 2:
             raise badBeamLineElement( \
@@ -1327,8 +1332,11 @@ class Aperture(BeamLineElement):
             print("     ----> Circular:")
             print("     ----> Radius (m)", self.getParams()[0])
         elif self.getType() == 1:
-            print("     ----> Eliptical:")
+            print("     ----> Elliptical:")
             print("     ----> Radius x, y (m)", self.getParams())
+        elif self.getType() == 2:
+            print("     ----> Rectangular:")
+            print("     ----> Half length x, y (m)", self.getParams())
         BeamLineElement.__str__(self)
         return " <---- Aperture parameter dump complete."
 
@@ -1363,12 +1371,21 @@ class Aperture(BeamLineElement):
                         " bad radius:",
                         _Param[1])
             self._Params = np.append(self._Params, _Param[1])
-        elif _Param[0] == 1:           #.. Eliptical aperture
+        elif _Param[0] == 1:           #.. Elliptical aperture
             if not isinstance(_Param[1], float) or \
                not isinstance(_Param[2], float):
                 raise badParameter( \
                         " BeamLineElement.Aperture.setApertureParameters:",\
                         " bad radius:",
+                        _Param[1], _Param[1])
+            self._Params = np.append(self._Params, _Param[1])
+            self._Params = np.append(self._Params, _Param[2])
+        elif _Param[0] == 2:           #.. Rectanglar aperture
+            if not isinstance(_Param[1], float) or \
+               not isinstance(_Param[2], float):
+                raise badParameter( \
+                        " BeamLineElement.Aperture.setApertureParameters:",\
+                        " half length:",
                         _Param[1], _Param[1])
             self._Params = np.append(self._Params, _Param[1])
             self._Params = np.append(self._Params, _Param[2])
@@ -1413,6 +1430,8 @@ class Aperture(BeamLineElement):
             print(" Aperture(BeamLineElement).Transport:", \
                   self.getType(), self.getParams())
             
+        _Rprime = None
+        
         NotCut = True
         if self.getType() == 0:
             Rad = np.sqrt(_R[0]**2 + _R[2]**2)
@@ -1425,6 +1444,16 @@ class Aperture(BeamLineElement):
             #print(" Aperture cut: RadX2, RapY2:", RadX2, RadY2)
             if (RadX2+RadY2) >= 1.:
                 NotCut = False
+        elif self.getType() == 2:
+            lenX = abs(_R[0])
+            lenY = abs(_R[2])
+            #print(" Aperture cut: RadX2, RapY2:", RadX2, RadY2)
+            if lenX > self.getParams()[0] or \
+               lenY > self.getParams()[1]:
+                NotCut = False
+
+        if not NotCut:
+            return _Rprime
 
         detTrnsfrMtrx = np.linalg.det(self.getTransferMatrix())
         error         = abs(1. - abs(detTrnsfrMtrx))
@@ -1458,7 +1487,7 @@ class Aperture(BeamLineElement):
         Typ  = self.getType()
         xmin = self.getParams()[0]
         ymin = self.getParams()[0]
-        if Typ == 1:
+        if Typ == 1 or Typ == 2:
             ymin = self.getParams()[1]
         if self.getDebug():
             print("     ----> xmin, ymin:", xmin, ymin)
