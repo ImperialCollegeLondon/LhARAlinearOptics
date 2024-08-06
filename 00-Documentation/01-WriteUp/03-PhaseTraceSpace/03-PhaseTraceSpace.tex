@@ -22,7 +22,7 @@ In the laboratory system, the position of the reference particle along
 its trajectory is directly related to the time coordinate by
 $t = c \beta_0 s$.
 This allows $s$ to be taken as the independent variable and for the
-motion of particles in the beam to be derived as function of $s$.
+motion of particles in the beam to be derived as functions of $s$.
 
 The 6D phase-space coordinates of a particle as a function of $s$ are
 given by the position and momentum three vectors.
@@ -64,27 +64,31 @@ Trace space is defined to simplify the calculation of the trajectory
 of particles through the accelerator lattice and is derived from the
 phase space expressed in the RPLC frame.
 Consider a particle with position
-$(x_{\rm\,RPLC}, y_{\rm\,RPLC}, z_{\rm\,RPLC})$ and momentum 
-$p_{\rm\,RPLC}$ with components
+$\bm{r}_{\rm\,RPLC}=(x_{\rm\,RPLC}, y_{\rm\,RPLC}, z_{\rm\,RPLC})$ and
+momentum $\bm{p}_{\rm\,RPLC}$ with components
 $(p_{\rm x\,RPLC}, p_{\rm y\,RPLC}, p_{\rm z\,RPLC})$.
 Taking the momentum of the reference particle in the laboratory frame
 to be $p_0$, the trace-space coordinates are given by:
 \begin{equation}
     \bm{\phi} = \begin{pmatrix}
                   x_{\rm\,RPLC}       \\
-                  x\prime_{\rm\,RPLC} \\
+                  x^\prime_{\rm\,RPLC} \\
                   y_{\rm\,RPLC}       \\
-                  y\prime_{\rm\,RPLC} \\
+                  y^\prime_{\rm\,RPLC} \\
                   z_{\rm\,RPLC}       \\
                   \delta_{\rm\,RPLC}
                 \end{pmatrix} \, ;
 \end{equation}
 where:
 \begin{eqnarray}
-  x\prime_{\rm\,RPLC}  & = & \frac{\partial x}{\partial s} = \frac{cp_{x\,{\rm\,RPLC}}}{cp_0} \, ; \\
-  y\prime_{\rm\,RPLC}  & = & \frac{\partial y}{\partial s} = \frac{cp_{y\,{\rm\,RPLC}}}{cp_0} \, ; \\
-  z_{\rm\,RPLC}        & = & \frac{s}{\beta_0} - ct = \frac{\Delta s}{\beta_0}                    \, {\rm ; and} \\
-  \delta_{\rm\,RPLC}   & = & \frac{E}{c p_0} - \frac{1}{\beta_0} = \frac{\Delta E}{cp_0}          \, .    
+  x^\prime_{\rm\,RPLC}  & = & \frac{\partial x}{\partial s}
+                        = \frac{cp_{x\,{\rm\,RPLC}}}{cp_0} \, ; \\
+  y^\prime_{\rm\,RPLC}  & = & \frac{\partial y}{\partial s}
+                        = \frac{cp_{y\,{\rm\,RPLC}}}{cp_0} \, ; \\
+  z_{\rm\,RPLC}        & = & \frac{s}{\beta_0} - ct
+                       = \frac{\Delta s}{\beta_0}             \, {\rm ; and} \\
+  \delta_{\rm\,RPLC}   & = & \frac{E}{c p_0} - \frac{1}{\beta_0}
+                        = \frac{\Delta E}{cp_0}                   \, .    
 \end{eqnarray}
 Here $\Delta s = s - s_0$ and $\Delta E = E - E_0$, where $s_0$ and
 $E_0$ are the reference particle position and energy respectively; $E$

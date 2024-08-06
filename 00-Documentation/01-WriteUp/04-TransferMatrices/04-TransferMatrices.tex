@@ -4,11 +4,11 @@
 
 A beam line may be described as a series of beam-line elements
 arranged one after the other.
-The problem of transporting a particle through the beam line may then
-carried out as a series of steps through each of the elements in turn.
-Taking advantage of the trace space defined above, the transport of
-a particle across a particular beam-line element may be described in
-terms of a linear transformation:
+A particle may then be transported through the beam line by
+transporting it through each element in turn.
+Taking advantage of the trace-space defined above, the transport of
+a particle across a particular beam-line element may be performed
+using a linear transformation:
 \begin{equation}
   \bm{\phi}_{\rm end} = \underline{\underline{T}} ~ \bm{\phi}_{\rm start} \, ;
 \end{equation}
@@ -16,7 +16,7 @@ where $\bm{\phi}_{\rm start}$ is the trace-space vector at the start
 of the beam-line element and $\bm{\phi}_{\rm end}$ is the transformed
 trace-space vector at the end.
 The step across the beam-line element implies an increment, $\delta s$,
-to teh $s$-coordinate given by:
+to the $s$-coordinate given by:
 \begin{equation}
   s_{\rm end} = s_{\rm start} + \delta s \, ;
 \end{equation}
@@ -87,11 +87,12 @@ be written:
 \end{equation}
 where:
 \begin{equation}
-  k_q = \frac{gc}{p} \times 10^{-3} \, ,  \label{Eq:Effectivekq}
+  k_q = \frac{gc}{p} \times 10^{-3} \, {\rm m}^{-2} \, ,
+                                                   \label{Eq:Effectivekq}
 \end{equation}
-and $c$ is the speed of light in metres per second, $p$ is the
-magnitude of the momentum of the particle in MeV/c, and the field
-gradient, $g$, is given in T/m.
+$c$ is the speed of light in metres per second, $p$ is the magnitude
+of the momentum of the particle in MeV/c, and the field gradient, $g$,
+is given in T/m. 
 As before, $\beta_0$ is the relativistic velocity of the reference
 particle and $\gamma_0=(1-\beta_0^2)^{-\frac{1}{2}}$.
 The increment in the reference particle trajectory is:
@@ -105,11 +106,12 @@ proton and ion source provides a broad energy spectrum.
 Reference \cite{Wolski:2014} provides two methods for the description of
 dispersion in a linear approximation.
 The first is to use the reference momentum to calculate the quadrupole
-focusing strength ($k_{0q} = \frac{gc}{p_0} \times 10^{-3}$) and to
-include terms in the expressions for $x$, $x^\prime$, $y$, and
+focusing strength ($k_{0q} = \frac{gc}{p_0} \times 10^{-3}$\,m$^{-2}$)
+and to include terms in the expressions for $x$, $x^\prime$, $y$, and
 $y^\prime$ dependent on $\delta$.    
 The second is to use equation~\ref{Eq:Effectivekq} to calculate the
-effective quadrupole focusing strength.
+effective quadrupole focusing strength, with $k_q$ evaluated using
+$p$.
 The second approach has been adopted here.
 
 In the same notation, the transfer matrix for a quadrupole focusing in
@@ -146,7 +148,7 @@ magnet is given by $\bm{B}_s = (0, 0, B_{s0})$, where the solenoid axis
 lies along the $z_{\rm RPLC}$ axis.
 The solenoid field strength parameter is then given by:
 \begin{equation}
-  k_s = \left[ \frac{B_{s0} c}{2p} \times 10^{-3} \right]^2\,;
+  k_s = \left[ \frac{B_{s0} c}{2p} \times 10^{-3} \right]^2 \, {\rm m}^{-2}\,;
   \label{Eq:Effectiveks}
 \end{equation}
 where $B_{s0}$ is measured in T, $p$ in MeV/c and $c$ in m/s.
@@ -166,7 +168,7 @@ may may be written:
         \end{pmatrix} \, .
 \end{equation}
 As in the case of the quadrupoles, dispersion is accounted for using
-equation~\ref{Eq:Effectiveks}.
+$p$ to calculate $k_s$ (equation~\ref{Eq:Effectiveks}).
 The increment in the reference particle trajectory is:
 \begin{equation}
   \delta s = l_s \, .
@@ -177,19 +179,20 @@ The increment in the reference particle trajectory is:
 
 A dense gas of electrons confined in a Penning-Malmberg trap provides
 an electric field that can be used to focus a positive ion beam.
-The electron gas is confined axially in the lens by an electostatic
+The electron gas is confined axially in the lens by an electrostatic 
 potential created using a central anode of length $l_G$.
 The gas is confined radially using the uniform field of a solenoid.
 Assuming a uniform electron density, $n_e$, the focusing parameter,
 $k_G$, may be written:
 \begin{equation}
-  k_G = \frac{e}{2\epsilon_0} \frac{m_p \gamma}{p^2} n_e \,;
-            \label{Eq:EffectivekG}
+  k_G = \frac{e}{2\epsilon_0} \frac{m_p \gamma}{p^2} n_e
+                              \quad {\rm m}^{-2}
+                              \, ; \label{Eq:EffectivekG}
 \end{equation}
 where $e$ is the charge on the electron, $\epsilon_0$ is the
 permittivity of free space, and $m_p$ is the proton mass.
 As in the case of the quadrupoles and solenoid, dispersion is
-accounted for using equation~\ref{Eq:EffectivekG}.
+accounted for using $p$ in equation~\ref{Eq:EffectivekG}.
 The force on a particle passing through the electron gas is towards
 the axis of the lens and is proportional to the radial distance of the
 particle from the axis.
@@ -201,7 +204,7 @@ lens falls to zero at the end of the electron gas and the contribution
 of the magnetic field used to confine the electron gas in the
 transverse direction has a negligible effect on particles passing
 through the lens.
-The transfer matrix for passage of a positive particle through the
+The transfer matrix for the passage of a positive particle through the
 lens may be written: 
 \begin{equation}
   \underline{\underline{T}}_{G} =
@@ -255,7 +258,7 @@ No edge focusing is considered.
 The passage of particles through a dipole may be described by defining
 the parameter, $k_D$:
 \begin{equation}
-  k_D = \left[ \frac{B_{D0} c}{p} \times 10^{-3} \right]^2\,.
+  k_D = \left[ \frac{B_{D0} c}{p} \times 10^{-3} \right]^2\, {\rm m}^{-2} \, .
   \label{Eq:EffectivekD}
 \end{equation}
 The momentum of the reference particle is related to the
@@ -269,7 +272,7 @@ so:
 \end{equation}
 and the angle $\phi$ is given by:
 \begin{equation}
-  \phi = \frac{l}{\rho} \, .
+  \phi = \frac{l_D}{\rho} \, .
 \end{equation}
 With these definitions the transfer matrix for passage through a
 dipole may be written:

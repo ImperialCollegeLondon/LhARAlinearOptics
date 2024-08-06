@@ -3,11 +3,10 @@
 \section{Source}
 
 A variety of options for the generation of the particle distribution
-at source are included in the package (see
-section \ref{SourceOptions}.
+at source are included in the package (see section \ref{SourceOptions}).
 The principal, and the default, option is the target-normal sheath
-acceleration (TNSA) model presented in~\cite{10.1038/nphys199}.
-This model is summarised in this section.
+acceleration (TNSA) model presented in~\cite{10.1038/nphys199} is
+summarised below.
 
 \subsection{Energy distribution}
 
@@ -19,21 +18,25 @@ in~\cite{10.1038/nphys199} is given by:
 \begin{equation}
   \frac{dN}{d\varepsilon} = \frac{n_{e0} c_{s} t_{laser} S_{sheath}}
                                  {\sqrt{2\varepsilon T_{e}}}
-                                 exp(- \sqrt{\frac{2\varepsilon}{T_{e}}})\,;
+                                 \exp\left(
+                                     - \sqrt{\frac{2\varepsilon}{T_{e}}}
+                                     \right)\,;
   \label{Eq:Spct:0}
 \end{equation}
 where $N$ is the number of protons or ions produced per unit solid
 angle, $\varepsilon$ is the ion kinetic energy in Joules, $n_{e0}$ and
-$T_e$ are the hot electron density and temperature respectively, $c_s$
-is the ion-acoustic velocity, $t_{\rm laser}$ is the duration of the
-laser pulse, and $S_{\rm sheath}$ is the effective area over which the
-TNSA mechanism takes place.
+$T_e$ are the hot electron density (in m$^{-3}$) and temperature (in
+K) respectively, $c_s$ is the ion acoustic velocity, $t_{\rm laser}$
+is the duration of the laser pulse (in s), and $S_{\rm sheath}$ (in
+m$^2$) is the effective area over which the TNSA mechanism takes
+place.
 The variables and the units in which they are expressed are presented
 in table~\ref{table:EnergySpectrumParameters}.
 \begin{table} 
   \caption{
-    Parameters present in the TNSA analytical
-    equation \ref{Eq:Spct:0}.
+    Parameters present in the analytical expression,
+    equation \ref{Eq:Spct:0}, describing target normal sheath
+    acceleration (TNSA).
   }
   \label{table:EnergySpectrumParameters}
   \begin{center}
@@ -73,13 +76,13 @@ in table~\ref{table:EnergySpectrumParameters}.
   \end{center}
 \end{table}
 
-Equation~\ref{Eq:Spct:0} is based on time-limited fluid models which
-are unable to predict the cut-off kinetic energy, $\varepsilon_{\rm max}$,
-accurately.
+Equation~\ref{Eq:Spct:0} is based on time-limited fluid-dynamical
+models which are unable to predict the cut-off kinetic energy,
+$\varepsilon_{\rm max}$, accurately.
 The cut-off kinetic energy is taken to be that given by the model
-described in~\cite{10.1103/PhysRevLett.97.045005} where the time over
-which the laser pulse creates the conditions necessary for
-acceleration. 
+described in~\cite{10.1103/PhysRevLett.97.045005} in which the time
+over which the laser pulse creates the conditions necessary for
+acceleration is obtained. 
 The kinetic energy cut-off is given by:
 \begin{equation}
   \varepsilon_{max} = X^{2} \varepsilon_{i,\infty} \, ;
@@ -89,10 +92,10 @@ where $X$ is obtained by solving:
 \begin{equation}
   \frac{t_{laser}}{t_{0}} = X \left( 1 + \frac{1}{2}
                            \frac{1}{1 - X^{2}} \right) +
-                           \frac{1}{4} \ln \left( \frac{1+X}{1-X} \right) \, ;
+                           \frac{1}{4} \ln \left( \frac{1+X}{1-X} \right) \, .
   \label{eq:Eq:Spct:1}
 \end{equation}
-where $t_0$ is the time over which the ion acceleration may be treated
+Here $t_0$ is the time over which the ion acceleration may be treated
 as ballistic and $\varepsilon_{i,\infty}$ is given in
 table~\ref{table:EnergySpectrumParameters}.
 
@@ -102,7 +105,7 @@ $\delta \cal{P}$, of a particle being generated in the interval
 $\varepsilon \rightarrow \varepsilon + \delta \varepsilon$ is given
 by:
 \begin{equation}
-   \delta \cal{P} = g(\varepsilon) \delta \varepsilon \, .
+   \delta {\cal P} = g \left( \varepsilon \right) \delta \varepsilon \, .
 \end{equation}
 $g(\varepsilon)$ can be written in terms of the differential spectrum
 given in equation~\ref{Eq:Spct:0} through the introduction of a
@@ -117,25 +120,41 @@ The cumulative distribution funtion, $G(\varepsilon)$, is given by:
 \end{equation}
 where the normalisation constant, $\cal{N}$, is set so that
 $G(\varepsilon_{\rm max}) = 1$.
-Carrying out the intergration yields:
+Carrying out the integration yields:
 \begin{equation}
   G(\varepsilon) = \frac{2}{\cal{N}}
                    \frac{n_{e0} c_{s} t_{laser} S_{sheath}} {\sqrt{2T_{e}}}
                    \sqrt{\frac{T_{e}}{2}}
                    \left[
-                     1 - \left(exp(- \sqrt{\frac{2\varepsilon}{T_{e}}}\right)
-                   \right] \, .
+                     1 - \exp\left(
+                                   -\sqrt{\frac{2\varepsilon}{T_{e}}}
+                             \right)
+                   \right] \, ;
+\end{equation}
+and the normalisation constant is given by:
+\begin{equation}
+  {\cal N} = 2
+             \frac{n_{e0} c_{s} t_{laser} S_{sheath}} {\sqrt{2T_{e}}}
+             \sqrt{\frac{T_{e}}{2}}
+             \left[
+               1 - \exp\left(
+                              -\sqrt{\frac{2\varepsilon_{\rm max}}{T_{e}}}
+                       \right)
+             \right] \, .
 \end{equation}
 
 The kinetic energy spectrum may now be obtained by choosing a value
-for $\varepsilon$ using a probability distribution uniform over the
-range $0 < \varepsilon < \varepsilon_{max}$.   
-A second random number, $\eta$, uniformly distributed on the range
-$0 < \eta < 1$ is then chosen.
-If $\eta$ is greater than $G(\varepsilon)$, a new value for
-$\varepsilon$ is chosen and the process repeats.
-Alternatively, if $\eta$ is less than $G(\varepsilon)$, the value of
-$\varepsilon$ is accepted. 
+for $G(\varepsilon)$ using a probability distribution uniform over the
+range $0 < G(\varepsilon) < 1$.
+The generated value of $\varepsilon$ is the obtained by evaluating:
+\begin{equation}
+  \varepsilon = \left[
+                      \sqrt{\varepsilon_{\rm min}} -
+                      \sqrt{\frac{T_e}{2}} \ln \left(
+                     1 - \frac{G(\varepsilon)}{G(\varepsilon_{\rm max})}
+                                               \right)
+                \right]^2 \, .
+\end{equation}
 
 \subsection{Angular Distribution}
 
@@ -168,3 +187,13 @@ uniform over the range $0 < \phi < 2\pi$.
 
 {\color{red} Maria, not sure what this means: A beam diameter of 10
 microns has been used.}
+
+\subsection{Simulated distributions}
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.33\linewidth]{SourceTst_plot13_Dist.pdf}
+  \end{center}
+  \caption{Need to add caption.}
+\end{figure}
+
