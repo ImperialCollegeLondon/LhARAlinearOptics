@@ -11,12 +11,21 @@ Test script for "Source" class
 import os
 import math  as mth
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from datetime import date
 
-import BeamLineElement as BLE
-import BeamLine        as BL
-import Particle        as Prtcl
+import BeamLineElement   as BLE
+import BeamLine          as BL
+import Particle          as Prtcl
+import PhysicalConstants as PhysCnst
+
+mpl.rc('text', usetex=True)
+mpl.rcParams['text.latex.preamble']="\\usepackage{bm}"
+
+#.. Physical Constants
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
 
 HOMEPATH = os.getenv('HOMEPATH')
 filename = os.path.join(HOMEPATH, \
@@ -72,7 +81,7 @@ print(" <---- Creation and built in method tests done!  --------  --------")
 SourceTest += 1
 print()
 print("SourceTest:", SourceTest, \
-      " test parameterised laser-driven source distribution ", \
+      " test parameterised laser-driven source distribution", \
       "check.")
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
                   0, [0.000004, 0.000004, 0.998, 1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25.])
@@ -86,6 +95,7 @@ PrtclX   = np.array([])
 PrtclY   = np.array([])
 PrtclKE  = np.array([])
 PrtclcT  = np.array([])
+PrtclT   = np.array([])
 PrtclPhi = np.array([])
 
 SrcX     = np.array([])
@@ -102,12 +112,6 @@ print("     ----> Generate many particles:")
 for i in range(100000):
     X, Y, KE, cTheta, Phi = Src1.getParticle()
     
-    PrtclX   = np.append(PrtclX , X)
-    PrtclY   = np.append(PrtclY , Y)
-    PrtclKE  = np.append(PrtclKE , KE)
-    PrtclcT  = np.append(PrtclcT , cTheta)
-    PrtclPhi = np.append(PrtclPhi, Phi)
-
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
     
@@ -116,13 +120,40 @@ for i in range(100000):
     SrcXp        = np.append(SrcXp, TrcSpcFrmSrc[1])
     SrcYp        = np.append(SrcYp, TrcSpcFrmSrc[3])
     SrcE         = np.append(SrcE,  TrcSpcFrmSrc[5])
+
+    p        = mth.sqrt(np.dot(PhsSpcFrmSrc[1], PhsSpcFrmSrc[1]))
+    Etot     = mth.sqrt(protonMASS**2 + \
+                        np.dot(PhsSpcFrmSrc[1], PhsSpcFrmSrc[1]))
+    
+    KE       = Etot - protonMASS
+    PrtclKE  = np.append(PrtclKE , KE)
+
+    cTheta   = PhsSpcFrmSrc[1][2] / p
+    PrtclcT  = np.append(PrtclcT , cTheta)
+
+    Theta    = mth.acos(cTheta)
+    PrtclT   = np.append(PrtclT , Theta)
+
+    Phi      = mth.atan2(PhsSpcFrmSrc[1][0], PhsSpcFrmSrc[1][1])
+    if Phi < 0.: Phi += mth.pi
+    PrtclPhi = np.append(PrtclPhi, Phi)
+
+    PrtclX   = np.append(PrtclX , PhsSpcFrmSrc[0][0])
+    PrtclY   = np.append(PrtclY , PhsSpcFrmSrc[0][1])
+    
+    
 print("     <---- Done.")
     
 ##! Next: Make plots:
 print("     ----> Make plots:")
+today = date.today().strftime("%d/%m/%Y")
 
 #.. ----> Energy:
 print("         ----> Energy:")
+
+n, bins, patches = plt.hist(PrtclKE, \
+                            bins=100, color='k', \
+                            histtype='step', label='Generated Distribution')
 
 Ee, g_E = Src1.getLaserDrivenProtonEnergyProbDensity()
 
@@ -142,130 +173,104 @@ x            = E_max_MeV
 plt.vlines(x, ymin=0, ymax=y_max_cutoff, color='r', \
            linestyle='-', linewidth=1)  # [MeV]
 
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Entries')
+plt.xlabel('Energy (MeV)', loc='right')
+plt.ylabel('Entries', loc='top')
 plt.yscale("log")
 plt.legend(loc="best")
-today = date.today().strftime("%m/%d/%Y")
 
 plt.title('ExpSourceTst (' + today + '): Energy distribution',
           weight='bold', size=12)
-plt.savefig('99-Scratch/SourceTst_plot13_Dist.pdf')
+plt.savefig('99-Scratch/SourceTst_KE_Dist.pdf')
 plt.close()
 
 print("         <---- Done.")
-exit()
 
 #.. ----> Cumulative probability:
-n, bins, patches = plt.hist(PrtclX, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('X (m)')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: X position distribution')
-plt.savefig('99-Scratch/SourceTst_plot11.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclY, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Y (m)')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Y position distribution')
-plt.savefig('99-Scratch/SourceTst_plot12.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclKE, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Entries')
-plt.yscale("log")
-plt.title('LsrDrvnSrc: Energy distribution')
-plt.savefig('99-Scratch/SourceTst_plot13.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(PrtclKE, \
-                            bins=100, color='k', \
-                            histtype='step', label='Generated Distribution')
-
+print("         ----> Cumulative probability:")
 
 cumPROB = []
 for eps in Ee:
     eps1 = eps * (1.6e-19 * 1e6)
     cumPROB.append(Src1.getLaserCumProb(eps1))
-plt.plot(Ee, cumPROB, color='k', label='Required Distribution', linewidth=2)
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Cumulative probability')
+    
+plt.plot(Ee, cumPROB, color='k', label='Required Distribution', linewidth=1)
+
+plt.xlabel('Energy (MeV)', loc='right')
+plt.ylabel('Cumulative probability', loc='top')
 plt.yscale("linear")
 plt.legend(loc="best")
-plt.title('LsrDrvnSrc: cumulative probability')
-plt.savefig('99-Scratch/SourceTst_plot13_cumulative.pdf')
+plt.title('ExpSourceTst (' + today + '): cumulative probability', \
+          weight='bold', size=12)
+
+plt.savefig('99-Scratch/SourceTst_cumulativePDF.pdf')
 plt.close()
+
+#.. ----> cos(theta) and theta distribution:
+print("         ----> cos(theta) and theta distribution:")
 
 n, bins, patches = plt.hist(PrtclcT, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('cos(theta)')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: (cos) polar angle distribution')
-plt.savefig('99-Scratch/SourceTst_plot14.pdf')
+                            bins=50, color='k', \
+                            histtype='step')
+
+plt.xlabel('$\\cos\\theta_S$', loc='right')
+plt.ylabel('Entries', loc='top')
+plt.title('ExpSourceTst (' + today + \
+          '): $\\bm{\\cos}\\bm{\\theta_S}$ distribution', \
+          weight='bold', size=12)
+
+plt.savefig('99-Scratch/SourceTst_costheta.pdf')
 plt.close()
+
+n, bins, patches = plt.hist(PrtclT, \
+                            bins=50, color='k', \
+                            histtype='step')
+
+plt.xlabel('$\\theta_S$', loc='right')
+plt.ylabel('Entries', loc='top')
+plt.title('ExpSourceTst (' + today + \
+          '): $\\bm{\\theta_S}$ distribution', \
+          weight='bold', size=12)
+
+plt.savefig('99-Scratch/SourceTst_theta.pdf')
+plt.close()
+
+print("         <---- Done.")
+
+#.. ----> phi distribution:
+print("         ----> phi distribution:")
 
 n, bins, patches = plt.hist(PrtclPhi, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Phi')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Azimuthal; angle distribution')
-plt.savefig('99-Scratch/SourceTst_plot15.pdf')
+                            bins=50, color='k', \
+                            histtype='step')
+
+plt.xlabel('$\\phi_S$', loc='right')
+plt.ylabel('Entries', loc='top')
+plt.title('ExpSourceTst (' + today + \
+          '): $\\bm{\\phi_S}$ distribution', \
+          weight='bold', size=12)
+
+plt.savefig('99-Scratch/SourceTst_phi.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(SrcX, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('X')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: X position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot16.pdf')
+print("         <---- Done.")
+
+#.. ----> x,y distribution:
+print("         ----> (x, y) distribution:")
+
+plt.hist2d(PrtclX, PrtclY, \
+           bins=50, norm=mpl.colors.LogNorm())
+plt.colorbar()
+
+plt.xlabel('x (m)')
+plt.ylabel('y (m)')
+plt.title('ExpSourceTst (' + today + \
+          '): (x, y) distribution', \
+          weight='bold', size=12)
+
+plt.savefig('99-Scratch/SourceTst_xy.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(SrcY, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Y')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Y position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot17.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcXp, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('X-prime')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: X-prime position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot18.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcYp, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('Y-prime')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Y-prime position at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot19.pdf')
-plt.close()
-
-n, bins, patches = plt.hist(SrcE, \
-                            bins=50, color='y', \
-                            log=False)
-plt.xlabel('delta')
-plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: delta at exit from source')
-plt.savefig('99-Scratch/SourceTst_plot20.pdf')
-plt.close()
-
+print("         <---- Done.")
 
 ##! Complete:
 print()
