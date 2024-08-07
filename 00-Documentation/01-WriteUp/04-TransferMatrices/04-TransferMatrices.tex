@@ -10,11 +10,12 @@ Taking advantage of the trace-space defined above, the transport of
 a particle across a particular beam-line element may be performed
 using a linear transformation:
 \begin{equation}
-  \bm{\phi}_{\rm end} = \underline{\underline{T}} ~ \bm{\phi}_{\rm start} \, ;
+  \underline{\phi}_{\rm\,end} = \underline{\underline{T}} ~
+                            \underline{\phi}_{\rm\,start} \, ;
 \end{equation}
-where $\bm{\phi}_{\rm start}$ is the trace-space vector at the start
-of the beam-line element and $\bm{\phi}_{\rm end}$ is the transformed
-trace-space vector at the end.
+where $\underline{\phi}_{\rm\,start}$ is the trace-space vector at the
+start of the beam-line element and $\underline{\phi}_{\rm\,end}$ is
+the transformed trace-space vector at the end.
 The step across the beam-line element implies an increment, $\delta s$,
 to the $s$-coordinate given by:
 \begin{equation}
@@ -46,7 +47,7 @@ In a drift, particles propagate in straight lines, therefore:
         \end{pmatrix} \, ; 
 \end{equation}
 where $l$ is the length of the drift.
-The increment in the reference particle trajectory is:
+The increment in the reference particle position is:
 \begin{equation}
   \delta s = l \, .
 \end{equation}
@@ -95,7 +96,7 @@ of the momentum of the particle in MeV/c, and the field gradient, $g$,
 is given in T/m. 
 As before, $\beta_0$ is the relativistic velocity of the reference
 particle and $\gamma_0=(1-\beta_0^2)^{-\frac{1}{2}}$.
-The increment in the reference particle trajectory is:
+The increment in the reference particle position is:
 \begin{equation}
   \delta s = l_q \, .
 \end{equation}
@@ -103,8 +104,8 @@ The increment in the reference particle trajectory is:
 It is important to include a description of the effect of dispersion
 on beam transport through the LhARA beam line since the laser-driven
 proton and ion source provides a broad energy spectrum. 
-Reference \cite{Wolski:2014} provides two methods for the description of
-dispersion in a linear approximation.
+Reference \cite{Wolski:2014} describes two methods for the description
+of dispersion in a linear approximation.
 The first is to use the reference momentum to calculate the quadrupole
 focusing strength ($k_{0q} = \frac{gc}{p_0} \times 10^{-3}$\,m$^{-2}$)
 and to include terms in the expressions for $x$, $x^\prime$, $y$, and
@@ -146,7 +147,7 @@ the $yz$ plane.
 In the ``hard-edge'' approximation, the magnetic field inside the
 magnet is given by $\bm{B}_s = (0, 0, B_{s0})$, where the solenoid axis
 lies along the $z_{\rm RPLC}$ axis.
-The solenoid field strength parameter is then given by:
+The solenoid field-strength parameter is then given by:
 \begin{equation}
   k_s = \left[ \frac{B_{s0} c}{2p} \times 10^{-3} \right]^2 \, {\rm m}^{-2}\,;
   \label{Eq:Effectiveks}
@@ -155,7 +156,7 @@ where $B_{s0}$ is measured in T, $p$ in MeV/c and $c$ in m/s.
 
 The transfer matrix for passage of a positive particle through a
 solenoid with field pointing in the positive $z_{\rm RPLC}$ direction
-may may be written: 
+may be written: 
 \begin{equation}
   \underline{\underline{T}}_{\rm~Sol} =
     \begin{pmatrix}
@@ -167,9 +168,9 @@ may may be written:
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
-As in the case of the quadrupoles, dispersion is accounted for using
-$p$ to calculate $k_s$ (equation~\ref{Eq:Effectiveks}).
-The increment in the reference particle trajectory is:
+As in the case of the quadrupoles, dispersion is accounted for by
+using $p$ to calculate $k_s$ (equation~\ref{Eq:Effectiveks}).
+The increment in the reference particle position is:
 \begin{equation}
   \delta s = l_s \, .
 \end{equation}
@@ -192,7 +193,7 @@ $k_G$, may be written:
 where $e$ is the charge on the electron, $\epsilon_0$ is the
 permittivity of free space, and $m_p$ is the proton mass.
 As in the case of the quadrupoles and solenoid, dispersion is
-accounted for using $p$ in equation~\ref{Eq:EffectivekG}.
+accounted for by using $p$ in equation~\ref{Eq:EffectivekG}.
 The force on a particle passing through the electron gas is towards
 the axis of the lens and is proportional to the radial distance of the
 particle from the axis.
@@ -217,7 +218,7 @@ lens may be written:
           0 & 0 & 0 & 0 & 0 &                             1
         \end{pmatrix} \, .
 \end{equation}
-The increment in the reference particle trajectory is:
+The increment in the reference particle position is:
 \begin{equation}
   \delta s = l_G \, .
 \end{equation}
@@ -228,8 +229,8 @@ The reference particle trajectory in the beam-line elements described
 above passes along the axis of the element.
 In contrast, a dipole bends the reference trajectory so that it
 describes the arc of a circle (see figure~\ref{fig:Dipole}).
-The code provides for the transport through a ``sector dipole'' in the
-hard-edge approximation.
+The code provides for transport through a ``sector dipole'' in the
+hard-edge approximation. 
 In this case, the field within the magnet is taken to be constant and
 parallel to $\bm{j}_{\rm RPLC}$, i.e. $\bm{B}_D = (0, B_{D0}, 0)$. 
 No edge focusing is considered.
@@ -248,9 +249,9 @@ No edge focusing is considered.
     of the sector dipole is $l_D$.
     The $x_{\rm RPLC}$ and $z_{\rm RPLC}$ coordinate axes at the entry
     and exit of the sector dipole are shown.
-    The radius of curvature of the reference particle-trajectory
-    trajectory inside the magnet is $\rho$ and the angle through which
-    the $x_{\rm RPLC}$ is rotated is $\phi$.
+    The radius of curvature of the reference particle trajectory
+    inside the magnet is $\rho$ and the angle through which the
+    $x_{\rm RPLC}$ is rotated is $\phi$. 
   }
   \label{fig:Dipole}
 \end{figure}
@@ -287,7 +288,7 @@ dipole may be written:
                              0 &                                                0 & 0 & 0 & 0 &                                                                1
         \end{pmatrix} \, .
 \end{equation}
-The increment in the reference particle trajectory is:
+The increment in the reference particle position is:
 \begin{equation}
   \delta s = l_D \, .
 \end{equation}
