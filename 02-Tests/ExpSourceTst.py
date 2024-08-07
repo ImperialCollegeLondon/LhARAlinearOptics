@@ -81,6 +81,7 @@ print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \
       Src1.getParticle())
 
+##! Next: Get data for plots:
 PrtclX   = np.array([])
 PrtclY   = np.array([])
 PrtclKE  = np.array([])
@@ -98,7 +99,7 @@ E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
 print("     ----> Generate many particles:")
-for i in range(1000000):
+for i in range(100000):
     X, Y, KE, cTheta, Phi = Src1.getParticle()
     
     PrtclX   = np.append(PrtclX , X)
@@ -108,12 +109,54 @@ for i in range(1000000):
     PrtclPhi = np.append(PrtclPhi, Phi)
 
     TrcSpcFrmSrc = Src1.getParticleFromSource()
+    PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
+    
     SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
     SrcY         = np.append(SrcY,  TrcSpcFrmSrc[2])
     SrcXp        = np.append(SrcXp, TrcSpcFrmSrc[1])
     SrcYp        = np.append(SrcYp, TrcSpcFrmSrc[3])
     SrcE         = np.append(SrcE,  TrcSpcFrmSrc[5])
+print("     <---- Done.")
     
+##! Next: Make plots:
+print("     ----> Make plots:")
+
+#.. ----> Energy:
+print("         ----> Energy:")
+
+Ee, g_E = Src1.getLaserDrivenProtonEnergyProbDensity()
+
+dE2     = (E_max_MeV - E_min_MeV) / 100. / 2.
+Ee[-1] -= dE2
+
+# Normalise:
+hist_heights, bin_edges = np.histogram(PrtclKE, bins=100)
+histCntnts = np.sum(hist_heights)
+g_scaled   = g_E * histCntnts
+
+# Plot required distribution:
+plt.plot(Ee, g_scaled, color='r', label='Required Distribution', linewidth=1)
+
+y_max_cutoff = g_scaled[-1]
+x            = E_max_MeV
+plt.vlines(x, ymin=0, ymax=y_max_cutoff, color='r', \
+           linestyle='-', linewidth=1)  # [MeV]
+
+plt.xlabel('Energy (MeV)')
+plt.ylabel('Entries')
+plt.yscale("log")
+plt.legend(loc="best")
+today = date.today().strftime("%m/%d/%Y")
+
+plt.title('ExpSourceTst (' + today + '): Energy distribution',
+          weight='bold', size=12)
+plt.savefig('99-Scratch/SourceTst_plot13_Dist.pdf')
+plt.close()
+
+print("         <---- Done.")
+exit()
+
+#.. ----> Cumulative probability:
 n, bins, patches = plt.hist(PrtclX, \
                             bins=50, color='y', \
                             log=False)
@@ -146,34 +189,6 @@ n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='k', \
                             histtype='step', label='Generated Distribution')
 
-Ee, g_E = Src1.getLaserDrivenProtonEnergyProbDensity()
-
-dE2     = (E_max_MeV - E_min_MeV) / 100. / 2.
-Ee[-1] -= dE2
-
-# Normalise:
-hist_heights, bin_edges = np.histogram(PrtclKE, bins=100)
-histCntnts = np.sum(hist_heights)
-g_scaled   = g_E * histCntnts
-
-# Plot required distribution:
-plt.plot(Ee, g_scaled, color='r', label='Required Distribution', linewidth=1)
-
-y_max_cutoff = g_scaled[-1]
-x            = E_max_MeV
-plt.vlines(x, ymin=0, ymax=y_max_cutoff, color='r', \
-           linestyle='-', linewidth=1)  # [MeV]
-
-plt.xlabel('Energy (MeV)')
-plt.ylabel('Entries')
-plt.yscale("log")
-plt.legend(loc="best")
-today = date.today().strftime("%m/%d/%Y")
-
-plt.title('ExpSourceTst (' + today + '): Energy distribution',
-          weight='bold', size=12)
-plt.savefig('99-Scratch/SourceTst_plot13_Dist.pdf')
-plt.close()
 
 cumPROB = []
 for eps in Ee:
