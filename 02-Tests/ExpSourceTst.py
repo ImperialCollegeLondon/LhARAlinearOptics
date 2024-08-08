@@ -131,11 +131,12 @@ for i in range(100000):
     cTheta   = PhsSpcFrmSrc[1][2] / p
     PrtclcT  = np.append(PrtclcT , cTheta)
 
-    Theta    = mth.acos(cTheta)
+    Theta    = mth.acos(cTheta) * 180. / mth.pi
     PrtclT   = np.append(PrtclT , Theta)
 
     Phi      = mth.atan2(PhsSpcFrmSrc[1][0], PhsSpcFrmSrc[1][1])
     if Phi < 0.: Phi += mth.pi
+    Phi *= 180. / mth.pi
     PrtclPhi = np.append(PrtclPhi, Phi)
 
     PrtclX   = np.append(PrtclX , PhsSpcFrmSrc[0][0])
@@ -148,8 +149,8 @@ print("     <---- Done.")
 print("     ----> Make plots:")
 today = date.today().strftime("%d/%m/%Y")
 
-#.. ----> Energy:
-print("         ----> Energy:")
+#.. ----> Kinetic energy:
+print("         ----> Kinetic energy:")
 
 n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='k', \
@@ -173,13 +174,13 @@ x            = E_max_MeV
 plt.vlines(x, ymin=0, ymax=y_max_cutoff, color='r', \
            linestyle='-', linewidth=1)  # [MeV]
 
-plt.xlabel('Energy (MeV)', loc='right')
+plt.xlabel('Kinetic energy (MeV)', loc='right')
 plt.ylabel('Entries', loc='top')
 plt.yscale("log")
 plt.legend(loc="best")
 
-plt.title('ExpSourceTst (' + today + '): Energy distribution',
-          weight='bold', size=12)
+plt.title('ExpSourceTst (' + today + '): Kinetic energy distribution',
+          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_KE_Dist.pdf')
 plt.close()
 
@@ -195,12 +196,12 @@ for eps in Ee:
     
 plt.plot(Ee, cumPROB, color='k', label='Required Distribution', linewidth=1)
 
-plt.xlabel('Energy (MeV)', loc='right')
+plt.xlabel('Kinetic energy (MeV)', loc='right')
 plt.ylabel('Cumulative probability', loc='top')
 plt.yscale("linear")
 plt.legend(loc="best")
 plt.title('ExpSourceTst (' + today + '): cumulative probability', \
-          weight='bold', size=12)
+          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_cumulativePDF.pdf')
 plt.close()
@@ -215,8 +216,8 @@ n, bins, patches = plt.hist(PrtclcT, \
 plt.xlabel('$\\cos\\theta_S$', loc='right')
 plt.ylabel('Entries', loc='top')
 plt.title('ExpSourceTst (' + today + \
-          '): $\\bm{\\cos}\\bm{\\theta_S}$ distribution', \
-          weight='bold', size=12)
+          '): $\\cos\\theta_S$ distribution', \
+          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_costheta.pdf')
 plt.close()
@@ -225,13 +226,26 @@ n, bins, patches = plt.hist(PrtclT, \
                             bins=50, color='k', \
                             histtype='step')
 
-plt.xlabel('$\\theta_S$', loc='right')
+plt.xlabel('$\\theta_S$ ($^\\circ$)', loc='right')
 plt.ylabel('Entries', loc='top')
 plt.title('ExpSourceTst (' + today + \
-          '): $\\bm{\\theta_S}$ distribution', \
-          weight='bold', size=12)
+          '): $\\theta_S$ distribution', \
+          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_theta.pdf')
+plt.close()
+
+plt.hist2d(PrtclKE, PrtclT, \
+           bins=50, norm=mpl.colors.LogNorm())
+plt.colorbar()
+
+plt.xlabel('Kinetic energy (MeV)', loc='right')
+plt.ylabel('$\\theta_S$ ($^\\circ$)', loc='top')
+plt.title('ExpSourceTst (' + today + \
+          '): $(\\theta_S, K)$ distribution', \
+          fontname="Times New Roman",  size=12)
+
+plt.savefig('99-Scratch/SourceTst_thetaK.pdf')
 plt.close()
 
 print("         <---- Done.")
@@ -243,11 +257,11 @@ n, bins, patches = plt.hist(PrtclPhi, \
                             bins=50, color='k', \
                             histtype='step')
 
-plt.xlabel('$\\phi_S$', loc='right')
+plt.xlabel('$\\phi_S$ ($^\\circ$)', loc='right')
 plt.ylabel('Entries', loc='top')
 plt.title('ExpSourceTst (' + today + \
-          '): $\\bm{\\phi_S}$ distribution', \
-          weight='bold', size=12)
+          '): $\\phi_S$ distribution', \
+          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_phi.pdf')
 plt.close()
@@ -265,7 +279,7 @@ plt.xlabel('x (m)')
 plt.ylabel('y (m)')
 plt.title('ExpSourceTst (' + today + \
           '): (x, y) distribution', \
-          weight='bold', size=12)
+          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_xy.pdf')
 plt.close()
