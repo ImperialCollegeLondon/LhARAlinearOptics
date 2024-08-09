@@ -171,11 +171,12 @@ The opening angle of the cone decreases as the ion energy considered
 increases.
 
 The distribution of the polar angle, $\theta_S$, at which particles
-are produced at the laser-driven source has been approximated using a
-Gaussian distribution~\cite{10.1038/s41598-019-41705-0}.  
+are produced at the laser-driven source has been approximated using
+the positive half of a Gaussian
+distribution~\cite{10.1038/s41598-019-41705-0}.
 At low kinetic energy ($\varepsilon \sim \varepsilon_{\rm min}$), the
 standard deviation, $\sigma_{\theta_S}(\varepsilon)$) of the Gaussian
-distribution is taken to be $20^\circ$.
+distribution is taken to be $\sim 20^\circ$.
 $\sigma_{\theta_S}(\varepsilon)$ is assumed to decrease linearly with
 energy such that
 \begin{equation}
@@ -193,13 +194,87 @@ uniform over the range $0 < \phi_S < 2\pi$.
 
 \subsection{Spatial distribution}
 
-Here!
-
-\subsection{Simulated distributions}
+The $x$ and $y$ distributions at production are assumed to be
+independent and Gaussianly distributed with a standard deviation given
+by the radius of the laser spot focused on the target.
 
 \begin{figure}
   \begin{center}
-    \includegraphics[width=0.33\linewidth]{SourceTst_plot13_Dist.pdf}
+    \includegraphics[width=0.49\linewidth]{SourceTst_K.pdf}
+    \includegraphics[width=0.49\linewidth]{SourceTst_theta.pdf}
+    \includegraphics[width=0.49\linewidth]{SourceTst_thetaK.pdf}
+    \includegraphics[width=0.49\linewidth]{SourceTst_sigTK.pdf}
+    \includegraphics[width=0.49\linewidth]{SourceTst_phi.pdf}
+    \includegraphics[width=0.49\linewidth]{SourceTst_xy.pdf}
   \end{center}
-  \caption{Need to add caption.}
+  \caption{Kinematic distributions of particles at the point of
+    production.
+    \underline{Top left:} the kinetic energy.
+    The disribution generated using the algorithmm described in the
+    text is shown as the solid histogram.
+    The required distribution defined by equation~\ref{Eq:Spct:0} is
+    shown as the solid red line.
+    The required distribution is normalised to the lowest
+    kinetic-energy bin.
+    \underline{Top right:} the distribution of the polar angle with
+    respect to the normal to the target-foil surface ($\theta_S$).
+    \underline{Centre left:} the distribution of $\theta_S$ versus
+    kinetic energy.
+    \underline{Centre right:} the dependence of the RMS of the
+    $\theta_S$ distribution plotted as a function of kinetic energy.
+    The solid circles are calculated using slices of width 1\,MeV
+    from the distribution in the centre-left panel.
+    The expected dependence based on equation~\ref{Eq:sigVeps} is
+    shown as the solid red line.
+    \underline{Bottom left:} distribution of the azimuthal angle,
+    $\phi_S$. 
+    \underline{Bottom right:} $(x, y)$ distribution of the
+    particle-production point.
+  }
+  \label{Fig:LsrDrvSrc:Dists}
 \end{figure}
+
+\subsection{Simulated distributions}
+
+Distributions $10^6$ protons produced by the TNSA mechanism using the
+algorithm described above are shown in
+figure~\ref{Fig:LsrDrvSrc:Dists}.
+The parameters used in the algorithm are presented in
+table~\ref{Tab:Src:Param}.
+The generated distribution of kinetic energy is in good agreement with
+the distribution implied by equation~\ref{Eq:Spct:0}.
+The width of the generated polar-angle distribution is observed to
+fall with kinetic energy and the kinetic-energy dependence of the RMS
+calculated from the generated particles is in good agreement with that
+expected from equation~\ref{Eq:sigVeps}.
+As a result, the distribution of $\theta_S$ is approximately Gaussian
+with a width dominated by the contribution of protons with kinetic
+energy close to $\varepsilon_{\rm min}$.
+The generated $\phi_S$ distribution is flat in the range
+$0^\circ < \phi_S < 360^\circ$ and the $(x, y)$ distribution is
+Gaussian in both the $x$ and $y$ projections.
+\begin{table}
+  \caption{Parameterised laser driven}
+  \label{Tab:Src:Param}
+  \begin{center}
+    \begin{tabular}{|l|c|l|}
+      \hline
+        \textbf{Parameter} & \textbf{Value} & \textbf{Unit} \\ 
+        \hline
+        $\sigma_x$&4e-06&$\mu$m \\ 
+        $\sigma_y$&4e-06&$\mu$m \\ 
+        $\cos\theta_S |_{\rm min}$&0.998& \\ 
+        $\varepsilon_{\rm min}$&1.0&MeV \\ 
+        $\varepsilon_{\rm max}$&25.0&MeV \\ 
+        nPnts&1000& \\ 
+        Laser power&2500000000000000.0&W \\ 
+        Laser energy&70.0&J \\ 
+        Laser wavelength&0.8&$\mu$m \\ 
+        Laser pulse duration&2.8e-14&s \\ 
+        Laser spot size&4e-07&$\mu$m \\ 
+        Laser intensity&4e+20&J$/m^2$ \\ 
+        Electron divergence angle&25.0&degrees \\ 
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}

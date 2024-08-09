@@ -153,6 +153,7 @@ import math
 
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
+import LaTeX             as LTX
 
 #.. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -4904,7 +4905,9 @@ class Source(BeamLineElement):
     #ParamList  = [ [float, float, float, float, float, int], \
     #               [float, float, float, float, float],      \
     #               [float, float, float, float, float] ]
-    ParamUnit  = [ [], \
+    ParamUnit  = [ ["$\\mu$m", "$\\mu$m", "", "MeV", "MeV", "", "W", \
+                    "J", "$\\mu$m", "s", "$\\mu$m", "J$/m^2$",       \
+                    "degrees"], \
                    ["m", "m", "MeV", "MeV", ""], \
                    [], [] ]
     ParamText  = [ [], \
@@ -4916,6 +4919,20 @@ class Source(BeamLineElement):
                    [float, float, float, float, float],      \
                    [float, float, float, float, float], \
                    [] ]
+    ParamLaTeX  = [ ["$\\sigma_x$", "$\\sigma_y$",                       \
+                     "$\\cos\\theta_S |_{\\rm min}$",                    \
+                     "$\\varepsilon_{\\rm min}$",                        \
+                     "$\\varepsilon_{\\rm max}$",                        \
+                     "nPnts", "Laser power",                             \
+                     "Laser energy", "Laser wavelength",                 \
+                     "Laser pulse duration", "Laser spot size",          \
+                     "Laser intensity",                                  \
+                     "Electron divergence angle"],                       \
+                    ["\\sigma_x", "\\sigma_y",                           \
+                     "\\cos\\theta_S |_{\\rm min}",                      \
+                     "Mean kinetic energy",                              \
+                     "Kinetic energy standard deviation"],               \
+                    [], []]
 
     Lsrdrvng_E = None
     LsrDrvnIni = False
@@ -4989,7 +5006,25 @@ class Source(BeamLineElement):
             "; Mode = " + str(self.getMode()) + "; paramters = " + \
             str(self.getParameters())
         return Str
-    
+
+    def tabulateParameters(self, filename="LaTeX.tex"):
+        LTX.TableHeader(filename, '|l|c|l|', \
+                        self.ModeText[self.getMode()])
+
+        Line = "\\textbf{Parameter} & \\textbf{Value} & \\textbf{Unit}"
+        LTX.TableLine(filename, Line)
+        Line = "\\hline"
+        LTX.TableLine(filename, Line)
+
+        iPrm = 0
+        for Prm in self.ParamLaTeX[self.getMode()]:
+            Line = Prm + "&"                                     + \
+                str(self.getParameters()[iPrm]) + "&" + \
+                self.ParamUnit[self.getMode()][iPrm]
+            iPrm += 1
+            LTX.TableLine(filename, Line)
+
+        LTX.TableTrailer(filename)
 
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)

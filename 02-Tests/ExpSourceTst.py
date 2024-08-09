@@ -77,6 +77,18 @@ print("    <---- __str__ done.")
 print(" <---- Creation and built in method tests done!  --------  --------")
 
 
+##! Next: Make plots:
+SourceTest += 1
+print()
+print("SourceTest:", SourceTest, \
+      " test tabulation of parameters.")
+
+print("     ----> Tabulate paramters:")
+Src.tabulateParameters('99-Scratch/SourceTst_ParameterTable.tex')
+
+exit()
+
+
 ##! Next: check paramterised laser-driven source distribution:
 SourceTest += 1
 print()
@@ -109,7 +121,7 @@ E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
 print("     ----> Generate many particles:")
-for i in range(100000):
+for i in range(1000):
     X, Y, KE, cTheta, Phi = Src1.getParticle()
     
     TrcSpcFrmSrc = Src1.getParticleFromSource()
@@ -181,7 +193,7 @@ plt.legend(loc="best")
 
 plt.title('ExpSourceTst (' + today + '): Kinetic energy distribution',
           fontname="Times New Roman",  size=12)
-plt.savefig('99-Scratch/SourceTst_KE_Dist.pdf')
+plt.savefig('99-Scratch/SourceTst_K.pdf')
 plt.close()
 
 print("         <---- Done.")
@@ -190,9 +202,11 @@ print("         <---- Done.")
 print("         ----> Cumulative probability:")
 
 cumPROB = []
+sigT    = []
 for eps in Ee:
     eps1 = eps * (1.6e-19 * 1e6)
     cumPROB.append(Src1.getLaserCumProb(eps1))
+    sigT.append(Src1.g_theta(eps))
     
 plt.plot(Ee, cumPROB, color='k', label='Required Distribution', linewidth=1)
 
@@ -233,6 +247,18 @@ plt.title('ExpSourceTst (' + today + \
           fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_theta.pdf')
+plt.close()
+
+plt.plot(Ee, sigT, color='r', label='Required dependence', linewidth=1)
+
+plt.xlabel('Kinetic energy (MeV)', loc='right')
+plt.ylabel('$\\sigma_{\\theta_S}$ ($^\\circ$)', loc='top')
+plt.title('ExpSourceTst (' + today + \
+          '): $\\sigma_{\\theta_S}$ versus kinetic energy',\
+          fontname="Times New Roman",  size=12)
+plt.legend(loc="best")
+
+plt.savefig('99-Scratch/SourceTst_sigTK.pdf')
 plt.close()
 
 plt.hist2d(PrtclKE, PrtclT, \
@@ -285,6 +311,9 @@ plt.savefig('99-Scratch/SourceTst_xy.pdf')
 plt.close()
 
 print("         <---- Done.")
+
+
+
 
 ##! Complete:
 print()
