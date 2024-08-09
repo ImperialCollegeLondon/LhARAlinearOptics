@@ -77,18 +77,6 @@ print("    <---- __str__ done.")
 print(" <---- Creation and built in method tests done!  --------  --------")
 
 
-##! Next: Make plots:
-SourceTest += 1
-print()
-print("SourceTest:", SourceTest, \
-      " test tabulation of parameters.")
-
-print("     ----> Tabulate paramters:")
-Src.tabulateParameters('99-Scratch/SourceTst_ParameterTable.tex')
-
-exit()
-
-
 ##! Next: check paramterised laser-driven source distribution:
 SourceTest += 1
 print()
@@ -121,7 +109,7 @@ E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
 print("     ----> Generate many particles:")
-for i in range(1000):
+for i in range(100000):
     X, Y, KE, cTheta, Phi = Src1.getParticle()
     
     TrcSpcFrmSrc = Src1.getParticleFromSource()
@@ -158,6 +146,11 @@ for i in range(1000):
 print("     <---- Done.")
     
 ##! Next: Make plots:
+SourceTest += 1
+print()
+print("SourceTest:", SourceTest, \
+      " plot distributions and compare with expectation.")
+
 print("     ----> Make plots:")
 today = date.today().strftime("%d/%m/%Y")
 
@@ -312,7 +305,14 @@ plt.close()
 
 print("         <---- Done.")
 
+##! Next: Tabulate parameters:
+SourceTest += 1
+print()
+print("SourceTest:", SourceTest, \
+      " test tabulation of parameters.")
 
+print("     ----> Tabulate paramters:")
+Src.tabulateParameters('99-Scratch/SourceTst_ParameterTable.tex')
 
 
 ##! Complete:
