@@ -93,7 +93,10 @@ class PhysicalConstants(object):
     
 #--------  "Set method" only Debug
 #.. Method believed to be self documenting(!)
-
+    @classmethod
+    def setAll2None(cls): 
+        pass
+       
     @classmethod
     def setDebug(cls, Debug=False):
         if cls.__Debug:
@@ -103,6 +106,10 @@ class PhysicalConstants(object):
 
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
+
+    @classmethod
+    def getinstances(cls):
+        return cls.__instance
 
     @classmethod
     def getDebug(cls):

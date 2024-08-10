@@ -373,8 +373,8 @@ class BeamLineElement:
 #.. Methods believed to be self documenting(!)
 
     @classmethod
-    def getDebug(self):
-        return self.__Debug
+    def getDebug(cls):
+        return cls.__Debug
 
     @classmethod
     def getinstances(self):
@@ -462,7 +462,7 @@ class BeamLineElement:
     def OutsideBeamPipe(self, _R):
         Outside = False
         Rad = np.sqrt(_R[0]**2 + _R[2]**2)
-        if Rad >= Facility.getInstance().getVCMVr():
+        if Rad >= Facility.getinstances().getVCMVr():
             Outside = True
         return Outside
 
@@ -479,7 +479,7 @@ class BeamLineElement:
                 
         Fail = False
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
         p0    = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[iAddr][:3], \
                                 iRefPrtcl.getPrIn()[iAddr][:3]))
@@ -508,8 +508,8 @@ class BeamLineElement:
 
         if self.getDebug():
             print(" BeamLineElement.Transport:", \
-                  Facility.getInstance().getName(), \
-                  Facility.getInstance().getVCMVr())
+                  Facility.getinstances().getName(), \
+                  Facility.getinstances().getVCMVr())
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> _R:", _R)
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
@@ -693,7 +693,7 @@ class BeamLineElement:
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -895,7 +895,7 @@ class Facility(BeamLineElement):
 #--------  "get methods"
 #.. Methods believed to be self documenting(!)
     @classmethod
-    def getInstance(cls):
+    def getinstances(cls):
         return cls.instance
     
     def getp0(self):
@@ -1099,7 +1099,7 @@ class Drift(BeamLineElement):
         self._Length = _Length
 
     def setTransferMatrix(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -1351,7 +1351,7 @@ class Aperture(BeamLineElement):
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
         
     def setApertureParameters(self, _Param):
@@ -1497,7 +1497,7 @@ class Aperture(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -1778,7 +1778,7 @@ class FocusQuadrupole(BeamLineElement):
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
         
     def setAll2None(self):
@@ -1817,7 +1817,7 @@ class FocusQuadrupole(BeamLineElement):
         self._kFQ = _kFQ
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -1905,7 +1905,7 @@ class FocusQuadrupole(BeamLineElement):
     
 # -------- Utilities:
     def calckFQ(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -1931,7 +1931,7 @@ class FocusQuadrupole(BeamLineElement):
         return kFQ
 
     def calcStrength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -1976,7 +1976,7 @@ class FocusQuadrupole(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -2345,7 +2345,7 @@ class DefocusQuadrupole(BeamLineElement):
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
         
     def setAll2None(self):
@@ -2384,7 +2384,7 @@ class DefocusQuadrupole(BeamLineElement):
         self._kDQ = _kDQ
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2472,7 +2472,7 @@ class DefocusQuadrupole(BeamLineElement):
     
 # -------- Utilities:
     def calckDQ(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2498,7 +2498,7 @@ class DefocusQuadrupole(BeamLineElement):
         return kDQ
 
     def calcStrength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2543,7 +2543,7 @@ class DefocusQuadrupole(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -2913,7 +2913,7 @@ class SectorDipole(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -3020,7 +3020,7 @@ class SectorDipole(BeamLineElement):
         self._B = _B
 
     def setLength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3045,7 +3045,7 @@ class SectorDipole(BeamLineElement):
         self._Length = l
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3096,7 +3096,7 @@ class SectorDipole(BeamLineElement):
         self._TrnsMtrx = TrnsMtrx
 
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
 
 # -------- "Get methods"
@@ -3380,7 +3380,7 @@ class Solenoid(BeamLineElement):
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
         
     def setAll2None(self):
@@ -3411,7 +3411,7 @@ class Solenoid(BeamLineElement):
         self._ksol = _ksol
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3488,7 +3488,7 @@ class Solenoid(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -3548,7 +3548,7 @@ class Solenoid(BeamLineElement):
 
 # -------- Utilities:
     def calcksol(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3574,7 +3574,7 @@ class Solenoid(BeamLineElement):
         return ksol
 
     def calcStrength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3870,7 +3870,7 @@ class GaborLens(BeamLineElement):
 
     def setElectronDensity(self):
         if isinstance(self.getStrength(), float):
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
                 raise ReferenceParticleNotSpecified()
 
@@ -3914,7 +3914,7 @@ class GaborLens(BeamLineElement):
             print(" <---- Electron density:", self.getElectronDensity())
             
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3998,7 +3998,7 @@ class GaborLens(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -4257,7 +4257,7 @@ class CylindricalRFCavity(BeamLineElement):
         _WaveNumber        = self.getAngularFrequency() / speed_of_light
         self.setWaveNumber(_WaveNumber)
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev = len(iRefPrtcl.getPrOut()) - 1
@@ -4368,7 +4368,7 @@ class CylindricalRFCavity(BeamLineElement):
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
-    def setDebug(cls, _Debug):
+    def setDebug(cls, _Debug=False):
         if not isinstance(_Debug, bool):
             raise badParameter( \
                     "BeamLineElement.CylindricalRFCavity.setDebug:" + \
@@ -4505,7 +4505,7 @@ class CylindricalRFCavity(BeamLineElement):
         
         
     def setmrf(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev  = len(iRefPrtcl.getPrOut()) - 1
@@ -4527,7 +4527,7 @@ class CylindricalRFCavity(BeamLineElement):
         self._mrf = _mrf
 
     def setTransferMatrix(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev  = len(iRefPrtcl.getPrOut()) - 1
@@ -4579,7 +4579,7 @@ class CylindricalRFCavity(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -4681,7 +4681,7 @@ class CylindricalRFCavity(BeamLineElement):
     
 #--------  Utilities:
     def Transport(self, _R=None):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev  = len(iRefPrtcl.getPrOut()) - 1
@@ -5534,7 +5534,7 @@ class Source(BeamLineElement):
             print("     ----> x, y, K, cTheta, Phi:", \
                   x, y, K, cTheta, Phi)
             
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
         p0        = iRefPrtcl.getMomentumIn(0)
         E0        = mth.sqrt( protonMASS**2 + p0**2)
         b0        = p0/E0
@@ -5915,7 +5915,7 @@ class QuadDoublet(BeamLineElement):
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
         
     def setAll2None(self):
@@ -6266,7 +6266,7 @@ class QuadTriplet(BeamLineElement):
 # -------- "Set methods"
 # Methods believed to be self-documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
         
     def setAll2None(self):
@@ -6576,7 +6576,7 @@ class RPLCswitch(BeamLineElement):
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)
     @classmethod
-    def setDebug(cls, Debug):
+    def setDebug(cls, Debug=False):
         cls.__Debug = Debug
 
     def set3Drotation(self, _3Drotation):

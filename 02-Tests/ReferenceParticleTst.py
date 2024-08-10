@@ -59,7 +59,7 @@ ReferenceParticleTest += 1
 print()
 print("ReferenceParticleTest:", ReferenceParticleTest, \
       " check get instane method.")
-print(Prtcl.ReferenceParticle.getinstance())
+print(Prtcl.ReferenceParticle.getinstances())
 
 
 ##! Load some geometry and then test reference particle load:
@@ -73,7 +73,7 @@ filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 BLI  = BL.BeamLine(filename)
 print(BLI)
-print(Prtcl.ReferenceParticle.getinstance())
+print(Prtcl.ReferenceParticle.getinstances())
 
 
 ##! Complete:

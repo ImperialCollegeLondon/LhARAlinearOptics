@@ -39,7 +39,7 @@ while not EndOfFile:
     #EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     EndOfFile = ibmIOr.readBeamDataRecord()
 
-    if BL.BeamLine.getinstance() == None:
+    if BL.BeamLine.getinstances() == None:
         ##! Create DRACO instance:
         print("     ----> Create DRACO instance:")
         filename     = os.path.join(HOMEPATH, \

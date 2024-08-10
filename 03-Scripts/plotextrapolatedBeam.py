@@ -78,7 +78,7 @@ def main(argv):
 
     print("     <---- Beam instance initialised.")
 
-    print(BL.BeamLine.getinstance())
+    print(BL.BeamLine.getinstances())
 
     print("     ----> Create report:")
 

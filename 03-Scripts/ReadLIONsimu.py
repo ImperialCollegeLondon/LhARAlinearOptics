@@ -28,7 +28,7 @@ while not EndOfFile:
     #EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     EndOfFile = ibmIOr.readBeamDataRecord()
 
-    if BL.BeamLine.getinstance() == None:
+    if BL.BeamLine.getinstances() == None:
         ##! Create LION instance:
         print("     ----> Create LION instance:")
         filename     = os.path.join(HOMEPATH, \

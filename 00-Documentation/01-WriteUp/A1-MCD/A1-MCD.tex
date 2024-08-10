@@ -5,9 +5,9 @@
 The linear optics package has been written in object-oriented Python
 and is broken down in four principal modules:
 \begin{itemize}
-  \item \underline{\texttt{BeamLineElement}:} provides descriptions
-    of the various beam-line elements required to build a description
-    of the beam line.
+  \item \underline{\texttt{BeamLineElement}:} provides the various
+    beam-line elements required to build a description of the beam
+    line.
     Each individual element, such as a drift, quadrupole, etc., is
     described in a class derived from the \texttt{BeamLineElement}
     parent class.
@@ -15,8 +15,11 @@ and is broken down in four principal modules:
     elements into a coherent beam line.
     \texttt{BeamLine} is a singleton class to ensure that two beam
     lines can not be simulated in a single run of the package.
+    The \texttt{extrapolateBeam} class is derived from
+    the \texttt{Beam} class to handle the propagation of beam
+    envelopes without the need to track individual particles.
   \item \underline{\texttt{Beam}:} provides code to calculate
-    ensemble properties of the beam such as emittance, etc.
+    ensemble properties of the beam such as emittance.
     The ensemble properties are stored as instance attributes of
     the \texttt{Beam} class.
   \item \underline{\texttt{Particle}:} provides code to record beam
@@ -25,9 +28,9 @@ and is broken down in four principal modules:
     class derived from the \texttt{Particle} class.
 \end{itemize}
 Other modules: \texttt{BeamIO}, \texttt{LaTeX},
-\texttt{PhysicalConstants}, \texttt{Report}, \texttt{Simulation}
-and \texttt{Utilities} support the principal modules or provide
-services.
+\texttt{PhysicalConstants}, \texttt{Report}, \texttt{Simulation},
+\texttt{UserFramework}, \texttt{Utilities}, and \texttt{Visualise}
+support the principal modules or provide services.
 The data structure is implemented as attributes of the instances of the 
 various classes.
 This section describes the implementation of the various modules, the
@@ -47,7 +50,7 @@ table~\ref{Tab:ClassAttributeAccess}).
       \hline
       \texttt{getinstances()}  &                   & List of instances of class &                                       \\
       \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
-      \texttt{getDebug()}      &                   & Boolean debug flag         & If true, generate debug print-out     \\
+      \texttt{getDebug()}      &                   & Boolean debug flag         & If True, generate debug print-out     \\
       \texttt{setAll2None()}   &                   &                            & Set all instance attributes to \texttt{None} at start of instantiation. \\
       \hline
     \end{tabular}

@@ -214,11 +214,11 @@ class Beam:
         self.setInputDataFile(ParticleFILE)
 
         EndOfFile = False
-        if BL.BeamLine.getinstance() == None:
+        if BL.BeamLine.getinstances() == None:
             EndOfFile = self.getBeamIOread().readBeamDataRecord()
 
 
-        if BL.BeamLine.getinstance() == None:
+        if BL.BeamLine.getinstances() == None:
             self.setbeamlineSpecificationCSVfile( \
                                         _beamlineSpecificationCSVfile)
             iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
@@ -229,7 +229,7 @@ class Beam:
         self.initialiseSums()
         
         #.. Must have reference particle:
-        if not isinstance(Prtcl.ReferenceParticle.getinstance(), \
+        if not isinstance(Prtcl.ReferenceParticle.getinstances(), \
                           Prtcl.ReferenceParticle):
             raise noReferenceBeam(" Reference particle, ", \
                                       "not first in particle list.")
@@ -544,7 +544,7 @@ class Beam:
         return self._outputCSVfile
         
     @classmethod
-    def getBeamInstances(cls):
+    def getinstances(cls):
         return cls.instances
 
     def getLocation(self):
@@ -726,9 +726,9 @@ class Beam:
                         iCnt = 1
                         Scl  = Scl * 10
 
-                iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
+                iPrtcl = Prtcl.Particle.getinstances()[-1]
                 if TrackBeam:
-                    nEvtGen = BL.BeamLine.getinstance().trackBeam( \
+                    nEvtGen = BL.BeamLine.getinstances().trackBeam( \
                             1, None, iPrtcl, self.getstartlocation(), False)
                     
                 self.incrementSums(iPrtcl)
@@ -770,7 +770,7 @@ class Beam:
     def cleanBeams(cls):
         DoneOK = False
         
-        for iBm in cls.getBeamInstances():
+        for iBm in cls.getinstances():
             del iBm
             
         cls.resetBeamInstances()
@@ -891,10 +891,10 @@ class Beam:
         gx    = []
         gy    = []
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
         if self.getDebug():
-            print(BL.BeamLine.getinstance())
+            print(BL.BeamLine.getinstances())
             print(self)
         
         iLocMin = self.getstartlocation()
@@ -944,7 +944,7 @@ class Beam:
 
             ivisRPLCy = vis.visualise("RPLC", "ys")
             axs[0].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[0].set_ylim(-0.05, 0.05)
             ivisRPLCy.Particles(axs[0], 1000)
             ivisRPLCy.BeamLine(axs[0])
@@ -963,7 +963,7 @@ class Beam:
             axs[2] = fig.add_subplot(gs[3:])
 
             axs[1].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[1].plot(s[0:len(sx)], sx, \
                 color='b', marker='o', markersize=4, label='s_x')
             axs[1].plot(s[0:len(sy)], sy, color='r', marker='s', markersize=4, \
@@ -973,7 +973,7 @@ class Beam:
             axs[1].set_ylabel('s_{xy} (m)')
 
             axs[2].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[2].plot(s[0:len(ex)], ex, \
                           color='b', marker='o', markersize=4, label='e_x')
             axs[2].plot(s[0:len(ey)], ey, \
@@ -1003,7 +1003,7 @@ class Beam:
 
             ivisRPLCy = vis.visualise("RPLC", "ys")
             axs[0].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[0].set_ylim(-0.05, 0.05)
             ivisRPLCy.Particles(axs[0], 1000)
             ivisRPLCy.BeamLine(axs[0])
@@ -1030,7 +1030,7 @@ class Beam:
             axs[3] = fig.add_subplot(gs[5:])
     
             axs[1].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[1].plot(s[0:len(bx)], bx, \
                           color='b', marker='o', markersize=4, \
                           label='b_x')
@@ -1049,7 +1049,7 @@ class Beam:
             ax1.set_ylabel('e_(xy) (m)')
 
             axs[2].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[2].plot(s[0:len(ax)], ax, \
                           color='b', marker='o', markersize=4, \
                           label='a_x')
@@ -1061,7 +1061,7 @@ class Beam:
             axs[2].set_ylabel('a_{xy}')
 
             axs[3].set_xlim(-0.5, \
-                Prtcl.ReferenceParticle.getinstance().gets()[-1]+0.5)
+                Prtcl.ReferenceParticle.getinstances().gets()[-1]+0.5)
             axs[3].plot(s[0:len(gx)], gx, \
                           color='b', marker='o', markersize=4, \
                           label='g_x')
@@ -1305,7 +1305,7 @@ class extrapolateBeam(Beam):
         if self.getDebug():
             print(" extrapolateBeam.extrapolateCovarianceMatrix start:")
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
         iLocMin = self.getstartlocation()
         if self.getDebug():
@@ -1373,8 +1373,8 @@ class extrapolateBeam(Beam):
     def extrapolateBeam(self):
         if self.getDebug():
             print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
-            print(" BeamLine: nBLs:", id(BL.BeamLine.getinstance()))
-            print(BL.BeamLine.getinstance())
+            print(" BeamLine: nBLs:", id(BL.BeamLine.getinstances()))
+            print(BL.BeamLine.getinstances())
         
         EndOfFile = False
         iEvt = 0
@@ -1415,7 +1415,7 @@ class extrapolateBeam(Beam):
                             iCnt = 1
                             Scl  = Scl * 10
 
-                    iPrtcl = Prtcl.Particle.getParticleInstances()[-1]
+                    iPrtcl = Prtcl.Particle.getinstances()[-1]
                     self.incrementSums(iPrtcl)
 
                     #.. Keep a few particles for plotting:

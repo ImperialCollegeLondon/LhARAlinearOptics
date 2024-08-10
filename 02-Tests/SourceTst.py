@@ -22,7 +22,7 @@ filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 BLI  = BL.BeamLine(filename)
 
-iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
 
 ##! Start:

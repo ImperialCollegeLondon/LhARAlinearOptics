@@ -32,7 +32,7 @@ while not EndOfFile:
     #EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
     EndOfFile = ibmIOr.readBeamDataRecord()
 
-    if BL.BeamLine.getinstance() == None:
+    if BL.BeamLine.getinstances() == None:
         filename     = os.path.join(HOMEPATH, \
 #                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Gabor.csv')
 #                '11-Parameters/LhARABeamLine-Params-LsrDrvn-Solenoid.csv')

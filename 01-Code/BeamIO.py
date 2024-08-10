@@ -163,7 +163,7 @@ class BeamIO:
             record = record.lstrip()
             record = record.rstrip('\n')
             TrcSpc = np.asarray(record.split(' '), dtype=float)
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             E0        = iRefPrtcl.getPrOut()[0][3]
             p0        = mth.sqrt(E0**2 - protonMASS**2)
             TrcSpc[5] = (1000.*TrcSpc[5] - E0) / p0

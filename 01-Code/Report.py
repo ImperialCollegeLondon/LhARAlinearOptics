@@ -108,6 +108,8 @@ class Report:
                  _Header=[], _Lines=[]):
 
         Report.instances.append(self)
+
+        self.setAll2None()
         
         if _Name == None:
             raise NoReportNameProvided( \
@@ -153,6 +155,29 @@ class Report:
         for i in range(len(self._Lines)):
             print("     ", self._Lines[i])
         return "     <---- Report __str__ done."
+
+
+#--------  Get/set methods:
+    @classmethod
+    def getinstances(cls):
+        return cls.instances
+
+    @classmethod
+    def setDebug(cls, Debug=False):
+        if cls.__Debug:
+            print(" PhysicalConstants.setdebug: ", Debug)
+        cls.__Debug = Debug
+    
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
+    def setAll2None(self):
+        self._Name       = None
+        self._ReportPath = None
+        self._FileName   = None
+        self._Header     = []
+        self._Lines      = []
 
 
 #--------  Processing methods

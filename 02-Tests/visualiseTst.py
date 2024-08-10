@@ -40,7 +40,7 @@ ibmIOr = bmIO.BeamIO(None, inputdatafile)
 EndOfFile = False
 EndOfFile = ibmIOr.readBeamDataRecord()
 
-print(BL.BeamLine.getinstance())
+print(BL.BeamLine.getinstances())
 
 for i in range(1001):
     ibmIOr.readBeamDataRecord()

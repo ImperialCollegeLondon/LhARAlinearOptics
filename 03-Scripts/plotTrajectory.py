@@ -41,14 +41,14 @@ while not EndOfFile:
     EndOfFile = ibmIOr.readBeamDataRecord()
     #EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
 
-    if BL.BeamLine.getinstance() == None:
+    if BL.BeamLine.getinstances() == None:
         filename     = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
         BLI  = BL.BeamLine(filename)
 
     else:
         iEvt      += 1
-        iPrtcl    = Prtcl.Particle.getParticleInstances()[0]
+        iPrtcl    = Prtcl.Particle.getinstances()[0]
         if iPrtcl.gets()[len(iPrtcl.gets())-1] > 1.88:
             print("     ----> iEvt:", iEvt, " made it all the way.")
             break
@@ -60,7 +60,7 @@ while not EndOfFile:
     BLI.setSrcTrcSpc(iPrtcl.getTraceSpace()[0])
     OK = BLI.trackBeam(1)
     BLI.setDebug(False)
-    iPrtcl1 = Prtcl.Particle.getParticleInstances()[1]
+    iPrtcl1 = Prtcl.Particle.getinstances()[1]
     """
   Loop over elements on the LION beam line.
   - Documentation in header of BeamLine.py and BeamLineElement.py.

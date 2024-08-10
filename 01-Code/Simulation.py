@@ -116,6 +116,8 @@ class Simulation(object):
                 print('-------------------')
             cls.__instance = super(Simulation, cls).__new__(cls)
             
+            cls.setAll2None()
+            
             cls.__Rnd.seed(int(cls.__RandomSeed))
 
             cls._NEvt          = NEvt
@@ -148,6 +150,12 @@ class Simulation(object):
             
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
+    @classmethod
+    def setAll2None(cls):
+            cls._NEvt          = None
+            cls._ParamFileName = None
+            cls._dataFileDir   = None
+            cls._dataFileName  = None
 
     def CdVrsn(self):
         return 1.0
@@ -193,7 +201,7 @@ class Simulation(object):
         self._iBmIOw = _iBmIOw
 
     @classmethod
-    def getInstance(cls):
+    def getinstances(cls):
         return cls.__instance
 
 #--------  Utilities:
@@ -227,7 +235,7 @@ class Simulation(object):
 
         #.. Write facility:
         if self.getiBmIOw() != None:
-            BL.BeamLine.getinstance().writeBeamLine( \
+            BL.BeamLine.getinstances().writeBeamLine( \
                                         self.getiBmIOw().getdataFILE())
 
         #.. Transport particles through facility:

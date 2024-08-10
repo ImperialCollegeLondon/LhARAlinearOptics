@@ -36,7 +36,7 @@ print("QuadTripletPlot:", QuadTripletPlot, \
 
 print(filename)
 BLI  = BL.BeamLine(filename)
-iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
 ##! Reference particle
 QuadTripletPlot += 1

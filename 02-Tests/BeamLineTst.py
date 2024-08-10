@@ -55,7 +55,7 @@ BL.BeamLine.setDebug(True)
 print(BmLn)
 BL.BeamLine.setDebug(False)
 
-iRefPrtcl = Prtcl.ReferenceParticle.getinstance()
+iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 print(iRefPrtcl)
 
 ##! Complete:

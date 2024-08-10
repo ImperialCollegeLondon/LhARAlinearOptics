@@ -162,12 +162,12 @@ class visualise(object):
             print("     ----> Projection:", \
                   self.getProjection())
 
-        Prtcl.ReferenceParticle.getinstance().visualise( \
+        Prtcl.ReferenceParticle.getinstances().visualise( \
                             self.getCoordSys(), self.getProjection(), axs)
 
-        n2plt = min(nPrtcl, len(Prtcl.Particle.getParticleInstances()))
+        n2plt = min(nPrtcl, len(Prtcl.Particle.getinstances()))
         for iPrtcl in range(1,n2plt):
-            Prtcl.Particle.getParticleInstances()[iPrtcl].visualise( \
+            Prtcl.Particle.getinstances()[iPrtcl].visualise( \
                             self.getCoordSys(), self.getProjection(), axs)
 
     def BeamLine(self, axs):

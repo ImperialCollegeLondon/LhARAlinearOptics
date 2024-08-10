@@ -75,7 +75,7 @@ recordParticle: i/p: Location, s, z, TraceSpace:
 
 
   Get methods:
-      getDebug, getParticleInstances, getLocation, getz, gets, 
+      getDebug, getinstances, getLocation, getz, gets, 
       getTraceSpace, getRPLCPhaseSpace, getPhaseSpace
           -- thought to be self documenting!
 
@@ -173,7 +173,7 @@ class Particle:
     def __init__(self, _species="proton"):
         #.. Must have reference particle as first in the instance list,
         #   ... so ...
-        if not isinstance(ReferenceParticle.getinstance(),ReferenceParticle):
+        if not isinstance(ReferenceParticle.getinstances(),ReferenceParticle):
             raise noReferenceParticle(" Reference particle, ", \
                                       "not first in particle list.")
 
@@ -347,7 +347,7 @@ class Particle:
         return cls.__Debug
 
     @classmethod
-    def getParticleInstances(cls):
+    def getinstances(cls):
         return cls.instances
 
     def getSpecies(self):
@@ -379,11 +379,11 @@ class Particle:
         if cls.getDebug():
             print(" Particle.fillPhaseSpaceAll, start:")
             print("     ----> fill phase space for", \
-                  len(cls.getParticleInstances()), \
+                  len(cls.getinstances()), \
                   "particle instances.")
 
         nPrtcl = 0
-        for iPrtcl in cls.getParticleInstances():
+        for iPrtcl in cls.getinstances():
             nPrtcl += 1
             if cls.getDebug():
                 print("     ----> Particle:", nPrtcl)
@@ -408,7 +408,7 @@ class Particle:
             print("     ----> fill phase space for particle with", \
                   len(self.getLocation()), "records.")
 
-        iRefPrtcl = ReferenceParticle.getinstance()
+        iRefPrtcl = ReferenceParticle.getinstances()
 
         nLoc = 0
         for iLoc in self.getLocation():
@@ -473,7 +473,7 @@ class Particle:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> trace space:", TrcSpc)
 
-        species      = Prtcl.ReferenceParticle.getinstance().getSpecies()
+        species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
         p0 = BL.BeamLine.getElement()[0].getp0()
@@ -550,7 +550,7 @@ class Particle:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> PhsSpx:", PhsSpc)
             
-        species      = Prtcl.ReferenceParticle.getinstance().getSpecies()
+        species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
         p0        = BL.BeamLine.getElement()[0].getp0()
@@ -603,7 +603,7 @@ class Particle:
             if Projection == "ys":
                 iCrd = 2
                 axl  = "y"
-            sorz = ReferenceParticle.getinstance().getsOut()
+            sorz = ReferenceParticle.getinstances().getsOut()
             for TrcSpc in self.getTraceSpace():
                 xory.append(TrcSpc[iCrd])
 
@@ -636,9 +636,9 @@ class Particle:
             print("     ----> len, sorz:", len(sorz), sorz)
             print("     ----> len, xory:", len(xory), xory)
             print("     ----> len ref. prtcl.:", \
-                  len(ReferenceParticle.getinstance().getsOut()))
+                  len(ReferenceParticle.getinstances().getsOut()))
 
-        if len(ReferenceParticle.getinstance().getsOut()) > len(xory):
+        if len(ReferenceParticle.getinstances().getsOut()) > len(xory):
             axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
         else:
             axs.plot(sorz, xory, color='darkgray', linewidth='0.5', zorder=2)
@@ -655,7 +655,7 @@ class Particle:
     def cleanAllParticles(cls):
         DoneOK = False
         
-        for iPrtcl in cls.getParticleInstances():
+        for iPrtcl in cls.getinstances():
             del iPrtcl
             
         cls.instances = []
@@ -670,7 +670,7 @@ class Particle:
     def cleanParticles(cls):
         DoneOK = False
         
-        for iPrtcl in cls.getParticleInstances():
+        for iPrtcl in cls.getinstances():
             if not isinstance(iPrtcl, ReferenceParticle):
                 del iPrtcl
             
@@ -706,7 +706,7 @@ class Particle:
             logE = True
                 
         nPrtcl = 0
-        for iPrtcl in cls.getParticleInstances():
+        for iPrtcl in cls.getinstances():
             particleMASS = \
                 iPhysclCnstnts.getparticleMASS(iPrtcl.getSpecies())
             nPrtcl += 1
@@ -833,7 +833,7 @@ class Particle:
             iPhysclCnstnts.SoL()
         
         nPrtcl = 0
-        for iPrtcl in cls.getParticleInstances():
+        for iPrtcl in cls.getinstances():
             particleMASS = \
                 iPhysclCnstnts.getparticleMASS(iPrtcl.getSpecies())
                 
@@ -1204,7 +1204,7 @@ class ReferenceParticle(Particle):
 
 #--------  "Built-in methods":
     def __init__(self, _species="proton"):
-        if ReferenceParticle.getinstance() is None:
+        if ReferenceParticle.getinstances() is None:
             if self.__RPDebug:
                 print(' ReferenceParticle(Particle).__init__: ', \
                       'creating the ReferenceParticle object')
@@ -1255,7 +1255,7 @@ class ReferenceParticle(Particle):
 #.. Methods believed to be self documenting(!)
 
     @classmethod
-    def getinstance(cls):
+    def getinstances(cls):
         return cls.__instance
         
     def getRPDebug(self):
