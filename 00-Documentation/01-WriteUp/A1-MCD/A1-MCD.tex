@@ -62,15 +62,27 @@ table~\ref{Tab:ClassAttributeAccess}).
 
 \subsubsection{Parent class}
 
-\paragraph{Instantiation} ~\newline
+\paragraph{Instantiation}   ~\newline
 \noindent
 The call to instantiate the \texttt{BeamLineElenent} class is:
 \begin{center}
-  \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt)}
+  \texttt{BeamLineElement(Name, rStrt, vStrt, drStrt, dvStrt)}
 \end{center}
-The arguments are translated into instance attributes as described in
-section~\ref{SubSubSect:BLE:InstAttr} and defined in
-table~\ref{Tab:BLE:Attributes}.
+where:
+\begin{description}
+  \item\texttt{Name}: (string) is the unique name of the element;
+  \item\texttt{rStrt}: (numpy.ndarray(3)) is the three-vector
+    position in laboratory coordinates of the start of the element;
+  \item\texttt{vStrt}: (numpy.ndarray(1,2)) is the polar, $\theta$,
+    and azimuthal, $\phi$, angles that define the $y$ ($i=0$) and $z$
+    ($i=1$)  axes of the RPLC coordinate system at the start of the
+    element ($\texttt{vStrt}=[[i],[\theta, \phi]]$);  
+  \item\texttt{drStrt}: (numpy.ndarray(3)) error in the three-vector
+    position with respect to the nominal position; and
+  \item\texttt{dvStrt}: (numpy.ndarray(1,2)) error in the polar and
+    azimuthal angles defining RLPC the $y$ and $z$ axes.
+\end{description}
+All arguments are required.
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:BLE:InstAttr}
@@ -109,22 +121,24 @@ table~\ref{Tab:BLE:Methods}.
     \end{tabular}
   \end{center}
 \end{table}
-\begin{table}[h]
+\begin{sidewaystable}[h]
   \caption{
     Definition of access methods for the \texttt{BeamLineElement}
     class. 
   }
   \label{Tab:BLE:Methods}
   \begin{center}
-    \begin{tabular}{|c|c|p{7cm}|}
+    \begin{tabular}{|c|c|p{12cm}|}
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                         \\
       \hline
       \texttt{setName(Name)}     & \texttt{getName()}        & Set/get name of beam-line element.                                \\
       \texttt{setrStrt(rStrt)}   & \texttt{getrStrt()}       & Set/get laboratory $[x, y, z]$ position of entrance.              \\
-                                         \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}      & Set/get RPLC $[\theta, \phi]$ of principal axis.                  \\
+      \texttt{setvStrt(vStrt)}   & \texttt{getvStrt()}       & Set/get RPLC $[\theta, \phi]$ of principal axis at start of element. \\
+                                 & \texttt{getvEnd()}        & Set/get RPLC $[\theta, \phi]$ of principal axis at end of element.   \\
       \texttt{setdrStrt(drStrt)} & \texttt{getdrStrt()}      & Set/get ``error'' displacement.                                   \\
       \texttt{setdvStrt(dvStrt)} & \texttt{getdvStrt()}      & Set/get ``error'' deviation in $[\theta, \phi]$.                  \\
+      \texttt{setLength(length)} & \texttt{getLength}        & Set/get increment in $s$ across element, (length for elements that do not bend beam). \\
       \texttt{setRot2LbStrt()}   & \texttt{getRot2LbStrt()}  & Set/get rotation matrix from RPLC axes to laboratory.             \\
       \texttt{setRot2LabStrt()}  & \texttt{getRot2LbStrt()}  & Setget rotation matrix from RPLC to laboratory at start.             \\
       \texttt{setStrt2End(t)}    & \texttt{getStrt2End()}    & Set/get displacement vector start to end in laboratory coordinates.
@@ -134,29 +148,33 @@ table~\ref{Tab:BLE:Methods}.
                                                                setRot2LbEnd takes 1 argument, \texttt{R}, a 2D np.array containing
                                                                the rotation matrix to be set.                                    \\
                                 & \texttt{getTransferMatrix()}  & Get transfer matrix set in derived class.                         \\
+                                & \texttt{getLines()}        & Get lines to write LaTeX specification of element.                   \\
       \hline
     \end{tabular}
   \end{center}
-\end{table}
+\end{sidewaystable}
 
 \paragraph{Processing methods} ~\newline
 \noindent
 Table~\ref{Tab:BLE:ProcMethods} presents the processing methods provided
 in the \texttt{BeamLineElement} class.
-\begin{table}[h]
+\begin{sidewaystable}[h]
   \caption{
     Processing methods provided by the \texttt{BeamLineElement}
     class. 
   }
   \label{Tab:BLE:ProcMethods}
   \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
+    \begin{tabular}{|l|c|c|p{12cm}|}
       \hline
       \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
       \hline
       \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
                                                                                     If \texttt{R}, radial distance from $z$ axis in RPLC,
                                                                                     falls outside beam pipe, returns True. \\
+      \texttt{ExpansionParamterFail(R)} & Float           & Boolean               & Calculates an approximate expansion parameter and
+                                                                                    returns False if the parameter is large ($>1$).
+                                                                                    Not yet used in \texttt{Transport}.      \\
       \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, across
                                                                                     element.
                                                                                     Final trace-space vector returned.       \\
@@ -170,7 +188,7 @@ in the \texttt{BeamLineElement} class.
       \hline
     \end{tabular}
   \end{center}
-\end{table}
+\end{sidewaystable}
 
 \paragraph{I/o methods} ~\newline
 \noindent
@@ -182,20 +200,20 @@ The calls are:
   \texttt{readElement(dataFILE)} \quad \quad {\rm and }
       \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
 \end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+where \texttt{dataFILE} is \texttt{BeamIO} instance. 
 
 \paragraph{Utilities} ~\newline
 \noindent
 Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
 \texttt{BeamLineElement} class.
-\begin{table}[h]
+\begin{sidewaystable}[h]
   \caption{
     Utilities provided by the \texttt{BeamLineElement}
     class. 
   }
   \label{Tab:BLE:Utilities}
   \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
+    \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
       \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
       \hline
@@ -203,10 +221,13 @@ Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
                                                            Reset \texttt{instances} list. \\
       \texttt{removeInstance(inst)} & Instance of BLE &  & Remove instance \texttt{inst} and remove from list of instances of
                                                            \texttt{BeamLineElement}. \\
+      \texttt{visualise(axs, CoordSys,Proj)} & \texttt{axs} -- MatPlotLib ``axes'' instance &  & Manages plotting (visualisation) of element.  \\
+                                             & \texttt{CoordSys} -- string                  &  & ``Lab'' or ``RPLC'', coordinate system in which to visualise element. \\
+                                             & \texttt{Proj} -- string                      &  & ``$xz$'' or ``$yz$'' projection to visualise. \\
       \hline
     \end{tabular}
   \end{center}
-\end{table}
+\end{sidewaystable}
 
 \FloatBarrier
 
