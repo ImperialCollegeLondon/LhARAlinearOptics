@@ -51,7 +51,10 @@ table~\ref{Tab:ClassAttributeAccess}).
       \texttt{getinstances()}  &                   & List of instances of class &                                       \\
       \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
       \texttt{getDebug()}      &                   & Boolean debug flag         & If True, generate debug print-out     \\
-      \texttt{setAll2None()}   &                   &                            & Set all instance attributes to \texttt{None} at start of instantiation. \\
+      \texttt{setAll2None()}   &                   &                            & Set all instance attributes to
+                                                                                  \texttt{None} at start of instantiation. \\
+      \texttt{SummaryStr()}    &                   & String                     & Text sring to record paramters in debug
+                                                                                  print out. \\
       \hline
     \end{tabular}
   \end{center}
@@ -103,7 +106,7 @@ table~\ref{Tab:BLE:Methods}.
   }
   \label{Tab:BLE:Attributes}
   \begin{center}
-    \begin{tabular}{|l|c|c|p{10cm}|}
+    \begin{tabular}{|l|c|c|p{9.7cm}|}
       \hline
       \textbf{Attribute} & \textbf{Type} & \textbf{Unit} & \textbf{Comment}                                                                   \\
       \hline
@@ -128,7 +131,7 @@ table~\ref{Tab:BLE:Methods}.
   }
   \label{Tab:BLE:Methods}
   \begin{center}
-    \begin{tabular}{|c|c|p{12cm}|}
+    \begin{tabular}{|c|c|p{10cm}|}
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                         \\
       \hline
@@ -243,9 +246,6 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
-The \texttt{Facility} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:Fclty:InstAttr} and
-defined in table~\ref{Tab:Fclty:Attributes}.
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:Fclty:InstAttr}
