@@ -568,7 +568,7 @@ table~\ref{Tab:FQuad:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{FocusQuadrupole} processing method is defined in
+The \texttt{FocusQuadrupole} processing methods are defined in
 table~\ref{Tab:FQuad:Methods}.
 \begin{table}[h]
   \caption{
@@ -613,9 +613,6 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
-The \texttt{DefocusQuadrupole} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:DQuad:InstAttr} and
-defined in table~\ref{Tab:DQuad:Attributes}.
 The quadrupole \texttt{Length} is required together with
 either the field gradient, \texttt{Strength}
 (equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
@@ -672,7 +669,7 @@ table~\ref{Tab:DQuad:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{DefocusQuadrupole} processing method is defined in
+The \texttt{DefocusQuadrupole} processing methods are defined in
 table~\ref{Tab:DQuad:Methods}.
 \begin{table}[h]
   \caption{
@@ -694,19 +691,13 @@ table~\ref{Tab:DQuad:Methods}.
 
 \paragraph{I/o methods} ~\newline
 \noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+The \texttt{Defocusquadrupole} derived class has no i/o methods other
+than those inheritted from the parent class.
 
 \paragraph{Utilities} ~\newline
 \noindent
-The \texttt{DefocusQuadrupole} derived class has no utilities.
+The \texttt{Defocusquadrupole} derived class has no utilities other
+than those inheritted from the parent class. 
 
 \FloatBarrier
 
