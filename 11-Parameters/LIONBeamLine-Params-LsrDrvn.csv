@@ -16,6 +16,8 @@
 1,Source,Source,Parameterised TNSA,Thickness,0.0000004,m,Target thickness
 1,Source,Source,Parameterised TNSA,Intensity,4.00E+20,W/cm2,Laser intensity
 1,Source,Source,Parameterised TNSA,DivAngle,25,degrees,Electron divergence angle
+1,Source,Source,Parameterised TNSA,SigmaThetaS0,20.00,degrees,Intercept of dependence of RMS theta_S on KE
+1,Source,Source,Parameterised TNSA,SlopeThetaS,15.00,degrees,Scaled slope of dependence of RMS theta_S on KE
 1,Capture,Drift,,Length,0.04034,m,Length of first drift
 1,Capture,Aperture,Elliptical,RadiusX,0.003,m,Half aperture in x of elliptical colimator
 1,Capture,Aperture,Elliptical,RadiusY,0.0015,m,Half aperture in y of ellipseof elliptical colimator

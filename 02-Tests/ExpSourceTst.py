@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from datetime import date
+from scipy.optimize import curve_fit
 
 import BeamLineElement   as BLE
 import BeamLine          as BL
@@ -62,7 +63,8 @@ except:
 #.. Create valid instance:
 Mode  = 0
 Param = [0.000004, 0.000004, 0.998,    \
-          1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25.]
+          1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25., \
+         20., 15.]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
@@ -84,7 +86,7 @@ print("SourceTest:", SourceTest, \
       " test parameterised laser-driven source distribution", \
       "check.")
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
-                  0, [0.000004, 0.000004, 0.998, 1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25.])
+                  0, [0.000004, 0.000004, 0.998, 1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25., 20., 15.])
 print(Src1)
 print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \

@@ -147,7 +147,6 @@ import math   as mth
 import random as rnd
 import scipy
 from scipy.optimize import fsolve
-import random as random
 import struct as strct
 import math
 
@@ -4819,9 +4818,11 @@ Derived class Source:
              [6] - P_L: Laser power [W]             [7] - E_L: Laser energy [J]
              [8] - lamda: Laser wavelength [um]
              [9] - t_laser: Laser pulse duration [s]
-             [10] - d: Laser thickness [m]
-             [11] - I: Laser intensity [W/cm2]
-             [12] - theta_degrees: Electron divergence angle [degrees]
+            [10] - d: Laser thickness [m]
+            [11] - I: Laser intensity [W/cm2]
+            [12] - theta_degrees: Electron divergence angle [degrees]
+            [13] - Intercept of sigma_{theta_S} at K=0 [degrees]
+            [14] - Scaled slope of sigma_{theta_S}     [degrees]
            Gaussian (Mode=1):
              [0] - Sigma of x gaussian - m
              [1] - Sigma of y gaussian - m
@@ -4902,22 +4903,23 @@ class Source(BeamLineElement):
     ModeList   = [0, 1, 2, 3]
     ModeText   = ["Parameterised laser driven", "Gaussian", "Flat", \
                   "Read from file"]
-    #ParamList  = [ [float, float, float, float, float, int], \
-    #               [float, float, float, float, float],      \
-    #               [float, float, float, float, float] ]
+    
     ParamUnit  = [ ["$\\mu$m", "$\\mu$m", "", "MeV", "MeV", "", "W", \
                     "J", "$\\mu$m", "s", "$\\mu$m", "J$/m^2$",       \
-                    "degrees"], \
+                    "degrees", "degrees", "degrees"], \
                    ["m", "m", "MeV", "MeV", ""], \
                    [], [] ]
+    
     ParamText  = [ [], \
                    ["SigmaX", "SigmaY", "MinCTheta", \
                     "MeanEnergy", "SigmaEnergy"],    \
                    [], [] ]
-    ParamList  = [ [float, float, float, float, float, int, \
-                    float, float, float, float, float, float, float], \
-                   [float, float, float, float, float],      \
-                   [float, float, float, float, float], \
+    
+    ParamList  = [ [float, float, float, float, float, int,   \
+                    float, float, float, float, float, float, \
+                    float, float, float],                        \
+                   [float, float, float, float, float],          \
+                   [float, float, float, float, float],          \
                    [] ]
     ParamLaTeX  = [ ["$\\sigma_x$", "$\\sigma_y$",                       \
                      "$\\cos\\theta_S |_{\\rm min}$",                    \
@@ -4927,7 +4929,9 @@ class Source(BeamLineElement):
                      "Laser energy", "Laser wavelength",                 \
                      "Laser pulse duration", "Laser spot size",          \
                      "Laser intensity",                                  \
-                     "Electron divergence angle"],                       \
+                     "Electron divergence angle",                        \
+                     "Intercept of $\\sigma_{\\theta_S}$",               \
+                     "Scaled slope of $\\sigma_{\\theta_S}$"],           \
                     ["\\sigma_x", "\\sigma_y",                           \
                      "\\cos\\theta_S |_{\\rm min}",                      \
                      "Mean kinetic energy",                              \
@@ -5164,7 +5168,7 @@ class Source(BeamLineElement):
         else:
             raise badParameters( \
                                  " BeamLineElement(Source).CheckParam:", \
-                                 " bad source paramters. Exit")
+                                 " bad source parameters. Exit")
 
         if iMtch == len(_Param):
             ValidParam = True
@@ -5206,7 +5210,7 @@ class Source(BeamLineElement):
     def getParticle(self):
         if self.getDebug():
             print(" BeamLineElement(Source).getParticle: start")
-            print("     ----> Mode, paramters:", \
+            print("     ----> Mode, parameters:", \
                   self.getMode(), self.getParameters())
 
         if self._Mode == 0:
@@ -5250,60 +5254,37 @@ class Source(BeamLineElement):
         return cosTheta, Phi
     
 
-    #.. 2D Gaussian distribution
-    def g_xy(self, x, y, sigma_x, sigma_y):  
-        g = (1. / (2.*np.pi*sigma_x*sigma_y)) * \
-            np.exp(-0.5*((x/sigma_x)**2 + (y/sigma_y)**2))
-       
-        # normalize the probability distribution
-        g /= np.sum(g)
-
-        return g    
-
-    ### Gaussian Angular Distribution ### 
+    ### Gaussian Angular Distribution ###   KL working on this now
     # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
     def g_theta(self,energy):
-        theta = 20 - 0.565 * energy      
+        Emax  = self.getderivedParameters()[4] / (1.6e-19*1e6)
+
+        if self.getDebug():
+            print(" Source.g_theta: intercept, slope:", \
+                  self.getParameters()[13], self.getParameters()[14])
+            print("     ----> enegy, Emax:", energy, Emax)
+            
+        theta = self.getParameters()[13] - \
+            self.getParameters()[14] * energy / Emax
+        
+        if self.getDebug():
+            print(" <---- theta:", theta)
+        
         return theta
     
     # Single angle generator with acceptance-rejection
     def angle_generator(self, E_MeV):
 
-        iCnt = 0
-        while True:
+        theta_E = self.g_theta(E_MeV)         # [degrees]
+        theta_E = np.radians(theta_E)         # [rad]
+        
+        phi = rnd.uniform(0., 2. * math.pi)  # [rad]
+ 
+        theta = abs(np.random.normal(0., theta_E))  # [rad]
 
-            theta_E = self.g_theta(E_MeV)         # [degrees]
-            theta_E = np.radians(theta_E)         # [rad]
-            phi = random.uniform(0., 2. * math.pi)  # [rad]
-
-            sigma_x = 10.e-6
-            sigma_y = 10.e-6
-
-            # Generate x, y as per Gaussian distribution
-            x = np.random.normal(0., sigma_x)
-            y = np.random.normal(0., sigma_y)
-
-            # Check acceptance based on Gaussian probability density function
-            acceptance_prob = self.g_xy(x, y, sigma_x, sigma_y)
-            if np.random.random() < acceptance_prob:
-
-                theta = np.random.normal(0., theta_E)
-
-                return theta, phi
-
-            iCnt += 1
-            if iCnt > 10**12:
-                raise KillInfiniteLoop()
+        return theta, phi
 
     def getGaussianThetaPhi(self, E_MeV):
-
-        P_L = self._Param[6]
-        E_laser = self._Param[7]
-        lamda = self._Param[8]
-        t_laser = self._Param[9]
-        d = self._Param[10]
-        I = self._Param[11]
-        theta_degrees = self._Param[12]
 
         """
            E_MeV = self.getLaserDrivenProtonEnergy(self, \

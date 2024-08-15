@@ -442,6 +442,8 @@ class BeamLine(object):
             print("                     ----> Mode:", SrcMode)
             
         if SrcMode == 0:               #.. Laser driven:
+            SigmaThetaS0 = 20.
+            SlopeThetaS  = 15.
             Emin  = float( \
              pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
             Emax = float( \
@@ -464,6 +466,16 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="Intensity"]["Value"].iloc[0])
             DivAngle = float( \
              pndsSource[pndsSource["Parameter"]=="DivAngle"]["Value"].iloc[0])
+            try:
+                SigmaThetaS0 = float( \
+                        pndsSource[pndsSource["Parameter"]=="SigmaThetaS0"]["Value"].iloc[0])
+            except:
+                pass
+            try:
+                SlopeThetaS  = float( \
+                        pndsSource[pndsSource["Parameter"]=="SlopeThetaS"]["Value"].iloc[0])
+            except:
+                pass
             
         elif SrcMode == 1:               #.. Gaussian:
             MeanE  = float( \
@@ -497,7 +509,8 @@ class BeamLine(object):
                       " nPnts, Power, Energy, Wavelength, Duration,", \
                       " Thickness, Intensity, DivAngle:", \
                       Emin, Emax, nPnts, Power, Energy, Wavelength, \
-                      Duration, Thickness, Intensity, DivAngle)
+                      Duration, Thickness, Intensity, DivAngle,     \
+                      SigmaThetaS0, SlopeThetaS)
             elif SrcMode == 1:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
@@ -508,7 +521,7 @@ class BeamLine(object):
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts, \
                         Power, Energy, Wavelength, Duration, Thickness, \
-                        Intensity, DivAngle]
+                        Intensity, DivAngle, SigmaThetaS0, SlopeThetaS]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]

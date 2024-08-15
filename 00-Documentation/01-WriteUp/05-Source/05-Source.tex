@@ -188,6 +188,15 @@ i.e. $\sigma_{\theta_S}(\varepsilon)$ decreases from $20^\circ$ at
 $\varepsilon=0$ to $5^\circ$ at $\varepsilon_{max}$.
 The polar angle, $\theta_S$, is then chosen from the Gaussian
 distribution with sigma given by equation~\ref{Eq:sigVeps}.
+Since the polar angle is defined in the range $0 \le \theta_S le \pi$,
+the RMS calculated from the generated $\theta_S$ distribution is given
+by:
+\begin{equation}
+  {\rm RMS}~\theta_S = \sigma_{\theta_S}(\varepsilon)
+                      \left( 1 - \frac{2}{\pi} \right)^\frac{1}{2} \, .
+  \label{Eq:sigVeps}
+\end{equation}
+
 
 Finally, the azimuthal angle, $\phi_S$, is chose from a distribution
 uniform over the range $0 < \phi_S < 2\pi$.
@@ -222,7 +231,7 @@ by the radius of the laser spot focused on the target.
     kinetic energy.
     \underline{Centre right:} the dependence of the RMS of the
     $\theta_S$ distribution plotted as a function of kinetic energy.
-    The solid circles are calculated using slices of width 1\,MeV
+    The solid circles are calculated using slices of width 0.15\,MeV
     from the distribution in the centre-left panel.
     The expected dependence based on equation~\ref{Eq:sigVeps} is
     shown as the solid red line.
@@ -273,7 +282,9 @@ Gaussian in both the $x$ and $y$ projections.
         Laser pulse duration&2.8e-14&s \\ 
         Laser spot size&4e-07&$\mu$m \\ 
         Laser intensity&4e+20&J$/m^2$ \\ 
-        Electron divergence angle&25.0&degrees \\ 
+        Electron divergence angle&25.0&degrees \\
+        RMS $\theta_S$ at $K=0$\,MeV & 20 & degrees \\
+        Scaled slope of RMS $\theta_S$ versus $K$ & 15 & degrees \\
       \hline
     \end{tabular}
   \end{center}
