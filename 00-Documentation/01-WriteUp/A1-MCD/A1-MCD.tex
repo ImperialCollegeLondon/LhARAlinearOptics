@@ -1,4 +1,4 @@
-\graphicspath{ {06-MCD/Figures/} }
+\graphicspath{ {A1-MCD/Figures/} }
 
 \section{Module, class and data structures}
 
@@ -48,17 +48,368 @@ table~\ref{Tab:ClassAttributeAccess}).
       \hline
       \textbf{Method}          & \textbf{Argument} & \textbf{Return}            & \textbf{Comment}                      \\
       \hline
-      \texttt{getinstances()}  &                   & List of instances of class &                                       \\
+      \texttt{getinstances()}  &                   & List of instances of class & For singleton classes such as
+                                                                                  \texttt{BeamLine}, \texttt{getinstances()}
+                                                                                  returns a single instance rather than a list. \\
       \texttt{setDebug(Debug)} & Boolean           &                            & Sets flag to generate debug print-out \\
       \texttt{getDebug()}      &                   & Boolean debug flag         & If True, generate debug print-out     \\
       \texttt{setAll2None()}   &                   &                            & Set all instance attributes to
                                                                                   \texttt{None} at start of instantiation. \\
-      \texttt{SummaryStr()}    &                   & String                     & Text sring to record paramters in debug
+      \texttt{SummaryStr()}    &                   & String                     & Text sring to record parameters in debug
                                                                                   print out. \\
       \hline
     \end{tabular}
   \end{center}
 \end{table}
+
+\pagebreak
+
+\subsection{\texttt{BeamLine}}
+
+\texttt{BeamLine} is a singleton class that sets up the beam line
+geometry and provides methods to track particles through the beam line
+using the transfer matarices defined in section~\ref{SubSubSect:BLE}.
+The beam-line geometry is provided in the form of a ``\texttt{csv}''
+file read using \texttt{pandas}.
+The format of the ``\texttt{csv}'' file is defined in
+section~\ref{SubSubSect:??}.
+Alternatively, if a data file written using the \texttt{BeamIO}
+package is being read, the beam-line geometry is read from the top of
+the data file.
+The instance of the \texttt{BeamLine} class is created when the first
+record of the data file is read.
+
+\subsubsection{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{BeamLineElenent} class is:
+\begin{center}
+  \texttt{BeamLine(BeamLineSpecificationCSVfile, readDataFile)}
+\end{center}
+\texttt{BeamLineSpecificationCSVfile} is a the full path of the CSV
+file containing the beam-line specificiation.
+\texttt{readDataFile} is a boolean flag.
+If \texttt{readDataFile} is set to \texttt{True}, then the \texttt{BeamLine}
+instance will be created and the beam-line geometry will be read from
+the header of the BeamIO data file.
+If \texttt{readDataFile} is not set or is set to \texttt{False}, the
+beam-line geometry will be read from \\
+\noindent \texttt{BeamLineSpecificationCSVfile}.
+
+\subsubsection{Instance attributes and access methods} ~\newline
+\label{SubSubSect:BL:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:BL:Attributes}
+and the access methods are summarised in table~\ref{Tab:BL:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{BeamLine} class.
+  }
+  \label{Tab:BL:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{8.5cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{BeamLineSpecificationCSVfile}$^*$ & path      & Full path to beam-line specification \texttt{csv} file.        \\
+      \texttt{BeamLineParamPandasInstance}      & dataframe & Pandas data frame containing beam-line specification.          \\
+      \texttt{Element}                          & list      & List of instances of \texttt{BeamLineElement} class containing
+                                                              pointers to the elements that make up the beam line.           \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{sidewaystable}[h]
+  \caption{
+    Definition of access methods for the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{10cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
+      \hline
+      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
+                                                                   \texttt{np.ndarray}.                                          \\
+                                         & \texttt{getinsance()} & Get instance of \texttt{BeamLine} class.                        \\
+                       & \texttt{BeamLineSpecificationCSVfile()} & Get beam line specification csv file.                           \\
+                             & \texttt{(getBeamLineParamPandas)} & Get pandas dat from containing beam-line specification.         \\
+                                         & \texttt{getElement()} & get list of \texttt{BeamLineElement} instances.                 \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\subsubsection{Processing methods} ~\newline
+\noindent
+Table~\ref{Tab:BL:ProcMethods} presents the processing methods provided
+in the \texttt{BeamLine} class.
+\begin{sidewaystable}[h]
+  \caption{
+    Processing methods provided by the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{addBeamLine()}   &  & \texttt{Success} & Loops through pandas data frame and manages parsing and instanciation
+                                                       of the beam line elements defined in the specification \texttt{csv} file.
+                                                       Returns \texttt{Success} (bool) which is \texttt{True} if the beamline
+                                                       has been set up OK and is \texttt{False} otherwise.                     \\
+      \texttt{addFacility()}   &  &  & Manages the extraction of the facility parameters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Facility(BeamLineElement)}.                  \\
+      \texttt{addSource()}     &  &  & Manages the extraction of the source parameters from the pandas data frame and the
+                                       creation of the single instance of \texttt{Source(BeamLineElement)}.                  \\
+      \texttt{parseFacility()} &  & \texttt{Name}, \texttt{K0}, \texttt{VCMVr} & Parses pandas data frane to extract
+                                                                                 facility parameters.
+                                                                                 Returns the facility \texttt{Name} (str), the
+                                                                                 kinetic energy of the reference particle,
+                                                                                 \texttt{K0} (float) in MeV, and the vacuum
+                                                                                 chamber mother volume radius, \texttt{VCMVr}
+                                                                                 (float) in m.                                 \\
+      \texttt{parseSource()}   &  & \texttt{Name}, \texttt{Mode}, \texttt{Param} & Parses pandas data frane to extract
+                                                                                 source parameters.
+                                                                                 Returns \texttt{Name} (str), \texttt{Mode} (int)
+                                                                                 \texttt{Param} (list) containing the parameters
+                                                                                 required to instanciate source \texttt{Mode}. \\
+      \texttt{addBeamLineElement(iBLE)} &  &  & Adds \texttt{BeamLineElement} instance \texttt{iBLE} to the list of instances of
+                                                     \texttt{BeamLineElement} that make up the beam line.                      \\
+      \texttt{checkConsistency()} &  & \texttt{Consistent} & Checks the consistency of the beam line representation in memory
+                                                             with that requested in the specification \texttt{csv} file.
+                                                             Returns \texttt{Consistent} (bool) which is \texttt{True} if the
+                                                             beamline is consistent is \texttt{False} otherwise.                     \\
+      \texttt{trackBeamn(NEvts, particleFILE)} &  &  & Generates \texttt{NEvts} (int) particles and tracks them through the
+                                                       beam line. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\subsubsection{I/o methods} ~\newline
+\noindent
+Table~\ref{Tab:BL:IoMethods} presents the i/o methods provided in
+the \texttt{BeamLine} class.
+\begin{table}[h]
+  \caption{
+    I/o methods provided by the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:IoMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{csv2pandas(csvFILE)} & Path & pandas dataframe & Read CSV file to create pandas data frame.
+                                                               \texttt{csvFILE} (path) is the full path to the \texttt{csv}   \\
+      \texttt{pandasBeamLine()}    &      & pandas dataframe & Create pandas dataframe from \texttt{BeamLine} instance.       \\
+      \texttt{getHeader()}         &      & List             & Prepares list of header fields for \texttt{pandasBeamLine}.    \\
+      \texttt{readBeamLine(file)}  & Path & Boolean          & Called from \texttt{BeamIO}.  Reads \texttt{BeamLine} from data file. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Utilities} ~\newline
+\noindent
+Table~\ref{Tab:BL:UtilMethods} presents the utilities provided in
+the \texttt{BeamLine} class.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{BeamLine}
+    class. 
+  }
+  \label{Tab:BL:UtilMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{cleaninstance()} &      &          & Remove \texttt{BeamLine} instance.    \\
+      \texttt{fixsz()}         &      & List     & Loop through \texttt{BeamLineElement} instances to
+                                                   set $s$ and $z$ at exit.               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier
+
+\subsection{\texttt{Particle} and \texttt{ReferenceParticle}}
+\label{SubSect:BLE:ParticleReferenceParticle}
+
+The \texttt{Particle} class provides methods to transport particles
+through the beam line.
+The trace and phase space is recorded at the start and end of each
+element.
+The \texttt{ReferenceParticle} derived class is a singleton and
+records the trajectory of the reference particle.
+
+\subsubsection{\texttt{Particle}} ~\newline
+\label{SubSubSect:BLE:Particle}
+
+\paragraph{Instantiation}  ~\newline
+\noindent
+The call to instantiate the \texttt{Particle} class is:
+\begin{center}
+  \texttt{Particle(Species)}
+\end{center}
+\texttt{Species}, the type of particle to be propagated, is a string
+containing the particle name.
+At present valid particle \texttt{species} are
+\texttt{proton}, \texttt{pion}, and \texttt{muon}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{Para:BLE:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:P:Attributes}
+and the access methods are summarised in table~\ref{Tab:P:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{Particle} class.
+  }
+  \label{Tab:P:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{12cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{Species}       & str   & Particle species; proton, muon or pion.                                                     \\
+      \texttt{Location}      & list  & List of strings containing the unique \texttt{Name} of the \texttt{BeamLineElement} at
+                                       the particle position is reported.                                                          \\
+      \texttt{s}             & list  & List of floats recording $s$ coordinate at which particle position is reported.             \\
+      \texttt{TraceSpace}    & list  & List of \texttt{np.ndarray} containing 6D trace space of particle at \texttt{s}.            \\
+      \texttt{PhaseSpace}    & list  & List of \texttt{np.ndarray} containing 6D phase space (RPLC) of particle at \texttt{s}.     \\
+      \texttt{LabPhaseSpace} & list  & List of \texttt{np.ndarray} containing 6D phase space (Lab) of particle at \texttt{s}.      \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{sidewaystable}[h]
+  \caption{
+    Definition of access methods for the \texttt{Particle}
+    class. 
+  }
+  \label{Tab:P:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{9cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
+      \hline
+      \texttt{setSpecies}        & \texttt{getSpecies}        & Set/get particle species.                                \\
+      \texttt{setLocation}       & \texttt{getLocation}       & Set/get list of locations location.                      \\
+      \texttt{sets}              & \texttt{gets}              & Set/get list of $s$ coordinates.                         \\
+      \texttt{setTraceSpace}     & \texttt{getTraceSpace}     & Set/get list of trace-space vectors.                     \\
+      \texttt{setRPLCPhaseSpace} & \texttt{setRPLCPhaseSpace} & Set/get list of phase-space vectirs in RPLC coordinates. \\
+      \texttt{setLabPhaseSpace}  & \texttt{getLabPhaseSpace}  & Set/get list of phase-space vectirs in Lab coordinates.  \\
+      \texttt{resetParticleInstances} &                       & Resets list of particle instances preserving reference
+                                                                particle as firt instance in the list.                   \\
+      \texttt{recordParticle(Loc,z,s,TrcSpc)} &            & Records particle attributes.  Arguments: \texttt{Loc}$=$Location,
+                                                                \texttt{z}$=z$, \texttt{s}$=s$, and
+                                                                \texttt{TrcSpc}$=$trace space.                           \\
+      \texttt{setSourceTraceSpace(TrcSpc)} &               & Sets \texttt{TrcSpc}$=$trace space at source.               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\paragraph{Processing methods} ~\newline % Here!
+\noindent
+Table~\ref{Tab:P:ProcMethods} presents the processing methods provided
+in the \texttt{Particle} class.
+\begin{sidewaystable}[h]
+  \caption{
+    Processing methods provided by the \texttt{Particle}
+    class. 
+  }
+  \label{Tab:P:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{fillPhaseSpaceAll()} & & Boolean & Fill phase space for all \texttt{Particle} instances.  Class Method.
+                                                 Return \texttt{True} if successful.                                         \\
+      \texttt{fillPhaseSpace()}    & & Boolean & Fill phase space for current \texttt{Particle} instance.
+                                                 Return \texttt{True} if successful.                                         \\
+      \texttt{initialiseSums()} &  &  & Initialises sums used to calculate covariance matrix.                                \\
+      \texttt{incrementSums(iPrtcl)}  & \texttt{Particle} instance &  & Increment sums used to calculate covariance matrix.  \\
+      \texttt{calcCovarianceMatrix()} &  &  & Calculate covariance matrix.                                                   \\
+      \texttt{evaluateBeam()} &  &  & Work through locations and calculate parameters from covariance matrix.                 \\
+      \texttt{calcRPLCPhaseSpace(nLoc)}& Int & np.ndarray & Calculate and return phase space in RPLCs at location \texttt{nLoc}. \\
+      \texttt{RPLCTraceSpace2PhaseSpace(TrcSpc)} & np.ndarray & np.ndarray & Transform trace space to phase space in RPLCs.  \\
+      \texttt{RPLCPhaseSpace2TraceSpace(TrcSpc)} & np.ndarray & np.ndarray & Transform phase space to trace space in RPLCs.  \\
+      
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The i/o methods provided by the \texttt{Particle} class are listed in
+table~\ref{Tab:P:IoMethods}.
+\begin{sidewaystable}[h]
+  \caption{
+    I/o methods provided by the \texttt{Particle} class. 
+  }
+  \label{Tab:P:IoMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \hline
+      \texttt{createParticleFile(path, file)} & Path, Str & Path    & Class method, kept for backward compatibility.          \\
+      \texttt{flushNcloseParticleFile(file)}  & Path      &         & Class method, kept for backward compatibility.          \\
+      \texttt{openParticleFile(path, file)}   & Path, Str &         & Class method, kept for backward compatibility.          \\
+      \texttt{closeParticleFile(path, file)}  & Path, Str &         & Class method, kept for backward compatibility.          \\
+      \texttt{readParticle(file)}             & Path      & Boolean & Read particle from input stream.  Called from \texttt{BeamIO}.
+                                                                   \texttt{file} is full path to file. Return \texttt{True} if end
+                                                                   of file.                                                   \\
+      \texttt{writeParticle(file, clean)} & Path, boolean &      & Write particle to output stream.  Called from \texttt{BeamIO}.
+                                                                   \texttt{file} is full path to file. If \texttt{clean}, then
+                                                                   clean particle instance after write.                    \\
+      
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+
+\paragraph{Utilities} ~\newline
+\noindent
+The utilities provided by the \texttt{Particle} class are listed in
+table~\ref{Tab:P:UtilMethods}.
+\begin{sidewaystable}[h]
+  \caption{
+    Utilities provided by the \texttt{Particle}
+    class. 
+  }
+  \label{Tab:P:UtilMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \hline
+      \texttt{cleanAllParticles()}&  &  & Delete all \texttt{Particle} instances including \texttt{ReferenceParticle}.     \\
+      \texttt{cleanParticles()}   &  &  & Delete all \texttt{Particle} instances except \texttt{ReferenceParticle}.        \\
+      \texttt{plotTraceSpaceProgression()} &  &  & Plot transverse trace space at each location.  Class method.  Writes file to
+                                                   \texttt{99-Scratch/}.                                                   \\
+      \texttt{plotLongitudinalTraceSpaceProgression()} &  &  & Plot longitudinal trace space at each location.  Class method.  Writes file to
+                                                   \texttt{99-Scratch/}.                                                   \\
+      \texttt{printProgression()} &  &  & Print particle parameters at each location.mmmmmmmmmmmmmmmm                      \\
+      \texttt{getLines()}         &  &  & Returns lines to be used to create summary pandas data frame.                    \\
+      \texttt{createReport()}     &  &  & Creates \texttt{csv} file containing summary of beam progression.                \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\FloatBarrier
 
 \subsection{\texttt{BeamLineElement}}
 \label{SubSubSect:BLE}
@@ -175,7 +526,7 @@ in the \texttt{BeamLineElement} class.
       \texttt{OutsideBeamPipe(R)} & Float                 & Boolean               & Returns False if particle is inside beam pipe.
                                                                                     If \texttt{R}, radial distance from $z$ axis in RPLC,
                                                                                     falls outside beam pipe, returns True. \\
-      \texttt{ExpansionParamterFail(R)} & Float           & Boolean               & Calculates an approximate expansion parameter and
+      \texttt{ExpansionParameterFail(R)} & Float           & Boolean               & Calculates an approximate expansion parameter and
                                                                                     returns False if the parameter is large ($>1$).
                                                                                     Not yet used in \texttt{Transport}.      \\
       \texttt{Transport(V)}       & $6\times1$ np.ndarray & $6\times1$ np.ndarray & Transport 6D trace-space vector, \texttt{V}, across
@@ -455,7 +806,7 @@ table~\ref{Tab:Aprtr:Methods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
       \hline
-      \texttt{setApertureParameters(ParamList)} &                      & Set aperture paramters.
+      \texttt{setApertureParameters(ParamList)} &                      & Set aperture parameters.
                                                                          Sets \texttt{Type} and parameters
                                                                          depending on \texttt{Type}. \\
                                                 & \texttt{getType()} & Get \texttt{Type} of aperture.\\
@@ -541,7 +892,7 @@ table~\ref{Tab:FQuad:Methods}.
                                           matrix; if 1, use reference particle momentum.         \\
       \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
       \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kFQ is not given. \\
-      \texttt{kFQ}      & float & m$^{-2}$ & Quadrupole $k$ paramter.                               \\
+      \texttt{kFQ}      & float & m$^{-2}$ & Quadrupole $k$ parameter.                               \\
       \hline
     \end{tabular}
   \end{center}
@@ -642,7 +993,7 @@ table~\ref{Tab:DQuad:Methods}.
                                           matrix; if 1, use reference particle momentum.         \\
       \texttt{Length}   & float & m     & Effective length of quadrupole.                        \\
       \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kDQ is not given. \\
-      \texttt{kDQ}      & float & m$^{-2}$ & Quadrupole $k$ paramter.                               \\
+      \texttt{kDQ}      & float & m$^{-2}$ & Quadrupole $k$ parameter.                               \\
       \hline
     \end{tabular}
   \end{center}
@@ -714,9 +1065,6 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
-The \texttt{SectorDipole} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:SDpl:InstAttr} and
-defined in table~\ref{Tab:SDpl:Attributes}.
 
 The orientation of the RLPC coordinate axes with respect to those of
 the laboratory frame changes from the start of sector dipole to its
@@ -810,23 +1158,18 @@ table~\ref{Tab:SDpl:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{SectorDipole} derived class has no processing methods.
+The \texttt{SectorDipole} derived class has no processing methods
+other than those inheritted from the parent class.
 
 \paragraph{I/o methods} ~\newline
 \noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+The \texttt{SectorDipole} derived class has no i/o methods other
+than those inheritted from the parent class.
 
 \paragraph{Utilities} ~\newline
 \noindent
-The \texttt{SectorDipole} derived class has no utilities.
+The \texttt{SectorDipole} derived class has no utilities other
+than those inheritted from the parent class. 
 
 \FloatBarrier
 
@@ -843,9 +1186,6 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
-The \texttt{Solenoid} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:Slnd:InstAttr} and
-defined in table~\ref{Tab:Slnd:Attributes}.
 The solenoid \texttt{Length} is required together with either the
 magnetic field strength, \texttt{Strength} or the solenoid $k$
 parameter, \texttt{kSol} (equation~\ref{Eq:Effectiveks}).  
@@ -872,7 +1212,7 @@ table~\ref{Tab:Slnd:Methods}.
       \hline
       \texttt{Length}   & float & m     & Effective length of solenoid.                           \\
       \texttt{Strength} & float & T/m   & Magnetic field gradient; required if kSol is not given. \\
-      \texttt{kSol}     & float & m$^{-2}$ & GaborLens $k$ paramter required if \texttt{Strength}
+      \texttt{kSol}     & float & m$^{-2}$ & GaborLens $k$ parameter required if \texttt{Strength}
                                           not given.                                              \\
       \hline
     \end{tabular}
@@ -902,6 +1242,17 @@ table~\ref{Tab:Slnd:Methods}.
 \noindent
 The \texttt{Solenoid} processing method is defined in
 table~\ref{Tab:Slnd:Methods}.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The \texttt{Solenoid} derived class has no i/o methods other
+than those inheritted from the parent class.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Solenoid} derived class has no utilities other
+than those inheritted from the parent class. 
+
 \begin{table}[h]
   \caption{
     Utilities provided by the \texttt{Solenoid} derived
@@ -920,22 +1271,6 @@ table~\ref{Tab:Slnd:Methods}.
   \end{center}
 \end{table}
 
-\paragraph{I/o methods} ~\newline
-\noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
-
-\paragraph{Utilities} ~\newline
-\noindent
-The \texttt{Solenoid} derived class has no utilities.
-
 \FloatBarrier
 
 \subsubsection{Derived class: \texttt{GaborLens(BeamLineElement)}}
@@ -951,12 +1286,9 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
-The \texttt{GaborLens} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:GbrLns:InstAttr} and
-defined in table~\ref{Tab:GbrLns:Attributes}. 
 The Gabor lens \texttt{Length} is required together with either the
-paramters \texttt{Bz}, \texttt{VA}, \texttt{RA}, \texttt{Rp}
-correspond, respectively, to the paramters $B_z$, $V_A$, $V_A$ and
+parameters \texttt{Bz}, \texttt{VA}, \texttt{RA}, and \texttt{Rp}
+corresponding, respectively, to the parameters $B_z$, $V_A$, $V_A$ and
 $R_p$ defined in section~\ref{SubSect:TrnsFrMtrx:GL}, or $kSol$, the
 solenoid strength parameter of the equaivalent solenoid (see
 section~\ref{SubSect:TrnsFrMtrx:GL}).
@@ -1024,23 +1356,18 @@ table~\ref{Tab:GbrLns:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
-The \texttt{GaborLens} dericed class has no processing methods.
+The \texttt{GaborLens} processing method is defined in
+table~\ref{Tab:Slnd:Methods}.
 
 \paragraph{I/o methods} ~\newline
 \noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
+The \texttt{GaborLens} derived class has no i/o methods other
+than those inheritted from the parent class.
 
 \paragraph{Utilities} ~\newline
 \noindent
-The \texttt{GaborLens} derived class has no utilities.
+The \texttt{GaborLens} derived class has no utilities other
+than those inheritted from the parent class. 
 
 \FloatBarrier
 
@@ -1057,9 +1384,6 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
-The \texttt{CylindricalRFCavity} arguments are translated into instance
-attributes as described in section~\ref{SubSubSect:CylndclRFCvty:InstAttr} and
-defined in table~\ref{Tab:CylndclRFCvty:Attributes}. 
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:CylndclRFCvty:InstAttr}
@@ -1087,13 +1411,13 @@ table~\ref{Tab:CylndclRFCvty:Methods}.
                                                    centre of cavity, ``linac convention''.       \\
       \texttt{TransitTimeFactor} & float &       & Transit time factor (equation~\ref{}).        \\
       \texttt{V0}                & float & MV    & Peak voltage.                                 \\
-      \texttt{alpha}             & float &       & $\alpha$ paramter defined in equation~\ref{}. \\
-      \texttt{wperp}             & float &       & $\omega_\perp$ paramter defined in equation~\ref{}. \\
-      \texttt{cperp}             & float &       & $c_\perp$ paramter defined in equation~\ref{}. \\
-      \texttt{sperp}             & float &       & $s_\perp$ paramter defined in equation~\ref{}. \\
-      \texttt{wprll}             & float &       & $\omega_{||}$ paramter defined in equation~\ref{}. \\
-      \texttt{cprll}             & float &       & $c_{||}$ paramter defined in equation~\ref{}. \\
-      \texttt{sprll}             & float &       & $s_{||}$ paramter defined in equation~\ref{}. \\
+      \texttt{alpha}             & float &       & $\alpha$ parameter defined in equation~\ref{}. \\
+      \texttt{wperp}             & float &       & $\omega_\perp$ parameter defined in equation~\ref{}. \\
+      \texttt{cperp}             & float &       & $c_\perp$ parameter defined in equation~\ref{}. \\
+      \texttt{sperp}             & float &       & $s_\perp$ parameter defined in equation~\ref{}. \\
+      \texttt{wprll}             & float &       & $\omega_{||}$ parameter defined in equation~\ref{}. \\
+      \texttt{cprll}             & float &       & $c_{||}$ parameter defined in equation~\ref{}. \\
+      \texttt{sprll}             & float &       & $s_{||}$ parameter defined in equation~\ref{}. \\
       \hline
     \end{tabular}
   \end{center}
@@ -1105,7 +1429,7 @@ table~\ref{Tab:CylndclRFCvty:Methods}.
   }
   \label{Tab:CylndclRFCvty:Methods}
   \begin{center}
-    \begin{tabular}{|c|c|p{7cm}|}
+    \begin{tabular}{|c|c|p{5cm}|}
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                 \\
       \hline
@@ -1116,7 +1440,8 @@ table~\ref{Tab:CylndclRFCvty:Methods}.
       \texttt{setWaveNumber(WaveNumber)}    & \texttt{getWaveNumber()}       & Set/get wavenumber.                     \\
       \texttt{setLength(Length)}            & \texttt{getLength()}           & Set/get Length. \\
       \texttt{setRadius(Radius)}            & \texttt{getRadius()}           & Set/get Radius. \\
-      \texttt{setTransitTimeFactor(TransitTimeFactor)}            & \texttt{getTransitTimeFactor()}           & Set/get TransitTimeFactor. \\
+      \texttt{setTransitTimeFactor}         & \texttt{getTransitTimeFactor()} & Set/get TransitTimeFactor. \\
+      \quad\quad\quad \texttt{(TransitTimeFactor)} & & \\
       \texttt{setV0(V0)}                    & \texttt{getV0()}               & Set/get peak voltage.                     \\
       \texttt{setalpha(alpha)}              & \texttt{getalpha()}            & Set/get alpha.                     \\
       \texttt{setwperp(wperp)}              & \texttt{getwperp()}             & Set/get wperp.                     \\
@@ -1133,297 +1458,22 @@ table~\ref{Tab:CylndclRFCvty:Methods}.
 
 \paragraph{Processing methods} ~\newline
 \noindent
+The \texttt{CylindricalRFCavity} derived class has no processing
+methods other than those inheritted from the parent class.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The \texttt{CylindricalRFCavity} derived class has no i/o methods other
+than those inheritted from the parent class.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{CylindricalRFCavity} derived class has no utilities other
+than those inheritted from the parent class. 
+
+\paragraph{Processing methods} ~\newline
+\noindent
 The \texttt{CylindricalRFCavity} dericed class has no processing methods.
 
-\paragraph{I/o methods} ~\newline
-\noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
-
-\paragraph{Utilities} ~\newline
-\noindent
-The \texttt{CylindricalRFCavity} derived class has no utilities.
-
 \FloatBarrier
 
-\subsection{\texttt{BeamLine}}
-
-\texttt{BeamLine} is a singleton class that sets up the beam line
-geometry and provides methods to track particles through the beam line
-using the transfer matarices defined in section~\ref{SubSubSect:BLE}.
-The beam-line geometry is provided in the form of a ``\texttt{csv}''
-file read using \texttt{pandas}.
-The format of the ``\texttt{csv}'' file is defined in
-section~\ref{SubSubSect:??}.
-Alternatively, if a data file written using the \texttt{BeamIO}
-package is being read, the beam-line geometry is read from the top of
-the data file.
-
-\subsubsection{Instantiation} ~\newline
-\noindent
-The call to instantiate the \texttt{BeamLineElenent} class is:
-\begin{center}
-  \texttt{BeamLine(BeamLineSpecificationCSVfile, readDataFile)}
-\end{center}
-\texttt{BeamLineSpecificationCSVfile} is a the full path of the CSV
-file containing the beam-line specificiation.
-\texttt{readDataFile} is a boolean flag.
-If \texttt{readDataFile} is set to \texttt{True}, then the \texttt{BeamLine}
-instance will be created and the beam-line geometry will be read from
-the header of the BeamIO data file.
-If \texttt{readDataFile} is not set or is set to \texttt{False}, the
-beam-line geometry will be read
-from \texttt{BeamLineSpecificationCSVfile}.
-
-\subsubsection{Instance attributes and access methods} ~\newline
-\label{SubSubSect:BL:InstAttr}
-\noindent
-The instance attributes are presented in table~\ref{Tab:BL:Attributes}
-and the access methods are summarised in table~\ref{Tab:BL:AccessMethods}.
-\begin{table}[h]
-  \caption{
-    Definition of attributes of instances of
-    the \texttt{BeamLine} class.
-  }
-  \label{Tab:BL:Attributes}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{10cm}|}
-      \hline
-      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
-      \hline
-      \texttt{BeamLineSpecificationCSVfile}$^*$ & path      & Full path to beam-line specification \texttt{csv} file.        \\
-      \texttt{BeamLineParamPandasInstance}      & dataframe & Pandas data frame containing beam-line specification.          \\
-      \texttt{Element}                          & list      & List of instances of \texttt{BeamLineElement} class containing
-                                                              pointers to the elements that make up the beam line.           \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-\begin{table}[h]
-  \caption{
-    Definition of access methods for the \texttt{BeamLine}
-    class. 
-  }
-  \label{Tab:BL:AccessMethods}
-  \begin{center}
-    \begin{tabular}{|c|c|p{7cm}|}
-      \hline
-      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
-      \hline
-      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
-                                                                   \texttt{np.ndarray}.                                          \\
-                                         & \texttt{getinsance()} & Get instance of \texttt{BeamLine} class.                        \\
-                       & \texttt{BeamLineSpecificationCSVfile()} & Get beam line specification csv file.                           \\
-                             & \texttt{(getBeamLineParamPandas)} & Get pandas dat from containing beam-line specification.         \\
-                                         & \texttt{getElement()} & get list of \texttt{BeamLineElement} instances.                 \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\subsubsection{Processing methods} ~\newline
-\noindent
-Table~\ref{Tab:BL:ProcMethods} presents the processing methods provided
-in the \texttt{BeamLine} class.
-\begin{table}[h]
-  \caption{
-    Processing methods provided by the \texttt{BeamLine}
-    class. 
-  }
-  \label{Tab:BL:ProcMethods}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
-      \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
-      \hline
-      \texttt{addBeamLine()}   &  & \texttt{Success} & Loops through pandas data frame and manages parsing and instanciation
-                                                       of the beam line elements defined in the specification \texttt{csv} file.
-                                                       Returns \texttt{Success} (bool) which is \texttt{True} if the beamline
-                                                       has been set up OK and is \texttt{False} otherwise.                     \\
-      \texttt{addFacility()}   &  &  & Manages the extraction of the facility paramters from the pandas data frame and the
-                                       creation of the single instance of \texttt{Facility(BeamLineElement)}.                  \\
-      \texttt{addSource()}     &  &  & Manages the extraction of the source paramters from the pandas data frame and the
-                                       creation of the single instance of \texttt{Source(BeamLineElement)}.                  \\
-      \texttt{parseFacility()} &  & \texttt{Name}, \texttt{K0}, \texttt{VCMVr} & Parses pandas data frane to extract
-                                                                                 facility parameters.
-                                                                                 Returns the facility \texttt{Name} (str), the
-                                                                                 kinetic energy of the reference particle,
-                                                                                 \texttt{K0} (float) in MeV, and the vacuum
-                                                                                 chamber mother volume radius, \texttt{VCMVr}
-                                                                                 (float) in m.                                 \\
-      \texttt{parseSource()}   &  & \texttt{Name}, \texttt{Mode}, \texttt{Param} & Parses pandas data frane to extract
-                                                                                 source parameters.
-                                                                                 Returns \texttt{Name} (str), \texttt{Mode} (int)
-                                                                                 \texttt{Param} (list) containing the parameters
-                                                                                 required to instanciate source \texttt{Mode}. \\
-      \texttt{addBeamLineElement(iBLE)} &  &  & Adds \texttt{BeamLineElement} instance \texttt{iBLE} to the list of instances of
-                                                     \texttt{BeamLineElement} that make up the beam line.                      \\
-      \texttt{checkConsistency()} &  & \texttt{Consistent} & Checks the consistency of the beam line representation in memory
-                                                             with that requested in the specification \texttt{csv} file.
-                                                             Returns \texttt{Consistent} (bool) which is \texttt{True} if the
-                                                             beamline is consistent is \texttt{False} otherwise.                     \\
-      \texttt{trackBeamn(NEvts, particleFILE)} &  &  & Generates \texttt{NEvts} (int) particles and tracks them through the
-                                                       beam line. \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\subsubsection{I/o methods} ~\newline
-\noindent
-Methods to read and write instance attributes to the files defined
-using the \texttt{BeamIO} package (see section \ref{Sect:BeamIO} are
-provided.
-The calls are:
-\begin{equation}
-  \texttt{readElement(dataFILE)} \quad \quad {\rm and }
-      \quad \quad \texttt{writeElement(dataFILE)} \,; \nonumber
-\end{equation}
-where \texttt{dataFILE} is the a file instance managed by \texttt{BeamIO}.
-In addition the \texttt{csv} file containing the specification of the
-beam line is read in using the method:
-\begin{equation}
-  \texttt{csv2pandas(csvFILE)} \,; \nonumber
-\end{equation}
-where \texttt{csvFILE} (path) is the full path to the \texttt{csv}
-file.
-
-\subsubsection{Utilities} ~\newline
-\noindent
-The \texttt{BEamLine} class has no utilities.
-
-\FloatBarrier
-
-\subsection{Particle and reference particle}
-\label{SubSect:BLE:ParticleReferenceParticle}
-
-The \texttt{Particle} class provides methods to transport particles
-through the beam line.
-The trace and phase space is recorded at the start and end of each
-element.
-The \texttt{ReferenceParticle} derived class is a singleton and
-records the trajectory of the reference particle.
-
-\subsubsection{\texttt{Particle}} ~\newline
-\label{SubSubSect:BLE:Particle}
-
-\paragraph{Instantiation}  ~\newline
-\noindent
-The call to instantiate the \texttt{Particle} class is:
-\begin{center}
-  \texttt{Particle(Species)}
-\end{center}
-\texttt{Species}, the type of particle to be propagated, is a string
-containing the particle name.
-At present valid particle \texttt{species} are proton, pion, and
-muon.
-
-\paragraph{Instance attributes and access methods} ~\newline
-\label{Para:BLE:InstAttr}
-\noindent
-The instance attributes are presented in table~\ref{Tab:P:Attributes}
-and the access methods are summarised in table~\ref{Tab:P:AccessMethods}.
-\begin{table}[h]
-  \caption{
-    Definition of attributes of instances of the \texttt{Particle} class.
-  }
-  \label{Tab:P:Attributes}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{10cm}|}
-      \hline
-      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
-      \hline
-      \texttt{Species}       & str   & Particle species; proton, muon or pion.                                                     \\
-      \texttt{Location}      & list  & List of strings containing the unique \texttt{Name} of the \texttt{BeamLineElement} at
-                                       the particle position is reported.                                                          \\
-      \texttt{s}             & list  & List of floats recording $s$ coordinate at which particle position is reported.             \\
-      \texttt{TraceSpace}    & list  & List of \texttt{np.ndarray} containing 6D trace space of particle at \texttt{s}.            \\
-      \texttt{PhaseSpace}    & list  & List of \texttt{np.ndarray} containing 6D phase space (RPLC) of particle at \texttt{s}.     \\
-      \texttt{LabPhaseSpace} & list  & List of \texttt{np.ndarray} containing 6D phase space (Lab) of particle at \texttt{s}.      \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-\begin{table}[h]
-  \caption{
-    Definition of access methods for the \texttt{Particle}
-    class. 
-  }
-  \label{Tab:P:AccessMethods}
-  \begin{center}
-    \begin{tabular}{|c|c|p{7cm}|}
-      \hline
-      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
-      \hline
-      \texttt{setSpecies}        & \texttt{getSpecies}        & Set/get particle species.                                \\
-      \texttt{setLocation}       & \texttt{getLocation}       & Set/get list of locations location.                      \\
-      \texttt{sets}              & \texttt{gets}              & Set/get list of $s$ coordinates.                         \\
-      \texttt{setTraceSpace}     & \texttt{getTraceSpace}     & Set/get list of trace-space vectors.                     \\
-      \texttt{setRPLCPhaseSpace} & \texttt{setRPLCPhaseSpace} & Set/get list of phase-space vectirs in RPLC coordinates. \\
-      \texttt{setLabPhaseSpace}  & \texttt{getLabPhaseSpace}  & Set/get list of phase-space vectirs in Lab coordinates.  \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\paragraph{Processing methods} ~\newline % Here!
-\noindent
-Table~\ref{Tab:P:ProcMethods} presents the processing methods provided
-in the \texttt{Particle} class.
-\begin{table}[h]
-  \caption{
-    Processing methods provided by the \texttt{Particle}
-    class. 
-  }
-  \label{Tab:P:ProcMethods}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
-      \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
-      \hline
-      \texttt{initialiseSums()} &  &  & Initialises sums used to calculate covariance matrix.                                \\
-      \texttt{incrementSums(iPrtcl)}  & \texttt{Particle} instance &  & Increment sums used to calculate covariance matrix.  \\
-      \texttt{calcCovarianceMatrix()} &  &  & Calculate covariance matrix.                                                   \\
-      \texttt{evaluateBeam()} &  &  & Work through locations and calculate paramters from covariance matrix.                 \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\paragraph{I/o methods} ~\newline
-\noindent
-The \texttt{Particle} class has no i/o methods.
-
-\paragraph{Utilities} ~\newline
-\noindent
-The utilities provided by the \texttt{Particle} class are listed in
-table~\ref{Tab:P:UtilMethods}.
-\begin{table}[h]
-  \caption{
-    Utilities provided by the \texttt{Particle}
-    class. 
-  }
-  \label{Tab:P:UtilMethods}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{7cm}|}
-      \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
-      \hline
-      \texttt{cleanBeams()}       &  &  & Delete (using \texttt{del}) instances of beam class.          \\
-      \texttt{printProgression()} &  &  & Prints the paramters at each location.                                           \\
-      \texttt{getHeader()}        &  &  & Returns header for pandas data frame used to store summary.                      \\
-      \texttt{getLines()}         &  &  & Returns lines to be used to create summary pandas data frame.                    \\
-      \texttt{createReport()}     &  &  & Creates \texttt{csv} file containing summary of beam progression.                \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\FloatBarrier
