@@ -403,7 +403,7 @@ table~\ref{Tab:P:UtilMethods}.
                                                    \texttt{99-Scratch/}.                                                   \\
       \texttt{plotLongitudinalTraceSpaceProgression()} &  &  & Plot longitudinal trace space at each location.  Class method.  Writes file to
                                                    \texttt{99-Scratch/}.                                                   \\
-      \texttt{printProgression()} &  &  & Print particle parameters at each location.mmmmmmmmmmmmmmmm                      \\
+      \texttt{printProgression()} &  &  & Print particle parameters at each location.                      \\
       \texttt{getLines()}         &  &  & Returns lines to be used to create summary pandas data frame.                    \\
       \texttt{createReport()}     &  &  & Creates \texttt{csv} file containing summary of beam progression.                \\
       \hline
@@ -413,6 +413,127 @@ table~\ref{Tab:P:UtilMethods}.
 
 \FloatBarrier
 
+\subsubsection{\texttt{ReferenceParticle}} ~\newline
+\label{SubSubSect:BLE:ReferenceParticle}
+
+\paragraph{Instantiation}  ~\newline
+\noindent
+\texttt{ReferenceParticle} is a singleton derived class.
+The call to instantiate the \texttt{ReferenceParticle} class is:
+\begin{center}
+  \texttt{ReferenceParticle(Species)}
+\end{center}
+\texttt{Species}, the type of particle to be propagated, is a string
+containing the particle name.
+At present valid particle \texttt{species} are
+\texttt{proton}, \texttt{pion}, and \texttt{muon}.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{Para:BLE:InstAttr}
+\noindent
+In addition to the instance attributes inheritted from the parent
+class, the \texttt{ReferenceParticle} class provides the instance
+attributes presented in table~\ref{Tab:RP:Attributes}
+and the access methods are summarised in
+table~\ref{Tab:RP:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{ReferenceParticle} class.
+  }
+  \label{Tab:RP:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{12cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                           \\
+      \hline
+      \texttt{\_sIn[]}   & list  & List of floats containing the $s$ coordinates at the entrance to the beam line elements along the
+                                   locus of the reference particle trajectory.                                                        \\
+      \texttt{\_sOut[]}  & list  & List of floats containing the $s$ coordinates at the exit to the beam line elements along the
+                                   locus of the reference particle trajectory.                                                        \\
+      \texttt{\_RrIn[]}  & list  & List of ndarrays containing the four-vector position in laboratory coordinates at the entrance to
+                                   the beam line elements along the locus of the reference particle trajectory.                       \\
+      \texttt{\_RrOut[]} & list  & List of ndarrays containing the four-vector position in laboratory coordinates at the exit to the
+                                   beam line elements along the locus of the reference particle trajectory.                           \\
+      \texttt{\_PrIn[]}  & list  & List of ndarrays containing the four-vector momentum in laboratory coordinates at the entrance to
+                                   the beam line elements along the locus of the reference particle trajectory.                       \\
+      \texttt{\_PrOut[]} & list  & List of ndarrays containing the four-vector momentum in laboratory coordinates at the exit to the
+                                   beam line elements along the locus of the reference particle trajectory.                           \\
+  \texttt{\_Rot2LabIn[]} & list  & List of ndarrays containing the rotation matrices taking RPLC to laboratory coordinates at the
+                                   entrance to the beam line elements along the locus of the reference particle trajectory.           \\
+ \texttt{\_Rot2LabOut[]} & list  & List of ndarrays containing the rotation matrices taking RPLC to laboratory coordinates at the
+                                   exit to the beam line elements along the locus of the reference particle trajectory.               \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{ReferenceParticle}
+    class. 
+  }
+  \label{Tab:RP:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
+      \hline
+      \texttt{setRPDebug}        & \texttt{getRPDebug}        & Set/get \texttt{ReferenceParticle} debug flag.           \\
+      \texttt{setsIn}            & \texttt{getsIn}            & Set/get \texttt{\_sIn}                                   \\
+      \texttt{setsOut}           & \texttt{getsOut}           & Set/get \texttt{\_sOut}                                  \\
+      \texttt{setRrIn}           & \texttt{getRrIn}           & Set/get \texttt{\_RrIn}                                  \\
+      \texttt{setRrOut}          & \texttt{getRrOut}          & Set/get \texttt{\_RrOut}                                 \\
+      \texttt{setPrIn}           & \texttt{getPrIn}           & Set/get \texttt{\_PrIn}                                  \\
+      \texttt{setPrOut}          & \texttt{getPrOut}          & Set/get \texttt{\_PrOut}                                 \\
+                                 & \texttt{getMomentumIn(iLoc)}  & Get magnitude of three-vector momentum at entrance of
+                                                                   location \texttt{iLoc}                                \\
+                                 & \texttt{getMomentumOut(iLoc)} & Get magnitude of three-vector momentum at exit of
+                                   location \texttt{iLoc}                                                                \\
+      \texttt{setRot2LabIn}      & \texttt{getRot2LabIn}      & Set/get \texttt{\_Rot2LabIn}                             \\
+      \texttt{setRot2LabOut}     & \texttt{getRot2LabOut}     & Set/get \texttt{\_Rot2LabOut}                            \\
+                                 & \texttt{getb0(iLoc)}       & Get $\beta_0$.                                           \\
+                                 & \texttt{getg0b0(iLoc)}     & Get $\gamma_0 \beta_0$.                                  \\
+      \texttt{setAllRP2None}     &                            & Set all \texttt{ReferenceParticle} attributes to None.   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{ReferenceParticle}
+    class. 
+  }
+  \label{Tab:RP:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{4cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{setReferenceParticleAtSource()} &     & boolean & Set \texttt{ReferenceParticle} attributes at source.  Returns
+                                                                True if success.                                             \\
+      \texttt{setReferenceParticleAtDrift(iBLE)} & BLE & boolean & Set \texttt{ReferenceParticle} attributes at
+                                                                   \texttt{BeamLineElement} (BLE) instance iBLE.  Returns
+                                                                   True if success.                                          \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier
+
+\paragraph{Processing methods} ~\newline % Here!
+\noindent
+Table~\ref{Tab:RP:ProcMethods} presents the processing methods provided
+in the \texttt{ReferenceParticle} class.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The \texttt{ReferenceParticle} class provides no additional i/o methods.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{ReferenceParticle} class provides no additional utilities.
+
+\vfill
 \pagebreak
 
 \subsection{\texttt{BeamLineElement}}
