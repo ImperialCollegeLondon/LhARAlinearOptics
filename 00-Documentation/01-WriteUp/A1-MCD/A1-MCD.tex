@@ -536,6 +536,148 @@ The \texttt{ReferenceParticle} class provides no additional utilities.
 \vfill
 \pagebreak
 
+\subsection{\texttt{Beam}}
+\label{SubSect:B}
+
+The \texttt{Beam} class is in some sense a "sister" class to Particle.
+Whereas an instance of \texttt{Particle} records the passage of a
+particle travelling through the   beam line, an instance
+of \texttt{Beam} records the collective properties of the beam such as
+emittance, etc., as the beam progresses through the beam line. 
+
+\subsubsection{\texttt{Beam}} ~\newline
+\label{SubSubSect:BLE:Particle}
+
+\paragraph{Instantiation}  ~\newline
+\noindent
+The call to instantiate the \texttt{Beam} class is:
+\begin{center}
+  \texttt{Beam(InputDatafile, nEvtMax, outputCSVfile,
+  startlocation, beamlineSpecificationCSVfile))}
+\end{center}
+\texttt{InputDatafile} is either the full path to a data file in one
+of the formats specified in \texttt{BeamIO} or an instance of
+the \texttt{BeamIO} class that refers to an existing data file that
+can be read.
+\texttt{nEvtMax} is the maximum number of events to read or process
+using the \texttt{Beam} instance.
+\texttt{outputCSVfile} is the output file, in CSV format, contining
+the beam paramters at the locations traversed by the beam.
+\texttt{startlocation} is the location along the beam line at which
+propagation will start.
+If absent or None propagation will start at the soruce.
+\texttt{beamlineSpecificationCSVfile} is the CSV file specifying the
+beam line.
+
+\texttt{beamlineSpecificationCSVfile} is kept for backward
+compatibilty.
+If the first record of \\
+\texttt{InputDatafile} contains the specification of the beam
+line, \texttt{beamlineSpecificationCSVfile} is not required. 
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{Para:BLE:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:B:Attributes}
+and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{Beam} class.
+  }
+  \label{Tab:B:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{12cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \hline
+      \texttt{Species}       & str   & Particle species; proton, muon or pion.                                                     \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{sidewaystable}[h]
+  \caption{
+    Definition of access methods for the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{9cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
+      \hline
+      \texttt{setSpecies}        & \texttt{getSpecies}        & Set/get particle species.                                \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\paragraph{Processing methods} ~\newline % Here!
+\noindent
+Table~\ref{Tab:B:ProcMethods} presents the processing methods provided
+in the \texttt{Beam} class.
+\begin{sidewaystable}[h]
+  \caption{
+    Processing methods provided by the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \hline
+      \texttt{fillPhaseSpaceAll()} & & Boolean & Fill phase space for all \texttt{Beam} instances.  Class Method.
+                                                 Return \texttt{True} if successful.                                         \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The i/o methods provided by the \texttt{Beam} class are listed in
+table~\ref{Tab:B:IoMethods}.
+\begin{sidewaystable}[h]
+  \caption{
+    I/o methods provided by the \texttt{Beam} class. 
+  }
+  \label{Tab:B:IoMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \hline
+      \texttt{createParticleFile(path, file)} & Path, Str & Path    & Class method, kept for backward compatibility.          \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+
+\paragraph{Utilities} ~\newline
+\noindent
+The utilities provided by the \texttt{Beam} class are listed in
+table~\ref{Tab:B:UtilMethods}.
+\begin{sidewaystable}[h]
+  \caption{
+    Utilities provided by the \texttt{Beam}
+    class. 
+  }
+  \label{Tab:B:UtilMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \hline
+      \texttt{cleanAllParticles()}&  &  & Delete all \texttt{Beam} instances including \texttt{ReferenceParticle}.     \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\FloatBarrier
+
 \subsection{\texttt{BeamLineElement}}
 \label{SubSubSect:BLE}
 
