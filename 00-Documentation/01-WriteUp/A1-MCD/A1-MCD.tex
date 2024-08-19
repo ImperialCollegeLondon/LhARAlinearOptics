@@ -541,11 +541,22 @@ The \texttt{ReferenceParticle} class provides no additional utilities.
 
 The \texttt{Beam} class is in some sense a "sister" class to Particle.
 Whereas an instance of \texttt{Particle} records the passage of a
-particle travelling through the   beam line, an instance
+particle travelling through the beam line, an instance
 of \texttt{Beam} records the collective properties of the beam such as
-emittance, as the beam progresses through the beam line. 
+emittance, as the beam progresses through the beam line.
+The beam parameters reported in the attributes of an instance
+of \texttt{Beam} are obtained by summing over \texttt{nEvtsMax}
+particles to evaluate the covariance matrices by location.
 
-\subsubsection{Instantiation}
+The \texttt{extrapolatedBeam} class is derived from \texttt{Beam}.
+An instance of \texttt{extrapolatedBeam} calculates the covariance
+matrix at a location along the beam line and then uses the transfer
+matrices to propagate the beam envelope.
+
+\subsubsection{\texttt{Beam}}
+
+\paragraph{Instantiation}\mbox{}\\
+\noindent
 The call to instantiate the \texttt{Beam} class is:
 \begin{center}
   \texttt{Beam(InputDatafile, nEvtMax, outputCSVfile,
@@ -571,8 +582,9 @@ If the first record of \\
 \texttt{InputDatafile} contains the specification of the beam
 line, \texttt{beamlineSpecificationCSVfile} is not required. 
 
-\subsubsection{Instance attributes and access methods}
-\label{Para:BLE:InstAttr}
+\paragraph{Instance attributes and access methods}\mbox{}\\
+\label{Para:B:InstAttr}
+\noindent
 The instance attributes are presented in table~\ref{Tab:B:Attributes}
 and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
 \begin{sidewaystable}[h]
@@ -642,7 +654,8 @@ and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
   \end{center}
 \end{sidewaystable}
 
-\subsubsection{Processing methods}
+\paragraph{Processing methods}\mbox{}\\
+\noindent
 Table~\ref{Tab:B:ProcMethods} presents the processing methods provided
 in the \texttt{Beam} class.
 \begin{sidewaystable}[h]
@@ -669,10 +682,12 @@ in the \texttt{Beam} class.
   \end{center}
 \end{sidewaystable}
 
-\subsubsection{I/o methods}
+\paragraph{I/o methods}\mbox{}\\
+\noindent
 The \texttt{Beam} class has no i/o methods.
 
-\subsubsection{Utilities}
+\paragraph{Utilities}\mbox{}\\
+\noindent
 The utilities provided by the \texttt{Beam} class are listed in
 table~\ref{Tab:B:UtilMethods}.
 \begin{sidewaystable}[h]
@@ -696,6 +711,83 @@ table~\ref{Tab:B:UtilMethods}.
     \end{tabular}
   \end{center}
 \end{sidewaystable}
+
+\FloatBarrier
+
+\subsubsection{\texttt{extrapolateBeam}}
+
+\paragraph{Instantiation}\mbox{}\\
+\noindent
+The call to instantiate the \texttt{extrapolateBeam} class is:
+\begin{center}
+  \texttt{Beam(InputDatafile, nEvtMax, outputCSVfile,
+  startlocation, beamlineSpecificationCSVfile))}
+\end{center}
+The arguments are passed directly to a call to instantiate the
+parent \texttt{Beam} class.
+In the execution of \texttt{extrapolateBeam}, the covariance matrices
+are calculated from \texttt{nEvtMax} at \texttt{startlocation}.
+If \texttt{startlocation}, the last location provided in the input
+data file is used as the source.
+
+\paragraph{Instance attributes and access methods}\mbox{}\\
+\label{Para:B:InstAttr}
+\noindent
+Instance attributes are inheritted from \texttt{Beam} (table~\ref{Tab:B:Attributes}).
+Access methods are also inheritted from \texttt{Beam}
+(table~\ref{Tab:B:AccessMethods}).
+The method \texttt{resetextrapolateBeamInstances} is provided to reset
+only the list of instances of \texttt{extrapolateBeam}.
+
+\paragraph{Processing methods}\mbox{}\\
+\noindent
+Table~\ref{Tab:eB:ProcMethods} presents the processing methods provided
+in the \texttt{extrapolateBeam} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{extrapolateBeam}
+    class. 
+  }
+  \label{Tab:eB:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{5cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                                       \\
+      \hline
+      \texttt{initialiseSums()}       &                & & Initialise sums to be used to calculate covariance matrices at \texttt{startlocation}.     \\
+      \texttt{incfementSums(iPrtcl)}  & Particle       & & Increment sums for covariance matrix calculation for \texttt{Particle}
+                                                           instance \texttt{iPrtcl} at \texttt{startlocation}.                                        \\
+      \texttt{extrapolateCovarianceMatrix()} &         & & Extrapolate covariance matrices along the beam line by location.                           \\
+      \texttt{extrapolateBeam()}             &         & & Estrapolate beam envelope and beam parameters along the beam line by location.             \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{I/o methods}\mbox{}\\
+\noindent
+The \texttt{extrapolateBeam} class has no i/o methods.
+
+\paragraph{Utilities}\mbox{}\\
+\noindent
+The utilities provided by the \texttt{extrapolateBeam} class are listed in
+table~\ref{Tab:eB:UtilMethods}.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{extrapolateBeam}
+    class. 
+  }
+  \label{Tab:eB:UtilMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{6cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                         \\
+      \hline
+      \texttt{cleanextrapolateBeams()}       &  & boolean & Delete all \texttt{extrapolateBeam} instances, returns True if successful. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \FloatBarrier
 
