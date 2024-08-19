@@ -536,7 +536,7 @@ The \texttt{ReferenceParticle} class provides no additional utilities.
 \vfill
 \pagebreak
 
-\subsection{\texttt{Beam}}
+\subsection{\texttt{Beam} and \texttt{extrapolateBeam}}
 \label{SubSect:B}
 
 The \texttt{Beam} class is in some sense a "sister" class to Particle.
@@ -654,34 +654,23 @@ in the \texttt{Beam} class.
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                            \\
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                                       \\
       \hline
-      \texttt{fillPhaseSpaceAll()} & & Boolean & Fill phase space for all \texttt{Beam} instances.  Class Method.
-                                                 Return \texttt{True} if successful.                                         \\
+      \texttt{initialiseSums()}       &                & & Initialise sums to be used to calculate covariance matrices by location.     \\
+      \texttt{incfementSums(iPrtcl)}  & Particle       & & Increment sums for covariance matrix calculation for \texttt{Particle}
+                                                           instance \texttt{iPrtcl}.                                                    \\
+      \texttt{calcCovarianceMatrix()} &                & & Calculate covariance matrices by location.                                   \\
+      \texttt{evaluateBeam(TrackBeam=False)} & boolean & & Loop over \texttt{nEvtMax} partices to calculate beam parameters by location.
+                                                           If \texttt{TrackBeam} is True, particles are transported through the beam line.
+                                                           If \texttt{TrackBeam} is False, covariance matrices stored as \texttt{Beam}
+                                                           instance attributes are used.                                                \\
       \hline
     \end{tabular}
   \end{center}
 \end{sidewaystable}
 
 \subsubsection{I/o methods}
-The i/o methods provided by the \texttt{Beam} class are listed in
-table~\ref{Tab:B:IoMethods}.
-\begin{sidewaystable}[h]
-  \caption{
-    I/o methods provided by the \texttt{Beam} class. 
-  }
-  \label{Tab:B:IoMethods}
-  \begin{center}
-    \begin{tabular}{|l|c|c|p{10cm}|}
-      \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
-      \hline
-      \texttt{createParticleFile(path, file)} & Path, Str & Path    & Class method, kept for backward compatibility.          \\
-      \hline
-    \end{tabular}
-  \end{center}
-\end{sidewaystable}
-
+The \texttt{Beam} class has no i/o methods.
 
 \subsubsection{Utilities}
 The utilities provided by the \texttt{Beam} class are listed in
@@ -695,9 +684,14 @@ table~\ref{Tab:B:UtilMethods}.
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                          \\
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                         \\
       \hline
-      \texttt{cleanAllParticles()}&  &  & Delete all \texttt{Beam} instances including \texttt{ReferenceParticle}.     \\
+      \texttt{cleanBeams()}                  &  & boolean & Delete all \texttt{Beam} instances, returns True if successful.       \\
+      \texttt{printProgression()}            &  &         & Print beam parameters by location.                                    \\
+      \texttt{getHeader()}                   &  & list    & Prepare header for CSV file containing beam parameters by location.   \\
+      \texttt{getLines()}                    &  & list    & Prepare lines for CSV file containing beam parameters by location.    \\
+      \texttt{createReport()}                &  &         & Interface to \texttt{Report} class to make beam paramter CSV file.    \\
+      \texttt{plotBeamProgression(plotFILE)} &  & path    & Plot beam parameters by location; plotFILE is full path to plot file. \\
       \hline
     \end{tabular}
   \end{center}
