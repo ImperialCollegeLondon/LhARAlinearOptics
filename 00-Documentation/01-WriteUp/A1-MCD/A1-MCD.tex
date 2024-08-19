@@ -543,13 +543,9 @@ The \texttt{Beam} class is in some sense a "sister" class to Particle.
 Whereas an instance of \texttt{Particle} records the passage of a
 particle travelling through the   beam line, an instance
 of \texttt{Beam} records the collective properties of the beam such as
-emittance, etc., as the beam progresses through the beam line. 
+emittance, as the beam progresses through the beam line. 
 
-\subsubsection{\texttt{Beam}} ~\newline
-\label{SubSubSect:BLE:Particle}
-
-\paragraph{Instantiation}  ~\newline
-\noindent
+\subsubsection{Instantiation}
 The call to instantiate the \texttt{Beam} class is:
 \begin{center}
   \texttt{Beam(InputDatafile, nEvtMax, outputCSVfile,
@@ -561,26 +557,25 @@ the \texttt{BeamIO} class that refers to an existing data file that
 can be read.
 \texttt{nEvtMax} is the maximum number of events to read or process
 using the \texttt{Beam} instance.
-\texttt{outputCSVfile} is the output file, in CSV format, contining
-the beam paramters at the locations traversed by the beam.
+\texttt{outputCSVfile} is the full path to the output file, in CSV
+format, contining the beam paramters at the locations traversed by the
+beam. 
 \texttt{startlocation} is the location along the beam line at which
-propagation will start.
-If absent or None propagation will start at the soruce.
+propagation will start; if \texttt{startlocation} is absent or None
+propagation will start at the source.
 \texttt{beamlineSpecificationCSVfile} is the CSV file specifying the
-beam line.
-
+beam line. \\
 \texttt{beamlineSpecificationCSVfile} is kept for backward
 compatibilty.
 If the first record of \\
 \texttt{InputDatafile} contains the specification of the beam
 line, \texttt{beamlineSpecificationCSVfile} is not required. 
 
-\paragraph{Instance attributes and access methods} ~\newline
+\subsubsection{Instance attributes and access methods}
 \label{Para:BLE:InstAttr}
-\noindent
 The instance attributes are presented in table~\ref{Tab:B:Attributes}
 and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
-\begin{table}[h]
+\begin{sidewaystable}[h]
   \caption{
     Definition of attributes of instances of the \texttt{Beam} class.
   }
@@ -588,13 +583,33 @@ and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
   \begin{center}
     \begin{tabular}{|l|c|p{12cm}|}
       \hline
-      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                  \\
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                          \\
       \hline
-      \texttt{Species}       & str   & Particle species; proton, muon or pion.                                                     \\
-      \hline
+      \texttt{InputDataFile}      & Path/BeamIO & Path to, or \texttt{BeamIO} instance of input file.                \\
+      \texttt{nEvtMax}            & int         & Maximum number of particles to read and process.                   \\
+      \texttt{outputCSVfile}      & Path        & Path to output CSV file to contain beam parmeters by location.     \\
+      \texttt{startlocation}      & int         & Location at which to start beam propagation.                       \\
+      \texttt{BLspecCSVfile}      & Path        & \texttt{beamlineSpecificationCSVfile}, kept for backward compatibility. \\
+      \texttt{Location[iLoc]}     & List        & List of locations (int) at which beam parameters are recorded.     \\
+      \texttt{s[iLoc]}            & List        & List of $s$ coordinates of reference particle at locations at which
+                                                  beam parameters are recorded.                                      \\
+      \texttt{nParticles[iLoc]}   & List        & List of number of particles (int) recorded at location \texttt{iLoc}. \\
+      \texttt{CovMtrx[iLoc][6,6]} & List        & List of covariance matrices (ndarray) by location.                 \\
+      \texttt{sigmaxy[iLoc][2]}   & List        & List of $\sigma_x={\rm \texttt{sigmaxy[iLoc][0]}}$ and
+                                                  $\sigma_y={\rm \texttt{sigmaxy[iLoc][1]}}$ (float).                  \\
+      \texttt{emittance[iLoc][5]} & List        & List of emittance by location:
+                                                  $\epsilon_x      ={\rm \texttt{emittance[iLoc][0]}}$, 
+                                                  $\epsilon_y      ={\rm \texttt{emittance[iLoc][1]}}$, 
+                                                  $\epsilon_{\rm L} ={\rm \texttt{emittance[iLoc][2]}}$, 
+                                                  $\epsilon_{\rm 4D}={\rm \texttt{emittance[iLoc][3]}}$, 
+                                                  $\epsilon_{\rm 6D}={\rm \texttt{emittance[iLoc][4]}}$.                \\
+      \texttt{Twiss[iLoc][2][3]}  & List        & List of Twiss parameters by location:
+                                                  ${\rm \texttt{Twiss[iLoc][0][0:2]}}=[\alpha_x, \beta_x, \gamma_x]$, 
+                                                  ${\rm \texttt{Twiss[iLoc][1][0:2]}}=[\alpha_y, \beta_y, \gamma_y]$.  \\
+       \hline
     \end{tabular}
   \end{center}
-\end{table}
+\end{sidewaystable}
 \begin{sidewaystable}[h]
   \caption{
     Definition of access methods for the \texttt{Beam}
@@ -612,8 +627,7 @@ and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
   \end{center}
 \end{sidewaystable}
 
-\paragraph{Processing methods} ~\newline % Here!
-\noindent
+\subsubsection{Processing methods}
 Table~\ref{Tab:B:ProcMethods} presents the processing methods provided
 in the \texttt{Beam} class.
 \begin{sidewaystable}[h]
@@ -634,8 +648,7 @@ in the \texttt{Beam} class.
   \end{center}
 \end{sidewaystable}
 
-\paragraph{I/o methods} ~\newline
-\noindent
+\subsubsection{I/o methods}
 The i/o methods provided by the \texttt{Beam} class are listed in
 table~\ref{Tab:B:IoMethods}.
 \begin{sidewaystable}[h]
@@ -655,8 +668,7 @@ table~\ref{Tab:B:IoMethods}.
 \end{sidewaystable}
 
 
-\paragraph{Utilities} ~\newline
-\noindent
+\subsubsection{Utilities}
 The utilities provided by the \texttt{Beam} class are listed in
 table~\ref{Tab:B:UtilMethods}.
 \begin{sidewaystable}[h]
