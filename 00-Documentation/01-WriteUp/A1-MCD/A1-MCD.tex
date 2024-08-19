@@ -621,7 +621,22 @@ and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
       \hline
-      \texttt{setSpecies}        & \texttt{getSpecies}        & Set/get particle species.                                \\
+      \texttt{setInputDataFile}                & \texttt{setInputDataFile}                & Set path to input file.      \\
+      \texttt{setBeamIOread}                   & \texttt{setBeamIOread}                   & Set instance of \texttt{BeamIO} for input file.  \\
+      \texttt{setnEvtMax}                      & \texttt{setnEvtMax}                      & Set maximum number of particles to deal with.    \\
+      \texttt{setoutputCSVfile}                & \texttt{setoutputCSVfile}                & Set pathh to output CSV file.                    \\
+      \texttt{setstartlocation}                & \texttt{setstartlocation}                & Set start location.                              \\
+      \texttt{setbeamlineSpecificationCSVfile} & \texttt{getbeamlineSpecificationCSVfile} & Set beam line specification file.                \\
+      \texttt{sets}                            & \texttt{sets}                            & Set $s$ by location.                             \\
+      \texttt{setsigmaxy}                      & \texttt{setsigmaxy}                      & Set $\sigma_{x,y}$ by location.                   \\
+      \texttt{setEmittance}                    & \texttt{setEmittance}                    & Set emittance list by location.                  \\
+      \texttt{setTwiss}                        & \texttt{setTwiss}                        & Set Twiss paramter list by location.             \\
+      \texttt{resetBeamInstances}              &                                          & Set list of beam instances to \texttt{[]}.       \\
+                                               & \texttt{getCovSums}                      & Get list of sums used to calculate covariance matrices. \\
+                                               & \texttt{getCovMtrx}                      & Get list of covariance matrices by location.     \\
+                                               & \texttt{getnParticles}                   & Get number of particles entering covariance sums by location. \\
+                                               & \texttt{getCovarianceMatrix}             & Get list of covariance matrices by location.     \\
+                                               & \texttt{getCovMtrx}                      & Get list of covariance matrices by location.     \\
       \hline
     \end{tabular}
   \end{center}
