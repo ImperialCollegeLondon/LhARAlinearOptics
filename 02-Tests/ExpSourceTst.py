@@ -112,7 +112,7 @@ E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
 print("     ----> Generate many particles:")
 for i in range(100000):
-    X, Y, KE, cTheta, Phi = Src1.getParticle()
+    X, Y, KE, cTheta, Phi, xp, yp = Src1.getParticle()
     
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
@@ -137,7 +137,7 @@ for i in range(100000):
     PrtclT   = np.append(PrtclT , Theta)
 
     Phi      = mth.atan2(PhsSpcFrmSrc[1][0], PhsSpcFrmSrc[1][1])
-    if Phi < 0.: Phi += mth.pi
+    if Phi < 0.: Phi += 2. * mth.pi
     Phi *= 180. / mth.pi
     PrtclPhi = np.append(PrtclPhi, Phi)
 

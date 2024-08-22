@@ -61,22 +61,6 @@ class visualise(object):
         self.setCoordSys(_CoordSys)
         self.setProjection(_Projection)
 
-        """
-        if self.getProjection().find('s') >= 0:
-            axs.set_xlabel('s (m)')
-        elif self.getProjection().find('z') >= 0:
-            axs.set_xlabel('z (m)')
-        else:
-            axs.set_xlabel('Not given')
-            
-        if self.getProjection().find('x') >= 0:
-            axs.set_ylabel('x (m)')
-        elif self.getProjection().find('y') >= 0:
-            axs.set_ylabel('y (m)')
-        else:
-            axs.set_ylabel('Not given')
-        """
-        
         if self.getDebug():
             self.print()
 
@@ -114,7 +98,7 @@ class visualise(object):
         self._Projection = None
 
     @classmethod
-    def setinstances(cls, instances):
+    def setinstancesDeprecated(cls, instances):
         if not isinstance(instances, list):
             raise badParameter()
         cls.__instances = instances
@@ -127,12 +111,19 @@ class visualise(object):
 
     def setCoordSys(self, _CoordSys):
         if not isinstance(_CoordSys, str):
-            raise badParameter()
+            raise badParameter("Not string")
+        if _CoordSys != "RPLC" and _CoordSys != "Lab":
+            raise badParameter("Not RPLC or Lab")
+        
         self._CoordSys = _CoordSys
 
     def setProjection(self, _Projection):
         if not isinstance(_Projection, str):
-            raise badParameter()
+            raise badParameter("Not string")
+        if _Projection != "xs" and _Projection != "xz" and \
+           _Projection != "ys" and _Projection != "yz":
+            raise badParameter("Not xs, xz, ys, or yz")
+        
         self._Projection = _Projection
 
         

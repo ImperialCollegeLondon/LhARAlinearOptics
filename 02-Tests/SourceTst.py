@@ -52,7 +52,7 @@ except:
 #.. Create valid instance:
 Mode  = 0
 Param = [0.000004, 0.000004, 0.999691155, 1., 25., 1000, 2.5E+15, 70., \
-         0.8, 2.80E-14, 0.0000004, 4.00E+20, 25.]
+         0.8, 2.80E-14, 0.0000004, 4.00E+20, 25., 20., 15.]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
@@ -76,7 +76,7 @@ BLE.Source.setDebug(False)
 BLE.Source.cleaninstances()
 Src = BLE.Source("Source1", rStrt, vStrt, drStrt, dvStrt, \
                  1, [0.000004, 0.000004, 0.998, 20., 0.3])
-x, y, K, cTheta, Phi = Src.getParticle()
+x, y, K, cTheta, Phi, xp, yp = Src.getParticle()
 print("     ----> First particle: x, y, KE, cosTheta, Phi:", \
       x, y, K, cTheta, Phi)
 print("         ----> And now in trace space:", \
@@ -96,7 +96,7 @@ SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
 for i in range(10000):
-    X, Y, KE, cTheta, Phi = Src.getParticle()
+    X, Y, KE, cTheta, Phi, xp, yp = Src.getParticle()
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
@@ -209,7 +209,8 @@ print("SourceTest:", SourceTest, \
       "check.")
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
                   0, [0.000004, 0.000004, 0.999691155, 1., 25., 1000, \
-                      2.5E+15, 70., 0.8, 2.80E-14, 0.0000004, 4.00E+20, 25.])
+                      2.5E+15, 70., 0.8, 2.80E-14, 0.0000004, 4.00E+20, 25., \
+                      20., 15.])
 print(Src1)
 print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \
@@ -229,7 +230,7 @@ SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
 for i in range(100000):
-    X, Y, KE, cTheta, Phi = Src1.getParticle()
+    X, Y, KE, cTheta, Phi, xp, yp = Src1.getParticle()
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
@@ -362,7 +363,7 @@ SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
 for i in range(100000):
-    X, Y, KE, cTheta, Phi = Src2.getParticle()
+    X, Y, KE, cTheta, Phi, xp, yp = Src2.getParticle()
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)

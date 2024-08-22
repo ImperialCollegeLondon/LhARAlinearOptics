@@ -153,6 +153,7 @@ import math
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
 import LaTeX             as LTX
+import Simulation        as Simu
 
 #.. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -5186,13 +5187,13 @@ class Source(BeamLineElement):
             print(" BeamLineElement(Source).getParticleFromSource: start")
 
         #.. Generate initial particle:
-        x, y, K, cTheta, Phi = self.getParticle()
+        x, y, K, cTheta, Phi, xp, yp = self.getParticle()
         if self.__Debug:
             print("     ----> x, y, K, cTheta, Phi:", \
                   x, y, K, cTheta, Phi)
 
         #.. Convert to trace space:
-        TrcSpc = self.getTraceSpace(x, y, K, cTheta, Phi)
+        TrcSpc = self.getTraceSpace(x, y, K, cTheta, Phi, xp, yp)
         if self.__Debug:
             print("     ----> Trace space:", TrcSpc)
 
@@ -5213,11 +5214,22 @@ class Source(BeamLineElement):
             print("     ----> Mode, parameters:", \
                   self.getMode(), self.getParameters())
 
+        xp = None
+        yp = None
+
         if self._Mode == 0:
             KE            = self.getLaserDrivenProtonEnergy()  # [MeV]
             
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
+            
+            upmax         = mth.tan(np.radians(self.g_theta(KE)))
+            xp            = Simu.getParabolic(upmax)
+            yp            = Simu.getParabolic(upmax)
+
+            if xp == yp:
+                print(" Help, equal xp and yp")
+                
             cosTheta, Phi = self.getGaussianThetaPhi(KE)
             """
               Rolled back to: self.getGaussianThetaPhi(), KL: 08Mar24
@@ -5246,7 +5258,7 @@ class Source(BeamLineElement):
             print(" <---- BeamLineElement(Source).getParticle, done.", \
                   '  --------  --------  --------  --------  --------')
             
-        return X, Y, KE, cosTheta, Phi
+        return X, Y, KE, cosTheta, Phi, xp, yp
     
     def getFlatThetaPhi(self):
         cosTheta = rnd.uniform(self.getParameters()[2], 1.)
@@ -5509,7 +5521,7 @@ class Source(BeamLineElement):
 
         return Ee, g_E
     
-    def getTraceSpace(self, x, y, K, cTheta, Phi):
+    def getTraceSpace(self, x, y, K, cTheta, Phi, xp=None, yp=None):
         if self.getDebug():
             print(" Source(BeamLineElement).getTraceSpace: start.")
             print("     ----> x, y, K, cTheta, Phi:", \
@@ -5531,6 +5543,11 @@ class Source(BeamLineElement):
         sTheta = mth.sqrt(1.-cTheta**2)
         xPrime = sTheta * mth.cos(Phi) * p / p0
         yPrime = sTheta * mth.sin(Phi) * p / p0
+        if xp != None:
+            xPrime = xp * p / p0
+        if yp != None:
+            yPrime = yp * p / p0
+            
         """
         xPrime = sTheta * mth.cos(Phi)
         yPrime = sTheta * mth.sin(Phi)

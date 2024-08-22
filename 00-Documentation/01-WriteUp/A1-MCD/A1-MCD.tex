@@ -130,7 +130,7 @@ and the access methods are summarised in table~\ref{Tab:BL:AccessMethods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                              \\
       \hline
-      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{setSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
+      \texttt{setSrcTrcSpc(SrcTrcSpc)} & \texttt{getSrcTrcSpc()} & Set trace space at source; SrcTrcSpc presented as \texttt{(1,6)}
                                                                    \texttt{np.ndarray}.                                          \\
                                          & \texttt{getinsance()} & Get instance of \texttt{BeamLine} class.                        \\
                        & \texttt{BeamLineSpecificationCSVfile()} & Get beam line specification csv file.                           \\
@@ -633,11 +633,11 @@ and the access methods are summarised in table~\ref{Tab:B:AccessMethods}.
       \hline
       \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                      \\
       \hline
-      \texttt{setInputDataFile}                & \texttt{setInputDataFile}                & Set path to input file.      \\
-      \texttt{setBeamIOread}                   & \texttt{setBeamIOread}                   & Set instance of \texttt{BeamIO} for input file.  \\
-      \texttt{setnEvtMax}                      & \texttt{setnEvtMax}                      & Set maximum number of particles to deal with.    \\
-      \texttt{setoutputCSVfile}                & \texttt{setoutputCSVfile}                & Set pathh to output CSV file.                    \\
-      \texttt{setstartlocation}                & \texttt{setstartlocation}                & Set start location.                              \\
+      \texttt{setInputDataFile}                & \texttt{getInputDataFile}                & Set path to input file.      \\
+      \texttt{setBeamIOread}                   & \texttt{getBeamIOread}                   & Set instance of \texttt{BeamIO} for input file.  \\
+      \texttt{setnEvtMax}                      & \texttt{getnEvtMax}                      & Set maximum number of particles to deal with.    \\
+      \texttt{setoutputCSVfile}                & \texttt{getoutputCSVfile}                & Set pathh to output CSV file.                    \\
+      \texttt{setstartlocation}                & \texttt{getstartlocation}                & Set start location.                              \\
       \texttt{setbeamlineSpecificationCSVfile} & \texttt{getbeamlineSpecificationCSVfile} & Set beam line specification file.                \\
       \texttt{sets}                            & \texttt{sets}                            & Set $s$ by location.                             \\
       \texttt{setsigmaxy}                      & \texttt{setsigmaxy}                      & Set $\sigma_{x,y}$ by location.                   \\
@@ -721,7 +721,7 @@ table~\ref{Tab:B:UtilMethods}.
 The call to instantiate the \texttt{extrapolateBeam} class is:
 \begin{center}
   \texttt{Beam(InputDatafile, nEvtMax, outputCSVfile,
-  startlocation, beamlineSpecificationCSVfile))}
+  startlocation, beamlineSpecificationCSVfile)}
 \end{center}
 The arguments are passed directly to a call to instantiate the
 parent \texttt{Beam} class.
@@ -1854,6 +1854,178 @@ than those inheritted from the parent class.
 \paragraph{Processing methods} ~\newline
 \noindent
 The \texttt{CylindricalRFCavity} dericed class has no processing methods.
+
+\FloatBarrier
+
+\subsection{\texttt{UserFramework}}
+\label{SubSubSect:UsrFrmwrk}
+
+\texttt{UserFramework} is a module that provides a set of methods used
+in the code provided to allow users easy access to the code and data.
+The following methods are provided: \\
+\begin{description}
+  \item{\texttt{startAnalysis(argv)}}: processes input flags passed
+    in call to run script.  \\
+    Argument:
+    \begin{description}
+      \item{\texttt{argv}}: list of arguments passed to \texttt{main}
+        by call to run script.
+    \end{description}
+    Returns:
+    \begin{description}
+      \item{\texttt{Success}}:      (boolean) True if processing successful.
+      \item{\texttt{Debug}}:        (boolean) Set to True if
+                                    flag \texttt{-d} is set to True.
+      \item{\texttt{inputfile}}:    (path) full path to input file; set
+                                    using flag \texttt{-y}.
+      \item{\texttt{outputfile}}:   (path) full path to output file; set
+                                    using flag \texttt{-o}.
+      \item{\texttt{nEvts}}:        (integer) number of events to
+                                    process; set using flag \texttt{-n}.
+      \item{\texttt{bdsimfile}}:    (path) full path to bdsim format file; set
+                                    using flag \texttt{-z}.
+      \item{\texttt{beamspecfile}}: (path) full path to beam
+                                    specification CSV file; set
+                                    using flag \texttt{-b}. \\
+    \end{description}
+    
+  \item{\texttt{handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False)}}: 
+    File handling method to check files exist and create
+    relevant \texttt{BeamIO} instances. \\
+    Arguments:
+    \begin{description}
+      \item{\texttt{beamspecfile}}: (path) full path to beam
+                                    specification CSV file;
+      \item{\texttt{inputfile}}:    (path) full path to input file;
+      \item{\texttt{outputfile}}:   (path) full path to output file;
+      \item{\texttt{bdsimfile}}:    (path) full path to bdsim format file.
+    \end{description}
+    Returns:
+    \begin{description}
+      \item{\texttt{Success}}: (boolean) True if file handling successful.
+      \item{\texttt{ibmIOr}}:  (\texttt{BeamIO}) instance
+                               of \texttt{BeamIO} class for file to be read.
+      \item{\texttt{ibmIOw}}:  (\texttt{BeamIO}) instance
+                               of \texttt{BeamIO} class for file to be
+                               written. \\
+    \end{description}
+    
+  \item{\texttt{EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvtsIn)}}:
+    executes loop over \texttt{nEvtsIn} events.
+    Reads event record or generates event if \texttt{ibmIOr}$=$None,
+    and handles end-of-file.
+    Passes control to \texttt{UserAnal.EventLoop}.   \\
+    Arguments:
+    \begin{description}
+      \item{\texttt{iUsrAnl}}: (\texttt{UserAnal}) instance.
+      \item{\texttt{ibmIOr}}:  (\texttt{BeamIO}) instance
+                               of \texttt{BeamIO} class for file to be read.
+      \item{\texttt{ibmIOw}}:  (\texttt{BeamIO}) instance
+                               of \texttt{BeamIO} class for file to be
+                               written.
+      \item{\texttt{nEvtsIn}}: (integer) number of events to
+                               process.
+    \end{description}
+    Returns:
+    \begin{description}
+      \item{\texttt{Success}}: (boolean) True if successful.
+    \end{description}
+\end{description}
+
+\subsection{\texttt{visualise}}
+\label{SubSect:vis}
+
+The \texttt{visualise} class manages the visualisation of the beam
+line and particles traversing it.
+
+\subsubsection{Instantiation}
+\noindent
+The call to instantiate the \texttt{visualise} class is:
+\begin{center}
+  \texttt{Beam(CoordSys, Projection)}
+\end{center}
+\texttt{CoordSys} (string) is either ``RPLC'' to visualise the beam
+line in the reference particle local coordinate system or ``Lab''.
+\texttt{Projection} (string) is either ``$xs$'' (RPLC) or ``$xz$''
+(lab) to visualise the $xs$ or $xz$ projecton and eithed ``$ys$''
+(RPLC) or ``$yz$'' (lab) to visualise the $xs$ or $xz$ projecton.
+
+\subsubsection{Instance attributes and access methods}
+\label{Para:vis:InstAttr}
+\noindent
+The instance attributes are presented in table~\ref{Tab:vis:Attributes}
+and the access methods are summarised in table~\ref{Tab:vis:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{visualise} class.
+  }
+  \label{Tab:vis:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{12cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                \\
+      \hline
+      \texttt{CoordSys}  & String & Either ``RPLC'' to visualise the
+                                    in the reference particle local
+                                    coordinate system or ``Lab''.         \\
+      \texttt{Projection}& String & Either ``$xs$'' (RPLC) or ``$xz$''
+                                    (lab) to visualise the $xs$ or
+                                    $xz$ projecton and eithed ``$ys$'' 
+                                    (RPLC) or ``$yz$'' (lab) to
+                                    visualise the $xs$ or $xz$
+                                    projecton.                            \\
+       \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{visualise}
+    class. 
+  }
+  \label{Tab:vis:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{11cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                  \\
+      \hline
+      \texttt{setCoordSys}     & \texttt{getCoordSys}   & Set coordinate system for visualisation.     \\
+      \texttt{setProjection}   & \texttt{setProjection} & Set projection for visualisation.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods}
+\noindent
+Table~\ref{Tab:vis:ProcMethods} presents the processing methods provided
+in the \texttt{visualise} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{visualise}
+    class. 
+  }
+  \label{Tab:vis:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                                       \\
+      \hline
+      \texttt{Particles(axs, nPrtcl)} & plot, integer  & & Manage ploting of \texttt{nPrtcl} particles on \texttt{matplotlib} \texttt{axes}
+                                                           instance.                                                                    \\
+      \texttt{BeamLine(axs)}          & plot           & & Manage ploting of beam line on \texttt{matplotlib} \texttt{axes} instance.   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods}
+\noindent
+The \texttt{visualise} class has no i/o methods.
+
+\subsubsection{Utilities}
+\noindent
+The \texttt{visualise} class has no i/o methods.
 
 \FloatBarrier
 
