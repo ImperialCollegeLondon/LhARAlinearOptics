@@ -95,6 +95,7 @@ print("     ----> First particle: KE, cosThetaPhi:", \
 ##! Next: Get data for plots:
 PrtclX   = np.array([])
 PrtclY   = np.array([])
+
 PrtclKE  = np.array([])
 PrtclcT  = np.array([])
 PrtclT   = np.array([])
@@ -104,11 +105,15 @@ SrcX     = np.array([])
 SrcY     = np.array([])
 SrcXp    = np.array([])
 SrcYp    = np.array([])
+SrcZ     = np.array([])
 SrcE     = np.array([])
 
 g_E       = Src1.getLaserDrivenProtonEnergyProbDensity()
 E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
 for i in range(100000):
@@ -119,8 +124,7 @@ for i in range(100000):
     
     SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
     SrcY         = np.append(SrcY,  TrcSpcFrmSrc[2])
-    SrcXp        = np.append(SrcXp, TrcSpcFrmSrc[1])
-    SrcYp        = np.append(SrcYp, TrcSpcFrmSrc[3])
+    SrcZ         = np.append(SrcE,  TrcSpcFrmSrc[4])
     SrcE         = np.append(SrcE,  TrcSpcFrmSrc[5])
 
     p        = mth.sqrt(np.dot(PhsSpcFrmSrc[1], PhsSpcFrmSrc[1]))
@@ -143,6 +147,11 @@ for i in range(100000):
 
     PrtclX   = np.append(PrtclX , PhsSpcFrmSrc[0][0])
     PrtclY   = np.append(PrtclY , PhsSpcFrmSrc[0][1])
+
+    xp           = TrcSpcFrmSrc[1] * p0 / p
+    yp           = TrcSpcFrmSrc[3] * p0 / p
+    SrcXp        = np.append(SrcXp, xp)
+    SrcYp        = np.append(SrcYp, yp)
     
     
 print("     <---- Done.")
@@ -303,6 +312,65 @@ plt.title('ExpSourceTst (' + today + \
           fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_xy.pdf')
+plt.close()
+
+#.. ----> Trace space
+print("         ----> Trace space distributions:")
+
+plt.hist(SrcX, bins=50, color='k', histtype='step')
+plt.xlabel('$x$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $x$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_x.pdf')
+plt.close()
+
+plt.hist(SrcY, bins=50, color='k', histtype='step')
+plt.xlabel('$y$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $x$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_y.pdf')
+plt.close()
+
+plt.hist(SrcXp, bins=50, color='k', histtype='step')
+plt.xlabel('$x^{\\prime}$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $x^{\\prime}$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_xp.pdf')
+plt.close()
+
+plt.hist(SrcYp, bins=50, color='k', histtype='step')
+plt.xlabel('$y^{\\prime}$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $y^{\\prime}$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_yp.pdf')
+plt.close()
+
+plt.hist(SrcZ, bins=50, color='k', histtype='step')
+plt.xlabel('$z$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $z$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_z.pdf')
+plt.close()
+
+print("         <---- Done.")
+
+plt.hist(SrcE, bins=50, color='k', histtype='step')
+plt.xlabel('$\\delta$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $\\delta$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_d.pdf')
 plt.close()
 
 print("         <---- Done.")

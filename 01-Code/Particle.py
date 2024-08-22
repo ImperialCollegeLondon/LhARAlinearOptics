@@ -476,15 +476,15 @@ class Particle:
         species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
-        p0 = BL.BeamLine.getElement()[0].getp0()
-        E0 = np.sqrt(particleMASS**2 + p0**2)
-        b0 = p0/E0
-        E  = E0 + TrcSpc[5]*p0
+        p0  = BL.BeamLine.getElement()[0].getp0()
+        E0  = np.sqrt(particleMASS**2 + p0**2)
+        b0  = p0/E0
+        E   = E0 + TrcSpc[5]*p0
 
-        D     = mth.sqrt(1. + \
-                         2.*TrcSpc[5]/b0 +
-                         TrcSpc[5]**2)
-        eps   = ( TrcSpc[1]**2 + TrcSpc[3]**2  ) / (2.*D**2)
+        D   = mth.sqrt(1. + \
+                       2.*TrcSpc[5]/b0 +
+                       TrcSpc[5]**2)
+        eps = ( TrcSpc[1]**2 + TrcSpc[3]**2  ) / (2.*D**2)
         
         if cls.getDebug():
             print("     ---->       p0, E0, b0, E:", p0, E0, b0, E)

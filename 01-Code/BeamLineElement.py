@@ -5226,13 +5226,14 @@ class Source(BeamLineElement):
             upmax         = mth.sin(np.radians(self.g_theta(KE)))
             rp            = Simu.getParabolic(upmax)
             phi           = rnd.uniform(0., math.pi)
-            xp            = rp * mth.cos(phi)
-            yp            = rp * mth.sin(phi)
+            xp            = Simu.getParabolic(upmax)
+            yp            = Simu.getParabolic(upmax)
 
             if xp == yp:
                 print(" Help, equal xp and yp")
-                
-            cosTheta, Phi = self.getGaussianThetaPhi(KE)
+
+            
+            cosTheta, Phi = None, None # self.getGaussianThetaPhi(KE)
             """
               Rolled back to: self.getGaussianThetaPhi(), KL: 08Mar24
               Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
@@ -5541,10 +5542,12 @@ class Source(BeamLineElement):
         p = mth.sqrt(E**2 - protonMASS**2)
         if self.getDebug():
             print("     ----> K, E, p:", K, E, p)
-        
-        sTheta = mth.sqrt(1.-cTheta**2)
-        xPrime = sTheta * mth.cos(Phi) * p / p0
-        yPrime = sTheta * mth.sin(Phi) * p / p0
+
+        if cTheta != None:
+            sTheta = mth.sqrt(1.-cTheta**2)
+            xPrime = sTheta * mth.cos(Phi) * p / p0
+            yPrime = sTheta * mth.sin(Phi) * p / p0
+            
         if xp != None:
             xPrime = xp * p / p0
         if yp != None:
