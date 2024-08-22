@@ -5223,9 +5223,11 @@ class Source(BeamLineElement):
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
             
-            upmax         = mth.tan(np.radians(self.g_theta(KE)))
-            xp            = Simu.getParabolic(upmax)
-            yp            = Simu.getParabolic(upmax)
+            upmax         = mth.sin(np.radians(self.g_theta(KE)))
+            rp            = Simu.getParabolic(upmax)
+            phi           = rnd.uniform(0., math.pi)
+            xp            = rp * mth.cos(phi)
+            yp            = rp * mth.sin(phi)
 
             if xp == yp:
                 print(" Help, equal xp and yp")
