@@ -105,6 +105,7 @@ SrcX     = np.array([])
 SrcY     = np.array([])
 SrcXp    = np.array([])
 SrcYp    = np.array([])
+SrcRp    = np.array([])
 SrcZ     = np.array([])
 SrcE     = np.array([])
 
@@ -150,8 +151,10 @@ for i in range(100000):
 
     xp           = TrcSpcFrmSrc[1] * p0 / p
     yp           = TrcSpcFrmSrc[3] * p0 / p
+    rp           = mth.cos(Phi)*xp + mth.sin(Phi)*yp
     SrcXp        = np.append(SrcXp, xp)
     SrcYp        = np.append(SrcYp, yp)
+    SrcRp        = np.append(SrcRp, rp)
     
     
 print("     <---- Done.")
@@ -351,6 +354,15 @@ plt.title('ExpSourceTst (' + today + \
           '): $y^{\\prime}$ distribution', \
           fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_yp.pdf')
+plt.close()
+
+plt.hist(SrcRp, bins=50, color='k', histtype='step')
+plt.xlabel('$r^{\\prime}$ (m)')
+plt.ylabel('Entries')
+plt.title('ExpSourceTst (' + today + \
+          '): $r^{\\prime}$ distribution', \
+          fontname="Times New Roman",  size=12)
+plt.savefig('99-Scratch/SourceTst_rp.pdf')
 plt.close()
 
 plt.hist(SrcZ, bins=50, color='k', histtype='step')

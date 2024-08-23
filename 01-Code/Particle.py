@@ -493,14 +493,14 @@ class Particle:
             print("     ----> particleMASS, K0, K:", particleMASS, K0, K)
             print("     ---->          D, epsilon:", D, eps)
         
-        p  = mth.sqrt(E**2 - particleMASS**2)
+        p = mth.sqrt(E**2 - particleMASS**2)
         
         rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
 
-        px    = TrcSpc[1]*p0
-        py    = TrcSpc[3]*p0
-        p2    = p**2 - px**2 - py**2
-            
+        px = TrcSpc[1]*p0
+        py = TrcSpc[3]*p0
+        p2 = p**2 - px**2 - py**2
+        
         if p2 < 0.:
             #.. Report issue and expansion parameter:
             print(" Particle.RPLCTraceSpace2PhaseSpace:", \

@@ -153,7 +153,6 @@ import math
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
 import LaTeX             as LTX
-import Simulation        as Simu
 
 #.. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -5209,6 +5208,11 @@ class Source(BeamLineElement):
         return TrcSpc
 
     def getParticle(self):
+        """
+        self.setDebug(True)
+        self.setDebug(False)
+        exit()
+        """
         if self.getDebug():
             print(" BeamLineElement(Source).getParticle: start")
             print("     ----> Mode, parameters:", \
@@ -5218,16 +5222,34 @@ class Source(BeamLineElement):
         yp = None
 
         if self._Mode == 0:
-            KE            = self.getLaserDrivenProtonEnergy()  # [MeV]
+            KE     = self.getLaserDrivenProtonEnergy()  # [MeV]
             
-            X             = rnd.gauss(0., self.getParameters()[0])
-            Y             = rnd.gauss(0., self.getParameters()[1])
+            X      = rnd.gauss(0., self.getParameters()[0])
+            Y      = rnd.gauss(0., self.getParameters()[1])
             
-            upmax         = mth.sin(np.radians(self.g_theta(KE)))
-            rp            = Simu.getParabolic(upmax)
-            phi           = rnd.uniform(0., math.pi)
-            xp            = Simu.getParabolic(upmax)
-            yp            = Simu.getParabolic(upmax)
+            upmax  = mth.sin(np.radians(self.g_theta(KE)))
+            if self.getDebug():
+                print("     ----> upmax:", upmax)
+                
+            Accept = False
+            iCnt   = 0
+            while not Accept:
+                iCnt += 1
+                if iCnt > 1E6:
+                    raise KillInfiniteLoop(" iCnt: " + str(iCnt))
+                
+                xp    = rnd.uniform(-upmax, upmax)
+                yp    = rnd.uniform(-upmax, upmax)
+                if self.getDebug():
+                    print("     ----> ypmax:", ypmax)
+                    print("     ----> xp, yp:", xp, yp)
+                
+                grp   = self.getgofrp(upmax, xp, yp)
+                if self.getDebug():
+                    print("     ----> grp:", grp)
+
+                if rnd.random() < grp:
+                    Accept = True
 
             if xp == yp:
                 print(" Help, equal xp and yp")
@@ -5253,11 +5275,11 @@ class Source(BeamLineElement):
             KE            = rnd.uniform(self.getParameters()[3], \
                                         self.getParameters()[4])
 
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> X, Y, KE, cosTheta, Phi:", \
                   X, Y, KE, cosTheta, Phi)
             
-        if self.__Debug:
+        if self.getDebug():
             print(" <---- BeamLineElement(Source).getParticle, done.", \
                   '  --------  --------  --------  --------  --------')
             
@@ -5267,6 +5289,13 @@ class Source(BeamLineElement):
         cosTheta = rnd.uniform(self.getParameters()[2], 1.)
         Phi      = rnd.uniform( 0., 2.*mth.pi)
         return cosTheta, Phi
+    
+    def getgofrp(self, upmax, xp, yp):
+        Nrm = 1./upmax**2
+        rp2 = xp**2 + yp**2 
+        grp = Nrm * (upmax**2 - rp2)
+        
+        return grp
     
 
     ### Gaussian Angular Distribution ###   KL working on this now
