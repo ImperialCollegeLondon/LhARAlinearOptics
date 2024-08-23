@@ -5208,19 +5208,21 @@ class Source(BeamLineElement):
         return TrcSpc
 
     def getParticle(self):
-        """
-        self.setDebug(True)
-        self.setDebug(False)
-        exit()
-        """
         if self.getDebug():
             print(" BeamLineElement(Source).getParticle: start")
             print("     ----> Mode, parameters:", \
                   self.getMode(), self.getParameters())
 
-        xp = None
-        yp = None
+        #.. Initialise o/p to None:
+        X      = None
+        Y      = None
+        K      = None
+        cTheta = None
+        Phi    = None
+        xp     = None
+        yp     = None
 
+        #-------- Laser driven:
         if self._Mode == 0:
             KE     = self.getLaserDrivenProtonEnergy()  # [MeV]
             
@@ -5230,7 +5232,7 @@ class Source(BeamLineElement):
             upmax  = mth.sin(np.radians(self.g_theta(KE)))
             if self.getDebug():
                 print("     ----> upmax:", upmax)
-                
+
             Accept = False
             iCnt   = 0
             while not Accept:
@@ -5241,7 +5243,6 @@ class Source(BeamLineElement):
                 xp    = rnd.uniform(-upmax, upmax)
                 yp    = rnd.uniform(-upmax, upmax)
                 if self.getDebug():
-                    print("     ----> ypmax:", ypmax)
                     print("     ----> xp, yp:", xp, yp)
                 
                 grp   = self.getgofrp(upmax, xp, yp)
@@ -5250,7 +5251,7 @@ class Source(BeamLineElement):
 
                 if rnd.random() < grp:
                     Accept = True
-
+            
             if xp == yp:
                 print(" Help, equal xp and yp")
 
@@ -5576,17 +5577,14 @@ class Source(BeamLineElement):
             sTheta = mth.sqrt(1.-cTheta**2)
             xPrime = sTheta * mth.cos(Phi) * p / p0
             yPrime = sTheta * mth.sin(Phi) * p / p0
+        else:
+            sTheta = None
             
         if xp != None:
             xPrime = xp * p / p0
         if yp != None:
             yPrime = yp * p / p0
             
-        """
-        xPrime = sTheta * mth.cos(Phi)
-        yPrime = sTheta * mth.sin(Phi)
-        """
-        
         if self.getDebug():
             print("     ----> sTheta, xPrime, yPrime:", 
                   sTheta, xPrime, yPrime)

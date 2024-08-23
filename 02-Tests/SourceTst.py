@@ -95,7 +95,7 @@ SrcYp    = np.array([])
 SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
-for i in range(10000):
+for i in range(1000):
     X, Y, KE, cTheta, Phi, xp, yp = Src.getParticle()
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
@@ -219,8 +219,8 @@ print("     ----> First particle: KE, cosThetaPhi:", \
 PrtclX   = np.array([])
 PrtclY   = np.array([])
 PrtclKE  = np.array([])
-PrtclcT  = np.array([])
-PrtclPhi = np.array([])
+Prtclxp  = np.array([])
+Prtclyp = np.array([])
 
 SrcX     = np.array([])
 SrcY     = np.array([])
@@ -229,13 +229,14 @@ SrcYp    = np.array([])
 SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
-for i in range(100000):
+for i in range(10000):
     X, Y, KE, cTheta, Phi, xp, yp = Src1.getParticle()
+    
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
     PrtclKE  = np.append(PrtclKE , KE)
-    PrtclcT  = np.append(PrtclcT , cTheta)
-    PrtclPhi = np.append(PrtclPhi, Phi)
+    Prtclxp  = np.append(PrtclcT , xp)
+    Prtclyp  = np.append(PrtclPhi, yp)
 
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
@@ -271,21 +272,21 @@ plt.title('LsrDrvnSrc: Energy distribution')
 plt.savefig('99-Scratch/SourceTst_plot13.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(PrtclcT, \
+n, bins, patches = plt.hist(Prtclxp, \
                             bins=50, color='y', \
                             log=False)
-plt.xlabel('cos(theta)')
+plt.xlabel('xp')
 plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: (cos) polar angle distribution')
+plt.title('LsrDrvnSrc: xp')
 plt.savefig('99-Scratch/SourceTst_plot14.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(PrtclPhi, \
+n, bins, patches = plt.hist(Prtclyp, \
                             bins=50, color='y', \
                             log=False)
-plt.xlabel('Phi')
+plt.xlabel('yp')
 plt.ylabel('Entries')
-plt.title('LsrDrvnSrc: Azimuthal; angle distribution')
+plt.title('LsrDrvnSrc: yp')
 plt.savefig('99-Scratch/SourceTst_plot15.pdf')
 plt.close()
 
@@ -362,7 +363,7 @@ SrcYp    = np.array([])
 SrcE     = np.array([])
 
 print("     ----> Generate many particles:")
-for i in range(100000):
+for i in range(10000):
     X, Y, KE, cTheta, Phi, xp, yp = Src2.getParticle()
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)

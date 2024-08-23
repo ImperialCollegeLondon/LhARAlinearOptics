@@ -117,7 +117,7 @@ iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
-for i in range(100000):
+for i in range(1000000):
     X, Y, KE, cTheta, Phi, xp, yp = Src1.getParticle()
     
     TrcSpcFrmSrc = Src1.getParticleFromSource()
@@ -125,7 +125,7 @@ for i in range(100000):
     
     SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
     SrcY         = np.append(SrcY,  TrcSpcFrmSrc[2])
-    SrcZ         = np.append(SrcE,  TrcSpcFrmSrc[4])
+    SrcZ         = np.append(SrcZ,  TrcSpcFrmSrc[4])
     SrcE         = np.append(SrcE,  TrcSpcFrmSrc[5])
 
     p        = mth.sqrt(np.dot(PhsSpcFrmSrc[1], PhsSpcFrmSrc[1]))
