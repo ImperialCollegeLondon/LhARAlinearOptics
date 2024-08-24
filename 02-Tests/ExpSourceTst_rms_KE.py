@@ -21,6 +21,13 @@ import BeamLine          as BL
 import Particle          as Prtcl
 import PhysicalConstants as PhysCnst
 
+mpl.rc('text', usetex=True)
+mpl.rcParams['text.latex.preamble']="\\usepackage{bm}"
+mpl.rcParams["figure.autolayout"]=True
+
+cm = 1./2.54  # centimeters in inches
+
+today = date.today().strftime("%d/%m/%Y")
 
 #.. Physical Constants:
 constants_instance = PhysCnst.PhysicalConstants()
@@ -55,7 +62,7 @@ g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
 E_max_MeV = Src.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
-for i in range(100000):
+for i in range(10000):
     X, Y, KE, cTheta, Phi, xp, yp = Src.getParticle()
 
     TrcSpcFrmSrc = Src.getParticleFromSource()
@@ -118,19 +125,20 @@ intercept_error = np.sqrt(covariance_matrix[1, 1])
 x_fit = np.linspace(min(energy_bins_center), max(energy_bins_center), 500)
 y_fit = linear_fit(x_fit)
 
-plt.figure(figsize=(8, 5))
+fig = plt.figure(figsize=(18.*cm, 6.*cm))
 plt.scatter(energy_bins_center, rms_theta, s=5, color='black')
 
-Scl = mth.sqrt(1. - 2./mth.pi)
+Scl = mth.sqrt(1./5.)/2.
 expectation = [-Src.getParameters()[14]/E_max_MeV*Scl, Src.g_theta(0.)*Scl]
 plt.plot(x_fit, y_fit, color='red', \
          label=f'    Linear Fit:    RMS $\\theta_S = ({coefficients[0]:.3f} \\pm {slope_error:.3f})$K$ + ({coefficients[1]:.2f} \\pm {intercept_error:.2f})$')
 plt.plot([], [], ' ', \
          label=f'Expectation:    RMS $\\theta_S = {expectation[0]:.3f}$K$ + {expectation[1]:.2f}$')
 
-plt.xlabel('Kinetic energy, $K$ (MeV)')
-plt.ylabel('RMS $\\theta_S$ (degrees)')
-plt.title('RMS $\\theta_S$ versus kinetic energy')
+plt.xlabel('Kinetic energy, $K$ (MeV)', loc='right')
+plt.ylabel('RMS $\\theta_S$ (degrees)', loc='top')
+plt.title('ExpSourceTst (' + today + \
+          '): RMS $\\theta_S$ versus kinetic energy')
 plt.legend()
 plt.savefig('99-Scratch/RMS_Set_kE.pdf')
 plt.close()

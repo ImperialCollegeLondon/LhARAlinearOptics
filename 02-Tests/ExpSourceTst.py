@@ -23,6 +23,9 @@ import PhysicalConstants as PhysCnst
 
 mpl.rc('text', usetex=True)
 mpl.rcParams['text.latex.preamble']="\\usepackage{bm}"
+mpl.rcParams["figure.autolayout"]=True
+
+cm = 1./2.54  # centimeters in inches
 
 #.. Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
@@ -117,7 +120,7 @@ iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
-for i in range(1000000):
+for i in range(10000):
     X, Y, KE, cTheta, Phi, xp, yp = Src1.getParticle()
     
     TrcSpcFrmSrc = Src1.getParticleFromSource()
@@ -171,6 +174,8 @@ today = date.today().strftime("%d/%m/%Y")
 #.. ----> Kinetic energy:
 print("         ----> Kinetic energy:")
 
+fig = plt.figure(figsize=(18.*cm, 6.*cm))
+
 n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='k', \
                             histtype='step', label='Generated Distribution')
@@ -214,7 +219,7 @@ for eps in Ee:
     eps1 = eps * (1.6e-19 * 1e6)
     cumPROB.append(Src1.getLaserCumProb(eps1))
     sigT.append(Src1.g_theta(eps))
-    
+
 plt.plot(Ee, cumPROB, color='k', label='Required Distribution', linewidth=1)
 
 plt.xlabel('Kinetic energy (MeV)', loc='right')
@@ -286,6 +291,7 @@ print("         <---- Done.")
 #.. ----> phi distribution:
 print("         ----> phi distribution:")
 
+fig = plt.figure(figsize=(9.*cm, 6.*cm))
 n, bins, patches = plt.hist(PrtclPhi, \
                             bins=50, color='k', \
                             histtype='step')
@@ -338,6 +344,7 @@ plt.title('ExpSourceTst (' + today + \
 plt.savefig('99-Scratch/SourceTst_y.pdf')
 plt.close()
 
+fig = plt.figure(figsize=(9.*cm, 6.*cm))
 plt.hist(SrcXp, bins=50, color='k', histtype='step')
 plt.xlabel('$x^{\\prime}$ (m)')
 plt.ylabel('Entries')
@@ -347,6 +354,7 @@ plt.title('ExpSourceTst (' + today + \
 plt.savefig('99-Scratch/SourceTst_xp.pdf')
 plt.close()
 
+fig = plt.figure(figsize=(9.*cm, 6.*cm))
 plt.hist(SrcYp, bins=50, color='k', histtype='step')
 plt.xlabel('$y^{\\prime}$ (m)')
 plt.ylabel('Entries')
@@ -356,6 +364,7 @@ plt.title('ExpSourceTst (' + today + \
 plt.savefig('99-Scratch/SourceTst_yp.pdf')
 plt.close()
 
+fig = plt.figure(figsize=(9.*cm, 6.*cm))
 plt.hist(SrcRp, bins=50, color='k', histtype='step')
 plt.xlabel('$r^{\\prime}$ (m)')
 plt.ylabel('Entries')
