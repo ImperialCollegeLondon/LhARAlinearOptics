@@ -234,9 +234,9 @@ for i in range(10000):
     
     PrtclX   = np.append(PrtclX , X)
     PrtclY   = np.append(PrtclY , Y)
-    PrtclKE  = np.append(PrtclKE , KE)
-    Prtclxp  = np.append(PrtclcT , xp)
-    Prtclyp  = np.append(PrtclPhi, yp)
+    PrtclKE  = np.append(PrtclKE, KE)
+    Prtclxp  = np.append(Prtclxp, xp)
+    Prtclyp  = np.append(Prtclyp, yp)
 
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
