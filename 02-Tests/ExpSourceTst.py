@@ -24,6 +24,7 @@ import PhysicalConstants as PhysCnst
 mpl.rc('text', usetex=True)
 mpl.rcParams['text.latex.preamble']="\\usepackage{bm}"
 mpl.rcParams["figure.autolayout"]=True
+mpl.rcParams['figure.constrained_layout.use'] = True
 
 cm = 1./2.54  # centimeters in inches
 
@@ -121,8 +122,6 @@ p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
 for i in range(10000):
-    X, Y, KE, cTheta, Phi, xp, yp = Src1.getParticle()
-    
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
     
@@ -235,6 +234,7 @@ plt.close()
 #.. ----> cos(theta) and theta distribution:
 print("         ----> cos(theta) and theta distribution:")
 
+fig = plt.figure(figsize=(9.*cm, 9.*cm))
 n, bins, patches = plt.hist(PrtclcT, \
                             bins=50, color='k', \
                             histtype='step')
@@ -248,6 +248,7 @@ plt.title('ExpSourceTst (' + today + \
 plt.savefig('99-Scratch/SourceTst_costheta.pdf')
 plt.close()
 
+fig = plt.figure(figsize=(9.*cm, 9.*cm))
 n, bins, patches = plt.hist(PrtclT, \
                             bins=50, color='k', \
                             histtype='step')
@@ -273,6 +274,7 @@ plt.legend(loc="best")
 plt.savefig('99-Scratch/SourceTst_sigTK.pdf')
 plt.close()
 
+fig = plt.figure(figsize=(9.*cm, 8.*cm))
 plt.hist2d(PrtclKE, PrtclT, \
            bins=50, norm=mpl.colors.LogNorm())
 plt.colorbar()
@@ -310,6 +312,8 @@ print("         <---- Done.")
 #.. ----> x,y distribution:
 print("         ----> (x, y) distribution:")
 
+fig = plt.figure(figsize=(9.*cm, 8.*cm))
+
 plt.hist2d(PrtclX, PrtclY, \
            bins=50, norm=mpl.colors.LogNorm())
 plt.colorbar()
@@ -326,6 +330,8 @@ plt.close()
 #.. ----> Trace space
 print("         ----> Trace space distributions:")
 
+fig = plt.figure(figsize=(9.*cm, 9.*cm))
+
 plt.hist(SrcX, bins=50, color='k', histtype='step')
 plt.xlabel('$x$ (m)')
 plt.ylabel('Entries')
@@ -334,6 +340,8 @@ plt.title('ExpSourceTst (' + today + \
           fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_x.pdf')
 plt.close()
+
+fig = plt.figure(figsize=(9.*cm, 9.*cm))
 
 plt.hist(SrcY, bins=50, color='k', histtype='step')
 plt.xlabel('$y$ (m)')
@@ -385,6 +393,7 @@ plt.close()
 
 print("         <---- Done.")
 
+fig = plt.figure(figsize=(9.*cm, 9.*cm))
 plt.hist(SrcE, bins=50, color='k', histtype='step')
 plt.xlabel('$\\delta$ (m)')
 plt.ylabel('Entries')

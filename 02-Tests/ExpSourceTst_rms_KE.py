@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 Test script for "Source" class
 =============================
@@ -24,6 +25,7 @@ import PhysicalConstants as PhysCnst
 mpl.rc('text', usetex=True)
 mpl.rcParams['text.latex.preamble']="\\usepackage{bm}"
 mpl.rcParams["figure.autolayout"]=True
+mpl.rcParams['figure.constrained_layout.use'] = True
 
 cm = 1./2.54  # centimeters in inches
 
@@ -63,8 +65,6 @@ E_max_MeV = Src.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
 for i in range(10000):
-    X, Y, KE, cTheta, Phi, xp, yp = Src.getParticle()
-
     TrcSpcFrmSrc = Src.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
 
@@ -128,7 +128,13 @@ y_fit = linear_fit(x_fit)
 fig = plt.figure(figsize=(18.*cm, 6.*cm))
 plt.scatter(energy_bins_center, rms_theta, s=5, color='black')
 
-Scl = mth.sqrt(1./5.)/2.
+print(Src.getParameters()[13], Src.getParameters()[14], Src.g_theta(0.))
+thmax = np.radians(Src.getParameters()[13])
+upmax = mth.sin(thmax)
+Scl = 0.5 * mth.sqrt( 1. /18. / upmax**3 * ( \
+                                             -12.*thmax*mth.cos(3*thmax) + (-14.+9.*thmax**2+(26.-9.*thmax**2)*mth.cos(2.*thmax))*upmax)
+                     ) * 180. / mth.pi / Src.getParameters()[13]
+print(" Scl:", Scl)
 expectation = [-Src.getParameters()[14]/E_max_MeV*Scl, Src.g_theta(0.)*Scl]
 plt.plot(x_fit, y_fit, color='red', \
          label=f'    Linear Fit:    RMS $\\theta_S = ({coefficients[0]:.3f} \\pm {slope_error:.3f})$K$ + ({coefficients[1]:.2f} \\pm {intercept_error:.2f})$')
@@ -142,3 +148,18 @@ plt.title('ExpSourceTst (' + today + \
 plt.legend()
 plt.savefig('99-Scratch/RMS_Set_kE.pdf')
 plt.close()
+
+
+def func(thetadeg):
+    theta = thetadeg * mth.pi/180.
+    upmax = mth.sin(theta)
+
+    Scl = mth.sqrt( 1. /18. / upmax**3 * ( \
+                                           -12.*thmax*mth.cos(3*thmax) + (-14.+9.*thmax**2+(26.-9.*thmax**2)*mth.cos(2.*thmax))*upmax)
+                   ) * 180. / mth.pi
+
+    print(Scl)
+    
+    return Scl
+
+print(func(20.))
