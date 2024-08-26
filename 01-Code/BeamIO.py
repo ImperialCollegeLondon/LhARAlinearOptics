@@ -7,6 +7,32 @@ Class BeamIO:
   Class provides management of file handling and i/o for the Beam
   package.
 
+  Class attributes:
+  -----------------
+    instances : List of instances of Particle class
+  __Debug     : Debug flag
+
+      
+      Input arguments:
+      ----------------
+        _datafilePATH :
+        _datafileNAME : 
+              _create :
+           _BDSIMfile :
+
+
+  Instance attributes:
+  --------------------
+   All instance attributes are initialised to Null
+
+            _dataFile : 
+           _Rd1stRcrd :
+     _dataFILEversion :
+           _BDSIMfile :
+
+
+
+
 """
 
 import io
@@ -124,19 +150,77 @@ class BeamIO:
         print("     ----> Data file:", self.getdataFILE())
 
         
-#.. Flush and close
-    def flushNclosedataFile(self, dataFILE=None):
-        if self.getDebug():
-            print(" BeamIO.flushNclosedataFile starts")
-            print("     ----> File:", dataFILE)
+#--------  "Set method" only Debug
+#.. Method believed to be self documenting(!)
 
-        if not isinstance(dataFILE, io.BufferedWriter):
-            raise noFILE( \
-                    " BeamIO.flushNcloseParticle: file does not exist.")
+    @classmethod
+    def setDebug(cls, Debug=False):
+        if cls.__Debug:
+            print(" BeamIO.setdebug: ", Debug)
+        cls.__Debug = Debug
+        
+    def setAll2None(self):
+        self._dataFile        = None
+        self._Rd1stRcrd       = False
+        self._dataFILEversion = None
+        self._BDSIMfile       = None
 
-        dataFILE.flush()
-        dataFILE.close()
+    @classmethod
+    def resetinstances(cls):
+        cls.instances = []
+        
+    def setpathFILE(self, _pathFILE):
+        self._pathFILE = _pathFILE
 
+    def setdataFILE(self, _dataFILE):
+        self._dataFILE = _dataFILE
+
+    def setReadFirstRecord(self, _Rd1stRcrd):
+        if not isinstance(_Rd1stRcrd, bool):
+            raise badArgument()
+        self._Rd1stRcrd = _Rd1stRcrd 
+
+    def setdataFILEversion(self, dataFILEversion):
+        if not isinstance(dataFILEversion, int):
+            raise badArgument()
+        self._dataFILEversion = dataFILEversion
+
+    def setBDSIMfile(self, _BDSIMfile):
+        if not isinstance(_BDSIMfile, bool):
+            raise badArgument()
+        self._BDSIMfile = _BDSIMfile
+
+        
+#--------  "Get methods" only; version, reference, and constants
+#.. Methods believed to be self documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+
+    @classmethod
+    def getinstances(cls):
+        return cls.instances
+
+    def getpathFILE(self):
+        return self._pathFILE
+
+    def getdataFILE(self):
+        return self._dataFILE
+
+    def getReadFirstRecord(self):
+        return self._Rd1stRcrd
+
+    def getdataFILEversion(self):
+        return self._dataFILEversion
+
+    def getBDSIMfile(self):
+        return self._BDSIMfile
+
+    
+#--------  Processing methods:
+
+
+#--------  I/o methods:
 #.. Manage read:
     def readBeamDataRecord(self):
         if self.getDebug():
@@ -238,72 +322,18 @@ class BeamIO:
 
         return Version
         
-        
-#--------  "Set method" only Debug
-#.. Method believed to be self documenting(!)
+#.. Flush and close
+    def flushNclosedataFile(self, dataFILE=None):
+        if self.getDebug():
+            print(" BeamIO.flushNclosedataFile starts")
+            print("     ----> File:", dataFILE)
 
-    @classmethod
-    def setDebug(cls, Debug=False):
-        if cls.__Debug:
-            print(" BeamIO.setdebug: ", Debug)
-        cls.__Debug = Debug
-        
-    def setAll2None(self):
-        self._dataFile        = None
-        self._Rd1stRcrd       = False
-        self._dataFILEversion = None
-        self._BDSIMfile       = None
+        if not isinstance(dataFILE, io.BufferedWriter):
+            raise noFILE( \
+                    " BeamIO.flushNcloseParticle: file does not exist.")
 
-    @classmethod
-    def resetinstances(cls):
-        cls.instances = []
-        
-    def setpathFILE(self, _pathFILE):
-        self._pathFILE = _pathFILE
-
-    def setdataFILE(self, _dataFILE):
-        self._dataFILE = _dataFILE
-
-    def setReadFirstRecord(self, _Rd1stRcrd):
-        if not isinstance(_Rd1stRcrd, bool):
-            raise badArgument()
-        self._Rd1stRcrd = _Rd1stRcrd 
-
-    def setdataFILEversion(self, dataFILEversion):
-        if not isinstance(dataFILEversion, int):
-            raise badArgument()
-        self._dataFILEversion = dataFILEversion
-
-    def setBDSIMfile(self, _BDSIMfile):
-        if not isinstance(_BDSIMfile, bool):
-            raise badArgument()
-        self._BDSIMfile = _BDSIMfile
-
-        
-#--------  "Get methods" only; version, reference, and constants
-#.. Methods believed to be self documenting(!)
-    @classmethod
-    def getDebug(cls):
-        return cls.__Debug
-
-    @classmethod
-    def getinstances(cls):
-        return cls.instances
-
-    def getdataFILE(self):
-        return self._dataFILE
-
-    def getpathFILE(self):
-        return self._pathFILE
-
-    def getReadFirstRecord(self):
-        return self._Rd1stRcrd
-
-    def getdataFILEversion(self):
-        return self._dataFILEversion
-
-    def getBDSIMfile(self):
-        return self._BDSIMfile
+        dataFILE.flush()
+        dataFILE.close()
 
 
 #--------  Utilities:

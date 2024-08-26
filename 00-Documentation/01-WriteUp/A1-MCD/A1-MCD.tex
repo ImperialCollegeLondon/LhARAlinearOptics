@@ -2029,3 +2029,131 @@ The \texttt{visualise} class has no i/o methods.
 
 \FloatBarrier
 
+\subsection{\texttt{BeamIO}}
+\label{SubSect:BmIO}
+
+The \texttt{BeamIO} class provides interfaces to the reading and
+writing of beam specification and beam data files.
+Each file is managed through an instance of the \texttt{BeamIO} class
+or a class derived from it.
+
+\subsubsection{Instantiation}
+\noindent
+The call to instantiate the \texttt{BeamIO} class is:
+\begin{center}
+  \texttt{BeamIO(datafilePATH, datafileNAME, create, BDSIMfile)}
+\end{center}
+\begin{description}
+  \item{\texttt{datafilePATH}}: (string) Path to directory in which
+    input file is to be found, or, in which output file is to be
+    created. 
+    \texttt{datafilePATH} can be set to  None if the full path is
+    specified in \texttt{datafileNAME}.
+  \item{\texttt{datafileNAME}}: (string) File name (string) which,
+    when appendded to \texttt{datafilePATH} gives the full path to the
+    input or output data file, or. full path to the input or output
+    file.
+  \item{\texttt{create}}: (boolean) if true indicates that the file
+    must be created.
+    If a file exists at the location specified
+    by \texttt{datafilePATH} and \texttt{datafileNAME} it will be
+    overwritten.
+  \item{\texttt{BDSIMfile}}: (boolean) If True then the file is to be
+    read or written in \texttt{BDSIMfile} format.
+\end{description}
+
+\subsubsection{Instance attributes and access methods}
+\label{Para:BmIO:InstAttr}
+\noindent
+The \texttt{BeamIO} instance attributes are presented in
+table~\ref{Tab:BmIO:Attributes} and the access methods are summarised
+in table~\ref{Tab:BmIO:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{BeamIO} class.
+  }
+  \label{Tab:BmIO:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{11cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                \\
+      \hline
+      \texttt{dataFILE}        & Path    & Full path to data file.                  \\
+      \texttt{Read1stRecord}   & Boolean & True if first record has been read from file. \\
+      \texttt{dataFILEversion} & Integer & For \texttt{BeamIO} files version number identifying file format. \\
+      \texttt{BDSIMfile}       & Boolean & True id reading or writing a BDSim file. \\
+       \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{BeamIO}
+    class. 
+  }
+  \label{Tab:BmIO:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7.5cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                                 \\
+      \hline
+      \texttt{setpathFILE}        & \texttt{getpathFILE}        & Set/get path to directory containing data file.                   \\
+      \texttt{setdataFILE}        & \texttt{getdataFILE}        & Set/get full path to data file.                                   \\
+      \texttt{setReadFirstRecord} & \texttt{getReadFirstRecord} & Set/get flag indicating whether the first record has been read.   \\
+      \texttt{setdataFILEversion} & \texttt{getdataFILEversion} & Set/get \texttt{BeamIO} version number.                           \\
+      \texttt{setBDSIMfile}       & \texttt{getBDSIMfile}       & Set/get flag indicating whether the data file is in BDSIM format. \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods}
+\noindent
+The \texttt{BeamIO} class has no processing methods.
+
+\subsubsection{I/o methods}
+\noindent
+Table~\ref{Tab:BmIO:IoMethods} presents the i/o methods provided by the
+\texttt{BeamIO} class.
+\begin{table}[h]
+  \caption{
+    I/o methods provided by the \texttt{BeamIO} class. 
+  }
+  \label{Tab:BmIO:IoMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{5cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                        \\
+      \hline
+      \texttt{readBeamDataRecord()}  &   & Boolean & Manages reading/writing of a record from/to the data file.
+                                           Returns a boolean, \texttt{EoF}, set to True of end of file has been detected. \\
+      \texttt{readVersion()}         &   & Integer & Reads data-file format version number from file.
+                                           Returns integer version number.                                                \\
+      \texttt{flushNclosedataFile(dataFILE)} & Path &     & Flush and close data \texttt{dataFILE} at end of processing.  \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Utilities}
+\noindent
+Table~\ref{Tab:BmIO:Utils} presents the utilities provided by the
+\texttt{BeamIO} class.
+\begin{table}[h]
+  \caption{
+    Utilities provided by the \texttt{BeamIO} class. 
+  }
+  \label{Tab:BmIO:Utils}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                          \\
+      \hline
+      \texttt{cleanBeamIOfiles()} &  &  & Delete \texttt{BeamIO} instances and reset list of instances.    \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\FloatBarrier
+
