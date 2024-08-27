@@ -19,7 +19,7 @@ print("LhARAOpticsPATH", LhARAOpticsPATH)
 filename  = os.path.join(LhARAOpticsPATH, \
                          '11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv')
 
-Smltn = Simu.Simulation(100000, filename)
+Smltn = Simu.Simulation(10000, filename)
 print()
 print(" <---- Simulation initialised.")
 

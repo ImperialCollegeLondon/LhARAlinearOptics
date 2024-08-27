@@ -16,7 +16,7 @@ Class BeamIO:
       Input arguments:
       ----------------
         _datafilePATH :
-        _datafileNAME : 
+        _datafileNAME :
               _create :
            _BDSIMfile :
 
@@ -174,10 +174,6 @@ class BeamIO:
         self._create          = None
         self._BDSIMfile       = None
 
-    @classmethod
-    def resetinstances(cls):
-        cls.instances = []
-        
     def setpathFILE(self, _pathFILE):
         self._pathFILE = _pathFILE
 
@@ -354,6 +350,10 @@ class BeamIO:
 
 
 #--------  Utilities:
+    @classmethod
+    def resetinstances(cls):
+        cls.instances = []
+        
     @classmethod
     def cleanBeamIOfiles(cls):
         DoneOK = False

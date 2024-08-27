@@ -372,10 +372,14 @@ table~\ref{Tab:P:IoMethods}.
       \texttt{readParticle(file)}             & Path      & Boolean & Read particle from input stream.  Called from \texttt{BeamIO}.
                                                                    \texttt{file} is full path to file. Return \texttt{True} if end
                                                                    of file.                                                   \\
-      \texttt{writeParticle(file, clean)} & Path, boolean &      & Write particle to output stream.  Called from \texttt{BeamIO}.
+      \texttt{writeParticle(file, clean)} & Path, boolean &      & Write particle to output stream.  
                                                                    \texttt{file} is full path to file. If \texttt{clean}, then
                                                                    clean particle instance after write.                    \\
-      
+      \texttt{writeParticleBDSIM(file, iLoc, clean)} & Path, integer, boolean &  & Write particle to BDSIM ascii file.
+                                                                   \texttt{file} is full path to file.
+                                                                   \texttt{iLoc} is the location along the beamm line at which
+                                                                   to write the particle coordinates.
+                                                                   If \texttt{clean}, then clean particle instance after write. \\
       \hline
     \end{tabular}
   \end{center}
@@ -2081,6 +2085,7 @@ in table~\ref{Tab:BmIO:AccessMethods}.
       \texttt{dataFILE}        & Path    & Full path to data file.                  \\
       \texttt{Read1stRecord}   & Boolean & True if first record has been read from file. \\
       \texttt{dataFILEversion} & Integer & For \texttt{BeamIO} files version number identifying file format. \\
+      \texttt{create}          & Boolean & True if data file is to be created. \\
       \texttt{BDSIMfile}       & Boolean & True id reading or writing a BDSim file. \\
        \hline
     \end{tabular}
@@ -2100,6 +2105,7 @@ in table~\ref{Tab:BmIO:AccessMethods}.
       \texttt{setpathFILE}        & \texttt{getpathFILE}        & Set/get path to directory containing data file.                   \\
       \texttt{setdataFILE}        & \texttt{getdataFILE}        & Set/get full path to data file.                                   \\
       \texttt{setReadFirstRecord} & \texttt{getReadFirstRecord} & Set/get flag indicating whether the first record has been read.   \\
+      \texttt{setcreate}          & \texttt{getcreate}          & Set/get flag indicating whether data file is to be created.       \\
       \texttt{setdataFILEversion} & \texttt{getdataFILEversion} & Set/get \texttt{BeamIO} version number.                           \\
       \texttt{setBDSIMfile}       & \texttt{getBDSIMfile}       & Set/get flag indicating whether the data file is in BDSIM format. \\
       \hline
@@ -2147,9 +2153,10 @@ Table~\ref{Tab:BmIO:Utils} presents the utilities provided by the
   \begin{center}
     \begin{tabular}{|l|c|c|p{7cm}|}
       \hline
-      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                          \\
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                     \\
       \hline
-      \texttt{cleanBeamIOfiles()} &  &  & Delete \texttt{BeamIO} instances and reset list of instances.    \\
+      \texttt{resetinstances()}   &  &  & Class method. Sets list of instances to \texttt{[]}.                        \\
+      \texttt{cleanBeamIOfiles()} &  &  & Class method. Delete \texttt{BeamIO} instances and reset list of instances. \\
       \hline
     \end{tabular}
   \end{center}

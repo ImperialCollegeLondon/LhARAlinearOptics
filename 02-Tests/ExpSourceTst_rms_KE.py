@@ -128,13 +128,11 @@ y_fit = linear_fit(x_fit)
 fig = plt.figure(figsize=(18.*cm, 6.*cm))
 plt.scatter(energy_bins_center, rms_theta, s=5, color='black')
 
-print(Src.getParameters()[13], Src.getParameters()[14], Src.g_theta(0.))
 thmax = np.radians(Src.getParameters()[13])
 upmax = mth.sin(thmax)
 Scl = 0.5 * mth.sqrt( 1. /18. / upmax**3 * ( \
                                              -12.*thmax*mth.cos(3*thmax) + (-14.+9.*thmax**2+(26.-9.*thmax**2)*mth.cos(2.*thmax))*upmax)
                      ) * 180. / mth.pi / Src.getParameters()[13]
-print(" Scl:", Scl)
 expectation = [-Src.getParameters()[14]/E_max_MeV*Scl, Src.g_theta(0.)*Scl]
 plt.plot(x_fit, y_fit, color='red', \
          label=f'    Linear Fit:    RMS $\\theta_S = ({coefficients[0]:.3f} \\pm {slope_error:.3f})$K$ + ({coefficients[1]:.2f} \\pm {intercept_error:.2f})$')
@@ -158,8 +156,4 @@ def func(thetadeg):
                                            -12.*thmax*mth.cos(3*thmax) + (-14.+9.*thmax**2+(26.-9.*thmax**2)*mth.cos(2.*thmax))*upmax)
                    ) * 180. / mth.pi
 
-    print(Scl)
-    
     return Scl
-
-print(func(20.))
