@@ -8,25 +8,26 @@ import math as mth
 
 import Particle as Prtcl
 import BeamLine as BL
+import Beam     as Bm
 import BeamIO   as bmIO
 
 def main(argv):
     """
        Parse input arguments:
     """
-    opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
-                               ["ifile=","ofile=","bfile", "nEvts"])
+    opts, args = getopt.getopt(argv,"hd:i:o:l:n:",\
+                               ["ifile=","ofile=","loc", "nEvts"])
 
     inputfile    = None
     outputfile   = None
     Debug        = False
+    iLoc         = 1
     nEvts        = None
     for opt, arg in opts:
         if opt == '-h':
             print ( \
-                    'readBEAMsim.py -i <inputfile> -o <outputfile>' + \
-                    ' -n <nEvts>')
-            print("     ----> <output file> not yet implemented.>")
+                    '2BDSIM.py -i <inputfile> -o <outputfile>' + \
+                    ' -l <start location> -n <nEvts>')
             sys.exit()
         if opt == '-d':
             Debug = True
@@ -34,17 +35,18 @@ def main(argv):
             inputfile = arg
         elif opt in ("-o", "--ofile"):
             outputfile = arg
+        elif opt in ("-l", "--loc"):
+            iLoc = int(arg)
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
 
     if inputfile    == None:
         print ( \
-                'readBEAMsim.py -i <inputfile> -o <outputfile>' + \
-                ' -n <nEvts>')
-        print("     ----> <output file> not yet implemented.>")
+                '2BDSIM.py -i <inputfile> -o <outputfile>' + \
+                ' -l <start location> -n <nEvts>')
         sys.exit()
 
-    print(" readBEAMsim: start")
+    print(" 2BDSIM: start")
     
     print("     ----> Initialise:")
     
@@ -63,42 +65,38 @@ def main(argv):
         sys.exit(1)
 
     ibmIOr = bmIO.BeamIO(None, inputfile)
-    #ibmIOr = bmIO.BeamIO("99-Scratch", "Data4Tests.dat")
     print("             ----> Input file:", inputfile)
-    
-    if outputfile != None and not os.path.isabs(outputfile): 
-        outputfile = os.path.join(HOMEPATH, outputfile)
-    if outputfile != None and not os.path.isdir(os.path.dirname(outputfile)):
-        print("                 ----> Directory for output file", \
-              os.path.dirname(outputfile), "does not exist.")
-    else:
-        print("             ----> Write beamline summary file to:", outputfile)
-    #    print("                   Exit.")
-    #    sys.exit(1)
-        print("                   Output file not implemented.")
+
+    ibmIOw = bmIO.BeamIO(None, outputfile, True, True)
+    print("             ----> Output file:", outputfile)
     
     print("     <---- Initialisation complete.")
 
     print("     ----> Read data file:")
 
     EndOfFile = False
-    iEvt = 0
+    iEvt = -1
     iCnt = 0
     Scl  = 10
     print("         ----> Read data file:")
     while not EndOfFile:
         EndOfFile = ibmIOr.readBeamDataRecord()
+        iEvt += 1
+        if Debug and iEvt < 1:
+            print(BL.BeamLine.getinstances()[0])
+        if len(Prtcl.Particle.getinstances()) <= 1:
+            continue
         if not EndOfFile:
-            iEvt += 1
             if (iEvt % Scl) == 0:
                 print("         ----> Read event ", iEvt)
                 iCnt += 1
                 if iCnt == 10:
                     iCnt = 1
                     Scl  = Scl * 10
-        if iEvt < 1:
-            print(BL.BeamLine.getinstance())
-            print(Prtcl.Particle.getParticleInstances()[iEvt-1])
+
+        iPrtcl = Prtcl.Particle.getinstances()[-1]
+        iPrtcl.writeParticleBDSIM(ibmIOw.getdataFILE(), 1, True)
+                    
         if nEvts != None and iEvt == nEvts:
             break
 
@@ -106,14 +104,9 @@ def main(argv):
 
     print(" <---- Data-file reading done.")
         
-    print(" ----> Plot progression:")
-    
-    Prtcl.Particle.plotTraceSpaceProgression()
-    Prtcl.Particle.plotLongitudinalTraceSpaceProgression()
-    
     print(" <---- Done.")
 
-    print(" readBEAMsim: ends")
+    print(" 2BDSIM: ends")
     
 """
    Execute main"

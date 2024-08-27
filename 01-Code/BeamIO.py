@@ -92,33 +92,39 @@ class BeamIO:
 
         #.. open file; if file doesnt exist and _create is true, create it:
         #if not os.path.isfile(pathFILE) or _create:
+        self.setcreate(_create)
+        self.setBDSIMfile(_BDSIMfile)
         if _create:
-            dataFILE = open(pathFILE, "wb")
-            if self.getDebug():
-                print("         ----> File opened for write.")
+            if not self.getBDSIMfile():
+                dataFILE = open(pathFILE, "wb")
+                if self.getDebug():
+                    print("         ----> File opened for write.")
                 
-            record = strct.pack(">i", 9999)
-            dataFILE.write(record)
-            if self.getDebug():
-                print("         ----> First word:", \
-                        strct.unpack(">i", record), \
-                      " is a large integer to distinguish v2 from v1")
+                record = strct.pack(">i", 9999)
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> First word:", \
+                          strct.unpack(">i", record), \
+                          " is a large integer to distinguish v2 from v1")
                 
-            version  = "BeamIO v2"
-            bversion = bytes(version, 'utf-8')
-            record   = strct.pack(">i", len(version))
-            dataFILE.write(record)
-            if self.getDebug():
-                print("         ----> Length of version record:", \
-                      strct.unpack(">i", record))
-            record   = bversion
-            dataFILE.write(record)
-            if self.getDebug():
-                print("         ----> Version:", bversion.decode('utf-8'))
+                version  = "BeamIO v2"
+                bversion = bytes(version, 'utf-8')
+                record   = strct.pack(">i", len(version))
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> Length of version record:", \
+                          strct.unpack(">i", record))
+                record   = bversion
+                dataFILE.write(record)
+                if self.getDebug():
+                    print("         ----> Version:", bversion.decode('utf-8'))
+            else:
+                dataFILE = open(pathFILE, "w")
+                if self.getDebug():
+                    print("         ----> File opened for write.")
 
         else:
-            if _BDSIMfile:
-                self.setBDSIMfile(True)
+            if self.getBDSIMfile():
                 dataFILE = open(pathFILE, "r")
             else:
                 dataFILE = open(pathFILE, "rb")
@@ -148,6 +154,8 @@ class BeamIO:
         print(" -------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ----> Data file:", self.getdataFILE())
+        print("     ---->    Create:", self.getcreate())
+        print("     ----> BDSIMfile:", self.getBDSIMfile())
 
         
 #--------  "Set method" only Debug
@@ -163,6 +171,7 @@ class BeamIO:
         self._dataFile        = None
         self._Rd1stRcrd       = False
         self._dataFILEversion = None
+        self._create          = None
         self._BDSIMfile       = None
 
     @classmethod
@@ -184,6 +193,11 @@ class BeamIO:
         if not isinstance(dataFILEversion, int):
             raise badArgument()
         self._dataFILEversion = dataFILEversion
+
+    def setcreate(self, _create):
+        if not isinstance(_create, bool):
+            raise badArgument()
+        self._create = _create
 
     def setBDSIMfile(self, _BDSIMfile):
         if not isinstance(_BDSIMfile, bool):
@@ -212,6 +226,9 @@ class BeamIO:
 
     def getdataFILEversion(self):
         return self._dataFILEversion
+
+    def getcreate(self):
+        return self._create
 
     def getBDSIMfile(self):
         return self._BDSIMfile

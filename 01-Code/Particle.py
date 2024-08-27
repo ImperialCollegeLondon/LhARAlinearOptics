@@ -983,6 +983,43 @@ class Particle:
         if CleanAfterWrite:
             Cleaned = self.cleanParticles()
         
+    def writeParticleBDSIM(self, ParticleFILE=None, iLoc=1, \
+                           CleanAfterWrite=True):
+        if self.getDebug():
+            print("Particle.writeParticleBDSIM starts.")
+
+        if not isinstance(ParticleFILE, io.TextIOWrapper):
+            raise noFILE( \
+                    " Particle.writeParticle: file does not exist.")
+
+        if self.getDebug():
+            print("     ----> Location to store:", iLoc)
+
+        species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
+        particleMASS = iPhysclCnstnts.getparticleMASS(species)
+
+        p0  = BL.BeamLine.getElement()[0].getp0()
+        E0  = np.sqrt(particleMASS**2 + p0**2)
+
+        b0  = p0//E0
+        s   = self.gets()[iLoc] + self.getTraceSpace()[iLoc][4]*b0
+
+        E   = E0 + self.getTraceSpace()[iLoc][5]*p0
+
+        Line = str(self.getTraceSpace()[iLoc][0]) + ' ' + \
+               str(self.getTraceSpace()[iLoc][2]) + ' ' + \
+               str(s)                             + ' ' + \
+               str(self.getTraceSpace()[iLoc][1]) + ' ' + \
+               str(self.getTraceSpace()[iLoc][3]) + ' ' + \
+               str(E) + "\n"
+            
+        ParticleFILE.write(Line)
+        if self.getDebug():
+                print("         ----> Line:", Line)
+        
+        if CleanAfterWrite:
+            Cleaned = self.cleanParticles()
+        
     @classmethod
     def flushNcloseParticleFile(cls, ParticleFILE=None):
         if cls.getDebug():
