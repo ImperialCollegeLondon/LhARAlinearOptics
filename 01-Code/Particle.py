@@ -995,6 +995,8 @@ class Particle:
         if self.getDebug():
             print("     ----> Location to store:", iLoc)
 
+        iAddr = iLoc - 1
+        
         species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
@@ -1002,15 +1004,21 @@ class Particle:
         E0  = np.sqrt(particleMASS**2 + p0**2)
 
         b0  = p0//E0
-        s   = self.gets()[iLoc] + self.getTraceSpace()[iLoc][4]*b0
+        s   = self.gets()[iAddr] + self.getTraceSpace()[iAddr][4]*b0
 
-        E   = E0 + self.getTraceSpace()[iLoc][5]*p0
+        E   = E0 + self.getTraceSpace()[iAddr][5]*p0
 
-        Line = str(self.getTraceSpace()[iLoc][0]) + ' ' + \
-               str(self.getTraceSpace()[iLoc][2]) + ' ' + \
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=5,suppress=True):
+                print("     ----> iAddr, iLoc, name:", iAddr, iLoc, \
+                      BLE.BeamLineElement.getinstances()[iLoc].getName())
+                print("     ----> Trace space:", self.getTraceSpace()[iAddr])
+                
+        Line = str(self.getTraceSpace()[iAddr][0]) + ' ' + \
+               str(self.getTraceSpace()[iAddr][2]) + ' ' + \
                str(s)                             + ' ' + \
-               str(self.getTraceSpace()[iLoc][1]) + ' ' + \
-               str(self.getTraceSpace()[iLoc][3]) + ' ' + \
+               str(self.getTraceSpace()[iAddr][1]) + ' ' + \
+               str(self.getTraceSpace()[iAddr][3]) + ' ' + \
                str(E) + "\n"
             
         ParticleFILE.write(Line)
@@ -1019,7 +1027,7 @@ class Particle:
         
         if CleanAfterWrite:
             Cleaned = self.cleanParticles()
-        
+
     @classmethod
     def flushNcloseParticleFile(cls, ParticleFILE=None):
         if cls.getDebug():
