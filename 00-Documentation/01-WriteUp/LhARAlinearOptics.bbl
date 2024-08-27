@@ -38,11 +38,13 @@ J.~Schreiber, F.~Bell, {\em et~al.}, ``Analytical Model for Ion Acceleration by
   \href{https://dx.doi.org/10.1103/PhysRevLett.97.045005}{{\em Physical review
   letters} {\bfseries 97} (08, 2006) 045005}.
 
-\bibitem{10.1038/s41598-019-41705-0}
-P.~Casolaro, L.~Campajola, G.~Breglio, S.~Buontempo, M.~Consales, A.~Cusano,
-  A.~Cutolo, F.~Di~Capua, F.~Fienga, and P.~Vaiano, ``Real-time dosimetry with
-  radiochromic films,''
-  \href{https://dx.doi.org/10.1038/s41598-019-41705-0}{{\em Scientific Reports}
-  {\bfseries 9} (03, 2019) }.
+\bibitem{10.1063/1.3086424}
+F.~Nürnberg, M.~Schollmeier, {\em et~al.}, ``{Radiochromic film imaging
+  spectroscopy of laser-accelerated proton beams},''
+  \href{https://dx.doi.org/10.1063/1.3086424}{{\em Review of Scientific
+  Instruments} {\bfseries 80} no.~3, (03, 2009) 033301},
+  \href{https://arxiv.org/abs/https://pubs.aip.org/aip/rsi/article-pdf/doi/10.1063/1.3086424/13601448/033301\_1\_online.pdf}{{\ttfamily
+  https://pubs.aip.org/aip/rsi/article-pdf/doi/10.1063/1.3086424/13601448/033301\_1\_online.pdf}}.
+  \url{https://doi.org/10.1063/1.3086424}.
 
 \end{thebibliography}\endgroup
