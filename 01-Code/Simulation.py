@@ -102,7 +102,7 @@ class Simulation(object):
     
     __RandomSeed = __T.time()
 
-    __Debug      = False
+    __Debug      = True
     __PrgrssPrnt = True
     __instance   = None
 
@@ -120,13 +120,13 @@ class Simulation(object):
             
             cls.__Rnd.seed(int(cls.__RandomSeed))
 
-            cls._NEvt          = NEvt
-            cls._ParamFileName = filename
-            cls._dataFileDir   = _dataFileDir
-            cls._dataFileName  = _dataFileName
+            cls.setNEvt(NEvt)
+            cls.setBeamLineSpecificationFile(filename)
+            cls.setdataFileDir(_dataFileDir)
+            cls.setdataFileName(_dataFileName)
 
             # Create Facility instance:
-            cls._Facility = BL.BeamLine(filename)
+            cls.setFacility(BL.BeamLine(filename))
 
             # Open file for write:
             cls._iBmIOw = None
@@ -147,8 +147,19 @@ class Simulation(object):
         self.print()
         return " Simulation.__str__ done."
 
+    def print(self):
+        print(" Simulation.print:")
+        print("                        Version:", self.CdVrsn())
+        print("      State of random generator:", self.__Rnd.getstate()[0])
+        print("   Number of events to generate:", self.getNEvt())
+        print("   Beam line specification file:", \
+              self.getBeamLineSpecificationFile())
+        print(" data file directory for output:", self.getdataFileDir())
+        print("       data filename for output:", self.getdataFileName())
+        print(" BeamIO output file instance id:", id(self.getiBmIOw()))
+    
             
-#--------  "Get methods" only; version, reference, and constants
+#--------  "Set/Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
     @classmethod
     def setAll2None(cls):
@@ -156,9 +167,44 @@ class Simulation(object):
             cls._ParamFileName = None
             cls._dataFileDir   = None
             cls._dataFileName  = None
+            cls._iBmIOw        = None
+            cls._Facility      = None
 
+    @classmethod
     def CdVrsn(self):
         return 1.0
+
+    @classmethod
+    def setNEvt(self, NEvt):
+        if not isinstance(NEvt, int):
+            raise badParameter()
+        
+        self._NEvt = NEvt
+
+    @classmethod
+    def setBeamLineSpecificationFile(self, BLspecfile):
+        if not isinstance(BLspecfile, str):
+            raise badParameter()
+
+        self._ParamFileName = BLspecfile
+
+    @classmethod
+    def setdataFileDir(self, dataFileDir):
+        if dataFileDir is not None and not isinstance(dataFileDir, str):
+            raise badParameter()
+        
+        self._dataFileDir = dataFileDir
+
+    @classmethod
+    def setdataFileName(self, dataFileName):
+        if not isinstance(dataFileName, str):
+            raise badParameter()
+        
+        self._dataFileName = dataFileName
+
+    @classmethod
+    def setDebug(cls, _Debug=False):
+        cls.__Debug = _Debug
 
     def getRandomSeed(self):
         return Simulation.__RandomSeed
@@ -168,16 +214,16 @@ class Simulation(object):
         return cls.__Debug
 
     @classmethod
-    def setDebug(cls, _Debug=False):
-        cls.__Debug = _Debug
-
-    @classmethod
-    def getProgressPrint(cls):
-        return cls.__PrgrssPrnt
-
-    @classmethod
     def setProgressPrint(cls, _PrgrssPrnt=True):
         cls.__PrgrssPrnt = _PrgrssPrnt
+
+    @classmethod
+    def setiBmIOw(self, _iBmIOw):
+        self._iBmIOw = _iBmIOw
+
+    @classmethod
+    def setFacility(cls, _Facility):
+        cls._Facility = _Facility
 
     @classmethod
     def getFacility(cls):
@@ -191,29 +237,27 @@ class Simulation(object):
     def getdataFileName(cls):
         return cls._dataFileName
 
+    @classmethod
     def getNEvt(self):
         return self._NEvt
 
+    @classmethod
+    def getBeamLineSpecificationFile(self):
+        return self._ParamFileName
+
+    @classmethod
     def getiBmIOw(self):
         return self._iBmIOw
 
-    def setiBmIOw(self, _iBmIOw):
-        self._iBmIOw = _iBmIOw
+    @classmethod
+    def getProgressPrint(cls):
+        return cls.__PrgrssPrnt
 
     @classmethod
     def getinstances(cls):
         return cls.__instance
 
 #--------  Utilities:
-    def print(self):
-        print(" Simulation.print:")
-        print("                        Version:", self.CdVrsn())
-        print("      State of random generator:", self.__Rnd.getstate()[0])
-        print("   Number of events to generate:", self._NEvt)
-        print("   Beam line specification file:", self._ParamFileName)
-        print(" data file directory for output:", self._dataFileDir)
-        print("       data filename for output:", self._dataFileName)
-        print(" BeamIO output file instance id:", id(self.getiBmIOw()))
 
         
 #--------  Simulation run methods
@@ -222,16 +266,6 @@ class Simulation(object):
             print()
             print('Simulation.RunSim: simulation begins')
             print('-----------------')
-
-        """
-        #.. Open file to store events:
-        ParticleFILE = None
-        if self.getdataFileDir()  != None and \
-           self.getdataFileName() != None:
-            ParticleFILE = Prtcl.Particle.createParticleFile( \
-                                            self.getdataFileDir(), \
-                                            self.getdataFileName() )
-        """
 
         #.. Write facility:
         if self.getiBmIOw() != None:
@@ -249,5 +283,7 @@ class Simulation(object):
         if self.getiBmIOw() != None:
             self.getiBmIOw().flushNclosedataFile( \
                                     self.getiBmIOw().getdataFILE())
-        
 
+#--------  Exceptions:
+class badParameter(Exception):
+    pass

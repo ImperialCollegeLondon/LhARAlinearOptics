@@ -63,18 +63,18 @@ class PhysicalConstants(object):
 #--------  "Built-in methods":
     def __new__(cls):
         if cls.__instance is None:
-            if cls.__Debug:
+            if cls.getDebug():
                 print(' PhysicalConstants.__new__: ', \
                       'creating the PhysicalConstants object')
             cls.__instance = super(PhysicalConstants, cls).__new__(cls)
 
         # Only constants; print values that will be used:
-        if cls.__Debug:
+        if cls.getDebug():
             print(" PhysicalConstants: version:", cls.CdVrsn(cls))
             print("PhysicalConstants: PDG reference:", cls.PDGref(cls))
             print("PhysicalConstants: speed of light:", cls.SoL(cls))
             
-        return cls.__instance
+        return cls.getinstances()
 
     def __repr__(self):
         return "PhysicalConstants()"
@@ -106,14 +106,13 @@ class PhysicalConstants(object):
 
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
 
     @classmethod
     def getinstances(cls):
         return cls.__instance
-
-    @classmethod
-    def getDebug(cls):
-        return cls.__Debug
 
     def CdVrsn(self):
         return 1.0

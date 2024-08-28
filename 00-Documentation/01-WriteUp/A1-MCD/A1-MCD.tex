@@ -2038,8 +2038,6 @@ The \texttt{visualise} class has no i/o methods.
 
 The \texttt{BeamIO} class provides interfaces to the reading and
 writing of beam specification and beam data files.
-Each file is managed through an instance of the \texttt{BeamIO} class
-or a class derived from it.
 
 \subsubsection{Instantiation}
 \noindent
@@ -2161,6 +2159,171 @@ Table~\ref{Tab:BmIO:Utils} presents the utilities provided by the
     \end{tabular}
   \end{center}
 \end{table}
+
+\FloatBarrier
+
+\subsection{\texttt{Simulation}}
+\label{SubSect:Simu}
+
+The singleton \texttt{Simulation} class provides a framework and
+utilities for the simulation of the passage of particles through the
+beam lines defined through the classes described in this document.
+By default the seed for the random number generator is set using the
+system time.
+
+\subsubsection{Instantiation}
+\noindent
+The call to instantiate the \texttt{Simulation} class is:
+\begin{center}
+  \texttt{Simulation(NEvts, BeamLineSpecificationCVSfile, dataFileDir, dataFileName)}
+\end{center}
+\begin{description}
+  \item{\texttt{NEvts}}: (integer) Number of events to generate.
+  \item{\texttt{BeamLineSpecificationCVSfile}}: (string) String
+    containing path to the beam-line specification CVS file.
+  \item{\texttt{dataFileDir}}: (string) String containing path
+    to directory in which data file is to be written.
+  \item{\texttt{dataFileName}}: (string) Name of file to be written.
+\end{description}
+
+\texttt{Simulation} has two methods defined outside the class:
+\begin{description}
+  \item{\texttt{getRandom()}}: returns number between $0.$ and $1.$
+    drawn from a uniform distributin; and 
+  \item{\texttt{getParabolic(umax)}}: returns number between
+    $-\texttt{umax}$ and $\texttt{umax}$ drawn from a parabolic
+      distribution with a maximum at 0. 
+\end{description}
+\subsubsection{Instance attributes and access methods}
+\label{Para:Simu:InstAttr}
+\noindent
+The \texttt{Simulation} instance attributes are presented in
+table~\ref{Tab:Simu:Attributes} and the access methods are summarised
+in table~\ref{Tab:Simu:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{Simulation} class.
+  }
+  \label{Tab:Simu:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{11cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                      \\
+      \hline
+      \texttt{NEvt}          & integer  & Number of events to generate.                                                          \\
+      \texttt{ParamFileName} & string   & Path to beam-line parameter CSV file.                                                  \\
+      \texttt{dataFileDir}   & string   & Path to the directory in which data file is to be written.                             \\
+      \texttt{dataFileName}  & string   & Name of file to be created.                                                            \\
+      \texttt{Facility}      & Facility & Instance of the derived \texttt{Facility} class derived from \texttt{BeamLineElement}. \\
+      \texttt{iBmIOw}        & BeamIO   & Instance of the derived \texttt{BeamIO} class for the file to be written.              \\
+      \texttt{ProgressPrint} & boolean  & If True the progress towards the \texttt{NEvt} requested events is printed.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{sidewaystable}[h]
+  \caption{
+    Definition of access methods for the \texttt{Simulation}
+    class. 
+  }
+  \label{Tab:Simu:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{9.5cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                                                       \\
+      \hline
+      \texttt{setNEvt}                      & \texttt{getNEvt}                      & Set/get number of events to generate.                               \\
+      \texttt{setBeamLineSpecificationFile} & \texttt{getBeamLineSpecificationFile} & Set/get full path to beam line specification file.                  \\
+      \texttt{setdataFileDir}               & \texttt{getdataFileDir}               & Set/get path to directory in which data file is to be written.      \\
+      \texttt{setdataFileName}              & \texttt{getdataFileName}              & Set/get name of data file to be created.                            \\
+      \texttt{setFacility}                  & \texttt{getFacility}                  & Set/get \texttt{Facility} instance.                                 \\
+      \texttt{setiBmIOw}                    & \texttt{getiBmIOw}                    & Set/get \texttt{BeamIO} instance specifying the file to be written. \\
+      \texttt{setProgressPrint}             & \texttt{getProgressPrint}             & Set/get flag that controls the progress printout.                   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\subsubsection{Processing methods}
+\noindent
+The \texttt{Simulation} class provides one processing method:
+\begin{center}
+  \texttt{RunSim()}
+\end{center}
+which manages the generation of \texttt{NEvts} events.
+The specification of the beam line and the individual events are
+written to the output data file.
+
+\subsubsection{I/o methods}
+\noindent
+The \texttt{Simulation} class provides no i/o methods.
+
+\subsubsection{Utilities}
+\noindent
+The \texttt{Simulation} provides no utilities.
+
+\FloatBarrier
+
+\subsection{\texttt{Physical constants}}
+\label{SubSect:PhysCnsts}
+
+The \texttt{PhysicalConstants} class provides the physical constants
+that are required to carry out the linear optics calculations. 
+The values are taken from, for example, the Particle Data Group book.
+The constants packages is implemented as a singleton class so that
+there is no ambiguity about which values are in use. 
+
+\subsubsection{Instantiation}
+\noindent
+The call to instantiate the \texttt{PhysicalConstants} class is:
+\begin{center}
+  \texttt{PhysicalConstants()}
+\end{center}
+
+\subsubsection{Instance attributes and access methods}
+\label{Para:PhysCnsts:InstAttr}
+\noindent
+The \texttt{PhysicalConstants} has no instance attributes.
+The access methods are summarised in
+table~\ref{Tab:PhysCnsts:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{PhysicalConstants}
+    class. 
+  }
+  \label{Tab:PhysCnsts:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{7cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                                                       \\
+      \hline
+        & \texttt{getPDGref}   & Returns PDG reference used.                               \\
+        & \texttt{getSoL} & Returns speed of light in m/s.                  \\
+        & \texttt{getSpecies}      & Returns list of particle species for which constants are stored. \\
+        & \texttt{getParticleMASS(Species)}  & Returns particle mass for \texttt{Species}.
+                                               Species is a list of strings:
+                                               \texttt{["proton", "pion", "muon", "neutrino"]}. \\
+        & \texttt{mp}                        & Returns proton mass in MeV. \\
+        & \texttt{getmPion}                  & Returns pion mass in MeV. \\
+        & \texttt{getmMuon}                  & Returns muon mass in MeV. \\
+        & \texttt{getmNeutrino}              & Returns 0, neutrino mass (for \texttt{nuSIM}). \\
+        & \texttt{getm0}                     & Returns permittivity of free space.                   \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods}
+\noindent
+The \texttt{PhysicalConstants} class provides no processing methods.
+
+\subsubsection{I/o methods}
+\noindent
+The \texttt{PhysicalConstants} class provides no i/o methods.
+
+\subsubsection{Utilities}
+\noindent
+The \texttt{PhysicalConstants} provides no utilities.
 
 \FloatBarrier
 
