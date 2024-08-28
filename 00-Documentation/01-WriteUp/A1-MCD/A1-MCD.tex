@@ -2327,3 +2327,51 @@ The \texttt{PhysicalConstants} provides no utilities.
 
 \FloatBarrier
 
+\subsection{\texttt{LaTeX}}
+\label{SubSect:LTX}
+
+The \texttt{LaTeX} module provides 2 methods to support the generation
+of LaTeX tables from data stored in the class and instance attributes.
+The first method, \texttt{TableHeader}, creates the header of LaTeX
+table.
+The method is accessed via the call:
+\begin{center}
+  \texttt{TableHeader(FilePath, TabString, Caption)}
+\end{center}
+where:
+\begin{description}
+  \item{\texttt{FilePath}}: (path) is the full path to the file to
+    contain the table;
+  \item{\texttt{TabString}}: (string) is the string that defines the
+    columns, e.g., \texttt{'|c|c|'}, would result in a two-column
+    table in which the contents of each column is centred; and
+  \item{\texttt{Caption}}: (string) Is the string to be used as the
+    table caption; and
+\end{description}
+Each line in the table are entered with the call:
+\begin{center}
+  \texttt{TableLine(FilePath, Line)}
+\end{center}
+where:
+\begin{description}
+  \item{\texttt{FilePath}}: (path) is the full path to the file to
+    contain the table;
+  \item{\texttt{Line}}: (string) is a list of strings that contain the
+    contents of the line.
+    A typical use case would be to create the table header, enter a
+    line containing the header fields and then procede to add each
+    line in the table in turn; and
+    LaTeX commants are allowed, e.g. \texttt{Line = $\backslash$hline}
+    will produce a horizontal line.
+\end{description}
+The final lines of LaTeX code is entered with the call:
+\begin{center}
+  \texttt{TableTrailer(FilePath)}
+\end{center}
+where:
+\begin{description}
+  \item{\texttt{FilePath}}: (path) is the full path to the file to
+    contain the table.
+\end{description}
+
+\FloatBarrier
