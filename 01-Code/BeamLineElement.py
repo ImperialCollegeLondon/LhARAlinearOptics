@@ -4815,7 +4815,8 @@ Derived class Source:
                      overwritten when calculated in
                      getLaserDrivenParticleEnergy
              [5] - nPnts: Number of points to sample for integration of PDF
-             [6] - P_L: Laser power [W]             [7] - E_L: Laser energy [J]
+             [6] - P_L: Laser power [W]
+             [7] - E_L: Laser energy [J]
              [8] - lamda: Laser wavelength [um]
              [9] - t_laser: Laser pulse duration [s]
             [10] - d: Laser thickness [m]

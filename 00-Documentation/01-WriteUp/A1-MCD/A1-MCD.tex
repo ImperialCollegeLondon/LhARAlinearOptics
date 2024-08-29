@@ -1861,6 +1861,205 @@ The \texttt{CylindricalRFCavity} dericed class has no processing methods.
 
 \FloatBarrier
 
+\subsubsection{Derived class: \texttt{Source(BeamLineElement)}}
+
+\paragraph{Instantiation} ~\newline
+\noindent
+The call to instantiate the \texttt{Source} derived class is:
+\begin{center}
+  \texttt{Source(Name, rStrt, vStrt, drStrt, dvStrt,
+          Mode, Parameters)}
+\end{center}
+Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
+\texttt{drStrt}, and \texttt{dvStrt} are described in
+section~\ref{SubSubSect:BLE:InstAttr}.
+These arguments are passed directly to \texttt{BeamLineElement}.
+\texttt{Mode} is an integer that transmits the type of source to be
+generated.
+The specification of the \texttt{Parameters} list depends on the value
+of \texttt{Mode}.
+The content of the \texttt{Parameters} list is transferred directly to
+the \texttt{Param} instance attribute.
+
+\paragraph{Instance attributes and access methods} ~\newline
+\label{SubSubSect:Source:InstAttr}
+\noindent
+The instance attributes are defined in
+tables~\ref{Tab:Source:AttributesA}, \ref{Tab:Source:AttributesB},
+and \ref{Tab:Source:AttributesC}, each table refers to a particular
+source \texttt{Mode}.
+The attributes are accessed and set using the methods defined in
+table~\ref{Tab:Source:Methods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Source(BeamLineElement)} derived class for
+    source \texttt{Mode}$=0$, the parameterised TNSA model.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Source:AttributesA}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type}      & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Mode}      & integer &          & \texttt{Mode}$=0$; parameterised laser-driven source.        \\
+      \hline
+       \texttt{Param[0]} & float   & m        & Standard deviation of normal distribution from which $x$ coordinate is sampled. \\
+       \texttt{Param[1]} & float   & m        & Standard deviation of normal distribution from which $y$ coordinate is sampled. \\
+       \texttt{Param[2]} & float   &          & Minimum $\cos\theta_S$.
+                                                The specification of a minimum for $\cos\theta_S$ improves the efficiency of
+                                                generation as it may be used to restrice generation to the set of partices that
+                                                will enter the downstream acceptane.                                            \\
+       \texttt{Param[3]} & float   & MeV      & Minimum kinetic energy ($K_{\rm min}$.                                          \\
+       \texttt{Param[4]} & float   & MeV      & Maximum kinetic energy ($K_{\rm max}$.
+                                                Value entered here is overwritten when calculated in
+                                                \texttt{getLaserDrivenParticleEnergy} during initialisation.                    \\
+       \texttt{Param[5]} & integer &          & \texttt{nPnts}: Number of points to sample for integration of PDF (kept for
+                                                backward compatibility).                                                        \\
+       \texttt{Param[6]} & float   & W        & $P_L$: Laser power.                                                             \\
+       \texttt{Param[7]} & float   & J        & $E_L$: Laser energy.                                                            \\
+       \texttt{Param[8]} & float   & $\mu$m   & $\lambda$: Laser wavelength.                                                     \\
+       \texttt{Param[9]} & float   & s        & $t_{\rm laser}$: Laser pulse duration.                                            \\
+      \texttt{Param[10]} & float   & m        & $d$: Diameter of laser spot at focus.                                           \\
+      \texttt{Param[11]} & float   & W/cm$^2$ & I: Laser intensity                                                              \\
+      \texttt{Param[12]} & float   & $^\circ$ & $\theta_{\rm degrees}$: Electron divergence angle.                                \\
+      \texttt{Param[13]} & float   & $^\circ$ & Intercept of $\alpha$, maximum half opening angle at $K=0$.                      \\
+      \texttt{Param[14]} & float   & $^\circ$ & Scaled slope of $\alpha(K)$.                                                     \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Source(BeamLineElement)} derived class for
+    source \texttt{Mode}$=1$ in which energy is sampled from a normal
+    distribution.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Source:AttributesB}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type}      & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Mode}      & integer &          & \texttt{Mode}$=1$; parameterised laser-driven source.        \\
+      \hline
+       \texttt{Param[0]} & float   & m        & Standard deviation of normal distribution from which $x$ coordinate is sampled. \\
+       \texttt{Param[1]} & float   & m        & Standard deviation of normal distribution from which $y$ coordinate is sampled. \\
+       \texttt{Param[2]} & float   &          & Minimum $\cos\theta_S$.
+                                                The specification of a minimum for $\cos\theta_S$ improves the efficiency of
+                                                generation as it may be used to restrice generation to the set of partices that
+                                                will enter the downstream acceptane.                                            \\
+       \texttt{Param[3]} & float   & MeV      & Mean kinetic energy.                                          \\
+       \texttt{Param[4]} & float   & MeV      & Standard deviation of kinetic energy distribution.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Source(BeamLineElement)} derived class for
+    source \texttt{Mode}$=2$ in which energy is sampled from a uniform
+    distribution.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Source:AttributesC}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type}      & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Mode}      & integer &          & \texttt{Mode}$=2$; parameterised laser-driven source.        \\
+      \hline
+       \texttt{Param[0]} & float   & m        & Standard deviation of normal distribution from which $x$ coordinate is sampled. \\
+       \texttt{Param[1]} & float   & m        & Standard deviation of normal distribution from which $y$ coordinate is sampled. \\
+       \texttt{Param[2]} & float   &          & Minimum $\cos\theta_S$.
+                                                The specification of a minimum for $\cos\theta_S$ improves the efficiency of
+                                                generation as it may be used to restrice generation to the set of partices that
+                                                will enter the downstream acceptane.                                            \\
+       \texttt{Param[3]} & float   & MeV      & Mean kinetic energy.                                          \\
+       \texttt{Param[4]} & float   & MeV      & Standard deviation of kinetic energy distribution.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of
+    the \texttt{Source(BeamLineElement)} derived class for
+    source \texttt{Mode}$=3$ in which parameters of particle at source
+    are read from an input file.
+    All attributes are required in the call to instantiate the
+    element.
+  }
+  \label{Tab:Source:AttributesD}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{10cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type}      & \textbf{Unit} & \textbf{Comment}                    \\
+      \hline
+      \texttt{Mode}      & integer &          & \texttt{Mode}$=3$; parameterised laser-driven source.        \\
+      \hline
+       \texttt{Param[0]} & float   & m        & Standard deviation of normal distribution from which $x$ coordinate is sampled. \\
+       \texttt{Param[1]} & float   & m        & Standard deviation of normal distribution from which $y$ coordinate is sampled. \\
+       \texttt{Param[2]} & float   &          & Minimum $\cos\theta_S$.
+                                                The specification of a minimum for $\cos\theta_S$ improves the efficiency of
+                                                generation as it may be used to restrice generation to the set of partices that
+                                                will enter the downstream acceptane.                                            \\
+       \texttt{Param[3]} & float   & MeV      & Mean kinetic energy.                                          \\
+       \texttt{Param[4]} & float   & MeV      & Standard deviation of kinetic energy distribution.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Source} derived
+    class. 
+  }
+  \label{Tab:Source:Methods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{5cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{setMode}             & \texttt{getMode()}          & Set/get Mode.                \\
+      \texttt{setModeText}         & \texttt{getModeText()}      & Set string with readable name for mode.  \\
+      \texttt{setModeParamterText} & \texttt{getParameterText()} & Set/get list of strings with readable name for paramter. \\
+      \texttt{setParameters}       & \texttt{getParameters()}    & Set/get parameters; list of paramters as defined above. \\ 
+      \texttt{setParameterUnit}    & \texttt{getParameterUnit()} & Set/get list of strings containing parameter units.  \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Source} derived class has no processing
+methods other than those inheritted from the parent class.
+
+\paragraph{I/o methods} ~\newline
+\noindent
+The \texttt{Source} derived class has no i/o methods other
+than those inheritted from the parent class.
+
+\paragraph{Utilities} ~\newline
+\noindent
+The \texttt{Source} derived class has no utilities other
+than those inheritted from the parent class. 
+
+\paragraph{Processing methods} ~\newline
+\noindent
+The \texttt{Source} dericed class has no processing methods.
+
+\FloatBarrier
+
 \subsection{\texttt{UserFramework}}
 \label{SubSubSect:UsrFrmwrk}
 
