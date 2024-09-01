@@ -130,30 +130,30 @@ class Report:
         else:
             _ReportPath, _FileName = os.path.split(_FileName)
             
-        self._Name       = _Name
-        self._ReportPath = _ReportPath
-        self._FileName   = _FileName
-        self._Header     = _Header
-        self._Lines      = _Lines
+        self.setName(_Name)
+        self.setReportPath(_ReportPath)
+        self.setFileName(_FileName)
+        self.setHeader(_Header)
+        self.setLines(_Lines)
 
         if self.getDebug():
             print(" Report.__init__ start:")
-            print("     ----> Name:", _Name)
-            print("     ----> Path:", _ReportPath)
-            print("     ----> File:", _FileName)
-            print("     ----> len(Header):", len(_Header))
-            print("     ---->  len(Lines):", len(_Lines))
+            print("     ----> Name:", self.getName())
+            print("     ----> Path:", self.getReportPath())
+            print("     ----> File:", self.getFileName())
+            print("     ----> len(Header):", len(self.getHeader()))
+            print("     ---->  len(Lines):", len(self.getLines()))
 
     def __repr__(self):
         return "Report(ReportName, PathToDirectory, ReportFile)"
 
     def __str__(self):
-        print(" Report: Name: ", self._Name)
-        print("     Output directory path: ", self._ReportPath)
-        print("     Report file name: ", self._FileName)
-        print("     Header fields:", self._Header)
-        for i in range(len(self._Lines)):
-            print("     ", self._Lines[i])
+        print(" Report: Name: ", self.getName())
+        print("     Output directory path: ", self.getReportPath())
+        print("     Report file name: ", self.getFileName())
+        print("     Header fields:", self.getHeader())
+        for i in range(len(self.getLines())):
+            print("     ", self.getLines()[i])
         return "     <---- Report __str__ done."
 
 
@@ -162,15 +162,11 @@ class Report:
     def getinstances(cls):
         return cls.instances
 
-    @classmethod
-    def setDebug(cls, Debug=False):
-        if cls.__Debug:
-            print(" PhysicalConstants.setdebug: ", Debug)
-        cls.__Debug = Debug
+    def setDebug(self, Debug=False):
+        self.__Debug = Debug
     
-    @classmethod
-    def getDebug(cls):
-        return cls.__Debug
+    def getDebug(self):
+        return self.__Debug
 
     def setAll2None(self):
         self._Name       = None
@@ -179,7 +175,40 @@ class Report:
         self._Header     = []
         self._Lines      = []
 
+    def setName(self, Name):
+        self._Name = Name
 
+    def setReportPath(self, ReportPath):
+        self._ReportPath = ReportPath
+
+    def setFileName(self, FileName):
+        self._FileName = FileName
+
+    def setHeader(self, Header):
+        self._Header = Header
+
+    def setLines(self, Lines):
+        self._Lines = Lines
+
+    def getName(self):
+        return Name
+
+    def getReportPath(self):
+        return ReportPath
+
+    def getFileName(self):
+        return FileName
+
+    def getHeader(self):
+        return Header
+
+    def getLines(self):
+        return Lines
+
+    def getDebug(self):
+        return self.__Debug
+
+    
 #--------  Processing methods
     def createPandasDataFrame(self):
         Data = []
@@ -196,8 +225,12 @@ class Report:
             print(" Report; createPandasDataframe: \n", Dataframe)
         return Dataframe
 
-    
-#--------  Report:
+
+#--------  I/o methods
+    def createCSV(self, _DataFrame):
+        _filename = os.path.join(self._ReportPath, self._FileName)
+        _DataFrame.to_csv(_filename, index=False, header=False)
+
     def asCSV(self):
 
         Data = []
@@ -220,17 +253,4 @@ class Report:
             print(filename)
 
         DataFrame.to_csv(filename, index=False, header=False)
-        
-    
-#--------  I/o methods
-    def createCSV(self, _DataFrame):
-        _filename = os.path.join(self._ReportPath, self._FileName)
-        _DataFrame.to_csv(_filename, index=False, header=False)
-
-
-    def setDebug(self, Debug):
-        self.__Debug = Debug
-
-    def getDebug(self):
-        return self.__Debug
 

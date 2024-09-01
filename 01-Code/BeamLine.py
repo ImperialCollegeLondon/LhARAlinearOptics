@@ -485,14 +485,14 @@ class BeamLine(object):
                         "SigmaEnergy"]["Value"].iloc[0])
             MinCTheta = float(\
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
-        elif SrcMode == 2:               #.. Gaussian:
+        elif SrcMode == 2:               #.. Flat
             Emin  = float( \
              pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
             Emax = float( \
              pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             MinCTheta = float( \
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
-        elif SrcMode == 3:
+        elif SrcMode == 3:               #.. Read from file
             pass
 
         if SrcMode != 3:

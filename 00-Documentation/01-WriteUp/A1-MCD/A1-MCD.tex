@@ -1,4 +1,4 @@
-\graphicspath{ {A1-MCD/Figures/} }
+        \graphicspath{ {A1-MCD/Figures/} }
 
 \section{Module, class and data structures}
 
@@ -1984,7 +1984,7 @@ table~\ref{Tab:Source:Methods}.
                                                 generation as it may be used to restrice generation to the set of partices that
                                                 will enter the downstream acceptane.                                            \\
        \texttt{Param[3]} & float   & MeV      & Mean kinetic energy.                                          \\
-       \texttt{Param[4]} & float   & MeV      & Standard deviation of kinetic energy distribution.            \\
+       \texttt{Param[4]} & float   & MeV      & Maximum kinetic energy.            \\
       \hline
     \end{tabular}
   \end{center}
@@ -2004,16 +2004,8 @@ table~\ref{Tab:Source:Methods}.
       \hline
       \textbf{Attribute} & \textbf{Type}      & \textbf{Unit} & \textbf{Comment}                    \\
       \hline
-      \texttt{Mode}      & integer &          & \texttt{Mode}$=3$; parameterised laser-driven source.        \\
-      \hline
-       \texttt{Param[0]} & float   & m        & Standard deviation of normal distribution from which $x$ coordinate is sampled. \\
-       \texttt{Param[1]} & float   & m        & Standard deviation of normal distribution from which $y$ coordinate is sampled. \\
-       \texttt{Param[2]} & float   &          & Minimum $\cos\theta_S$.
-                                                The specification of a minimum for $\cos\theta_S$ improves the efficiency of
-                                                generation as it may be used to restrice generation to the set of partices that
-                                                will enter the downstream acceptane.                                            \\
-       \texttt{Param[3]} & float   & MeV      & Mean kinetic energy.                                          \\
-       \texttt{Param[4]} & float   & MeV      & Standard deviation of kinetic energy distribution.            \\
+      \texttt{Mode}      & integer &          & \texttt{Mode}$=3$; partice trace space read from file.
+                                                In this case no additional paramters are required. \\
       \hline
     \end{tabular}
   \end{center}
@@ -2051,8 +2043,44 @@ than those inheritted from the parent class.
 
 \paragraph{Utilities} ~\newline
 \noindent
-The \texttt{Source} derived class has no utilities other
-than those inheritted from the parent class. 
+The utilities provided by the \texttt{Source} derived class are listed
+in table \ref{Tab:Source:Utilities}.
+\begin{table}[h]
+  \caption{
+    Definition of utilities provided by the \texttt{Source} derived
+    class. 
+  }
+  \label{Tab:Source:Utilities}
+  \begin{center}
+    \begin{tabular}{|c|c|c|p{5cm}|}
+      \hline
+      \textbf{Method} & \textbf{Arguments} & \textbf{Return}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{CheckSourceParam(Mode, Param)} & Integer, list & boolean & Class method. Check that mode and parameters are valid.
+                                                                         Calls \texttt{CheckMode} and \texttt{CheckParam}                  \\
+      \texttt{CheckMode(Mode)}               & integer & boolean       & Class method. Check is valid.                                     \\
+      \texttt{CheckParam}                    & list    & boolean       & Class method. Check paramter list is valid.                       \\
+      \texttt{getParticleFromSource()}       &         & ndarray       & Get trace space for particle at source, returns np.array.         \\
+      \texttt{getParticle()}                 &         & floats        & Called from \texttt{getParticleFromSource()}, returns parameters
+                                                                         used to create trace space of particle at source.                 \\
+      \texttt{getFlatThetaPhi()}             &         & floats        & Called from \texttt{getParticle()} if flat $\cos\theta_S$, flat
+                                                                         $\phi_S$ distribution is requested.                               \\
+      \texttt{getgofrp(rpmax, xp, yp)}       & floats  & float         & Returns $g(r^\prime)$ given input $r^\prime_{\rm max}$, $x^\prime$,
+                                                                         and $y^\prime$.                                                    \\
+      \texttt{g\_theta(Energy)}              & float   &               & Returns $\theta_S$ generated using a guassian distribution.
+                                                                         Depricated.                                                       \\
+      \texttt{angle\_gemerator(Energy)}      & float   &               & Returns $\theta_S$, $\phi_S$ using \texttt{g\_theta} and uniform
+                                                                         distribution for $\phi_S$.  Depricated.                           \\
+      \texttt{getGaussianThetaPhi(Energy)}   & float   &               & Returns $\cos\theta_S$ and $\phi_S$ using \texttt{angle\_generator}. \\
+     \texttt{paramters(P, E, l, tl, d, I, t)}& floats  &               & Returns derived parameters used to generate TNSA proton kinetic
+                                                                         energy spectrum.                                                  \\
+      \texttt{(equation(x, tl, t0)}          & floats  &               & Returns result of evaluation equation~\ref{EquforX}.                   \\
+      \texttt{(getLaserDrivenProtonEnergy()} &         &               & Generates proton kinetic energy at source for paramterised TNSA
+                                                                         model.                                                            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \paragraph{Processing methods} ~\newline
 \noindent
@@ -2525,6 +2553,133 @@ The \texttt{PhysicalConstants} class provides no i/o methods.
 The \texttt{PhysicalConstants} provides no utilities.
 
 \FloatBarrier
+
+\subsection{\texttt{Report}}
+\label{SubSect:Rprt}
+
+The \texttt{Report} parent class supports a collection of derived
+classes to generate reports, usually in the form of a CSV file, based
+on the data stored in the attributes of
+the \texttt{Beam}, \texttt{BeamLine}, \texttt{BeamLineElement}, \texttt{Particle},
+and other classes.
+
+\subsubsection{Instantiation}
+\noindent
+The call to instantiate the \texttt{Report} class is:
+\begin{center}
+  \texttt{Report(Name, ReportPath, FileName, Header, Lines)}
+\end{center}
+\begin{description}
+  \item{\texttt{Name}}: (string) Name of report;
+  \item{\texttt{ReportPath}}: (string) String containing path to the
+    directory where report will be written; 
+  \item{\texttt{FileName}}: (string) String containing name of the
+   file in which report will be written.
+  \item{\texttt{Header}}: (list of strings) List containing strings
+    that will form the header record of the report; and
+  \item{\texttt{Lines}}: (list of lists) The lines that will
+    make up the lines of the report.
+    List[i][j] provides the value of the item to be recorded in
+    column \texttt{j} of row \texttt{i} of the report.
+\end{description}
+
+\subsubsection{Instance attributes and access methods}
+\label{Para:Rprt:InstAttr}
+\noindent
+The \texttt{Report} parent class supports a collection of derived
+classes to generate reports, usually in the form of a CSV file, based
+on the data stored in the attributes of
+the \texttt{Beam}, \texttt{BeamLine}, \texttt{BeamLineElement}, \texttt{Particle},
+and other classes.
+instance attributes are presented in
+table~\ref{Tab:Rprt:Attributes} and the access methods are summarised
+in table~\ref{Tab:Rprt:AccessMethods}.
+\begin{table}[h]
+  \caption{
+    Definition of attributes of instances of the \texttt{Report} class.
+  }
+  \label{Tab:Rprt:Attributes}
+  \begin{center}
+    \begin{tabular}{|l|c|p{11cm}|}
+      \hline
+      \textbf{Attribute} & \textbf{Type} & \textbf{Comment}                                                                      \\
+      \hline
+      \texttt{NEvt}          & integer  & Number of events to generate.                                                          \\
+      \texttt{ParamFileName} & string   & Path to beam-line parameter CSV file.                                                  \\
+      \texttt{dataFileDir}   & string   & Path to the directory in which data file is to be written.                             \\
+      \texttt{dataFileName}  & string   & Name of file to be created.                                                            \\
+      \texttt{Facility}      & Facility & Instance of the derived \texttt{Facility} class derived from \texttt{BeamLineElement}. \\
+      \texttt{iBmIOw}        & BeamIO   & Instance of the derived \texttt{BeamIO} class for the file to be written.              \\
+      \texttt{ProgressPrint} & boolean  & If True the progress towards the \texttt{NEvt} requested events is printed.            \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{table}[h]
+  \caption{
+    Definition of access methods for the \texttt{Report}
+    class. 
+  }
+  \label{Tab:Rprt:AccessMethods}
+  \begin{center}
+    \begin{tabular}{|c|c|p{9.5cm}|}
+      \hline
+      \textbf{Set method} & \textbf{Get method}  & \textbf{Comment}                                                       \\
+      \hline
+      \texttt{setName}       & \texttt{getName}       & Set/get name of report.                                           \\
+      \texttt{setReportPath} & \texttt{getReportPath} & Set/get path to director into which report file is to be written. \\
+      \texttt{setFileName}   & \texttt{getFileName}   & Set/get name of file to be written.                               \\
+      \texttt{setHeader}     & \texttt{getHeader}     & Set/get list of strings forming header fields.                    \\
+      \texttt{setLines}      & \texttt{getLines}      & Set/get list of lists containing report entries line by line.     \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Processing methods}
+\noindent
+Table~\ref{Tab:Rprt:ProcMethods} presents the processing methods provided
+in the \texttt{Report} class.
+\begin{table}[h]
+  \caption{
+    Processing methods provided by the \texttt{Report}
+    class. 
+  }
+  \label{Tab:Rprt:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{5cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                                       \\
+      \hline
+      \texttt{createPandasDataFrame()} & & Data frame instance & Create pandas data frame using the data contained in \texttt{Header}
+                                                                 and \texttt{Lines}.
+                                                                 The instance is returned.                                              \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{I/o methods}
+\noindent
+Table~\ref{Tab:Rprt:IoMethods} presents the i/o methods provided in
+the \texttt{Report} class.
+\begin{table}[h]
+  \caption{
+    I/o methods provided by the \texttt{Report} class. 
+  }
+  \label{Tab:Rprt:ProcMethods}
+  \begin{center}
+    \begin{tabular}{|l|c|c|p{7cm}|}
+      \hline
+      \textbf{Method} & \textbf{Argument(s)} & \textbf{Return} & \textbf{Comment}                                                       \\
+      \hline
+      \texttt{createCSV(DataFrame)} & Data frame instance & & Create CSV file from pandas data \texttt{DatsFrame} frame using the data
+                                                              contained in \texttt{Header} and \texttt{Lines}.                          \\
+      \texttt{asCSV()}              &                     & & Write pandas dataframe and write it to CSV file.                          \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \subsection{\texttt{LaTeX}}
 \label{SubSect:LTX}
