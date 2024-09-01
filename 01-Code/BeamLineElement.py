@@ -5012,25 +5012,6 @@ class Source(BeamLineElement):
             str(self.getParameters())
         return Str
 
-    def tabulateParameters(self, filename="LaTeX.tex"):
-        LTX.TableHeader(filename, '|l|c|l|', \
-                        self.ModeText[self.getMode()])
-
-        Line = "\\textbf{Parameter} & \\textbf{Value} & \\textbf{Unit}"
-        LTX.TableLine(filename, Line)
-        Line = "\\hline"
-        LTX.TableLine(filename, Line)
-
-        iPrm = 0
-        for Prm in self.ParamLaTeX[self.getMode()]:
-            Line = Prm + "&"                                     + \
-                str(self.getParameters()[iPrm]) + "&" + \
-                self.ParamUnit[self.getMode()][iPrm]
-            iPrm += 1
-            LTX.TableLine(filename, Line)
-
-        LTX.TableTrailer(filename)
-
 #--------  "Set methods".
 #.. Methods believed to be self documenting(!)
     def setAll2None(self):
@@ -5086,102 +5067,7 @@ class Source(BeamLineElement):
         return self._ParameterUnit
     
         
-#--------  Utilities:
-    @classmethod
-    def CheckSourceParam(cls, _Mode, _Param):
-        if cls.getDebug():
-            print(' BeamLineElement(Source).CheckSourceParam:', \
-                  ' mode, params:', \
-                  _Mode, _Param)
-
-        ValidMode  = False
-        ValidParam = False
-        
-        ValidMode  = cls.CheckMode(_Mode)
-        if ValidMode:
-            ValidParam = cls.CheckParam(_Mode, _Param)
-
-        ValidSourceParam = ValidMode and ValidParam
-        if cls.getDebug():
-            print("     <---- ValidMode, ValidParam, ValidSourcParam:", \
-                  ValidMode, ValidParam, ValidSourceParam)
-
-        if cls.getDebug():
-            print(' <---- BeamLineElement(Source).CheckSourceParam,', \
-                  ' done.  --------', \
-                  '  --------  --------  --------  --------  --------')
-            
-        return ValidSourceParam
-
-    @classmethod
-    def CheckMode(cls, _Mode):
-        if cls.getDebug():
-            print(' BeamLineElement(Source).CheckMode: mode:', _Mode)
-            
-        #.. Do this with a loop, detault fail
-        ValidMode = False
-        for iMode in cls.ModeList:
-            if cls.getDebug():
-                print("     ----> iMode:", iMode, "cf _Mode", _Mode)
-            
-            if _Mode == iMode:
-                ValidMode = True
-                break
-            
-        if cls.getDebug():
-            print("     <---- iMode, _Mode, ValidMode:", \
-                  iMode, _Mode, ValidMode)
-            
-        if cls.getDebug():
-            print(' <---- BeamLineElement(Source).CheckMode: done.', \
-            '  --------  --------  --------  --------  --------  ')
-
-        return ValidMode
-    
-    @classmethod
-    def CheckParam(cls, _Mode, _Param):
-        if cls.getDebug():
-            print(' BeamLineElement(Source).CheckParam: mode, params:', \
-                  _Mode, _Param)
-
-        #.. Detault fail
-        ValidParam = False
-        if cls.getDebug():
-            print("     ----> len(_Param):", len(_Param))
-            print("         ----> cf     :", len(cls.ParamList[_Mode]))
-
-        if len(_Param) == len(cls.ParamList[_Mode]):
-            iMtch = 0
-            for i in range(len(_Param)):
-                if cls.getDebug():
-                    print("         ----> i, ParamList, _Param:", \
-                          i, cls.ParamList[_Mode][i], _Param[i])
-                if isinstance(_Param[i], cls.ParamList[_Mode][i]):
-                    iMtch += 1
-                else:
-                    if cls.getDebug():
-                        print("             ----> No match for", \
-                              "i, ParamList, _Param:", \
-                              i, cls.ParamList[_Mode][i], _Param[i])
-                    
-            if cls.getDebug():
-                print("     ----> iMtch:", iMtch)
-        else:
-            raise badParameters( \
-                                 " BeamLineElement(Source).CheckParam:", \
-                                 " bad source parameters. Exit")
-
-        if iMtch == len(_Param):
-            ValidParam = True
-        if cls.getDebug():
-            print("     <---- ValidParam:", ValidParam)
-        if cls.getDebug():
-            print(" <---- BeamLineElement(Source).CheckParam, done.", \
-                  "  --------", \
-                  '  --------  --------  --------  --------  --------')
-
-        return ValidParam
-
+#--------  Processing methods:
     def getParticleFromSource(self):
         if self.__Debug:
             print(" BeamLineElement(Source).getParticleFromSource: start")
@@ -5602,6 +5488,121 @@ class Source(BeamLineElement):
                 print("     ----> Trace space:", TrcSpc)
 
         return TrcSpc
+
+#--------  Utilities:
+    def tabulateParameters(self, filename="LaTeX.tex"):
+        LTX.TableHeader(filename, '|l|c|l|', \
+                        self.ModeText[self.getMode()])
+
+        Line = "\\textbf{Parameter} & \\textbf{Value} & \\textbf{Unit}"
+        LTX.TableLine(filename, Line)
+        Line = "\\hline"
+        LTX.TableLine(filename, Line)
+
+        iPrm = 0
+        for Prm in self.ParamLaTeX[self.getMode()]:
+            Line = Prm + "&"                                     + \
+                str(self.getParameters()[iPrm]) + "&" + \
+                self.ParamUnit[self.getMode()][iPrm]
+            iPrm += 1
+            LTX.TableLine(filename, Line)
+
+        LTX.TableTrailer(filename)
+
+    @classmethod
+    def CheckSourceParam(cls, _Mode, _Param):
+        if cls.getDebug():
+            print(' BeamLineElement(Source).CheckSourceParam:', \
+                  ' mode, params:', \
+                  _Mode, _Param)
+
+        ValidMode  = False
+        ValidParam = False
+        
+        ValidMode  = cls.CheckMode(_Mode)
+        if ValidMode:
+            ValidParam = cls.CheckParam(_Mode, _Param)
+
+        ValidSourceParam = ValidMode and ValidParam
+        if cls.getDebug():
+            print("     <---- ValidMode, ValidParam, ValidSourcParam:", \
+                  ValidMode, ValidParam, ValidSourceParam)
+
+        if cls.getDebug():
+            print(' <---- BeamLineElement(Source).CheckSourceParam,', \
+                  ' done.  --------', \
+                  '  --------  --------  --------  --------  --------')
+            
+        return ValidSourceParam
+
+    @classmethod
+    def CheckMode(cls, _Mode):
+        if cls.getDebug():
+            print(' BeamLineElement(Source).CheckMode: mode:', _Mode)
+            
+        #.. Do this with a loop, detault fail
+        ValidMode = False
+        for iMode in cls.ModeList:
+            if cls.getDebug():
+                print("     ----> iMode:", iMode, "cf _Mode", _Mode)
+            
+            if _Mode == iMode:
+                ValidMode = True
+                break
+            
+        if cls.getDebug():
+            print("     <---- iMode, _Mode, ValidMode:", \
+                  iMode, _Mode, ValidMode)
+            
+        if cls.getDebug():
+            print(' <---- BeamLineElement(Source).CheckMode: done.', \
+            '  --------  --------  --------  --------  --------  ')
+
+        return ValidMode
+    
+    @classmethod
+    def CheckParam(cls, _Mode, _Param):
+        if cls.getDebug():
+            print(' BeamLineElement(Source).CheckParam: mode, params:', \
+                  _Mode, _Param)
+
+        #.. Detault fail
+        ValidParam = False
+        if cls.getDebug():
+            print("     ----> len(_Param):", len(_Param))
+            print("         ----> cf     :", len(cls.ParamList[_Mode]))
+
+        if len(_Param) == len(cls.ParamList[_Mode]):
+            iMtch = 0
+            for i in range(len(_Param)):
+                if cls.getDebug():
+                    print("         ----> i, ParamList, _Param:", \
+                          i, cls.ParamList[_Mode][i], _Param[i])
+                if isinstance(_Param[i], cls.ParamList[_Mode][i]):
+                    iMtch += 1
+                else:
+                    if cls.getDebug():
+                        print("             ----> No match for", \
+                              "i, ParamList, _Param:", \
+                              i, cls.ParamList[_Mode][i], _Param[i])
+                    
+            if cls.getDebug():
+                print("     ----> iMtch:", iMtch)
+        else:
+            raise badParameters( \
+                                 " BeamLineElement(Source).CheckParam:", \
+                                 " bad source parameters. Exit")
+
+        if iMtch == len(_Param):
+            ValidParam = True
+        if cls.getDebug():
+            print("     <---- ValidParam:", ValidParam)
+        if cls.getDebug():
+            print(" <---- BeamLineElement(Source).CheckParam, done.", \
+                  "  --------", \
+                  '  --------  --------  --------  --------  --------')
+
+        return ValidParam
 
     def visualise(self, axs, CoordSys, Proj):
         if self.getDebug():

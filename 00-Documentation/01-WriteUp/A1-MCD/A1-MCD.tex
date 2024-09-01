@@ -2041,25 +2041,21 @@ methods other than those inheritted from the parent class.
 The \texttt{Source} derived class has no i/o methods other
 than those inheritted from the parent class.
 
-\paragraph{Utilities} ~\newline
+\paragraph{Processing methods} ~\newline
 \noindent
-The utilities provided by the \texttt{Source} derived class are listed
-in table \ref{Tab:Source:Utilities}.
-\begin{table}[h]
+The processing methods provided by the \texttt{Source} derived class
+are listed in table \ref{Tab:Source:Proc}.
+\begin{sidewaystable}[h]
   \caption{
-    Definition of utilities provided by the \texttt{Source} derived
-    class. 
+    Definition of processing methods provided by the \texttt{Source}
+    derived class. 
   }
-  \label{Tab:Source:Utilities}
+  \label{Tab:Source:Proc}
   \begin{center}
-    \begin{tabular}{|c|c|c|p{5cm}|}
+    \begin{tabular}{|c|c|c|p{7cm}|}
       \hline
       \textbf{Method} & \textbf{Arguments} & \textbf{Return}  & \textbf{Comment}                                                 \\
       \hline
-      \texttt{CheckSourceParam(Mode, Param)} & Integer, list & boolean & Class method. Check that mode and parameters are valid.
-                                                                         Calls \texttt{CheckMode} and \texttt{CheckParam}                  \\
-      \texttt{CheckMode(Mode)}               & integer & boolean       & Class method. Check is valid.                                     \\
-      \texttt{CheckParam}                    & list    & boolean       & Class method. Check paramter list is valid.                       \\
       \texttt{getParticleFromSource()}       &         & ndarray       & Get trace space for particle at source, returns np.array.         \\
       \texttt{getParticle()}                 &         & floats        & Called from \texttt{getParticleFromSource()}, returns parameters
                                                                          used to create trace space of particle at source.                 \\
@@ -2072,19 +2068,44 @@ in table \ref{Tab:Source:Utilities}.
       \texttt{angle\_gemerator(Energy)}      & float   &               & Returns $\theta_S$, $\phi_S$ using \texttt{g\_theta} and uniform
                                                                          distribution for $\phi_S$.  Depricated.                           \\
       \texttt{getGaussianThetaPhi(Energy)}   & float   &               & Returns $\cos\theta_S$ and $\phi_S$ using \texttt{angle\_generator}. \\
-     \texttt{paramters(P, E, l, tl, d, I, t)}& floats  &               & Returns derived parameters used to generate TNSA proton kinetic
+      \texttt{paramters(P, E, l, tl, d, I, t)}& floats &               & Returns derived parameters used to generate TNSA proton kinetic
                                                                          energy spectrum.                                                  \\
-      \texttt{(equation(x, tl, t0)}          & floats  &               & Returns result of evaluation equation~\ref{EquforX}.                   \\
-      \texttt{(getLaserDrivenProtonEnergy()} &         &               & Generates proton kinetic energy at source for paramterised TNSA
+      \texttt{equation(x, tl, t0)}          & floats  &               & Returns result of evaluation equation~\ref{EquforX}.                   \\
+      \texttt{getLaserDrivenProtonEnergy()} &         &               & Generates proton kinetic energy at source for paramterised TNSA
                                                                          model.                                                            \\
+      \texttt{getLaserCumProbParam()} &         &               &                                                             \\
+      \texttt{getLaserCumProb()} &         &               &                                                             \\
+      \texttt{getLaserDrivenProtonEnergyProbDensity()} &         &               &                                                             \\
+      \texttt{getTraceSpace()} &         &               &                                                             \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{sidewaystable}
+
+\paragraph{Utilities} ~\newline
+\noindent
+The utilities provided by the \texttt{Source} derived class are listed
+in table \ref{Tab:Source:Utils}.
+\begin{table}[h]
+  \caption{
+    Definition of utilities provided by the \texttt{Source}
+    derived class. 
+  }
+  \label{Tab:Source:Utils}
+  \begin{center}
+    \begin{tabular}{|c|c|c|p{5cm}|}
+      \hline
+      \textbf{Method} & \textbf{Arguments} & \textbf{Return}  & \textbf{Comment}                                                 \\
+      \hline
+      \texttt{CheckSourceParam(Mode, Param)} & Integer, list & boolean & Class method. Check that mode and parameters are valid.
+                                                                         Calls \texttt{CheckMode} and \texttt{CheckParam}                  \\
+      \texttt{CheckMode(Mode)}               & integer & boolean       & Class method. Check is valid.                                     \\
+      \texttt{CheckParam}                    & list    & boolean       & Class method. Check paramter list is valid.                       \\
+      \texttt{tabulateParameters()} &         &               &                                                             \\
       \hline
     \end{tabular}
   \end{center}
 \end{table}
-
-\paragraph{Processing methods} ~\newline
-\noindent
-The \texttt{Source} dericed class has no processing methods.
 
 \FloatBarrier
 
