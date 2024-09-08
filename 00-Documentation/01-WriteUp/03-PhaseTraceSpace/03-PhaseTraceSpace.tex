@@ -1,6 +1,6 @@
 \graphicspath{ {03-PhaseTraceSpace/Figures/} }
 
-\section{Phase space and trace space}
+\section{Phase space, trace space, beam parameters}
 
 The motion of particles passing through an accelerator is most often
 described using classical Hamiltonian mechanics; quantum mechanics
@@ -95,3 +95,59 @@ Here $\Delta s = s - s_0$ and $\Delta E = E - E_0$, where $s_0$ and
 $E_0$ are the reference particle position and energy respectively; $E$
 and $s$ are the energy and position of a particular particle in the
 beam.
+
+\subsection{Beam parameters}
+
+The trace space vector, $\underline{\phi}_i$, of the $i^{\rm th}$
+particle at a position along the beam line contains the varaince of
+the particle coordinates with respect to those of the reference
+particle.
+For a sample containing $N$ particles, the covariance matrix,
+$\underline{\underline{C}}_6$, may therefore be obtained by evaluating:
+\begin{equation}
+  \underline{\underline{C}}_6 = \frac{1}{N} \sum_i^N
+                                    \underline{\phi}_i \; \underline{\phi}_i^T
+                              = \left<
+                                    \underline{\phi} \; \underline{\phi}^T
+                                \right> \, ;
+\end{equation}
+where the notation $\left< \right>$ is used to denote evaluating the
+expectation value.
+The RMS emittance of the beam in all 6 trace-space dimensions is then
+given by:
+\begin{equation}
+  \varepsilon_6 = \sqrt[6]{\left| \underline{\underline{C}}_6 \right| }\;.
+\end{equation}
+In an analagous notation, the four-dimensional transverse trace space
+$(x, x^\prime, y, y^\prime)$ may be used to define the
+four-dimensional covariance matrix $\underline{\underline{C}}_4$,
+which, in turn, can be used to evaluate the four-dimensional
+transverse emittance:
+\begin{equation}
+  \varepsilon_4 = \sqrt[4]{\left| \underline{\underline{C}}_4 \right| }\;.
+\end{equation}
+The size of the beam in the two ``transverse planes'' $(x, x^\prime)$
+and $(y, y^\prime)$ is contained in two, $2 \times 2$ submatrices of
+$\underline{\underline{C}}_6$, $\underline{\underline{C}}_x$ and
+$\underline{\underline{C}}_y$.
+If the $x$ and $y$ coordinates are to be taken as uncoupled, then the
+emittance of the $(x, x^\prime)$ and $(y, y^\prime)$ trace space my
+be obtained using:
+\begin{eqnarray}
+  \varepsilon_x & = & \sqrt     {\left| \underline{\underline{C}}_x \right| }
+    {\rm~and} \\
+  \varepsilon_y & = & \sqrt{\left| \underline{\underline{C}}_y \right| }\;.
+\end{eqnarray}
+With $u=x~{\rm or}~y$, the area of the trace space ellipse is given
+by $\pi \varepsilon_u$ and the Twise parameters, $\alpha_u$,
+$\beta_u$, and $\gamma_u$ are given by:
+\begin{eqnarray}
+  \sigma_u^2 = \left< u^2 \right> &         = & \beta_u, \varepsilon_u \, ;            \\
+  \left< u^{\prime 2} \right> &              = & \gamma_u, \varepsilon_u \, {\rm : and} \\
+  \left< u u^\prime \right>   &              = & -\alpha_u \varepsilon_u \, ;
+\end{eqnarray}
+where:
+\begin{equation}
+  \beta_u \gamma_u - \alpha_u^2 = 1 \, .
+\end{equation}
+
