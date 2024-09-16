@@ -10,12 +10,14 @@ import UserAnal      as UsrAnl
 def main(argv):
 
     Success, Debug, \
-        beamspecfile, inputfile, outputfile, \
+        beamspecfile, inputfile, bdsimfile, outputfile, \
         nEvts = UsrFw.startAnalysis(argv)
     if not Success:
         print(" <---- Failed at UsrFw.startAnalysis, exit")
         exit(1)
 
+    print(beamspecfile)
+    print(type(beamspecfile))
     Success, ibmIOr, ibmIOw = UsrFw.handleFILES(beamspecfile, \
                                                 inputfile, outputfile)
     if not Success:

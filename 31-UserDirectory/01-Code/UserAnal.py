@@ -67,7 +67,7 @@ class UserAnal:
         print("     ----> Default UserInit.")
 
         if not UserAnal.InitCalled:
-            print(BL.BeamLine.getinstance())
+            print(BL.BeamLine.getinstances())
 
         print("\n <---- Default UserInit complete.")
         
@@ -158,7 +158,7 @@ class UserAnal:
     def EventLoop(self, ibmIOw):
 
         nPrtcl = 0
-        for iPrtcl in Prtcl.Particle.getParticleInstances():
+        for iPrtcl in Prtcl.Particle.getinstances():
             nPrtcl += 1
             if isinstance(iPrtcl, Prtcl.ReferenceParticle):
                 iRefPrtcl = iPrtcl

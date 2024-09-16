@@ -121,7 +121,8 @@ class Simulation(object):
             cls.__Rnd.seed(int(cls.__RandomSeed))
 
             cls.setNEvt(NEvt)
-            cls.setBeamLineSpecificationFile(filename)
+            if filename != None:
+                cls.setBeamLineSpecificationFile(filename)
             cls.setdataFileDir(_dataFileDir)
             cls.setdataFileName(_dataFileName)
 
@@ -183,6 +184,7 @@ class Simulation(object):
 
     @classmethod
     def setBeamLineSpecificationFile(self, BLspecfile):
+        print(type(BLspecfile))
         if not isinstance(BLspecfile, str):
             raise badParameter()
 

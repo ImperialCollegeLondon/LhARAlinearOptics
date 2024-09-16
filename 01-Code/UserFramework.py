@@ -141,6 +141,7 @@ def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
     #.. ----> Beam specification file, if specified:
     #         Note, reading from specification file, then, instanciation
     #         of Simulation class handles output file
+    print(" Here:", beamspecfile)
     if beamspecfile != None:
         if not os.path.isfile(beamspecfile):
             beamspecfile = os.path.join(HOMEPATH, beamspecfile)
@@ -155,6 +156,7 @@ def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
         ofileSPLIT = [None, None]
         if outputfile != None:
             ofileSPLIT = os.path.split(outputfile)
+        print(" ofileSPLIT:", ofileSPLIT)
         iSm    = Simu.Simulation(1, None, ofileSPLIT[0], ofileSPLIT[1])
 
         ibmIOw = iSm.getiBmIOw()
@@ -175,7 +177,7 @@ def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvtsIn):
             print(" UserAnal.EventLoop start:")
     Success = False
 
-    iSm = Simu.Simulation.getInstance()
+    iSm = Simu.Simulation.getinstances()
 
     nEvts = 1000
     if nEvtsIn != None:
