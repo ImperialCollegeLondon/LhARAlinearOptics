@@ -5276,17 +5276,20 @@ class Source(BeamLineElement):
         t_0 = B/v_inf
 
         # Solves the equation numerically for X
-        initial_guess = 0.5  
-        X_solution = fsolve(self.equation, initial_guess, args=(t_laser, t_0))
-        X = X_solution[0]
+        initial_guess = mth.acos(0.5)
+        Theta_solution = fsolve( \
+                        self.equation, initial_guess, args=(t_laser, t_0) \
+                                )
+        X = mth.cos(Theta_solution[0])
 
         E_max = E_i_inf*(X**2)  # [J]
 
         return ne_0, c_s, s_sheath, T_e, E_max
 
     # Defines the function to solve for f(x) = 0
-    def equation(self, X, t_laser, t_0):
-        print(" equation: X, t_laser, t_0:", X, t_laser, t_0)
+    def equation(self, Theta, t_laser, t_0):
+        X = mth.cos(Theta)
+        print(" equation: Theta, X, t_laser, t_0:", Theta, X, t_laser, t_0)
         return (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
             (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
 
