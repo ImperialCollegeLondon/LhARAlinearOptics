@@ -1,0 +1,5 @@
+﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
+0,Facility,Global,Name,Name,LhARA,,
+0,Facility,Global,Reference particle,Kinetic energy,15,MeV,
+0,Facility,Global,Vacuum chamber,Mother volume radius,0.02,m,
+1,Source,Source,ReadFromFile,SourceMode,3,,Read particles from file

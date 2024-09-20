@@ -16,10 +16,9 @@ def main(argv):
         print(" <---- Failed at UsrFw.startAnalysis, exit")
         exit(1)
 
-    print(beamspecfile)
-    print(type(beamspecfile))
     Success, ibmIOr, ibmIOw = UsrFw.handleFILES(beamspecfile, \
-                                                inputfile, outputfile)
+                                                inputfile, outputfile, \
+                                                bdsimfile)
     if not Success:
         print(" <---- Failed at UsrFw.handleFILES, exit")
         exit(1)
