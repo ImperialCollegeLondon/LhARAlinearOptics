@@ -1428,12 +1428,13 @@ class extrapolateBeam(Beam):
                     if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
                         break
             
-        if self.getDebug():
-            print("     <----", iEvt, "events read")
+            if self.getDebug():
+                print("     <----", iEvt, "events read")
 
-        if self.getDebug():
-            print("     ----> calculate covariance matrix:")
-        self.calcCovarianceMatrix()
+            if self.getDebug():
+                print("     ----> calculate covariance matrix:")
+            self.calcCovarianceMatrix()
+                
         if self.getDebug():
             print("     <---- done.")
             print("     ----> extrapolate covariance matrix:")

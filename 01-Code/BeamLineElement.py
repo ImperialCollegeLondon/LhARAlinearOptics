@@ -5101,13 +5101,13 @@ class Source(BeamLineElement):
                   self.getMode(), self.getParameters())
 
         #.. Initialise o/p to None:
-        X      = None
-        Y      = None
-        K      = None
-        cTheta = None
-        Phi    = None
-        xp     = None
-        yp     = None
+        X        = None
+        Y        = None
+        KE       = None
+        cosTheta = None
+        Phi      = None
+        xp       = None
+        yp       = None
 
         #-------- Laser driven:
         if self._Mode == 0:
