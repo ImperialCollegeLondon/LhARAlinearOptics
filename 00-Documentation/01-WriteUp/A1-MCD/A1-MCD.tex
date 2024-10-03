@@ -27,6 +27,29 @@ and is broken down in four principal modules:
     The module provides the singleton \texttt{ReferenceParticle}
     class derived from the \texttt{Particle} class.
 \end{itemize}
+The relationships between the principal modules is illustrated in
+figure~\ref{App:Fig:SASD}.
+The single \texttt{BeamLine} instance represents a beam line made up
+of many \texttt{BeamLineElements} (indicated by the double-headed
+arrow).
+In turn, many beams may be passed through the single \texttt{BeamLine}
+instance and the results of the simulations compared.
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{sasd.pdf}
+  \end{center}
+  \caption{
+    Schematc diagram of the relationships between the principal
+    classes that make up the linear optics package.
+    The double-headed arroes indicate a many-to-one relationship
+    between the objects; the arrow head points to the object which
+    has only one instance.
+    The classes indicated in grey are derived from the class indicated
+    in black to over which they are plotted.
+  }
+  \label{App:Fig:SASD}
+\end{figure}
+
 Other modules: \texttt{BeamIO}, \texttt{LaTeX},
 \texttt{PhysicalConstants}, \texttt{Report}, \texttt{Simulation},
 \texttt{UserFramework}, and \texttt{Visualise}
@@ -536,9 +559,6 @@ The \texttt{ReferenceParticle} class provides no additional i/o methods.
 \paragraph{Utilities} ~\newline
 \noindent
 The \texttt{ReferenceParticle} class provides no additional utilities.
-
-\vfill
-\pagebreak
 
 \subsection{\texttt{Beam} and \texttt{extrapolateBeam}}
 \label{SubSect:B}
