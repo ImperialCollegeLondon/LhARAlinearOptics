@@ -23,6 +23,8 @@ Class Beam:
 
    Input arguments:
   _InputDataFile  : Path to BeamIO data file containing events to be read.
+ _BeamLineInstance: Instance of BeamLine class to which the this instance of
+                    the Beam class refers.
   _nEvtMax        : Maximum number of events to read, if not set, read 'em all
   _outputCSVfile  : Path to csv file in which summary of beam processing will
                     be written
@@ -217,12 +219,16 @@ class Beam:
         if BL.BeamLine.getinstances() == None:
             EndOfFile = self.getBeamIOread().readBeamDataRecord()
 
-
-        if BL.BeamLine.getinstances() == None:
+        iBm = BL.BeamLine.getinstances()
+        if iBm == None:
             self.setbeamlineSpecificationCSVfile( \
                                         _beamlineSpecificationCSVfile)
             iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
 
+        #.. Set beam line instance:
+        self.setBeamLineInstance(iBm)
+        
+        #.. Set locations and initialise sums:
         for iBLE in BLE.BeamLineElement.getinstances():
             if not isinstance(iBLE, BLE.Facility):
                 self.setLocation(iBLE.getName())
@@ -259,6 +265,8 @@ class Beam:
               self.getbeamlineSpecificationCSVfile())
         print("     ----> Input data file:", \
               self.getInputDataFile())
+        print("     ----> Beam line:", \
+              self.getBeamLineInstance().getElement()[0].getName())
         print("     ----> Number of events to read:", \
               self.getnEvtMax())
         print("     ----> Output data file:", \
@@ -317,6 +325,7 @@ class Beam:
         self._outputCSVfile                = None
         self._startlocation                = None
         self._beamlineSpecificationCSVfile = None
+        self._BeamLineInstance                 = None
 
         self._Location   = []
         self._CovSums    = []
@@ -326,6 +335,9 @@ class Beam:
         self._emittance  = []
         self._Twiss      = []
 
+    def setBeamLineInstance(self, _BeamLineInstance):
+        self._BeamLineInstance = _BeamLineInstance
+        
     def setbeamlineSpecificationCSVfile(self, _beamlineSpecificationCSVfile):
         self._beamlineSpecificationCSVfile = \
                         _beamlineSpecificationCSVfile
@@ -531,6 +543,9 @@ class Beam:
     def getDebug(cls):
         return cls.__Debug
 
+    def getBeamLineInstance(self):
+        return self._BeamLineInstance
+        
     def getbeamlineSpecificationCSVfile(self):
         return self._beamlineSpecificationCSVfile
 
