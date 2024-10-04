@@ -1,6 +1,8 @@
 \documentclass{99-Styles/CCAP}
 
 \input 99-Styles/GetPackages
+\input 99-Styles/Definitions
+
 \usepackage{afterpage}
 
 \begin{document}
@@ -8,13 +10,21 @@
 \input 00-Top-matter/00-Top-matter
 
 \makeatletter
-\linenumbers
-\modulolinenumbers[5]
+%\linenumbers
+%\modulolinenumbers[5]
 
+\begin{center}
+  \includegraphics[width=0.825\textwidth]{00-Top-matter/Figures/LhARA-RPLC.pdf}
+  \includegraphics[width=0.825\textwidth]{00-Top-matter/Figures/LhARA-lab.pdf}
+\end{center}
+
+\clearpage
+
+\thispagestyle{empty}
 %\setcounter{tocdepth}{3}
 \tableofcontents
 
-\input 99-Styles/Definitions
+\clearpage
 
 \parindent 10pt
 \pagenumbering{arabic}                   
