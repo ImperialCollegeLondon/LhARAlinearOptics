@@ -122,7 +122,7 @@ iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
-for i in range(1000000):
+for i in range(100000):
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
     

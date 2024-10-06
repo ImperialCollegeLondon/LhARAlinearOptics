@@ -64,7 +64,7 @@ g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
 E_max_MeV = Src.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
-for i in range(1000000):
+for i in range(100000):
     TrcSpcFrmSrc = Src.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
 
