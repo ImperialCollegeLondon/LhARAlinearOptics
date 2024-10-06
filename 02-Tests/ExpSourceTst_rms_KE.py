@@ -64,7 +64,7 @@ g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
 E_max_MeV = Src.getderivedParameters()[4] / (1.6e-19 * 1e6)
 E_min_MeV = Src.getderivedParameters()[5] / (1.6e-19 * 1e6)
 
-for i in range(10000):
+for i in range(1000000):
     TrcSpcFrmSrc = Src.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
 
@@ -141,8 +141,10 @@ plt.plot([], [], ' ', \
 
 plt.xlabel('Kinetic energy, $K$ (MeV)', loc='right')
 plt.ylabel('RMS $\\theta_S$ (degrees)', loc='top')
+"""
 plt.title('ExpSourceTst (' + today + \
           '): RMS $\\theta_S$ versus kinetic energy')
+"""
 plt.legend()
 plt.savefig('99-Scratch/RMS_Set_kE.pdf')
 plt.close()

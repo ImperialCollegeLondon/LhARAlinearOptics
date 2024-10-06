@@ -27,12 +27,12 @@ The parameter table is organised in 8 columns:
     particular element of the beam line.
   \item{\texttt{Element}:} (string) indicates that the line will
     define one parameter for the particular beam-line element
-    ``\texttt{Element'}''.
-    Each beam-line element defined in appendix~\ref{A1} is specified
-    by a series of consecutive lines, each line defining one of the
-    parameters that specifies the element.
-    The lines required to specify each element are given in
-    appendix~\ref{A1}.
+    ``\texttt{Element}''.
+    Each beam-line element is specified by a series of consecutive
+    lines, each line defining one of the parameters that specifies the
+    element. 
+    Examples of the lines required to specify each element are given in
+    table~\ref{Tab:BLspec}.
   \item{\texttt{Type}:} (string) specifies the type
     of \texttt{Element} that is to be used.
     For example, an \texttt{Aperture} along the beam line may be
@@ -43,8 +43,8 @@ The parameter table is organised in 8 columns:
     of which is specified by the line.
     For example, the length of an element is specified by setting
     the \texttt{Parameter} field to ``\texttt{Length}''.
-  \item{\texttt{Value}:} (float, integer) value of parameter.
-  \item{\texttt{Unit}:} (string) unit for parameter.
+  \item{\texttt{Value}:} (float, integer) value of the parameter.
+  \item{\texttt{Unit}:} (string) unit in which parameter is specified.
     Presently the code does not require \texttt{Unit} to be
     specified, it is included to record the unit of the value.
   \item{\texttt{Comment}:} (string) free format comment.
@@ -79,7 +79,7 @@ The scripts and the tasks they perform are;
     uses the beam line specified in \texttt{<beamlinefile>} to
     generate \texttt{<nEvts>} and propagate them down the beam line.
     The output is written to \texttt{<outputfile>} in the format
-    defined in the \texttt{BeamIO} class.
+    defined in the \texttt{BeamIO} class (see appendix~\ref{App:A1}).
     If specified, \texttt{<inputfile>} is a \texttt{BeamIO} data
     file.
     In this case, beam transport starts from the most downstream
@@ -92,18 +92,19 @@ The scripts and the tasks they perform are;
     Two \texttt{PDF} files are written to \texttt{99-Scratch}.
     The first, \texttt{ParticleProgressionPlot.pdf}, contains plots of
     the transverse trace space coordinates of the particles at the
-    exit of each beamm line element.
+    exit of each beam line element.
     The second, \texttt{ParticleLongiProgressionPlot.pdf}, contains
-    plots of the longitudina trace space coordinates of the particles
-    at the exit of each beamm line element.
+    plots of the longitudinal trace space coordinates of the particles
+    at the exit of each beam line element.
     The option \texttt{-o <outputfile>} has not yet been
     implemented.
-  \item{\texttt{plotBeam.py -i <inputfile> -n <nEvts> -o <outputfile> -l <startlocation> [-b <beamlinefile>]}} \\
+  \item{\texttt{plotBeam.py -i <inputfile> -n <nEvts> -o <outputfile> \\
+    -l <startlocation> [-b <beamlinefile>]}} \\
     calculates the covariance matrix of the trace-space coordinates at
-    the exit from each vbean-line element and uses these covariance
+    the exit from each beam-line element and uses these covariance
     matrices to calculate the RMS beam size and Twiss parameters.
     A \texttt{PDF} file, \texttt{BeamProgress.pdf}, showing the
-    evolution of these quantities along the is written
+    evolution of these quantities along the beam line is written
     to \texttt{99-Scratch}.
     The calculations are performed on \texttt{<nEvts>} read
     from \texttt{<inputfile>}.
@@ -113,7 +114,9 @@ The scripts and the tasks they perform are;
     will be plotted from from location \texttt{<startlocation>}.
     The option \texttt{-b <beamlinefile>} is retained in case early
     versions of \texttt{BeamIO}-format data files are to be read.
-  \item{\texttt{plotextrapolatedBeam.py -i <inputfile> -n <nEvts> -o <outputfile> -l <startlocation> [-b <beamlinefile>]}} \\
+  \item{\texttt{plotextrapolatedBeam.py -i <inputfile> -n <nEvts>
+    -o <outputfile> \\
+    -l <startlocation> [-b <beamlinefile>]}} \\
     calculates the covariance matrix of the beam at
     location \texttt{<startlocation>} and then calculates the
     evolution of the covariance matrix and Twiss parameters using the
@@ -126,10 +129,11 @@ The scripts and the tasks they perform are;
     the beam line.
     The meaning of the other switches are as
     for \texttt{plotBeam.py}.
-  \item{\texttt{2BDSIM.py -i <inputfile> -o <outputfile> -l <start location> -n <nEvts>}} \\
+  \item{\texttt{2BDSIM.py -i <inputfile> -o <outputfile> -l <start location>
+    -n <nEvts>}} \\
     reads \texttt{<nEvts>} events from the \texttt{BeamIO}-format
     file \texttt{<inputfile>} and writes the ascii
-    file \texttt{<outputfile>} in the format required by BDSIM.
+    file \texttt{<output\-file>} in the format required by BDSIM.
     If specified, the BDSIM-format file is generated at
     location \texttt{<start location>}.
     If \texttt{<start location>} is not specified, the BDSIM-format is

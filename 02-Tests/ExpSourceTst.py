@@ -67,8 +67,8 @@ except:
 #.. Create valid instance:
 Mode  = 0
 Param = [0.000004, 0.000004, 0.998,    \
-          1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25., \
-         20., 15.]
+          1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, \
+         25., 20., 15.]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
@@ -90,7 +90,8 @@ print("SourceTest:", SourceTest, \
       " test parameterised laser-driven source distribution", \
       "check.")
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
-                  0, [0.000004, 0.000004, 0.998, 1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25., 20., 15.])
+                  0, [0.000004, 0.000004, 0.998, 1., 25., 1000, 2.50e15, \
+                  70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25., 20., 15.])
 print(Src1)
 print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \
@@ -121,7 +122,7 @@ iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
-for i in range(10000):
+for i in range(1000000):
     TrcSpcFrmSrc = Src1.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
     
@@ -202,8 +203,8 @@ plt.ylabel('Entries', loc='top')
 plt.yscale("log")
 plt.legend(loc="best")
 
-plt.title('ExpSourceTst (' + today + '): Kinetic energy distribution',
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + '): Kinetic energy distribution',
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_K.pdf')
 plt.close()
 
@@ -225,8 +226,8 @@ plt.xlabel('Kinetic energy (MeV)', loc='right')
 plt.ylabel('Cumulative probability', loc='top')
 plt.yscale("linear")
 plt.legend(loc="best")
-plt.title('ExpSourceTst (' + today + '): cumulative probability', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + '): cumulative probability', \
+#          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_cumulativePDF.pdf')
 plt.close()
@@ -241,9 +242,9 @@ n, bins, patches = plt.hist(PrtclcT, \
 
 plt.xlabel('$\\cos\\theta_S$', loc='right')
 plt.ylabel('Entries', loc='top')
-plt.title('ExpSourceTst (' + today + \
-          '): $\\cos\\theta_S$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $\\cos\\theta_S$ distribution', \
+#          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_costheta.pdf')
 plt.close()
@@ -255,9 +256,9 @@ n, bins, patches = plt.hist(PrtclT, \
 
 plt.xlabel('$\\theta_S$ ($^\\circ$)', loc='right')
 plt.ylabel('Entries', loc='top')
-plt.title('ExpSourceTst (' + today + \
-          '): $\\theta_S$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $\\theta_S$ distribution', \
+#          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_theta.pdf')
 plt.close()
@@ -266,9 +267,9 @@ plt.plot(Ee, sigT, color='r', label='Required dependence', linewidth=1)
 
 plt.xlabel('Kinetic energy (MeV)', loc='right')
 plt.ylabel('$\\sigma_{\\theta_S}$ ($^\\circ$)', loc='top')
-plt.title('ExpSourceTst (' + today + \
-          '): $\\sigma_{\\theta_S}$ versus kinetic energy',\
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $\\sigma_{\\theta_S}$ versus kinetic energy',\
+#          fontname="Times New Roman",  size=12)
 plt.legend(loc="best")
 
 plt.savefig('99-Scratch/SourceTst_sigTK.pdf')
@@ -281,9 +282,9 @@ plt.colorbar()
 
 plt.xlabel('Kinetic energy (MeV)', loc='right')
 plt.ylabel('$\\theta_S$ ($^\\circ$)', loc='top')
-plt.title('ExpSourceTst (' + today + \
-          '): $(\\theta_S, K)$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $(\\theta_S, K)$ distribution', \
+#          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_thetaK.pdf')
 plt.close()
@@ -300,9 +301,9 @@ n, bins, patches = plt.hist(PrtclPhi, \
 
 plt.xlabel('$\\phi_S$ ($^\\circ$)', loc='right')
 plt.ylabel('Entries', loc='top')
-plt.title('ExpSourceTst (' + today + \
-          '): $\\phi_S$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $\\phi_S$ distribution', \
+#          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_phi.pdf')
 plt.close()
@@ -320,9 +321,9 @@ plt.colorbar()
 
 plt.xlabel('x (m)')
 plt.ylabel('y (m)')
-plt.title('ExpSourceTst (' + today + \
-          '): (x, y) distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): (x, y) distribution', \
+#          fontname="Times New Roman",  size=12)
 
 plt.savefig('99-Scratch/SourceTst_xy.pdf')
 plt.close()
@@ -335,9 +336,9 @@ fig = plt.figure(figsize=(9.*cm, 9.*cm))
 plt.hist(SrcX, bins=50, color='k', histtype='step')
 plt.xlabel('$x$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $x$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $x$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_x.pdf')
 plt.close()
 
@@ -346,9 +347,9 @@ fig = plt.figure(figsize=(9.*cm, 9.*cm))
 plt.hist(SrcY, bins=50, color='k', histtype='step')
 plt.xlabel('$y$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $x$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $x$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_y.pdf')
 plt.close()
 
@@ -356,9 +357,9 @@ fig = plt.figure(figsize=(9.*cm, 6.*cm))
 plt.hist(SrcXp, bins=50, color='k', histtype='step')
 plt.xlabel('$x^{\\prime}$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $x^{\\prime}$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $x^{\\prime}$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_xp.pdf')
 plt.close()
 
@@ -366,9 +367,9 @@ fig = plt.figure(figsize=(9.*cm, 6.*cm))
 plt.hist(SrcYp, bins=50, color='k', histtype='step')
 plt.xlabel('$y^{\\prime}$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $y^{\\prime}$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $y^{\\prime}$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_yp.pdf')
 plt.close()
 
@@ -376,18 +377,18 @@ fig = plt.figure(figsize=(9.*cm, 6.*cm))
 plt.hist(SrcRp, bins=50, color='k', histtype='step')
 plt.xlabel('$r^{\\prime}$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $r^{\\prime}$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $r^{\\prime}$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_rp.pdf')
 plt.close()
 
 plt.hist(SrcZ, bins=50, color='k', histtype='step')
 plt.xlabel('$z$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $z$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $z$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_z.pdf')
 plt.close()
 
@@ -397,9 +398,9 @@ fig = plt.figure(figsize=(9.*cm, 9.*cm))
 plt.hist(SrcE, bins=50, color='k', histtype='step')
 plt.xlabel('$\\delta$ (m)')
 plt.ylabel('Entries')
-plt.title('ExpSourceTst (' + today + \
-          '): $\\delta$ distribution', \
-          fontname="Times New Roman",  size=12)
+#plt.title('ExpSourceTst (' + today + \
+#          '): $\\delta$ distribution', \
+#          fontname="Times New Roman",  size=12)
 plt.savefig('99-Scratch/SourceTst_d.pdf')
 plt.close()
 

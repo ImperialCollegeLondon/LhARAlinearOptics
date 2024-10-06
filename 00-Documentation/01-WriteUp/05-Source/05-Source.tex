@@ -3,7 +3,8 @@
 \section{Source}
 
 A variety of options for the generation of the particle distribution
-at source are included in the package (see section \ref{SourceOptions}).
+at source are included in the package (see
+section \ref{subsubSect:A1:BLE:Source}.
 The principal, and the default, option is the target-normal sheath
 acceleration (TNSA) model presented in~\cite{10.1038/nphys199} .
 The implementation of this model is summarised below.
@@ -13,21 +14,21 @@ presentatiaon of the particle-production model.
 
 \subsection{Energy distribution}
 
-The typical kinetic energy spectrum produced in target-normal sheath
-acceleration falls rapidly with kinetic energy before dropping rapidly
-to zero above a maximum ``cut off'' energy $\varepsilon_{\rm max}$.
+The typical kinetic energy, $K$, spectrum produced in target-normal
+sheath acceleration falls rapidly with kinetic energy before dropping
+rapidly to zero above a maximum ``cut off'' energy $K_{\rm max}$.
 The kinetic-energy spectrum of the TNSA model presented
 in~\cite{10.1038/nphys199} is given by:
 \begin{equation}
-  \frac{dN}{d\varepsilon} = \frac{n_{e0} c_{s} t_{laser} S_{sheath}}
-                                 {\sqrt{2\varepsilon T_{e}}}
+  \frac{dN}{dK} = \frac{n_{e0} c_{s} t_{laser} S_{sheath}}
+                                 {\sqrt{2K T_{e}}}
                                  \exp\left(
-                                     - \sqrt{\frac{2\varepsilon}{T_{e}}}
+                                     - \sqrt{\frac{2K}{T_{e}}}
                                      \right)\,;
   \label{Eq:Spct:0}
 \end{equation}
 where $N$ is the number of protons or ions produced per unit solid
-angle, $\varepsilon$ is the ion kinetic energy, $n_{e0}$ and
+angle, $K$ is the ion kinetic energy, $n_{e0}$ and
 $T_e$ are the hot electron density and temperature respectively, $c_s$
 is the ion acoustic velocity, $t_{\rm laser}$ is the duration of the
 laser pulse, and $S_{\rm sheath}$ is the effective area over which the
@@ -47,7 +48,7 @@ in table~\ref{table:EnergySpectrumParameters}.
       \textbf{Parameter} & \textbf{Definition} & \textbf{Value} & \textbf{Unit} \\ [1ex] 
       \hline \hline
       $N$ & Ion number & - & - \\ 
-      $\varepsilon$ & Ion kinetic energy & - & J \\  
+      $K$ & Ion kinetic energy & - & J \\  
       $n_{e0}$ & Hot electron density & $\frac{N_{E}}{c t_{laser} S_{sheath}}$ & $pp/m^3$ \\ 
       $N_{e}$ & Accelerated electron number & $\frac{f E_{laser}}{T_e}$ & - \\ 
       $E_{laser}$ & Laser energy & $70$ & J \\  
@@ -70,9 +71,9 @@ in table~\ref{table:EnergySpectrumParameters}.
       $m_{i}$ & Proton mass & $1.67 \times 10^{-27}$ & Kg \\ 
       $P_{R}$ & Relativistic power unit & $\frac{m_{e} c^{2}}{r_{e}} = 8.71 \times 10^{9}$ & W \\  
       $r_{e}$ & Electron radius & $2.82 \times 10^{-15}$ & m \\  
-      $\varepsilon_{i,\infty}$ & Maximum ion kinetic energy & $2 Z m_{e} c^{2} \sqrt{\frac{f P_{laser}}{P_{R}}}$ & MeV \\  
+      $K_{i,\infty}$ & Maximum ion kinetic energy & $2 Z m_{e} c^{2} \sqrt{\frac{f P_{laser}}{P_{R}}}$ & MeV \\  
       $t_{0}$ & Ballistic time & $\frac{B}{v(\infty)}$ & s \\  
-      $v(\infty)$ & Ballistic velocity & $\sqrt{\frac{2 \varepsilon_{i,\infty}}{m_{i}}}$ & m/s \\  
+      $v(\infty)$ & Ballistic velocity & $\sqrt{\frac{2 K_{i,\infty}}{m_{i}}}$ & m/s \\  
       \hline
     \end{tabular}
   \end{center}
@@ -87,7 +88,7 @@ the laser pulse creates the conditions necessary for acceleration is
 derived.
 The kinetic energy cut-off is given by:
 \begin{equation}
-  \varepsilon_{max} = X^{2} \varepsilon_{i,\infty} \, ;
+  K_{max} = X^{2} K_{i,\infty} \, ;
   \label{eq:Eq:Spct:2}
 \end{equation}
 where $X$ is obtained by solving:
@@ -98,42 +99,42 @@ where $X$ is obtained by solving:
   \label{eq:Eq:Spct:1}
 \end{equation}
 Here $t_0$ is the time over which the ion acceleration may be treated
-as ballistic and $\varepsilon_{i,\infty}$ is given in
+as ballistic and $K_{i,\infty}$ is given in
 table~\ref{table:EnergySpectrumParameters}.
 
 To generate the kinetic energy spectrum, the probability density
-function, $g(\varepsilon)$, is defined such that the probability,
+function, $g(K)$, is defined such that the probability,
 $\delta {\cal P}$, of a particle being generated in the interval
-$\varepsilon \rightarrow \varepsilon + \delta \varepsilon$ is given
+$K \rightarrow K + \delta K$ is given
 by:
 \begin{equation}
-   \delta {\cal P} = g \left( \varepsilon \right) \delta \varepsilon \, .
+   \delta {\cal P} = g \left( K \right) \delta K \, .
 \end{equation}
-$g(\varepsilon)$ can be written in terms of the differential spectrum
+$g(K)$ can be written in terms of the differential spectrum
 given in equation~\ref{Eq:Spct:0} through the introduction of a
 normalisation constant ${\cal N}$:
 \begin{equation}
-  g(\varepsilon) = \frac{1}{\cal N} \frac{dN}{d\varepsilon} \, .
+  g(K) = \frac{1}{\cal N} \frac{dN}{dK} \, .
 \end{equation}
-The cumulative distribution funtion, $G(\varepsilon)$, is given by:
+The cumulative distribution funtion, $G(K)$, is given by:
 \begin{equation}
-  G(\varepsilon) = \int_{\varepsilon_{\rm min}}^{\varepsilon_{\rm max}} g(\varepsilon)
-                                               d\varepsilon \,;
+  G(K) = \int_{K_{\rm min}}^{K_{\rm max}} g(K)
+                                               dK \,;
 \end{equation}
-where $\varepsilon_{\rm min}$ is the minimum kinetic energy and the
+where $K_{\rm min}$ is the minimum kinetic energy and the
 normalisation constant, ${\cal N}$, is set so that
-$G(\varepsilon_{\rm max}) = 1$.
+$G(K_{\rm max}) = 1$.
 Carrying out the integration yields:
 \begin{equation}
-  G(\varepsilon) = \frac{2}{\cal N}
+  G(K) = \frac{2}{\cal N}
                    \frac{n_{e0} c_{s} t_{laser} S_{sheath}} {\sqrt{2T_{e}}}
                    \sqrt{\frac{T_{e}}{2}}
                    \left[
                          \exp\left(
-                                   -\sqrt{\frac{2\varepsilon_{\rm min}}{T_{e}}}
+                                   -\sqrt{\frac{2K_{\rm min}}{T_{e}}}
                              \right) -
                          \exp\left(
-                                   -\sqrt{\frac{2\varepsilon}{T_{e}}}
+                                   -\sqrt{\frac{2K}{T_{e}}}
                              \right)
                    \right] \, ;
 \end{equation}
@@ -144,23 +145,23 @@ and the normalisation constant is given by:
              \sqrt{\frac{T_{e}}{2}}
              \left[
                    \exp\left(
-                             -\sqrt{\frac{2\varepsilon_{\rm min}}{T_{e}}}
+                             -\sqrt{\frac{2K_{\rm min}}{T_{e}}}
                              \right) -
                          \exp\left(
-                                   -\sqrt{\frac{2\varepsilon}{T_{e}}}
+                                   -\sqrt{\frac{2K}{T_{e}}}
                               \right)
              \right] \, .
 \end{equation}
 
 The kinetic energy spectrum may now be obtained by choosing a value
-for $G(\varepsilon)$ using a probability distribution uniform over the
-range $0 < G(\varepsilon) < 1$.
-The generated value of $\varepsilon$ is obtained by evaluating:
+for $G(K)$ using a probability distribution uniform over the
+range $0 < G(K) < 1$.
+The generated value of $K$ is obtained by evaluating:
 \begin{equation}
-  \varepsilon = \left[
-                      \sqrt{\varepsilon_{\rm min}} -
+  K = \left[
+                      \sqrt{K_{\rm min}} -
                       \sqrt{\frac{T_e}{2}} \ln \left(
-                     1 - \frac{G(\varepsilon)}{G(\varepsilon_{\rm max})}
+                     1 - \frac{G(K)}{G(K_{\rm max})}
                                                \right)
                 \right]^2 \, .
 \end{equation}
@@ -173,7 +174,7 @@ the foil surface~\cite{10.1063/1.3086424}.
 Radiochromic film has been used to observe the opening angle,
 $2\alpha$, of the cone as a function of energy.
 The envelope angle, $\alpha$, defined such that, at a particular
-energy, all particles are contained within $\pm\alpha(\varepsilon)$ of
+energy, all particles are contained within $\pm\alpha(K)$ of
 the $z$ axis.
 The opening angle is observed to decrease as the ion energy
 increases.
@@ -191,17 +192,17 @@ probability density function:
   g(r^\prime) = \frac{3}{4r^{\prime 2}_m} \left(r^{\prime 2}_m-r^{\prime 2} \right)\,;
 \end{equation}
 where $r^\prime_m=\sin\alpha$.
-At low kinetic energy ($\varepsilon \sim \varepsilon_{\rm min}$),
-$\alpha(\varepsilon)$ is taken to be $\sim 20^\circ$.
-$\alpha(\varepsilon)$ is assumed to decrease linearly with energy such
+At low kinetic energy ($K \sim K_{\rm min}$),
+$\alpha(K)$ is taken to be $\sim 20^\circ$.
+$\alpha(K)$ is assumed to decrease linearly with energy such
 that:
 \begin{equation}
-  \alpha(\varepsilon) =
-                20^\circ - 15^\circ \frac{\varepsilon}{\varepsilon_{max}} \, ;
+  \alpha(K) =
+                20^\circ - 15^\circ \frac{K}{K_{max}} \, ;
   \label{Eq:sigVeps}
 \end{equation}
-i.e. $\alpha(\varepsilon)$ decreases from $20^\circ$ at $\varepsilon=0$
-to $5^\circ$ at $\varepsilon_{max}$.
+i.e. $\alpha(K)$ decreases from $20^\circ$ at $K=0$
+to $5^\circ$ at $K_{max}$.
 Finally, the azimuthal angle, $\phi_S$, is chose from a distribution
 uniform over the range $0 < \phi_S < 2\pi$.
 
@@ -277,7 +278,7 @@ calculated from the generated particles is in good agreement with that
 expected from equation~\ref{Eq:sigVeps}.
 As a result, the distribution of $\theta_S$ is approximately Gaussian
 with a width dominated by the contribution of protons with kinetic
-energy close to $\varepsilon_{\rm min}$.
+energy close to $K_{\rm min}$.
 The generated $\phi_S$ distribution is flat in the range
 $0^\circ < \phi_S < 360^\circ$ and the $(x, y)$ distribution is
 Gaussian in both the $x$ and $y$ projections.
@@ -292,10 +293,10 @@ Gaussian in both the $x$ and $y$ projections.
         $\sigma_x$&4e-06&$\mu$m \\ 
         $\sigma_y$&4e-06&$\mu$m \\ 
         $\cos\theta_S |_{\rm min}$&0.998& \\ 
-        $\varepsilon_{\rm min}$&1.0&MeV \\ 
-        $\varepsilon_{\rm max}$&25.0&MeV \\ 
+        $K_{\rm min}$&1.0&MeV \\ 
+        $K_{\rm max}$&25.0&MeV \\ 
         nPnts&1000& \\ 
-        Laser power&2500000000000000.0&W \\ 
+        Laser power&$2.5\times10^{15}$&W \\ 
         Laser energy&70.0&J \\ 
         Laser wavelength&0.8&$\mu$m \\ 
         Laser pulse duration&2.8e-14&s \\ 

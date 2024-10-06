@@ -1,6 +1,7 @@
 \graphicspath{ {A1-MCD/Figures/} }
 
-\section{Module, class and data structures}
+\section{Class and data structures}
+\label{App:A1}
 
 The linear optics package has been written in object-oriented Python
 and is broken down in four principal modules:
@@ -1006,6 +1007,18 @@ The \texttt{Facility} arguments are translated into instance
 attributes as described in section~\ref{SubSubSect:Fclty:InstAttr} and
 defined in table~\ref{Tab:Fclty:Attributes}.
 
+The lines that specify the \texttt{Facility} in the beam-line
+specification file are presented in table~\ref{App:MCD:Fac:BS}.
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    \texttt{Facility} object.
+  }
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Facility.pdf}
+  \end{center}
+\end{table}
+
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:Fclty:InstAttr}
 \noindent
@@ -1883,6 +1896,7 @@ The \texttt{CylindricalRFCavity} dericed class has no processing methods.
 \FloatBarrier
 
 \subsubsection{Derived class: \texttt{Source(BeamLineElement)}}
+\label{subsubSect:A1:BLE:Source}
 
 \paragraph{Instantiation} ~\newline
 \noindent
