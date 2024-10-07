@@ -1003,7 +1003,7 @@ class Particle:
         p0  = BL.BeamLine.getElement()[0].getp0()
         E0  = np.sqrt(particleMASS**2 + p0**2)
 
-        b0  = p0//E0
+        b0  = p0/E0
         s   = self.gets()[iAddr] + self.getTraceSpace()[iAddr][4]*b0
 
         E   = E0 + self.getTraceSpace()[iAddr][5]*p0
