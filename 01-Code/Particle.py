@@ -1015,10 +1015,10 @@ class Particle:
                 print("     ----> Trace space:", self.getTraceSpace()[iAddr])
                 
         Line = str(self.getTraceSpace()[iAddr][0]) + ' ' + \
-               str(self.getTraceSpace()[iAddr][2]) + ' ' + \
-               str(s)                             + ' ' + \
                str(self.getTraceSpace()[iAddr][1]) + ' ' + \
+               str(self.getTraceSpace()[iAddr][2]) + ' ' + \
                str(self.getTraceSpace()[iAddr][3]) + ' ' + \
+               str(s)                              + ' ' + \
                str(E) + "\n"
             
         ParticleFILE.write(Line)
