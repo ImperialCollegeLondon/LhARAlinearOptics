@@ -37,34 +37,26 @@ OK - RunLhARAsimulation.py
 OK - ReadDRACOsimu.py
 OK - ReadLIONsimu.py
 OK - ReadLhARAsimu.py
- - RunSimulationTst.py
- - SimulationTst.py
- - SolenoidTst.py
- - SourceTst.py
- - TestWrite.py
- - TestRead.py
- - extrapolatedBeamTst.py
- - plotQuadTriplet.py
- - plotTrajectory.py
- - testGitRepoId.py
- - visualiseTst.py
+OK - RunSimulationTst.py
+OK - SimulationTst.py
+OK - SolenoidTst.py
+OK - SourceTst.py
+OK - TestWrite.py
+OK - TestRead.py
+OK - extrapolatedBeamTst.py
+OK - plotTrajectory.py
+OK - visualiseTst.py
 Fail - OctupoleTst.py
+Fail - plotQuadTriplet.py
+Fail - testGitRepoId.py
 
 Scripts:
- - 2BDSIM.py               - OK
- - runBeamSim.py           - OK
- - readBeamSim.py          - OK
- - RunDRACOsimulation.py   - OK
- - ReadDRACOsimu.py        - OK
- - RunLIONsimulation.py    - OK
- - ReadLIONsimu.py         - OK
- - RunLhARAsimulation.py   - OK
- - ReadLhARAsimu.py        - OK
- - plotBeam.py             - OK
- - plotTrajectory.py       - OK
- - plotextrapolatedBeam.py - OK
- - LhARAMagnetTable.py     - OK
- - plotQuadTriplet.py      - Fails
+OK - 2BDSIM.py
+OK - plotBeam.py
+OK - plotextrapolatedBeam.py
+OK - runBeamSim.py
+OK - readBeamSim.py
+OK - visualiseBeam.py
 
 
 --------  --------  --------  --------  --------  --------  --------  --------
@@ -117,17 +109,10 @@ Tests:
  - visualiseTst.py
 
 Scripts:
- - 2BDSIM.py               - 
- - runBeamSim.py           -
- - readBeamSim.py          -
- - RunDRACOsimulation.py   -
- - ReadDRACOsimu.py        -
- - RunLIONsimulation.py    -
- - ReadLIONsimu.py         -
- - RunLhARAsimulation.py   -
- - ReadLhARAsimu.py        -
- - plotBeam.py             -
- - plotTrajectory.py       -
- - plotextrapolatedBeam.py -
- - LhARAMagnetTable.py     -
- - plotQuadTriplet.py      -
+ - 2BDSIM.py
+ - list.txt
+ - plotBeam.py
+ - plotextrapolatedBeam.py
+ - runBeamSim.py
+ - readBeamSim.py
+ - visualiseBeam.py

@@ -123,8 +123,11 @@ class Simulation(object):
             cls.setNEvt(NEvt)
             if filename != None:
                 cls.setBeamLineSpecificationFile(filename)
-            cls.setdataFileDir(_dataFileDir)
-            cls.setdataFileName(_dataFileName)
+
+            if _dataFileDir  != None:
+                cls.setdataFileDir(_dataFileDir)
+            if _dataFileName != None:
+                cls.setdataFileName(_dataFileName)
 
             # Create Facility instance:
             cls.setFacility(BL.BeamLine(filename))
@@ -199,6 +202,7 @@ class Simulation(object):
 
     @classmethod
     def setdataFileName(self, dataFileName):
+        print("Here:", dataFileName, type(dataFileName))
         if not isinstance(dataFileName, str):
             raise badParameter()
         
