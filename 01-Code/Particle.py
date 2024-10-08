@@ -1004,7 +1004,7 @@ class Particle:
         E0  = np.sqrt(particleMASS**2 + p0**2)
 
         b0  = p0/E0
-        s   = self.gets()[iAddr] + self.getTraceSpace()[iAddr][4]*b0
+        z   = self.gets()[iAddr] + self.getTraceSpace()[iAddr][4]*b0
 
         E   = E0 + self.getTraceSpace()[iAddr][5]*p0
 
@@ -1013,13 +1013,18 @@ class Particle:
                 print("     ----> iAddr, iLoc, name:", iAddr, iLoc, \
                       BLE.BeamLineElement.getinstances()[iLoc].getName())
                 print("     ----> Trace space:", self.getTraceSpace()[iAddr])
-                
+
+        """
+        reportString = "distrFileFormat = " +\
+            "x[m]:xp[rad]:y[m]:yp[rad]:z[m]:E[MeV]";
+        """
+        
         Line = str(self.getTraceSpace()[iAddr][0]) + ' ' + \
-               str(self.getTraceSpace()[iAddr][1]) + ' ' + \
                str(self.getTraceSpace()[iAddr][2]) + ' ' + \
+               str(z)                              + ' ' + \
+               str(self.getTraceSpace()[iAddr][1]) + ' ' + \
                str(self.getTraceSpace()[iAddr][3]) + ' ' + \
-               str(s)                              + ' ' + \
-               str(E/1000.) + "\n"
+               str(E) + "\n"
             
         ParticleFILE.write(Line)
         if self.getDebug():
