@@ -1019,7 +1019,7 @@ class Particle:
                str(self.getTraceSpace()[iAddr][2]) + ' ' + \
                str(self.getTraceSpace()[iAddr][3]) + ' ' + \
                str(s)                              + ' ' + \
-               str(E) + "\n"
+               str(E/1000.) + "\n"
             
         ParticleFILE.write(Line)
         if self.getDebug():

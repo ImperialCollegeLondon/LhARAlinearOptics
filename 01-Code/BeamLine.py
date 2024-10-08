@@ -355,7 +355,7 @@ class BeamLine(object):
             
         #.. Parse the dataframe to get source parameters:
         Name, SrcMode, SrcParam = cls.parseSource()
-        if Name == None and SrcMode == None and SrcMode == None:
+        if Name == None and SrcMode == None:
             return
 
         #.. Create the source beam line element:
@@ -468,12 +468,14 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="DivAngle"]["Value"].iloc[0])
             try:
                 SigmaThetaS0 = float( \
-                        pndsSource[pndsSource["Parameter"]=="SigmaThetaS0"]["Value"].iloc[0])
+                        pndsSource[pndsSource["Parameter"]== \
+                                   "SigmaThetaS0"]["Value"].iloc[0])
             except:
                 pass
             try:
                 SlopeThetaS  = float( \
-                        pndsSource[pndsSource["Parameter"]=="SlopeThetaS"]["Value"].iloc[0])
+                        pndsSource[pndsSource["Parameter"]== \
+                                   "SlopeThetaS"]["Value"].iloc[0])
             except:
                 pass
             
