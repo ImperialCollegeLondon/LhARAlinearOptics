@@ -997,7 +997,7 @@ Table~\ref{Tab:BLE:Utilities} presents the utilities provided in the
 \noindent
 The call to instantiate the \texttt{Facility} derived class is:
 \begin{center}
-  \texttt{FacilityName, rStrt, vStrt, drStrt, dvStrt, p0, VCMV)}
+  \texttt{Facility(Name, rStrt, vStrt, drStrt, dvStrt, p0, VCMV)}
 \end{center}
 Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
@@ -1013,7 +1013,12 @@ specification file are presented in table~\ref{App:MCD:Fac:BS}.
   \caption{
     Entries in the beam-line specification file that define the
     \texttt{Facility} object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
   }
+  \label{App:MCD:Fac:BS}
   \begin{center}
     \includegraphics[width=0.95\textwidth]{Facility.pdf}
   \end{center}
@@ -1099,6 +1104,23 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
 
+The lines that specify the \texttt{Drift} in the beam-line
+specification file are presented in table~\ref{App:MCD:Drft:BS}.
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+  }
+  \label{App:MCD:Drft:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Drift.pdf}
+  \end{center}
+\end{table}
+
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:Drft:InstAttr}
 \noindent
@@ -1171,6 +1193,26 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
+
+The lines that specify the \texttt{Aperture} object in the beam-line
+specification file are presented in table~\ref{App:MCD:Aprtr:BS}.
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+    The three different types of aperture provided by the derived
+    class are instanciated using the entries separarated by solid
+    lines.
+  }
+  \label{App:MCD:Aprtr:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Aperture.pdf}
+  \end{center}
+\end{table}
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:Aprtr:InstAttr}
@@ -1286,6 +1328,27 @@ either the field gradient, \texttt{Strength}
 (equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
 parameter, \texttt{kFQ} (equation~\ref{Eq:Effectivekq}).
 
+The lines that specify the \texttt{FocusQuadrupole} object in the
+beam-line specification file are presented in
+table~\ref{App:MCD:Quads:BS}. 
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+    The entries that define focus quadrupole are shaded light grey
+    while the lines that define the defocus quadrupole are shaded in a
+    darker shade of grey.
+  }
+  \label{App:MCD:Quads:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Quads.pdf}
+  \end{center}
+\end{table}
+
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:FQuad:InstAttr}
 \noindent
@@ -1387,6 +1450,10 @@ either the field gradient, \texttt{Strength}
 (equation~\ref{Eq:Trnsf:gxy}), or the quadrupole $k$
 parameter, \texttt{kDQ} (equation~\ref{Eq:Effectivekq}).
 
+The lines that specify the \texttt{FocusQuadrupole} object in the
+beam-line specification file are presented in
+table~\ref{App:MCD:Quads:BS}.
+
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:DQuad:InstAttr}
 \noindent
@@ -1483,6 +1550,24 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
+
+The lines that specify the \texttt{SectorDipole} object in the
+beam-line specification file are presented in
+table~\ref{App:MCD:SctrDpl:BS}. 
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    sector dipole object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+  }
+  \label{App:MCD:SctrDpl:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Dipole.pdf}
+  \end{center}
+\end{table}
 
 The orientation of the RLPC coordinate axes with respect to those of
 the laboratory frame changes from the start of sector dipole to its
@@ -1608,6 +1693,24 @@ The solenoid \texttt{Length} is required together with either the
 magnetic field strength, \texttt{Strength} or the solenoid $k$
 parameter, \texttt{kSol} (equation~\ref{Eq:Effectiveks}).  
 
+The lines that specify the \texttt{Solenoid} object in the
+beam-line specification file are presented in
+table~\ref{App:MCD:Slnd:BS}. 
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    solenoid object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+  }
+  \label{App:MCD:Slnd:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Solenoid.pdf}
+  \end{center}
+\end{table}
+
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:Slnd:InstAttr}
 \noindent
@@ -1689,8 +1792,6 @@ than those inheritted from the parent class.
   \end{center}
 \end{table}
 
-\FloatBarrier
-
 \subsubsection{Derived class: \texttt{GaborLens(BeamLineElement)}}
 
 \paragraph{Instantiation} ~\newline
@@ -1713,6 +1814,24 @@ section~\ref{SubSect:TrnsFrMtrx:GL}).
 The effective electon number density inside the trap is calculated
 using either \texttt{Bz}, \texttt{VA}, \texttt{RA} and \texttt{Rp}
 or \texttt{kSol}.
+
+The lines that specify the \texttt{GaborLens} object in the
+beam-line specification file are presented in
+table~\ref{App:MCD:Slnd:BS}. 
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    Gabor lens object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+  }
+  \label{App:MCD:Slnd:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Gabor.pdf}
+  \end{center}
+\end{table}
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:GbrLns:InstAttr}
@@ -1802,6 +1921,24 @@ Parent class arguments \texttt{Name}, \texttt{rStrt}, \texttt{vStrt},
 \texttt{drStrt}, and \texttt{dvStrt} are described in
 section~\ref{SubSubSect:BLE:InstAttr}.
 These arguments are passed directly to \texttt{BeamLineElement}.
+
+The lines that specify the \texttt{CylindricalCavity} object in the
+beam-line specification file are presented in
+table~\ref{App:MCD:CylCav:BS}. 
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    cylindrical-cavity object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+  }
+  \label{App:MCD:CylCav:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{CylindricalCavity.pdf}
+  \end{center}
+\end{table}
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:CylndclRFCvty:InstAttr}
@@ -1915,6 +2052,25 @@ The specification of the \texttt{Parameters} list depends on the value
 of \texttt{Mode}.
 The content of the \texttt{Parameters} list is transferred directly to
 the \texttt{Param} instance attribute.
+
+The lines that specify the \texttt{Source} object in the beam-line
+specification file are presented in table~\ref{App:MCD:Src:BS}. 
+\begin{table}[h]
+  \caption{
+    Entries in the beam-line specification file that define the
+    source object.
+    \texttt{Stage} and \texttt{Section} may be speficied for
+    convenience.
+    These fields are used in creating the unique string that refers
+    to the instance of the derived class.
+    The groups of lines that define the source of each of the 
+    four \texttt{Mode}s are indicated by the shading.
+  }
+  \label{App:MCD:Src:BS}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{Source.pdf}
+  \end{center}
+\end{table}
 
 \paragraph{Instance attributes and access methods} ~\newline
 \label{SubSubSect:Source:InstAttr}
