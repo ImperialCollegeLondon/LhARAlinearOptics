@@ -2,26 +2,24 @@
 
 \subsection*{Introduction}
 This section summarises the steps needed to set-up and run
-the linear optics simulation of the LhARA beam line.
-A summary of the tasks that the software suite performs
-will be documented in due course.
+the LhARA linear optics package. 
 The code has been developed in python; python~3 is assumed.
 
 \subsection*{Getting the code}
 The linear optics package is maintained using the GitHub
 version-control system.
 The latest release can be downloaded from: \\
-\begin{verbatim}
-  \centerline{
-    \href{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}
-  }
-\end{verbatim}
-  
+\begin{center}
+  \href{https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}%
+       {https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}
+\end{center}
+
 \subsection*{Dependencies and required packages}
-The linear optics code requires the following packages:
-\begin{itemize}
-  \item Python modules: \verb+scipy+ and \verb+matplotlib+. 
-\end{itemize}
+The linear optics code requires the following Python modules: \\
+\begin{center}
+  \verb+GitPython+, \verb+matplotlib+, \verb+numpy+, and \verb+scipy+.
+\end{center}
+
 It may be convenient to run the package in a ``virtual environment''.
 To set this up, after updating your python installation to python~3.9,
 execute the following commands:
@@ -32,14 +30,12 @@ execute the following commands:
         related to the virtual environment.
     \end{itemize}
   \item \verb+source venv/bin/activate+
-  \item \verb+python -m pip install pandas scipy matplotlib+
+  \item \verb+pip install -r requirements.txt+
 \end{enumerate}
 To exit from the virtual environment, execute the command
 \verb+deactivate+. 
 The command \verb+source venv/bin/activate+ places you back
 into the virtual environment.
-
-The Imperial HEP linux cluster provides python 3.9.18 by default.
 
 \subsection*{Unpacking the code, directories, and running the tests}
 After downloading the package from GitHub, or cloning the repository,
@@ -84,3 +80,22 @@ bash command "\verb+source startup.bash+").  This will:
     Example scripts are provided for the DRACO, LION, and LhARA
     Stage~1 beam lines.
 \end{itemize}
+
+\subsection*{User framework}
+It is assumed that most users will want to use the code rather than
+develop new features.
+To facilitate easy use of the package, the directory tree
+``\verb+31-UserDirectory/+" has been provided.
+To use the code, copy the files and directories in
+\verb+31-UserDirectory/+ to your own space.
+The environment is set-up by executing:
+\begin{center}
+  \verb+source <LhARAOpticsPackage>/venv/bin/activate+
+\end{center}
+where \verb+<LhARAOpticsPackage>+ is the path to the directory in
+which the LhARA linear optics package was installed.
+The environment variables are set using:
+\begin{center}
+  \verb+source startup.bash -p <path to LhARAOpticsPackage>+
+\end{center}
+
