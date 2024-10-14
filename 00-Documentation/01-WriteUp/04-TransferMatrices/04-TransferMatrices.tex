@@ -301,3 +301,48 @@ The increment in the reference particle position is:
 \begin{equation}
   \delta s = l_D \, .
 \end{equation}
+
+\subsection{Cylindrical cavity}
+
+\begin{equation}
+  \alpha = \frac{q V_0}{P_0 c}
+\end{equation}
+where $V_0$ is the cavity voltage defined in terms of the required
+electric-field amplitude, $E_0$, and the length, $L$, of the cavity:
+\begin{equation}
+  V_0 = E_0 TL 
+\end{equation}
+$T$ is the ``transit-time factor'' which takes into account the
+variation in the electric field of the time taken by the particle to
+traverse the cavity:
+\begin{equation}
+  T = \frac{2\pi\beta_0}{k^2L^2} \sin\left( \frac{k L}{2\beta_0} \right) \; .
+\end{equation}
+
+The linear transfer map for the cylindircal cavity may then be
+written:
+\begin{equation}
+  \underline{\phi}_{\rm end} = \underline{\underline{T}}_{\rm cav}
+                              \underline{\phi}_{\rm start} +
+                              \underline{m}_{\rm cav}
+\end{equation}
+where:
+\begin{equation}
+  \underline{\underline{T}}_{\rm cav} =
+    \begin{pmatrix}
+                       c_\perp & s_\perp &                      0 &      0 &                                                 0 &                                        0 \\
+        -\omega_\perp^2 s_\perp & c_\perp &                      0 &      0 &                                                 0 &                                        0 \\
+                            0 &       0 &                c_\perp & s_\perp &                                                 0 &                                        0 \\
+                            0 &       0 & -\omega_\perp^2 s_\perp & c_\perp &                                                 0 &                                        0 \\
+                            0 &       0 &                      0 &      0 &                                        c_\parallel & \frac{1}{\beta_0^2 \gamma_0^2} s_\parallel \\
+                            0 &       0 &                      0 &      0 & -\beta_0^2 \gamma_0^2 \omega^2_\parallel s_\parallel & c_\parallel                                \\
+        \end{pmatrix} \, ;
+\end{equation}
+and:
+\begin{equation}
+  \underline{m}_{\rm cav} = \begin{pmatrix} 0 \\ 0 \\ 0 \\ 0 \\
+                                   \left( 1 = \cos\left( \omega_\parallel L \right) \right) \frac{\tan \phi_0}{k} \\
+                                   \beta_0^2 \gamma_0^2 \omega_\parallel \sin\left(\omega_\parallel L \right) \frac{\tan \phi_0}{k} \\
+                           \end{pmatrix} \, ;
+\end{equation}
+where:
