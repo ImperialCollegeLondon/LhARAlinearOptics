@@ -168,9 +168,9 @@ def main(argv):
         # add an artist, in this case a nice label in the middle...
         Ttl = "Test RPLC visualise"
         fig.suptitle(Ttl, fontdict=font)
-        axs[0].set_xlim(-0.1, 1.1)
+        axs[0].set_xlim(-0.1, 2.0)
         axs[0].set_ylim(-0.05, 0.05)
-        axs[1].set_xlim(-0.1, 1.1)
+        axs[1].set_xlim(-0.1, 2.0)
         axs[1].set_ylim(-0.05, 0.05)
 
         ivisRPLCx.Particles(axs[0], nEvts)
@@ -193,9 +193,9 @@ def main(argv):
         Ttl = "Test lab coordinate system visualise"
         fig.suptitle(Ttl, fontdict=font)
 
-        axs[0].set_xlim(-0.1, 1.1)
+        axs[0].set_xlim(-0.1, 2.0)
         axs[0].set_ylim(-0.05, 0.05)
-        axs[1].set_xlim(-0.1, 1.1)
+        axs[1].set_xlim(-0.1, 2.0)
         axs[1].set_ylim(-0.05, 0.05)
 
         ivisLabx.Particles(axs[0], nEvts)
