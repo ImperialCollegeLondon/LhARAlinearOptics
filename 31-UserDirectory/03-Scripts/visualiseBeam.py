@@ -93,7 +93,7 @@ def main(argv):
     EndOfFile = False
     EndOfFile = ibmIOr.readBeamDataRecord()
 
-    print(BL.BeamLine.getinstance())
+    print(BL.BeamLine.getinstances())
 
     """
     R = np.zeros(6)
