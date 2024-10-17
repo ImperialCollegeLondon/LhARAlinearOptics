@@ -37,6 +37,9 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
 ## Updating to new install and set-up -- read this:
  * git clone git@github.com:ImperialCollegeLondon/LhARAlinearOptics.git
  * cd LhARAlineaOptics
+ * If you have Anaconda installed and are using an automatically activated environment, and can see (base) in your prompt string,
+   consider deactivating this: conda deactivate
+ * If you are using a Mac you are probably running zsh, start a bash shell by typing: bash
  * Set up a virtual environment.  Possible commands:
    - python3 -m venv venv
    - virtualenv venv <br />
@@ -47,7 +50,7 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
  * pip install -r ./requirements.txt
 
 To execute code from this, the source, directory tree execute:
- * source setup.bash                
+ * source startup.bash
 
 ## User environment:
 
