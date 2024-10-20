@@ -304,27 +304,48 @@ The increment in the reference particle position is:
 
 \subsection{Cylindrical cavity}
 
+Acceleration of particle beams is often achieved by means of
+structures in which standing electromagnetic waves are confined within
+vacuum spaces with conducting walls.
+These ``cavities'' are tuned to resonate at a particular frequency,
+usually in the microwave frequency range.
+A ``transverse magnetic'' (TM) standing wave may be excited in the
+``TM010'' mode in which the electric field is directed along the axis
+of the cavity. 
+The electric field on axis is sinusoidal and oscillates at the
+resonant frequency of the cavity.
+
+The transfer of energy from the field within the cavity to the beam
+causes the amplitude of the accelerating field to drop.
+This effect, referred to as ``beam loading'', can be significant for
+intense beams.
+In addition, the passage of the beam through the cavity excites
+currents which, in turn, generate fields within the cavity.
+These ``wake fields'' can significantly perturb the accelerating
+fields present inside the cavity.
+
+Neglecting wake fields and the effects of beam loading, the transfer
+matrix for a cylindrical cavity may be derived in terms of the cavity
+voltage, $V_0$.
+$V_0$ may be defined in terms of the amplitude of the on-axis electric
+field, $E_0$, and the length, $L$, of the cavity:
 \begin{equation}
-  \alpha = \frac{q V_0}{P_0 c}
+  V_0 = E_0 T L \, ;
 \end{equation}
-where $V_0$ is the cavity voltage defined in terms of the required
-electric-field amplitude, $E_0$, and the length, $L$, of the cavity:
-\begin{equation}
-  V_0 = E_0 TL 
-\end{equation}
-$T$ is the ``transit-time factor'' which takes into account the
-variation in the electric field of the time taken by the particle to
-traverse the cavity:
+where $T$ is the ``transit-time factor'' which takes into account the
+variation in the electric field experienced by the particle during its
+passage across the cavity.
+$T$ is given by:
 \begin{equation}
   T = \frac{2\pi\beta_0}{k^2L^2} \sin\left( \frac{k L}{2\beta_0} \right) \; .
+  \label{Eq:TrnsMat:CylCav:TransitTimeFactor}
 \end{equation}
-
-The linear transfer map for the cylindircal cavity may then be
+The linear transfer map for the cylindrical cavity may then be
 written:
 \begin{equation}
   \underline{\phi}_{\rm end} = \underline{\underline{T}}_{\rm cav}
                               \underline{\phi}_{\rm start} +
-                              \underline{m}_{\rm cav}
+                              \underline{m}_{\rm cav} ', ;
 \end{equation}
 where:
 \begin{equation}
@@ -341,8 +362,25 @@ where:
 and:
 \begin{equation}
   \underline{m}_{\rm cav} = \begin{pmatrix} 0 \\ 0 \\ 0 \\ 0 \\
-                                   \left( 1 = \cos\left( \omega_\parallel L \right) \right) \frac{\tan \phi_0}{k} \\
+                                   \left( 1 - \cos\left( \omega_\parallel L \right) \right) \frac{\tan \phi_0}{k} \\
                                    \beta_0^2 \gamma_0^2 \omega_\parallel \sin\left(\omega_\parallel L \right) \frac{\tan \phi_0}{k} \\
-                           \end{pmatrix} \, ;
+                           \end{pmatrix} \, .
 \end{equation}
+Here, the transverse components of the transfer map has been defined in
+terms of the parameters: 
+\begin{eqnarray}
+  c_\perp      & = & \cos \left( \omega_\perp L \right) \, ; \label{Eq:TrnsMat:CylCav:cPerp} \\
+  s_\perp      & = & \frac{ \sin \left( \omega_\perp L \right)}{\omega_\perp} \, {\rm and};\label{Eq:TrnsMat:CylCav:sPerp}\\
+  \omega_\perp & = & k \sqrt{\frac{\alpha_{\rm RF} \cos \phi_0}{2\pi}} \, ; \label{Eq:TrnsMat:CylCav:omegaPerp}
+\end{eqnarray}
 where:
+\begin{equation}
+  \alpha_{\rm RF} = \frac{q V_0}{p_0 c} \, . \label{Eq:TrnsMat:CylCav:alphaRF}
+\end{equation}
+The longitudinal components of the transfer map are written in terms
+of the parameters:
+\begin{eqnarray}
+  c_\parallel      & = & \cos \left( \omega_\parallel L \right) \, ; \label{Eq:TrnsMat:CylCav:cParallel}\\
+  s_\parallel      & = & \frac{ \sin \left( \omega_\parallel L \right)}{\omega_\parallel} \, {\rm and};\label{Eq:TrnsMat:CylCav:sParallel}\\
+  \omega_\parallel & = & \frac{k}{\beta_0 \gamma_0} \sqrt{\frac{\alpha_{\rm RF} \cos \phi_0}{\pi}} \, . \label{Eq:TrnsMat:CylCav:omegaParallel}
+\end{eqnarray}
