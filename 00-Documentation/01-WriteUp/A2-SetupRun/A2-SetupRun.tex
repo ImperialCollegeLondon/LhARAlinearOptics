@@ -1,11 +1,16 @@
 \section{Set-up and run}
 
-\subsection*{Introduction}
+\subsection{Introduction}
 This section summarises the steps needed to set-up and run
 the LhARA linear optics package. 
 The code has been developed in python; python~3 is assumed.
 
-\subsection*{Getting the code}
+It is assumed that most users will want to use the code rather than
+develop new features.
+The instructions to set up your ``\texttt{UserFramework}'' are given
+in section~\ref{A2:UsrFrmwrk}.
+
+\subsection{Getting the code}
 The linear optics package is maintained using the GitHub
 version-control system.
 The latest release can be downloaded from: \\
@@ -14,14 +19,13 @@ The latest release can be downloaded from: \\
        {https://github.com/ImperialCollegeLondon/LhARAlinearOptics.git}
 \end{center}
 
-\subsection*{Dependencies and required packages}
-The linear optics code requires the following Python modules: \\
+\subsection{Dependencies and required packages}
+The linear optics code requires the following Python modules:
 \begin{center}
-  \verb+GitPython+, \verb+matplotlib+, \verb+numpy+, and \verb+scipy+.
+  \verb+matplotlib+, \verb+numpy+, and \verb+scipy+.
 \end{center}
-
 It may be convenient to run the package in a ``virtual environment''.
-To set this up, after updating your python installation to python~3.9,
+To set this up, after updating your python installation to python~3,
 execute the following commands:
 \begin{enumerate}
   \item \verb+python3 -m venv --system-site-packages venv+
@@ -33,11 +37,12 @@ execute the following commands:
   \item \verb+pip install -r requirements.txt+
 \end{enumerate}
 To exit from the virtual environment, execute the command
-\verb+deactivate+. 
+\verb+deactivate+.
+
 The command \verb+source venv/bin/activate+ places you back
 into the virtual environment.
 
-\subsection*{Unpacking the code, directories, and running the tests}
+\subsection{Unpacking the code, directories, and running the tests}
 After downloading the package from GitHub, or cloning the repository,
 you will find a ``\verb+README.md+'' file which provides some orientation
 and instructions to run the code.
@@ -66,7 +71,7 @@ presented is:
 The instructions in the \verb+README.md+ file should be followed to set
 up and run the code.
 
-\subsection*{Running the code}
+\subsection{Running the code}
 Execute "\verb+startup.bash+" from the top directory (i.e. run the
 bash command "\verb+source startup.bash+").  This will:
 \begin{itemize}
@@ -81,7 +86,8 @@ bash command "\verb+source startup.bash+").  This will:
     Stage~1 beam lines.
 \end{itemize}
 
-\subsection*{User framework}
+\subsection{User framework}
+\label{A2:UsrFrmwrk}
 It is assumed that most users will want to use the code rather than
 develop new features.
 To facilitate easy use of the package, the directory tree
@@ -96,6 +102,6 @@ where \verb+<LhARAOpticsPackage>+ is the path to the directory in
 which the LhARA linear optics package was installed.
 The environment variables are set using:
 \begin{center}
-  \verb+source startup.bash -p <path to LhARAOpticsPackage>+
+  \verb+source user_startup.bash -p <path to LhARAOpticsPackage>+
 \end{center}
 
