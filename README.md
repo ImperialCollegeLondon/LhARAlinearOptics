@@ -57,12 +57,9 @@ To execute code from this, the source, directory tree execute:
 
 Utilities are provided to allow users to use the package and to develop their own analyses.  To set this up:
 
- * Copy 31-UserDirectory/UserDirectory.tar.gz to your local directory;
- * Unpack the files using:
-   * gunzip UserDirectory.tar.gz
-   * tar xvf UserDirectort.tar
+ * Copy the files in 31-UserDirectory/to your local directory;
  * Set-up the environment variables by executing:
-  * source setup.bash -p <path to LhARAlinearOptics>
+  * source user_startup.bash -p <path to LhARAlinearOptics>
  * Commands from the repository can now be run using:
   * $LhARAopticsPATH/03-Scripts/...
   Scrtipts in the 03-Scripts directory run "standalone" or print a hint on how they are to be run if they are executed without input arguments.
