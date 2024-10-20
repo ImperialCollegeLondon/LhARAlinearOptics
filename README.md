@@ -32,7 +32,8 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
  * Test scripts assume code directory (01-Code) is in PYTHON path.  A bash script "startup.bash" is provided to update the PYTHON path.
 
 ## History
- * January 2024:  Code tidied for "users"/co-developers!
+ * October 2024: Update to include documentation, numerous fixes and improvements.
+ * January 2024: Code tidied for "users"/co-developers!
 
 ## Updating to new install and set-up -- read this:
  * git clone git@github.com:ImperialCollegeLondon/LhARAlinearOptics.git
@@ -70,5 +71,3 @@ Utilities are provided to allow users to use the package and to develop their ow
   * $LhARAopticsPATH/03-Scripts/readBeamSim.py -- reads simulation file and produces phase space plots in 99-Scratch
   * $LhARAopticsPATH/03-Scripts/plotBeam.py -- plots the beam envelopes by calculating the covariance matrix at the end of each beam-line element
   * $LhARAopticsPATH/03-Scripts/plotextrapolatedBeam -- makes teh same beam-envelope plots, but, propagates the covariance matrices starting from a given location
-  * 
-
