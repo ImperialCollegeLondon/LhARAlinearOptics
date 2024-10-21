@@ -20,20 +20,6 @@ print('     ----> tagDT.strftime("%Y-%m-%d %H:%M:%S")', \
       tagDT.strftime("%Y-%m-%d %H:%M:%S"))
 
 log = repo.head.reference.log()
-"""
-print(" Last entry in log:", log[-1])
-"""
 entryDT = dt.datetime.fromtimestamp(log[-1][3][0])
-print(entryDT, type(entryDT), entryDT.strftime("%Y-%m-%d %H:%M:%S"))
-
-
-exit()
-print(log)
-
-
-Commit = False
-print("    Length:", len(log))
-"""
-for iEnt in range(len(log)):
-    print(iEnt, log[iEnt])
-"""
+print(" Most recent commit:", log[-1][4])
+print("     ----> Date time:", entryDT.strftime("%Y-%m-%d %H:%M:%S"))
