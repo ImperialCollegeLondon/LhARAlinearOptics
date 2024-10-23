@@ -15,22 +15,75 @@ Class BeamIO:
       
       Input arguments:
       ----------------
-        _datafilePATH :
-        _datafileNAME :
-              _create :
-           _BDSIMfile :
+        _datafilePATH : Path to directory containing (or to contain, if
+                        _create is True) data file
+        _datafileNAME : Full path to data file, or, name of data file in
+                        directory defined by _datafilePATH
+              _create : If True, file to be created.
+           _BDSIMfile : If True, read file in BDSIM format.
 
 
   Instance attributes:
   --------------------
    All instance attributes are initialised to Null
 
-            _dataFile : 
-           _Rd1stRcrd :
-     _dataFILEversion :
-           _BDSIMfile :
+            _dataFile : Data file to be read or written;
+           _Rd1stRcrd : Boolean, True, if first record has been read from
+                        _dataFile.
+     _dataFILEversion : _dataFILEversion version of data file being read:
+                  = 1 : First version, does not have geometry record as
+                        first record in file.
+                 >= 2 : Has geometry as first record in file.
+                 >= 3 : Also has repo version stored in _repoVERSION
+         _repoVERSION : [ [tagNAME, tagDATETIME],
+                          [commitSTRING, commitDATETIME] ]
+           _BDSIMfile : If True, read file in BDSIM format.
 
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of beam-line element class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
 
+        print: Print all attributes.
+
+  setAll2None: Set all instance attributes to None.
+        No input or return.
+
+  Set methods:
+     setDebug: set class debug flag
+           Input: bool, True/False
+          Return: None
+
+     setpathFILE, setdataFILE, setReadFirstRecord, setdataFILEversion,
+     setcreate, setBDSIMfile
+
+  Get methods:
+     getDebug: returns class debug flag
+          Return: Boolean
+
+ getinstances: return list of instances of BeamIO class.
+
+     getpathFILE, getdataFILE, getReadFirstRecord, getdataFILEversion,
+     getcreate, getBDSIMfile
+
+  Processing methods:
+    readBeamDataRecord: Read a record from the file.
+              No input; returns Boolean "end of file"
+
+         readVersion: Read version from file, returns version (string)
+
+   flushNclosedataFile: Flush data in buffer not yet written and close
+                        data file.
+          Input: dataFILE : io.BufferedWriter : file being written
+
+  Utilities:
+    resetBeamInsances:
+               Sets cls.instances []
+
+     cleanBeamIOfiles:
+                Removes instances of class.
 
 
 """
@@ -44,6 +97,7 @@ import math   as mth
 import BeamLine as BL
 import Particle as Prtcl
 import PhysicalConstants as PhysCnst
+import LhARALinearOptics as LLO
 
 constants_instance = PhysCnst.PhysicalConstants()
 protonMASS         = constants_instance.mp()
@@ -86,6 +140,8 @@ class BeamIO:
 
         else:
             pathFILE = _datafileNAME
+            
+        self.setpathFILE(pathFILE)
 
         if self.getDebug():
             print("     ----> Proceed with data file:", pathFILE)
@@ -97,29 +153,17 @@ class BeamIO:
         if _create:
             if not self.getBDSIMfile():
                 dataFILE = open(pathFILE, "wb")
+                self.setdataFILE(dataFILE)
                 if self.getDebug():
                     print("         ----> File opened for write.")
                 
-                record = strct.pack(">i", 9999)
-                dataFILE.write(record)
-                if self.getDebug():
-                    print("         ----> First word:", \
-                          strct.unpack(">i", record), \
-                          " is a large integer to distinguish v2 from v1")
+                self.writeFIRSTword()
+                self.writeVersion("BeamIO v3")
+                self.writeREPOversion()
                 
-                version  = "BeamIO v2"
-                bversion = bytes(version, 'utf-8')
-                record   = strct.pack(">i", len(version))
-                dataFILE.write(record)
-                if self.getDebug():
-                    print("         ----> Length of version record:", \
-                          strct.unpack(">i", record))
-                record   = bversion
-                dataFILE.write(record)
-                if self.getDebug():
-                    print("         ----> Version:", bversion.decode('utf-8'))
             else:
                 dataFILE = open(pathFILE, "w")
+                self.setdataFILE(dataFILE)
                 if self.getDebug():
                     print("         ----> File opened for write.")
 
@@ -130,12 +174,11 @@ class BeamIO:
                 dataFILE = open(pathFILE, "rb")
             if self.getDebug():
                 print("         ----> File opened for read.")
+            self.setdataFILE(dataFILE)
 
         if self.getDebug():
             print("     <---- File ready.")
 
-        self.setpathFILE(pathFILE)
-        self.setdataFILE(dataFILE)
         
         if self.__Debug:
             print("     ----> New BeamIO instance: \n", \
@@ -292,11 +335,20 @@ class BeamIO:
             if nId == 9999:
                 if self.getDebug():
                     print("           Not version 1!")
-                Version = self.readVersion()
-                self.setdataFILEversion(int(Version[-1]))
+                Version  = self.readVersion()
+                nVersion = int(Version[-1])
+                self.setdataFILEversion(nVersion)
                 if self.getDebug():
                     print("           Version:", \
                           self.getdataFILEversion())
+                if nVersion >= 3:
+                    repoVERSION = self.readREPOversion()
+                """
+                self.setrepoVERSION(repoVERSION)
+                if self.getDebug():
+                    print("           Repo version:", \
+                          self.getrepoVERSION())
+                """
                     
                 BL.BeamLine.readBeamLine(self.getdataFILE())
             else:
@@ -334,7 +386,161 @@ class BeamIO:
             print(" <---- Version:", Version)
 
         return Version
+
+    def writeFIRSTword(self):
+        dataFILE = self.getdataFILE()
         
+        record = strct.pack(">i", 9999)
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> First word:", \
+                  strct.unpack(">i", record), \
+                  " is a large integer to distinguish v2, v3... from v1")
+
+    def writeVersion(self, versionSTR=None):
+        if not isinstance(versionSTR, str):
+            raise badArgument()
+
+        dataFILE = self.getdataFILE()
+        
+        bversionSTR = bytes(versionSTR, 'utf-8')
+        
+        record      = strct.pack(">i", len(versionSTR))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of version record:", \
+                  strct.unpack(">i", record))
+            
+        record   = bversionSTR
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Version:", \
+                  bversionSTR.decode('utf-8'))
+            
+    def readREPOversion(self):
+        if self.getDebug():
+            print(" BeamIO.readrepoVERSION start.")
+            
+        dataFILE = self.getdataFILE()
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of Tag:", len)
+            
+        brecord = dataFILE.read(len)
+        TAG     = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Tag:", TAG)
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of time:", len)
+            
+        brecord = dataFILE.read(len)
+        TAGtim     = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Time:", TAGtim)
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of commit:", len)
+            
+        brecord = dataFILE.read(len)
+        CMMT     = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Commit:", CMMT)
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of time:", len)
+            
+        brecord = dataFILE.read(len)
+        CMMTtim = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Time:", CMMTtim)
+
+        repoVERSION = [ \
+                        [TAG, TAGtim], [CMMT, CMMTtim] \
+                       ]
+        
+        if self.getDebug():
+            print(" <----> repoVERSION:", repoVERSION)
+
+        return repoVERSION
+
+    def writeREPOversion(self):
+        dataFILE = self.getdataFILE()
+
+        repoVRSN = LLO.version()
+        if self.getDebug():
+            print("         ----> BeamIO.writeREPOversion: \n",
+                   "              Version list:", repoVRSN)
+
+        bTAG = bytes(repoVRSN[0][0], 'utf-8')
+        bTIM = bytes(repoVRSN[0][1], 'utf-8')
+
+        record = strct.pack(">i", len(repoVRSN[0][0]))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Length of tag:", \
+                  strct.unpack(">i", record))
+
+        record = bTAG
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Tag:", \
+                  bTAG.decode('utf-8'))
+            
+        record  = strct.pack(">i", len(repoVRSN[0][1]))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Length of time string:", \
+                  strct.unpack(">i", record))
+        
+        record = bTIM
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Time:", \
+                  bTIM.decode('utf-8'))
+            
+        bCMMT = bytes(repoVRSN[1][0], 'utf-8')
+        bTIM  = bytes(repoVRSN[1][1], 'utf-8')
+        
+        record  = strct.pack(">i", len(repoVRSN[1][0]))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Length of commit record:", \
+                  strct.unpack(">i", record))
+        
+        record = bCMMT
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Commit:", \
+                  bCMMT.decode('utf-8'))
+            
+        record  = strct.pack(">i", len(repoVRSN[1][1]))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Length of time string:", \
+                  strct.unpack(">i", record))
+        
+        record = bTIM
+        dataFILE.write(record)
+        if self.getDebug():
+            print("             ----> Time:", \
+                  bTIM.decode('utf-8'))
+            
+        if self.getDebug():
+            print("         <---- BeamIO.writeREPOversion: Done.")
+
 #.. Flush and close
     def flushNclosedataFile(self, dataFILE=None):
         if self.getDebug():

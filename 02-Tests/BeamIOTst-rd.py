@@ -28,7 +28,8 @@ BeamIOTest = 1
 print()
 print("BeamIOTest:", BeamIOTest, " check data format v1 can be read OK.")
 
-ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat")
+iBL = BL.BeamLine("11-Parameters/LhARABeamLine-Params-Gauss-Gabor.csv")
+ibmIOr = bmIO.BeamIO("11-Parameters", "V1Data4Tests.dat")
 
 EndOfFile = False
 iEvt = 0
@@ -60,6 +61,43 @@ bmIO.BeamIO.cleanBeamIOfiles()
 
 print(" <---- Version 1 data format read check done!")
 
+##! Test writing and reading of beam-line setup:
+BeamIOTest += 1
+print()
+print("BeamIOTTest:", BeamIOTest, \
+      " check reading of beam-line and particles.")
+
+ibmIOr = bmIO.BeamIO("11-Parameters", "V2Data4Tests.dat")
+
+EndOfFile = False
+iEvt = 0
+iCnt = 0
+nEvt = 100
+Scl  = 10
+print("     ----> Read data format 2 file:")
+while not EndOfFile:
+    EndOfFile = ibmIOr.readBeamDataRecord()
+    if not EndOfFile:
+        iEvt += 1
+        if (iEvt % Scl) == 0:
+            print("         ----> Read event ", iEvt)
+            iCnt += 1
+            if iCnt == 10:
+                iCnt = 1
+                Scl  = Scl * 10
+    if iEvt <0:
+        print(Prtcl.Particle.getParticleInstances()[iEvt])
+    if iEvt == nEvt:
+        break
+
+print("     <----", iEvt, "events read")
+
+Prtcl.Particle.cleanParticles()
+Prtcl.ReferenceParticle.cleaninstance()
+BLE.BeamLineElement.cleaninstances()
+bmIO.BeamIO.cleanBeamIOfiles()
+
+print(" <---- Version 2 data format read check done!")
 
 ##! Test writing and reading of beam-line setup:
 BeamIOTest += 1
@@ -74,7 +112,7 @@ iEvt = 0
 iCnt = 0
 nEvt = 100
 Scl  = 10
-print("     ----> Read data format >1 file:")
+print("     ----> Read data format 3 file:")
 while not EndOfFile:
     EndOfFile = ibmIOr.readBeamDataRecord()
     if not EndOfFile:

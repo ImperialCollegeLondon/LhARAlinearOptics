@@ -56,7 +56,7 @@ print("BeamIOTTest:", BeamIOTest, \
 
 #.. __init__:
 print("     __init__:")
-ibmIOr = bmIO.BeamIO("11-Parameters", "Data4Tests.dat")
+ibmIOr = bmIO.BeamIO("11-Parameters", "V2Data4Tests.dat")
 print("         ---> ibmIOr: id, file:", id(ibmIOr), ibmIOr.getdataFILE())
 
 bmIO.BeamIO.cleanBeamIOfiles
