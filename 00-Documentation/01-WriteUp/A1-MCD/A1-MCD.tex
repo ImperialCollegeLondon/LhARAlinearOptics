@@ -2568,8 +2568,17 @@ Table~\ref{Tab:BmIO:IoMethods} presents the i/o methods provided by the
       \hline
       \texttt{readBeamDataRecord()}  &   & Boolean & Manages reading/writing of a record from/to the data file.
                                            Returns a boolean, \texttt{EoF}, set to True of end of file has been detected. \\
-      \texttt{readVersion()}         &   & Integer & Reads data-file format version number from file.
+      \texttt{writeFIRSTword()}      &   &         & Writes \texttt{9999} to indicate that \texttt{BeamIO} version is $>1$.
                                            Returns integer version number.                                                \\
+      \texttt{writeVersion(version)} & string &    & Writes data-file format version to file.  Version is a string, e.g.
+                                                       \texttt{BeamIO V3}.                                                \\
+      \texttt{readVersion()}         &   & Integer & Reads data-file format version number from file.
+                                           Returns integer version number stripped from end of string (e.g. 3).           \\
+      \texttt{writeREPOversion()}    &   &         & Writes git repo Tag label, together with date/time and text description
+                                                     of last commit, together with date/time.                             \\
+      \texttt{readREPOversion()}     &   & list    & Reads and returns list of strings containing git repo Tag label,
+                                                     together with date/time and text description of last commit, together
+                                                     with date/time.                                                      \\
       \texttt{flushNclosedataFile(dataFILE)} & Path &     & Flush and close data \texttt{dataFILE} at end of processing.  \\
       \hline
     \end{tabular}
@@ -2596,8 +2605,6 @@ Table~\ref{Tab:BmIO:Utils} presents the utilities provided by the
     \end{tabular}
   \end{center}
 \end{table}
-
-\FloatBarrier
 
 \subsection{\texttt{Simulation}}
 \label{SubSect:Simu}
@@ -2698,8 +2705,6 @@ The \texttt{Simulation} class provides no i/o methods.
 \subsubsection{Utilities}
 \noindent
 The \texttt{Simulation} provides no utilities.
-
-\FloatBarrier
 
 \subsection{\texttt{Physical constants}}
 \label{SubSect:PhysCnsts}

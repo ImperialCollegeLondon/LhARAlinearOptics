@@ -370,23 +370,6 @@ class BeamIO:
 
         return EoF
 
-    def readVersion(self):
-        if self.getDebug():
-            print(" BeamIO.readVersion start.")
-
-        brecord = self.getdataFILE().read(4)
-        record  = strct.unpack(">i", brecord)
-        len     = record[0]
-        if self.getDebug():
-            print("         ----> Length of version:", len)
-            
-        brecord  = self.getdataFILE().read(len)
-        Version = brecord.decode('utf-8')
-        if self.getDebug():
-            print(" <---- Version:", Version)
-
-        return Version
-
     def writeFIRSTword(self):
         dataFILE = self.getdataFILE()
         
@@ -417,64 +400,22 @@ class BeamIO:
             print("         ----> Version:", \
                   bversionSTR.decode('utf-8'))
             
-    def readREPOversion(self):
+    def readVersion(self):
         if self.getDebug():
-            print(" BeamIO.readrepoVERSION start.")
-            
-        dataFILE = self.getdataFILE()
+            print(" BeamIO.readVersion start.")
 
-        brecord = dataFILE.read(4)
+        brecord = self.getdataFILE().read(4)
         record  = strct.unpack(">i", brecord)
         len     = record[0]
         if self.getDebug():
-            print("     ----> Length of Tag:", len)
+            print("         ----> Length of version:", len)
             
-        brecord = dataFILE.read(len)
-        TAG     = brecord.decode('utf-8')
+        brecord  = self.getdataFILE().read(len)
+        Version = brecord.decode('utf-8')
         if self.getDebug():
-            print("         ----> Tag:", TAG)
+            print(" <---- Version:", Version)
 
-        brecord = dataFILE.read(4)
-        record  = strct.unpack(">i", brecord)
-        len     = record[0]
-        if self.getDebug():
-            print("     ----> Length of time:", len)
-            
-        brecord = dataFILE.read(len)
-        TAGtim     = brecord.decode('utf-8')
-        if self.getDebug():
-            print("         ----> Time:", TAGtim)
-
-        brecord = dataFILE.read(4)
-        record  = strct.unpack(">i", brecord)
-        len     = record[0]
-        if self.getDebug():
-            print("     ----> Length of commit:", len)
-            
-        brecord = dataFILE.read(len)
-        CMMT     = brecord.decode('utf-8')
-        if self.getDebug():
-            print("         ----> Commit:", CMMT)
-
-        brecord = dataFILE.read(4)
-        record  = strct.unpack(">i", brecord)
-        len     = record[0]
-        if self.getDebug():
-            print("     ----> Length of time:", len)
-            
-        brecord = dataFILE.read(len)
-        CMMTtim = brecord.decode('utf-8')
-        if self.getDebug():
-            print("         ----> Time:", CMMTtim)
-
-        repoVERSION = [ \
-                        [TAG, TAGtim], [CMMT, CMMTtim] \
-                       ]
-        
-        if self.getDebug():
-            print(" <----> repoVERSION:", repoVERSION)
-
-        return repoVERSION
+        return Version
 
     def writeREPOversion(self):
         dataFILE = self.getdataFILE()
@@ -540,6 +481,65 @@ class BeamIO:
             
         if self.getDebug():
             print("         <---- BeamIO.writeREPOversion: Done.")
+
+    def readREPOversion(self):
+        if self.getDebug():
+            print(" BeamIO.readrepoVERSION start.")
+            
+        dataFILE = self.getdataFILE()
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of Tag:", len)
+            
+        brecord = dataFILE.read(len)
+        TAG     = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Tag:", TAG)
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of time:", len)
+            
+        brecord = dataFILE.read(len)
+        TAGtim     = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Time:", TAGtim)
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of commit:", len)
+            
+        brecord = dataFILE.read(len)
+        CMMT     = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Commit:", CMMT)
+
+        brecord = dataFILE.read(4)
+        record  = strct.unpack(">i", brecord)
+        len     = record[0]
+        if self.getDebug():
+            print("     ----> Length of time:", len)
+            
+        brecord = dataFILE.read(len)
+        CMMTtim = brecord.decode('utf-8')
+        if self.getDebug():
+            print("         ----> Time:", CMMTtim)
+
+        repoVERSION = [ \
+                        [TAG, TAGtim], [CMMT, CMMTtim] \
+                       ]
+        
+        if self.getDebug():
+            print(" <----> repoVERSION:", repoVERSION)
+
+        return repoVERSION
 
 #.. Flush and close
     def flushNclosedataFile(self, dataFILE=None):
