@@ -5289,7 +5289,8 @@ class Source(BeamLineElement):
     # Defines the function to solve for f(x) = 0
     def equation(self, Theta, t_laser, t_0):
         X = mth.cos(Theta)
-        print(" equation: Theta, X, t_laser, t_0:", Theta, X, t_laser, t_0)
+        if self.getDebug():
+            print(" equation: Theta, X, t_laser, t_0:", Theta, X, t_laser, t_0)
         return (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
             (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
 
