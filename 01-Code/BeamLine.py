@@ -1116,6 +1116,8 @@ class BeamLine(object):
 
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
+                if cls.getDebug():
+                    print("     ----> Write particle to file:", ParticleFILE)
                 PrtclInst.writeParticle(ParticleFILE, CleanAfterWrite)
                 if CleanAfterWrite:
                     Prtcl.Particle.cleanParticles()
