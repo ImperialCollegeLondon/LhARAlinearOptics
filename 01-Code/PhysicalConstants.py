@@ -131,8 +131,8 @@ class PhysicalConstants(object):
     def getparticleMASS(self, _Species):
         particleMASS = None
         if not isinstance(_Species, str):
-            raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
-                               _Species + " not a string!")
+            raise badParameter("PhysicalConstants.getParticleMASS:", \
+                               " Species " + _Species + " not a string!")
         if _Species.lower() in PhysicalConstants.getSpecies():
             if   _Species.lower() == "proton":
                 particleMASS = self.mp()

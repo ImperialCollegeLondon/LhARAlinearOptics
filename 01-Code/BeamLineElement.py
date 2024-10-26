@@ -154,21 +154,27 @@ import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
 import LaTeX             as LTX
 
-#.. Physical Constants
-constants_instance = PhysCnst.PhysicalConstants()
-speed_of_light     = constants_instance.SoL()
-protonMASS         = constants_instance.mp()
+#--------  Physical Constants
 
-alpha              = 0.0072973525693
+#.. Constants from scipy; SI units:
+speed_of_light   = scipy.constants.speed_of_light
+alpha            = scipy.constants.alpha
+epsilon0SI       = scipy.constants.epsilon_0
+electronCHARGESI = scipy.constants.elementary_charge
+electronMASSSI   = scipy.constants.electron_mass
+protonMASSSI     = scipy.constants.proton_mass
+
+#.. Natural units:
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
 electricCHARGE     = mth.sqrt(4.*mth.pi*alpha)
 epsilon0           = 1.
+
+
 Joule2MeV          = 6241509074000.
 m2InvMeV           = 5067730717679.4
 
-epsilon0SI       = 8.8541878128E-12
-electronCHARGESI = 1.602176634E-19
-electronMASSSI   = 9.1093837015E-31
-protonMASSSI     = 1.67262192369E-27
+
 
 
 class BeamLineElement:
