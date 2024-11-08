@@ -141,7 +141,6 @@ def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
     #.. ----> Beam specification file, if specified:
     #         Note, reading from specification file, then, instanciation
     #         of Simulation class handles output file
-    print(" Here:", beamspecfile)
     if beamspecfile != None:
         if not os.path.isfile(beamspecfile):
             beamspecfile = os.path.join(HOMEPATH, beamspecfile)

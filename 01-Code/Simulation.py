@@ -187,7 +187,6 @@ class Simulation(object):
 
     @classmethod
     def setBeamLineSpecificationFile(self, BLspecfile):
-        print(type(BLspecfile))
         if not isinstance(BLspecfile, str):
             raise badParameter()
 
@@ -202,7 +201,6 @@ class Simulation(object):
 
     @classmethod
     def setdataFileName(self, dataFileName):
-        print("Here:", dataFileName, type(dataFileName))
         if not isinstance(dataFileName, str):
             raise badParameter()
         

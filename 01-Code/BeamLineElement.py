@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-To do:
-======
- - Still to do:
-   - KL: Add rotation to Shift2Local and Shift2Laboratory.  Need to update
-         dvStrt to Euler angles, I think.
-         Also, as coded, these methods are not correct, they do not account
-         for position of element in laboratory coordinates.
-   - KL: Need to write out Rot2LbStrt and end etc.
 
 
 Class BeamLineElement:
@@ -103,13 +95,11 @@ OutsideBeamPipe : Returns true of  particle outside beam pipe defined in
              Input: 6D phase-space vector, np.array.
             Return: 6D phase-space vector after element
 
-    Shift2Local : Transform from laboratory to local coordinates.
-                 <---- Not correct yet!
+    Shift2Local : Shift (translate) to local coordinates of element
              Input: 6D phase-space vector, np.array.
             Return: Transformed 6D phase-space vector
 
-   Shift2Laboratory : Transform from local to laboratory coordinates
-                 <---- Not correctyet!
+     Shift2RPLC : Shift (translate) back to RPLC coordinates
              Input: 6D phase-space vector, np.array.
             Return: Transformed 6D phase-space vector
 
@@ -140,6 +130,7 @@ Created on Mon 12Jun23: Version history:
 @author: kennethlong
 """
 
+from copy import deepcopy
 import matplotlib.patches as patches
 import scipy  as sp
 import numpy  as np
@@ -153,6 +144,7 @@ import math
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
 import LaTeX             as LTX
+import BeamIO            as bmIO
 
 #--------  Physical Constants
 
@@ -505,7 +497,11 @@ class BeamLineElement:
 
         return Fail
 
-    def Transport(self, _R):
+    def Transport(self, __R):
+        #.. Protect input vector; planning to transform it to coordinate
+        #   system referred to beam-line element
+        _R = deepcopy(__R)
+        
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
@@ -517,6 +513,14 @@ class BeamLineElement:
                   Facility.getinstances().getVCMVr())
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> _R:", _R)
+
+        _R = self.Shift2Local(_R)
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Shift to element-centred coordinates:")
+                print("           _R:", _R)
+                
+        if self.getDebug():
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
             print("     ----> Expansion parameter fail:", \
                   self.ExpansionParameterFail(_R))
@@ -545,6 +549,17 @@ class BeamLineElement:
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Rprime:", _Rprime)
+
+        if isinstance(_Rprime, np.ndarray):
+            _Rprime = self.Shift2RPLC(_Rprime)
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Shift to element-centred coordinates:")
+                print("           _Rprime:", _Rprime)
+                
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(" <---- Rprime:", _Rprime)
 
         if not isinstance(_Rprime, np.ndarray):
@@ -557,20 +572,28 @@ class BeamLineElement:
             raise badParameter( \
                         " BeamLineElement.Shift2Local: bad input vector:", \
                                 _R)
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" Shift2Local: R:", _R)
 
-        _Rprime    = _R
+        _Rprime    = deepcopy(_R)
         _Rprime[0] -= self._drStrt[0]
         _Rprime[2] -= self._drStrt[1]
 
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Rprime:", _Rprime)
+        
         return _Rprime
 
-    def Shift2Laboratory(self, _R):
+    def Shift2RPLC(self, _R):
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
-                        " BeamLineElement.Shift2Local: bad input vector:", \
+                        " BeamLineElement.Shift2RPLC: bad input vector:", \
                                 _R)
         
-        _Rprime    = _R
+        _Rprime    = deepcopy(_R)
         _Rprime[0] += self._drStrt[0]
         _Rprime[2] += self._drStrt[1]
         
@@ -1776,7 +1799,8 @@ class FocusQuadrupole(BeamLineElement):
         Str  = "FocusQuadrupole  : " + BeamLineElement.SummaryStr(self) + \
             "; Length = " + str(self.getLength()) + \
             "; Strength (gradient) = " + str(self.getStrength()) + \
-            "; kFQ = " + str(self.getkFQ())
+            "; kFQ = " + str(self.getkFQ()) + \
+            "; dr = " + str(self.getdrStrt())
         return Str
 
     
@@ -2158,15 +2182,19 @@ class FocusQuadrupole(BeamLineElement):
         if self.getDebug():
             print("         ----> Derived class:", bversion.decode('utf-8'))
 
-        record = strct.pack(">3d", \
+        record = strct.pack(">6d", \
                             self.getLength(), \
                             self.getStrength(), \
-                            self.getkFQ())
+                            self.getkFQ(), \
+                            self.getdrStrt()[0], \
+                            self.getdrStrt()[1], \
+                            self.getdrStrt()[2]
+                            )
 
         dataFILE.write(record)
         if self.getDebug():
-            print("         ----> Length, strength, kFQ:", \
-                  strct.unpack(">3d",record))
+            print("         ----> Length, strength, kFQ, drStrt:", \
+                  strct.unpack(">6d",record))
 
         BeamLineElement.writeElement(self, dataFILE)
         
@@ -2183,15 +2211,29 @@ class FocusQuadrupole(BeamLineElement):
 
         EoF = False
 
-        brecord = dataFILE.read((3*8))
+        nFls = 0
+        for ibmIOr in filter(lambda iFL : \
+                    iFL.getdataFILE() == dataFILE,\
+                    bmIO.BeamIO.getinstances()):
+            nFls += 1
+
+        if nFls != 1:
+            raise cantFINDfile()
+
+        if  ibmIOr.getdataFILEversion() > 3:
+            brecord = dataFILE.read((6*8))
+            record = strct.unpack(">6d", brecord)
+        else:
+            brecord = dataFILE.read((3*8))
+            record = strct.unpack(">3d", brecord)
+       
         if brecord == b'':
             return True
         
-        record = strct.unpack(">3d", brecord)
-
         Ln  = None
         St  = None
         kFQ = None
+        drStrt = np.array([0., 0., 0.])
 
         if float(record[0]) != -1.:
             Ln     = float(record[0])
@@ -2200,10 +2242,14 @@ class FocusQuadrupole(BeamLineElement):
         if float(record[2]) != -1.:
             kFQ   = float(record[2])
 
+        if  ibmIOr.getdataFILEversion() > 3:
+            drStrt[0] = float(record[3])
+            drStrt[1] = float(record[4])
+
         if cls.getDebug():
-            print("     ----> Ln, St, kDQ:", Ln, St, kFQ)
+            print("     ----> Ln, St, kDQ, drStrt:", Ln, St, kFQ, drStrt)
             
-        return EoF, Ln, St, kFQ
+        return EoF, Ln, St, kFQ, drStrt
 
     
 """
@@ -2343,7 +2389,8 @@ class DefocusQuadrupole(BeamLineElement):
         Str  = "DefocusQuadrupole: " + BeamLineElement.SummaryStr(self) + \
             "; Length = " + str(self.getLength()) + \
             "; Strength = " + str(self.getStrength()) + \
-            "; kDQ = " + str(self.getkDQ())
+            "; kDQ = " + str(self.getkDQ()) + \
+            "; dr = " + str(self.getdrStrt())
         return Str
 
     
@@ -2730,15 +2777,19 @@ class DefocusQuadrupole(BeamLineElement):
         if self.getDebug():
             print("         ----> Derived class:", bversion.decode('utf-8'))
 
-        record = strct.pack(">3d", \
+        record = strct.pack(">6d", \
                             self.getLength(), \
                             self.getStrength(), \
-                            self.getkDQ())
+                            self.getkDQ(), \
+                            self.getdrStrt()[0], \
+                            self.getdrStrt()[1], \
+                            self.getdrStrt()[2]
+                            )
 
         dataFILE.write(record)
         if self.getDebug():
-            print("         ----> Length, strength, kDQ:", \
-                  strct.unpack(">3d",record))
+            print("         ----> Length, strength, kDQ, drStrt:", \
+                  strct.unpack(">6d",record))
 
         BeamLineElement.writeElement(self, dataFILE)
         
@@ -2755,15 +2806,29 @@ class DefocusQuadrupole(BeamLineElement):
 
         EoF = False
 
-        brecord = dataFILE.read((3*8))
+        nFls = 0
+        for ibmIOr in filter(lambda iFL : \
+                    iFL.getdataFILE() == dataFILE,\
+                    bmIO.BeamIO.getinstances()):
+            nFls += 1
+
+        if nFls != 1:
+            raise cantFINDfile()
+
+        if  ibmIOr.getdataFILEversion() > 3:
+            brecord = dataFILE.read((6*8))
+            record = strct.unpack(">6d", brecord)
+        else:
+            brecord = dataFILE.read((3*8))
+            record = strct.unpack(">3d", brecord)
+       
         if brecord == b'':
             return True
-        
-        record = strct.unpack(">3d", brecord)
 
         Ln  = None
         St  = None
         kDQ = None
+        drStrt = np.array([0., 0., 0.])
 
         if float(record[0]) != -1.:
             Ln     = float(record[0])
@@ -2772,10 +2837,14 @@ class DefocusQuadrupole(BeamLineElement):
         if float(record[2]) != -1.:
             kDQ   = float(record[2])
 
+        if  ibmIOr.getdataFILEversion() > 3:
+            drStrt[0] = float(record[3])
+            drStrt[1] = float(record[4])
+
         if cls.getDebug():
-            print("     ----> Ln, St, kDQ:", Ln, St, kDQ)
+            print("     ----> Ln, St, kDQ, drStrt:", Ln, St, kDQ, dsStrt)
             
-        return EoF, Ln, St, kDQ
+        return EoF, Ln, St, kDQ, drStrt
 
     
 """
@@ -6883,4 +6952,7 @@ class FailToCreateTraceSpaceAtSource(Exception):
     pass
 
 class KillInfiniteLoop(Exception):
+    pass
+
+class cantFINDfile(Exception):
     pass

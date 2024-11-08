@@ -579,17 +579,18 @@ class BeamLine(object):
             if cls.getDebug():
                 print("                ----> Name, iLst.Name:", \
                       Name, iLst.getName())
-            
-            rStrt = iLst.getrStrt() + iLst.getStrt2End()
-            vStrt = iLst.getvEnd()
-            drStrt = np.array([0.,0.,0.])
-            dvStrt = np.array([[0.,0.],[0.,0.]])
+
+            if NewElement:
+                rStrt = iLst.getrStrt() + iLst.getStrt2End()
+                vStrt = iLst.getvEnd()
+                drStrt = np.array([0.,0.,0.])
+                dvStrt = np.array([[0.,0.],[0.,0.]])
             if cls.getDebug():
-                print("                ----> rStrt:", rStrt)
-                print("                ----> rStrt:", vStrt)
-                print("                ----> rStrt:", drStrt)
-                print("                ----> rStrt:", dvStrt)
-                
+                print("                ---->  rStrt:", rStrt)
+                print("                ---->  vStrt:", vStrt)
+                print("                ----> drStrt:", drStrt)
+                print("                ----> dvStrt:", dvStrt)
+
             if iLine.Section != Section:
                 Section   = iLine.Section
                 nRPLCswtch = 0
@@ -694,6 +695,14 @@ class BeamLine(object):
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Fquad":
+                if NewElement:
+                    nLnsFQ = 2
+                    iLnsFQ = 0
+                    if isinstance(iLine.Type, str) and \
+                       "shift" in iLine.Type.lower():
+                        nLnsFQ += 2
+                iLnsFQ += 1
+                
                 if iLine.Parameter == "Length":
                     FqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
@@ -702,17 +711,21 @@ class BeamLine(object):
                     kq   = float(iLine.Value)
                     Brho = (1/(speed_of_light*1.E-9))*p0/1000.
                     FqS  = kq * Brho
-                if NewElement:
+                elif iLine.Parameter == "dx":
+                    drStrt[0] = float(iLine.Value)
+                elif iLine.Parameter == "dy":
+                    drStrt[1] = float(iLine.Value)
+
+                if NewElement or iLnsFQ < nLnsFQ:
                     NewElement = False
                     continue
                 else:
                     NewElement = True
+                    
                 """
-                rStrt = np.array([0.,0.,s])
-                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
-                drStrt = np.array([0.,0.,0.])
                 dvStrt = np.array([[0.,0.],[0.,0.]])
                 """
+                
                 nFquad += 1
                 Name       = Name + str(nFquad)
                 if cls.getDebug():
@@ -724,6 +737,14 @@ class BeamLine(object):
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Dquad":
+                if NewElement:
+                    nLnsDQ = 2
+                    iLnsDQ = 0
+                    if isinstance(iLine.Type, str) and \
+                       "shift" in iLine.Type.lower():
+                        nLnsDQ += 2
+                iLnsDQ += 1
+                
                 if iLine.Parameter == "Length":
                     DqL = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
@@ -732,17 +753,21 @@ class BeamLine(object):
                     kq   = float(iLine.Value)
                     Brho = (1/(speed_of_light*1.E-9))*p0/1000.
                     DqS  = kq * Brho
-                if NewElement:
+                elif iLine.Parameter == "dx":
+                    drStrt[0] = float(iLine.Value)
+                elif iLine.Parameter == "dy":
+                    drStrt[1] = float(iLine.Value)
+                    
+                if NewElement or iLnsDQ < nLnsDQ:
                     NewElement = False
                     continue
                 else:
                     NewElement = True
+                    
                 """
-                rStrt = np.array([0.,0.,s])
-                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
-                drStrt = np.array([0.,0.,0.])
                 dvStrt = np.array([[0.,0.],[0.,0.]])
                 """
+                
                 nDquad += 1
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
@@ -832,7 +857,6 @@ class BeamLine(object):
                 drStrt = np.array([0.,0.,0.])
                 dvStrt = np.array([[0.,0.],[0.,0.]])
                 """
-                nDquad += 1
                 nGbrLns += 1
                 Name  += str(nGbrLns)
                 if iLine.Type == "Length, strength":
@@ -1229,12 +1253,13 @@ class BeamLine(object):
         if cls.getDebug():
             print("     ----> Number of beam line elements:", nBLE)
                 
-        dr = np.array([0., 0., 0.])
-        dv = np.array([[0., 0.], [0., 0.]])
         for iBLE in range(nBLE):
             if cls.getDebug():
                 print("         ----> Read element:", iBLE)
 
+            dr = np.array([0., 0., 0.])
+            dv = np.array([[0., 0.], [0., 0.]])
+                
             brecord = beamlineFILE.read(4)
             if brecord == b'':
                 if cls.getDebug():
@@ -1288,12 +1313,12 @@ class BeamLine(object):
                 if EoF:
                     return EoF
             elif derivedCLASS == "DefocusQuadrupole":
-                EoF, Ln, St, kDQ = \
+                EoF, Ln, St, kDQ, dr = \
                     BLE.DefocusQuadrupole.readElement(beamlineFILE)
                 if EoF:
                     return EoF
             elif derivedCLASS == "FocusQuadrupole":
-                EoF, Ln, St, kFQ = \
+                EoF, Ln, St, kFQ, dr = \
                     BLE.FocusQuadrupole.readElement(beamlineFILE)
                 if EoF:
                     return EoF

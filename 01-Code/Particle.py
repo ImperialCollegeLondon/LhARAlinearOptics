@@ -619,19 +619,6 @@ class Particle:
                 xory.append(RrOut[0][iCrd])
                 sorz.append(RrOut[0][2])
 
-                """
-                zPrtcl    = RrOut[0][2]
-                iAddr    += 1
-
-                iBLE0 = BLE.BeamLineElement.getinstances()[iAddr+1]
-                iBLE1 = None
-                if len(BLE.BeamLineElement.getinstances()) > iAddr+2:
-                    iBLE1 = BLE.BeamLineElement.getinstances()[iAddr+2]
-                if iBLE1 != None:
-                    if zPrtcl > iBLE1.getrStrt()[2]:
-                        zPrtcl = iBLE1.getrStrt()[2]
-                """
-
         if self.getDebug():
             print("     ----> len, sorz:", len(sorz), sorz)
             print("     ----> len, xory:", len(xory), xory)

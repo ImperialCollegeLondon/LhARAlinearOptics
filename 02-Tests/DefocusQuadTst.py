@@ -120,6 +120,44 @@ else:
     print(" <---- Defocusing quadrupole transport test successful.")
 
     
+##! Check position displacement
+DefocusQuadrupoleTest += 1
+print()
+print("DefocusQuadrupoleTest:", DefocusQuadrupoleTest, \
+      " check handling of position displacement.")
+
+rStrt = np.array([0.,0.,0.])
+vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
+drStrt = np.array([0.2,0.1,0.])
+dvStrt = np.array([[0.,0.],[0.,0.]])
+DQuad1 = BLE.DefocusQuadrupole("ValidQuad3", rStrt, vStrt, drStrt, dvStrt, \
+                             0.1, None, 153.93033817278908)
+refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(DQuad1)
+
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
+Rprime = DQuad1.Transport(R)
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Input phase-space vector:", R)
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Transfer matrix: \n", DQuad1.getTransferMatrix())
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Transported phase-space vector:", Rprime)
+RprimeTest = np.array([ 0.608918361, 2.189714009, -0.200329912, 2.089382607, \
+                        1.260471929, 0.5 ])
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Pre-calculated          Rprime:", RprimeTest)
+Diff       = np.subtract(Rprime, RprimeTest)
+Norm       = np.linalg.norm(Diff)
+with np.printoptions(linewidth=500,precision=5,suppress=True): \
+     print("     ----> Difference Rprime - RprimeTest:", Diff)
+print("     ----> Magnitude of Diff:", Norm)
+if Norm > 1E-6:
+    raise Exception(" !!!!----> FAILED: focusing quadrupole transport", \
+                    " result not as expected.")
+else:
+    print(" <---- Defocusing quadrupole transport test successful.")
+
+    
 ##! Complete:
 print()
 print("========  DefocusQuadrupole: tests complete  ========")
