@@ -602,7 +602,7 @@ class BeamLine(object):
                 nGbrLns    = 0
                 nDpl       = 0
                 nCvty      = 0
-
+            
             if iLine.Element == "RPLCswitch":
                 if cls.getDebug():
                     print("               ----> Start on RPLCswitch.")
@@ -666,35 +666,74 @@ class BeamLine(object):
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
             elif iLine.Element == "Aperture":
-                if iLine.Type == "Circular":
-                    Param = [0, float(iLine.Value)]
-                elif iLine.Type == "Elliptical" or \
-                     iLine.Type == "Rectangular":
-                    if NewElement:
-                        iMode = 1
-                        if iLine.Type == "Rectangular": iMode = 2
-                        Param      = [iMode, float(iLine.Value)]
-                        NewElement = False
-                        continue
-                    else:
-                        Param.append(float(iLine.Value))
-                        NewElement = True
-                else:
-                    raise BLEnotvalid(" Aperture " + \
-                                      str(iLine.Type) + \
-                                      " not recognised.")
-
-                nAperture += 1
-                Name       = Name + iLine.Type + ":" + str(nAperture)
+                localType = iLine.Type.replace(" ", "")
+                typeLIST  = localType.split(',')
                 if cls.getDebug():
-                    print("             ----> Add", Name)
+                    print(" Aperture: localType, typeLIST:",
+                          localType, typeLIST)
+            
+                if NewElement:
+                    iMode   = 0
+                    iLnsApp = 0
+                    nLnsApp = 1
+                    Param   = [0, 0., 0.]
+                    if typeLIST[0] == "Elliptical" or \
+                       typeLIST[0] == "Rectangular":
+                        iMode   = 1
+                        nLnsApp = 2
+                        if typeLIST[0] == "Rectangular": iMode = 2
+
+                    if "Shift" in localType:
+                        nLnsApp +=2
+
+                Param[0] = iMode
+                iLnsApp += 1
+                if cls.getDebug():
+                    print("     ----> iMode, iLnsApp, nLnsApp, NewElement:",\
+                          iMode, iLnsApp, nLnsApp, NewElement)
+
+                if typeLIST[0] == "Circular":
+                    if iLine.Parameter == "Radius":
+                        Param[1] = float(iLine.Value)
+                elif typeLIST[0] == "Elliptical" or \
+                    typeLIST[0] == "Rectangular":
+                    if iLine.Parameter == "RadiusX":
+                        Param[1] = float(iLine.Value)
+                    elif iLine.Parameter == "RadiusY":
+                        Param[2] = float(iLine.Value)
+
+                if iLine.Parameter == "dx":
+                    drStrt[0] = float(iLine.Value)
+                elif iLine.Parameter == "dy":
+                    drStrt[1] = float(iLine.Value)
+
+                if cls.getDebug():
+                    print("     ----> Param, drStrt:", \
+                          Param, drStrt)
+                    print("     ----> NewElement, iLnsApp, nLnsApp:", \
+                          NewElement, iLnsApp, nLnsApp)
+                    
+                if iLnsApp < nLnsApp:
+                    NewElement = False
+                    continue
+                else:
+                    NewElement = True
+                    
+                nAperture += 1
+                Name       = Name + typeLIST[0] + ":" + str(nAperture)
+                if cls.getDebug():
+                    print("     ----> NewElement:", NewElement)
+                    print("     ----> Add", Name)
                 iBLE = BLE.Aperture(Name, \
                                     rStrt, vStrt, drStrt, dvStrt, Param)
                 cls.addBeamLineElement(iBLE)
                 s += 0.
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+
             elif iLine.Element == "Fquad":
+                if cls.getDebug():
+                    print(" Fquad: NewElement:", NewElement)
                 if NewElement:
                     nLnsFQ = 2
                     iLnsFQ = 0
@@ -716,7 +755,7 @@ class BeamLine(object):
                 elif iLine.Parameter == "dy":
                     drStrt[1] = float(iLine.Value)
 
-                if NewElement or iLnsFQ < nLnsFQ:
+                if iLnsFQ < nLnsFQ:
                     NewElement = False
                     continue
                 else:
@@ -1313,12 +1352,12 @@ class BeamLine(object):
                 if EoF:
                     return EoF
             elif derivedCLASS == "DefocusQuadrupole":
-                EoF, Ln, St, kDQ, dr = \
+                EoF, Ln, St, kDQ = \
                     BLE.DefocusQuadrupole.readElement(beamlineFILE)
                 if EoF:
                     return EoF
             elif derivedCLASS == "FocusQuadrupole":
-                EoF, Ln, St, kFQ, dr = \
+                EoF, Ln, St, kFQ = \
                     BLE.FocusQuadrupole.readElement(beamlineFILE)
                 if EoF:
                     return EoF
@@ -1331,7 +1370,8 @@ class BeamLine(object):
                       "  Abort.")
                 sys.exit(1)
 
-            EoF, Loc, r, v = BLE.BeamLineElement.readElement(beamlineFILE)
+            EoF, Loc, r, v, dr, dv = \
+                BLE.BeamLineElement.readElement(beamlineFILE)
             
             if derivedCLASS == "Facility":
                 instBLE = BLE.Facility(Loc, r, v, dr, dv, p0, VCMVr)
