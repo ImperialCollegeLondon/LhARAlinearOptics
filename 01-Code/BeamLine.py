@@ -221,8 +221,6 @@ class BeamLine(object):
             if cls.getDebug():
                 print("        ----> Reference particle: ")
             
-            #refPrtclSet = refPrtcl.setReferenceParticle()
-
             if cls.getDebug():
                 print("            ----> Reference particle set, success:")
                 print("        <---- Reference particle done. ")
@@ -566,7 +564,8 @@ class BeamLine(object):
             raise ReferenceParticleNotSpecified()
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
                                     iRefPrtcl.getPrIn()[0][:3]))
-        
+
+        iBLE = None
         for iLine in pndsBeamline.itertuples():
             Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                            + str(iLine.Stage) + ":"  \
@@ -580,11 +579,40 @@ class BeamLine(object):
                 print("                ----> Name, iLst.Name:", \
                       Name, iLst.getName())
 
+            elementKEY = iLine.Element
+            
+            if iBLE != None and \
+               isinstance(iLine.Type, str) and \
+                   Name0 == Name:
+                if "shift" in iLine.Type.lower():
+                    if iLine.Parameter == "dx":
+                        nShft += 1
+                        iBLE.getdrStrt()[0] = float(iLine.Value)
+                        if cls.getDebug():
+                            print("                ----> Shift",
+                                  Name, ", nShft =", nShft, \
+                                  ": dr =", iBLE.getdrStrt())
+                        continue
+                    elif iLine.Parameter == "dy":
+                        nShft += 1
+                        iBLE.getdrStrt()[1] = float(iLine.Value)
+                        if cls.getDebug():
+                            print("                ----> Shift",
+                                  Name, ", nShft =", nShft, \
+                                  ": dr =", iBLE.getdrStrt())
+                        continue
+                        
+                    if nShft != 0 and nShft != 2: 
+                        raise badSHIFT()
+                                        
             if NewElement:
+                nShft = 0
+                Name0 = Name
                 rStrt = iLst.getrStrt() + iLst.getStrt2End()
                 vStrt = iLst.getvEnd()
                 drStrt = np.array([0.,0.,0.])
                 dvStrt = np.array([[0.,0.],[0.,0.]])
+            
             if cls.getDebug():
                 print("                ---->  rStrt:", rStrt)
                 print("                ---->  vStrt:", vStrt)
@@ -602,8 +630,8 @@ class BeamLine(object):
                 nGbrLns    = 0
                 nDpl       = 0
                 nCvty      = 0
-            
-            if iLine.Element == "RPLCswitch":
+
+            if elementKEY == "RPLCswitch":
                 if cls.getDebug():
                     print("               ----> Start on RPLCswitch.")
                 if NewElement:
@@ -646,17 +674,11 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += iBLE.getLength()
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Drift":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Drift":
                 nDrift   += 1
                 Name      = Name + str(nDrift)
                 Length    = float(iLine.Value)
-                """
-                rStrt = np.array([0.,0.,s])
-                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
-                drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
-                """
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.Drift(Name, 
@@ -664,8 +686,8 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += Length
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Aperture":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Aperture":
                 localType = iLine.Type.replace(" ", "")
                 typeLIST  = localType.split(',')
                 if cls.getDebug():
@@ -683,9 +705,6 @@ class BeamLine(object):
                         nLnsApp = 2
                         if typeLIST[0] == "Rectangular": iMode = 2
 
-                    if "Shift" in localType:
-                        nLnsApp +=2
-
                 Param[0] = iMode
                 iLnsApp += 1
                 if cls.getDebug():
@@ -701,11 +720,6 @@ class BeamLine(object):
                         Param[1] = float(iLine.Value)
                     elif iLine.Parameter == "RadiusY":
                         Param[2] = float(iLine.Value)
-
-                if iLine.Parameter == "dx":
-                    drStrt[0] = float(iLine.Value)
-                elif iLine.Parameter == "dy":
-                    drStrt[1] = float(iLine.Value)
 
                 if cls.getDebug():
                     print("     ----> Param, drStrt:", \
@@ -729,17 +743,14 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += 0.
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
 
-            elif iLine.Element == "Fquad":
+            elif elementKEY == "Fquad":
                 if cls.getDebug():
                     print(" Fquad: NewElement:", NewElement)
                 if NewElement:
                     nLnsFQ = 2
                     iLnsFQ = 0
-                    if isinstance(iLine.Type, str) and \
-                       "shift" in iLine.Type.lower():
-                        nLnsFQ += 2
                 iLnsFQ += 1
                 
                 if iLine.Parameter == "Length":
@@ -750,10 +761,6 @@ class BeamLine(object):
                     kq   = float(iLine.Value)
                     Brho = (1/(speed_of_light*1.E-9))*p0/1000.
                     FqS  = kq * Brho
-                elif iLine.Parameter == "dx":
-                    drStrt[0] = float(iLine.Value)
-                elif iLine.Parameter == "dy":
-                    drStrt[1] = float(iLine.Value)
 
                 if iLnsFQ < nLnsFQ:
                     NewElement = False
@@ -761,10 +768,6 @@ class BeamLine(object):
                 else:
                     NewElement = True
                     
-                """
-                dvStrt = np.array([[0.,0.],[0.,0.]])
-                """
-                
                 nFquad += 1
                 Name       = Name + str(nFquad)
                 if cls.getDebug():
@@ -774,14 +777,11 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += FqL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Dquad":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Dquad":
                 if NewElement:
                     nLnsDQ = 2
                     iLnsDQ = 0
-                    if isinstance(iLine.Type, str) and \
-                       "shift" in iLine.Type.lower():
-                        nLnsDQ += 2
                 iLnsDQ += 1
                 
                 if iLine.Parameter == "Length":
@@ -792,10 +792,6 @@ class BeamLine(object):
                     kq   = float(iLine.Value)
                     Brho = (1/(speed_of_light*1.E-9))*p0/1000.
                     DqS  = kq * Brho
-                elif iLine.Parameter == "dx":
-                    drStrt[0] = float(iLine.Value)
-                elif iLine.Parameter == "dy":
-                    drStrt[1] = float(iLine.Value)
                     
                 if NewElement or iLnsDQ < nLnsDQ:
                     NewElement = False
@@ -803,10 +799,6 @@ class BeamLine(object):
                 else:
                     NewElement = True
                     
-                """
-                dvStrt = np.array([[0.,0.],[0.,0.]])
-                """
-                
                 nDquad += 1
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
@@ -816,8 +808,8 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += DqL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Solenoid":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Solenoid":
                 if NewElement:
                     if iLine.Type == "Length, layers and turns":
                         nLnsSlnd = 4
@@ -870,8 +862,8 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += SlndL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Gabor lens":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Gabor lens":
                 if NewElement:
                     if iLine.Type == "Length, strength":
                         nLnsGbrLns = 2
@@ -913,8 +905,8 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += GbrLnsL
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Dipole":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Dipole":
                 if NewElement:
                     if iLine.Type == "Sector (Length, angle)":
                         nLnsDpl = 2
@@ -948,8 +940,8 @@ class BeamLine(object):
                                 rStrt, vStrt, drStrt, dvStrt, DplA, B))
                 s += cls._Element[len(cls._Element)-1].getLength()
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
-            elif iLine.Element == "Cavity":
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
+            elif elementKEY == "Cavity":
                 if NewElement:
                     if iLine.Type == "Cylindrical":
                         nLnsCvty = 3
@@ -971,12 +963,6 @@ class BeamLine(object):
                     continue
                 else:
                     NewElement = True
-                """
-                rStrt = np.array([0.,0.,s])
-                vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
-                drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
-                """
                 nCvty   += 1
                 Name    += str(nCvty)
                 iBLE    = BLE.CylindricalRFCavity(Name, \
@@ -985,7 +971,7 @@ class BeamLine(object):
                 cls.addBeamLineElement(iBLE)
                 s += cls._Element[len(cls._Element)-1].getLength()
                 refPrtcl    = Prtcl.ReferenceParticle.getinstances()
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
 
             if cls.getDebug():
                 print("                 ---->", Name, \
@@ -1384,7 +1370,7 @@ class BeamLine(object):
                 refPrtclSet = refPrtcl.setReferenceParticleAtSource()
             elif derivedCLASS == "Drift":
                 instBLE = BLE.Drift(Loc, r, v, dr, dv, Length)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "Aperture":
@@ -1392,48 +1378,48 @@ class BeamLine(object):
                 if len(Params) > 1:
                     Param.append(Params[1])
                 instBLE = BLE.Aperture(Loc, r, v, dr, dv, Param)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "GaborLens":
                 instBLE = BLE.GaborLens(Loc, r, v, dr, dv, \
                                         Bz, VA, RA, Rp, Ln, St)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "Solenoid":
                 instBLE = BLE.Solenoid(Loc, r, v, dr, dv, \
                                         Ln, St, kSol)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "CylindricalRFCavity":
                 instBLE = BLE.CylindricalRFCavity(Loc, r, v, dr, dv, \
                                                   Grdnt, Frqncy, Phs)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "SectorDipole":
                 instBLE = BLE.SectorDipole(Loc, r, v, dr, dv, \
                                            Angl, B)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "DefocusQuadrupole":
                 instBLE = BLE.DefocusQuadrupole(Loc, r, v, dr, dv, \
                                                 Ln, St, kDQ)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "FocusQuadrupole":
                 instBLE = BLE.FocusQuadrupole(Loc, r, v, dr, dv, \
                                                 Ln, St, kFQ)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             elif derivedCLASS == "RPLCswitch":
                 instBLE = BLE.RPLCswitch(Loc, r, v, dr, dv)
-                refPrtclSet = refPrtcl.setReferenceParticleAtDrift(instBLE)
+                refPrtclSet = refPrtcl.setReferenceParticle(instBLE)
                 if cls.getDebug():
                     print(instBLE)
             else:
@@ -1491,4 +1477,7 @@ class noFILE(Exception):
     pass
 
 class BLEnotvalid(Exception):
+    pass
+
+class badSHIFT(Exception):
     pass

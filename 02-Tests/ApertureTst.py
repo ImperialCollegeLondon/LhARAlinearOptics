@@ -8,10 +8,21 @@ Test script for "Aperture" class
 
 """
 
+import os
 import numpy             as np
 
 import BeamLineElement   as BLE
+import BeamLine          as BL
+import Particle          as Prtcl
 
+"""
+constants_instance = PhysCnst.PhysicalConstants()
+protonMASS         = constants_instance.mp()
+"""
+
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/Dummy4Tests.csv')
 
 ##! Start:
 print(" ========  Aperture: tests start  ========")
@@ -41,8 +52,21 @@ except:
 BLE.BeamLineElement.cleaninstances()
 
 #.. Create valid instance:
+BLI  = BL.BeamLine(filename)
+iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+
+print("     ----> Reference particle set:")
+print("         ----> In:", iRefPrtcl.getPrIn())
+print("              Out:", iRefPrtcl.getPrOut())
+
+p0        = iRefPrtcl.getMomentumIn(0)
+with np.printoptions(linewidth=500,precision=7,suppress=True):
+    print("         ----> Three momentum (in, RPLC):", \
+          iRefPrtcl.getPrIn()[0][0:3], ", Magnitude:", p0)
+
 Aprtr = BLE.Aperture(" ValidAperture", rStrt, vStrt, drStrt, dvStrt, \
                      [0, 0.2])
+refPrtclSet = iRefPrtcl.setReferenceParticle(Aprtr)
     
 #.. __repr__
 print("     __repr__:")
@@ -114,6 +138,7 @@ print(" ApertureTest:", ApertureTest, " check elliptical aperture:")
 
 Aprtr = BLE.Aperture("ValidAperture", rStrt, vStrt, drStrt, dvStrt, \
                      [1, 0.2, 0.4])
+refPrtclSet = iRefPrtcl.setReferenceParticle(Aprtr)
 R     = np.array([0.2, 0.1, -0.003, -0.3, 0.1, 0.05])
 Trnsp = Aprtr.Transport(R)
 print("         ----> Outside Trnsp:", Trnsp)
@@ -147,6 +172,7 @@ print(" ApertureTest:", ApertureTest, " check rectangular aperture:")
 
 Aprtr = BLE.Aperture("ValidAperture", rStrt, vStrt, drStrt, dvStrt, \
                      [1, 0.2, 0.4])
+refPrtclSet = iRefPrtcl.setReferenceParticle(Aprtr)
 R     = np.array([0.2, 0.1, -0.003, -0.3, 0.1, 0.05])
 Trnsp = Aprtr.Transport(R)
 print("         ----> Outside Trnsp:", Trnsp)
@@ -159,6 +185,7 @@ else:
 
 Aprtr = BLE.Aperture("ValidAperture", rStrt, vStrt, drStrt, dvStrt, \
                      [2, 0.2, 0.4])
+refPrtclSet = iRefPrtcl.setReferenceParticle(Aprtr)
 R      = np.array([0.005, 0.1, -0.003, -0.2, 0.1, 0.05])
 RprmT  = R
 Rprime = Aprtr.Transport(R)

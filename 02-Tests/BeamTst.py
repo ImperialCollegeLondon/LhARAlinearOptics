@@ -84,7 +84,6 @@ BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 Prtcl.Particle.cleanAllParticles()
 BmInst = Bm.Beam(inputdatafile, 1000, outputdatafile, 3)
-print(BmInst)
 BmInst.evaluateBeam()
 BmInst.createReport()
 

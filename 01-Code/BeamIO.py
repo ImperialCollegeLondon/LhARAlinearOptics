@@ -332,6 +332,7 @@ class BeamIO:
             if self.getDebug():
                 print("     ----> Id number:", nId)
                 
+            Version = "Version 1"
             self.setdataFILEversion(1)
             if nId == 9999:
                 if self.getDebug():
@@ -344,14 +345,12 @@ class BeamIO:
                           self.getdataFILEversion())
                 if nVersion >= 3:
                     repoVERSION = self.readREPOversion()
-                """
-                self.setrepoVERSION(repoVERSION)
-                if self.getDebug():
-                    print("           Repo version:", \
-                          self.getrepoVERSION())
-                """
+                
+                print(" BeamIO.readBeamDataRecord:", \
+                      "reading data file version", Version)
                     
                 BL.BeamLine.readBeamLine(self.getdataFILE())
+
             else:
                 if self.getDebug():
                     print("           Handle version 1!")

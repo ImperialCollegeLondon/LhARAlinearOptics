@@ -70,9 +70,10 @@ print("     ----> Input phase-space vector:", R)
 BmLnElmnt.setdrStrt(np.array([0.1, 0.2, 0.3]))
 print("     ----> Offset to start of element position:", BmLnElmnt.getdrStrt())
 Rprime = BmLnElmnt.Shift2Local(R)
-print("         ----> Phase-space vector in local coordiantes:", Rprime)
-R2prime = BmLnElmnt.Shift2Laboratory(Rprime)
-print("         ----> Phase-space vector back in laboratory coordiantes:", \
+print("         ----> Phase-space vector in element-local coordiantes:", \
+      Rprime)
+R2prime = BmLnElmnt.Shift2RPLC(Rprime)
+print("         ----> Phase-space vector back in RPLC coordinates:", \
       R2prime)
 Diff       = np.subtract(R, R2prime)
 Norm       = np.linalg.norm(Diff)

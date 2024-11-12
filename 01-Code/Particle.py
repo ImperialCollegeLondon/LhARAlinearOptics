@@ -1216,7 +1216,7 @@ Derived class ReferenceParticle(Particle):
                                Sets attributes for reference partice at
                                source.
 
- setReferenceParticleAtDrift: I/p: iBLE : BeamLineElement instance
+ setReferenceParticle: I/p: iBLE : BeamLineElement instance
                                Sets attributes for reference partice for a
                                drift space.  Also works for apertures,
                                quads, and any element that has length but
@@ -1507,13 +1507,13 @@ class ReferenceParticle(Particle):
 
         return Success
 
-    def setReferenceParticleAtDrift(self, iBLE=None):
+    def setReferenceParticle(self, iBLE=None):
         nRcrds  = len(self.getsIn())
         if self.getDebug():
             print(" --------  --------  --------  //", \
                   "  --------  --------  --------")
             print( \
-            " ReferenceParticle(Particle).setReferenceParticleAtDrift ", \
+            " ReferenceParticle(Particle).setReferenceParticle ", \
                    "starts; \n", \
                    "    ----> Number of previous records:", nRcrds)
         

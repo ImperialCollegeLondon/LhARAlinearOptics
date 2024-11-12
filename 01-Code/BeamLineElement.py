@@ -692,10 +692,15 @@ class BeamLineElement:
                            float(record[2])])
         v      = np.array([[float(record[3]), float(record[4])],     \
                            [float(record[5]), float(record[6])]]  )
-        dr     = np.array([float(record[7]), float(record[8]),       \
-                           float(record[9])])
-        dv     = np.array([ [float(record[10]), float(record[11])],  \
-                            [float(record[12]), float(record[13])] ])
+        
+        if ibmIOr.getdataFILEversion() < 4:
+            dr     = np.array([0., 0., 0.])
+            dv     = np.array([0., 0., 0.])
+        else:
+            dr     = np.array([float(record[7]), float(record[8]),       \
+                               float(record[9])])
+            dv     = np.array([ [float(record[10]), float(record[11])],  \
+                                [float(record[12]), float(record[13])] ])
         
         if cls.getDebug():
             print("     ----> r, v, dr, dv:", r, v, dr, dv)

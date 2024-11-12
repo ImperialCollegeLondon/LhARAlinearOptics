@@ -69,11 +69,11 @@ with np.printoptions(linewidth=500,precision=7,suppress=True):
 DfQuada = BLE.DefocusQuadrupole("ValidDquad1", rStrt, vStrt, drStrt, dvStrt, \
                                0.1, 100.)
 print(" Set reference particle phase space for:", DfQuada.getName())
-refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(DfQuada)
+refPrtclSet = iRefPrtcl.setReferenceParticle(DfQuada)
 DfQuad = BLE.DefocusQuadrupole("ValidDquad2", rStrt, vStrt, drStrt, dvStrt, \
                                0.1, None, 153.93033817278908)
 print(" Set reference particle phase space for:", DfQuad.getName())
-refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(DfQuad)
+refPrtclSet = iRefPrtcl.setReferenceParticle(DfQuad)
     
 #.. __repr__
 print("    __repr__:")
@@ -132,7 +132,7 @@ drStrt = np.array([0.2,0.1,0.])
 dvStrt = np.array([[0.,0.],[0.,0.]])
 DQuad1 = BLE.DefocusQuadrupole("ValidQuad3", rStrt, vStrt, drStrt, dvStrt, \
                              0.1, None, 153.93033817278908)
-refPrtclSet = iRefPrtcl.setReferenceParticleAtDrift(DQuad1)
+refPrtclSet = iRefPrtcl.setReferenceParticle(DQuad1)
 
 R      = np.array([0.5, 0.1, -0.3, -0.2, 0.1, 0.5])
 Rprime = DQuad1.Transport(R)
