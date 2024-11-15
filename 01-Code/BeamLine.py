@@ -331,7 +331,7 @@ class BeamLine(object):
         rStrt = np.array([0.,0.,0.])
         vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
         drStrt = np.array([0.,0.,0.])
-        dvStrt = np.array([[0.,0.],[0.,0.]])
+        dvStrt = np.array([0.,0.,0.])
 
         p0     = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
 
@@ -357,7 +357,7 @@ class BeamLine(object):
         rStrt = np.array([0.,0.,0.])
         vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
         drStrt = np.array([0.,0.,0.])
-        dvStrt = np.array([[0.,0.],[0.,0.]])
+        dvStrt = np.array([0.,0.,0.])
         SourceBLE = BLE.Source(Name, rStrt, vStrt, drStrt, dvStrt, \
                                SrcMode, SrcParam)
 
@@ -611,7 +611,7 @@ class BeamLine(object):
                 rStrt = iLst.getrStrt() + iLst.getStrt2End()
                 vStrt = iLst.getvEnd()
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
+                dvStrt = np.array([0.,0.,0.])
             
             if cls.getDebug():
                 print("                ---->  rStrt:", rStrt)
@@ -841,7 +841,7 @@ class BeamLine(object):
                 rStrt = np.array([0.,0.,s])
                 vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
+                dvStrt = np.array([0.,0.,0.])
                 """
                 nSlnd += 1
                 Name  += str(nSlnd)
@@ -886,7 +886,7 @@ class BeamLine(object):
                 rStrt = np.array([0.,0.,s])
                 vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
+                dvStrt = np.array([0.,0.,0.])
                 """
                 nGbrLns += 1
                 Name  += str(nGbrLns)
@@ -930,7 +930,7 @@ class BeamLine(object):
                 rStrt = np.array([0.,0.,s])
                 vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
                 drStrt = np.array([0.,0.,0.])
-                dvStrt = np.array([[0.,0.],[0.,0.]])
+                dvStrt = np.array([0.,0.,0.])
                 """
                 nDpl   += 1
                 Name   += str(nDpl)
@@ -1283,7 +1283,7 @@ class BeamLine(object):
                 print("         ----> Read element:", iBLE)
 
             dr = np.array([0., 0., 0.])
-            dv = np.array([[0., 0.], [0., 0.]])
+            dv = np.array([0., 0., 0.])
                 
             brecord = beamlineFILE.read(4)
             if brecord == b'':

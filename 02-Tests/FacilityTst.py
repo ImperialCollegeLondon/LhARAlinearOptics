@@ -31,7 +31,7 @@ BLE.BeamLineElement.cleaninstances()
 rStrt = np.array([0.,0.,0.])
 vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([[0.,0.],[0.,0.]])
+dvStrt = np.array([0.,0.,0.])
 p0     = 15.
 VCMV   = 0.5
 Fclty = BLE.Facility("Facility0", rStrt, vStrt, drStrt, dvStrt, \

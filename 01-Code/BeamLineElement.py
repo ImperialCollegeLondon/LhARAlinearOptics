@@ -32,7 +32,8 @@ constants_instance: Instance of PhysicalConstants class
       _drStrt : "error", displacement of start from nominal position
                 (rad). 
       _dvStrt : "error", deviation in theta and phy from nominal axis
-                (rad).
+                in form of Euler angles (rad).  Convention is an
+                "intrinsic" rotation in the "z-y-z" convention.
 
   Calculated and set in derived classes:
     _Strt2End : Calculated; vector that translates from start to end of
@@ -65,7 +66,7 @@ constants_instance: Instance of PhysicalConstants class
          setrStrt  : Set start of element, x, y, z (m)
          setvStrt  : Set orientation of element, theta, phi (rad)
         setdrStrt  : Set offset of start of element, x, y, z (m)
-        setdvStrt  : Set offset orientation of element, theta, phi (rad)
+        setdvStrt  : Set offset orientation of element, Euler angles (rad)
      setRot2LbStrt : set rotation matrix totransform from RLBC to lab at
                      start.
 
@@ -76,7 +77,7 @@ constants_instance: Instance of PhysicalConstants class
           getrStrt : Get start of element, x, y, z (m)
           getvStrt : Get orientation of element, theta, phi (rad)
          getdrStrt : Get offset from nominal start of element, x, y, z (m)
-         getdvStrt : Get offset of orientation of element, theta, phi (rad)
+         getdvStrt : Get offset of orientation of element Euler angles (rad)
        getStrt2End : Get vector to translate from start to end in lab
      getRot2LbStrt : Get rotation matrix totransform from RLBC to lab at
                      start.
@@ -221,7 +222,7 @@ class BeamLineElement:
         print("     ---->               Position:", self.getrStrt())
         print("     ---->            Orientation: \n", self.getvStrt())
         print("     ---->        Position offset:", self.getdrStrt())
-        print("     ---->     Orientation offset: \n", self.getdvStrt())
+        print("     ---->     Orientation offset:", self.getdvStrt())
         print("     ---->    Start to end vector:", self.getStrt2End())
         print("     ----> Rotate to lab at start: \n", self.getRot2LbStrt())
         print("     ---->   Rotate to lab at end: \n", self.getRot2LbEnd())
@@ -621,7 +622,7 @@ class BeamLineElement:
         if self.getDebug():
             print("     ----> Location:", bLocation.decode('utf-8'))
 
-        record = strct.pack(">14d",                 \
+        record = strct.pack(">13d",                 \
                             self.getrStrt()[0],     \
                             self.getrStrt()[1],     \
                             self.getrStrt()[2],     \
@@ -632,10 +633,9 @@ class BeamLineElement:
                             self.getdrStrt()[0],    \
                             self.getdrStrt()[1],    \
                             self.getdrStrt()[2],    \
-                            self.getdvStrt()[0][0], \
-                            self.getdvStrt()[0][1], \
-                            self.getdvStrt()[1][0], \
-                            self.getdvStrt()[1][1]
+                            self.getdvStrt()[0], \
+                            self.getdvStrt()[1], \
+                            self.getdvStrt()[2]
                             )
         dataFILE.write(record)
         if self.getDebug():
@@ -679,15 +679,19 @@ class BeamLineElement:
 
         if ibmIOr.getdataFILEversion() < 4:
             brecord = dataFILE.read((7*8))
-        else:
+        elif ibmIOr.getdataFILEversion() == 4:
             brecord = dataFILE.read((14*8))
+        else:
+            brecord = dataFILE.read((13*8))
         if brecord == b'':
             return True, None, None, None, None
         
         if ibmIOr.getdataFILEversion() < 4:
             record = strct.unpack(">7d", brecord)
-        else:
+        elif ibmIOr.getdataFILEversion() == 4:
             record = strct.unpack(">14d", brecord)
+        else:
+            record = strct.unpack(">13d", brecord)
         r      = np.array([float(record[0]), float(record[1]),       \
                            float(record[2])])
         v      = np.array([[float(record[3]), float(record[4])],     \
@@ -696,11 +700,15 @@ class BeamLineElement:
         if ibmIOr.getdataFILEversion() < 4:
             dr     = np.array([0., 0., 0.])
             dv     = np.array([0., 0., 0.])
+        elif ibmIOr.getdataFILEversion() == 4:
+            dr     = np.array([float(record[7]), float(record[8]),       \
+                               float(record[9])])
+            dv     = np.array([[0., 0.], [0., 0.]])
         else:
             dr     = np.array([float(record[7]), float(record[8]),       \
                                float(record[9])])
-            dv     = np.array([ [float(record[10]), float(record[11])],  \
-                                [float(record[12]), float(record[13])] ])
+            dv     = np.array([ float(record[10]), float(record[11]),  \
+                                float(record[12]) ])
         
         if cls.getDebug():
             print("     ----> r, v, dr, dv:", r, v, dr, dv)

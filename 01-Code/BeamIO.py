@@ -35,7 +35,8 @@ Class BeamIO:
                         first record in file.
                  >= 2 : Has geometry as first record in file.
                  >= 3 : Also has repo version stored in _repoVERSION
-                 >= 4 : Include drStrt for focus and defocus quads
+                 >= 4 : Include drStrt and dvStrt for beam line elements
+                 >= 5 : Convert dvStrt to Euler angles
          _repoVERSION : [ [tagNAME, tagDATETIME],
                           [commitSTRING, commitDATETIME] ]
            _BDSIMfile : If True, read file in BDSIM format.
@@ -159,7 +160,7 @@ class BeamIO:
                     print("         ----> File opened for write.")
                 
                 self.writeFIRSTword()
-                self.writeVersion("BeamIO v4")
+                self.writeVersion("BeamIO v5")
                 self.writeREPOversion()
                 
             else:

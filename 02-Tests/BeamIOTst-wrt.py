@@ -94,7 +94,7 @@ LhARAFclty.writeBeamLine(ibmIOw.getdataFILE())
 #bmIO.BeamIO.setDebug(True)
 #bmIO.BeamIO.setDebug(False)
 
-LhARAFclty.trackBeam(100, ibmIOw.getdataFILE())
+LhARAFclty.trackBeam(1000, ibmIOw.getdataFILE())
 
 ibmIOw.flushNclosedataFile(ibmIOw.getdataFILE())
 

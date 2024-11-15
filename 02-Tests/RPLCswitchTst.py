@@ -50,7 +50,7 @@ print("RPLCswitchTest:", RPLCswitchTest, \
 rStrt = np.array([0.,0.,0.])
 vStrt = np.array([[np.pi/2.,0.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([[0.,0.],[0.,0.]])
+dvStrt = np.array([0.,0.,0.])
 RPLCswtch = BLE.RPLCswitch("ValidRPLCswitch", rStrt, vStrt, drStrt, dvStrt, \
                            False)
 refPrtcl    = Prtcl.ReferenceParticle.getinstances()

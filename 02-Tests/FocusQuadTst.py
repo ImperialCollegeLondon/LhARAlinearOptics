@@ -43,7 +43,7 @@ except:
 rStrt = np.array([0.,0.,0.])
 vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([[0.,0.],[0.,0.]])
+dvStrt = np.array([0.,0.,0.])
 try:
     FQuad = BLE.FocusQuadrupole("NoStrength", rStrt, vStrt, drStrt, dvStrt)
 except:
