@@ -239,10 +239,11 @@ class BeamLineElement:
         Str = "Pos = " + str(self.getrStrt()) + \
               " dr = " + str(self.getdrStrt()) + \
               " dv = " + str(self.getdvStrt())
-        if np.linalg.norm(self.getdvStrt()) != 0.:
-            Str += \
-              "\n dR = " + str(self.getdRotStrt()) + \
-              "\n dRINV = " + str(self.getdRotStrtINV())
+        if self.getDebug():
+            if np.linalg.norm(self.getdvStrt()) != 0.:
+                Str += \
+                    "\n dR = " + str(self.getdRotStrt()) + \
+                    "\n dRINV = " + str(self.getdRotStrtINV())
         return Str
 
     
@@ -297,7 +298,6 @@ class BeamLineElement:
         self._drStrt = _drStrt
         
     def setdvStrt(self, _dvStrt):
-        self.setDebug(True)
         if not isinstance(_dvStrt, np.ndarray):
             raise badParameter(" BeamLineElement.setdvStrt:", \
                                " bad orienttion offset:", \
@@ -328,8 +328,6 @@ class BeamLineElement:
                 print("     ---->    dRot:", self.getdRotStrt())
                 print("     ----> dRotINV:", self.getdRotStrtINV())
                 print(" <---- Done.")
-
-        self.setDebug(False)
 
     def setLength(self, _Length):
         self._Length = _Length
@@ -1455,9 +1453,7 @@ class Aperture(BeamLineElement):
     def SummaryStr(self):
         Str  = "Aperture         : " + BeamLineElement.SummaryStr(self) + \
             "; Type = " + str(self.getType()) + \
-            "; Parameters = " + str(self.getParams()) + \
-            "; dr = " + str(self.getdrStrt()) + \
-            "; dv = " + str(self.getdvStrt())
+            "; Parameters = " + str(self.getParams())
         return Str
 
     
@@ -1874,9 +1870,7 @@ class FocusQuadrupole(BeamLineElement):
         Str  = "FocusQuadrupole  : " + BeamLineElement.SummaryStr(self) + \
             "; Length = " + str(self.getLength()) + \
             "; Strength (gradient) = " + str(self.getStrength()) + \
-            "; kFQ = " + str(self.getkFQ()) + \
-            "; dr = " + str(self.getdrStrt()) + \
-            "; dv = " + str(self.getdvStrt())
+            "; kFQ = " + str(self.getkFQ())
 
         return Str
 
@@ -2444,9 +2438,7 @@ class DefocusQuadrupole(BeamLineElement):
         Str  = "DefocusQuadrupole: " + BeamLineElement.SummaryStr(self) + \
             "; Length = " + str(self.getLength()) + \
             "; Strength = " + str(self.getStrength()) + \
-            "; kDQ = " + str(self.getkDQ()) + \
-            "; dr = " + str(self.getdrStrt()) + \
-            "; dv = " + str(self.getdvStrt())
+            "; kDQ = " + str(self.getkDQ())
 
         return Str
 
