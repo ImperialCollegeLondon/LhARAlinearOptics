@@ -579,66 +579,77 @@ class BeamLine(object):
                             len(BLE.BeamLineElement.getinstances()) - 1 \
                                                         ]
             if cls.getDebug():
-                print("                ----> Name, iLst.Name:", \
+                print("     ----> Name, iLst.Name:", \
                       Name, iLst.getName())
 
             elementKEY = iLine.Element
 
-            if iBLE != None: print(" Here:", \
+            if cls.getDebug():
+                if iBLE != None: print("     ----> Just before Shift/Tilt", \
+                                       "handling:", \
                                    iBLE.getName(),
                                    iLine.Type, Name, Name0)
-            if iBLE != None and \
-               isinstance(iLine.Type, str) and \
-                   Name0 == Name:
-                if "shift" in iLine.Type.lower():
-                    if iLine.Parameter == "dx":
-                        nShft += 1
-                        iBLE.getdrStrt()[0] = float(iLine.Value)
+            if iBLE != None:
+                if cls.getDebug():
+                    print("         ----> Name0, Name:", Name0, Name)
+                if Name0 == Name and isinstance(iLine.Type, str):
+                    if cls.getDebug():
+                        print("             ---->", \
+                              iLine.Type.lower())
+                    if "shift" in iLine.Type.lower() or \
+                       "tilt"  in iLine.Type.lower():
                         if cls.getDebug():
-                            print("                ----> Shift",
-                                  Name, ", nShft =", nShft, \
-                                  ": dr =", iBLE.getdrStrt())
-                        continue
-                    elif iLine.Parameter == "dy":
-                        nShft += 1
-                        iBLE.getdrStrt()[1] = float(iLine.Value)
-                        if cls.getDebug():
-                            print("                ----> Shift",
-                                  Name, ", nShft =", nShft, \
-                                  ": dr =", iBLE.getdrStrt())
-                        continue
-                elif "tilt"  in iLine.Type.lower():
-                    if iLine.Parameter == "alphaE":
-                        nTlt += 1
-                        iBLE.getdvStrt()[0] = float(iLine.Value)
-                        if cls.getDebug():
-                            print("                ----> Tilt",
-                                  Name, ", nTlt =", nTlt, \
-                                  ": dv =", iBLE.getdvStrt())
-                        continue
-                    elif iLine.Parameter == "betaE":
-                        nTlt += 1
-                        iBLE.getdvStrt()[1] = float(iLine.Value)
-                        if cls.getDebug():
-                            print("                ----> Tilt",
-                                  Name, ", nTlt =", nTlt, \
-                                  ": dv =", iBLE.getdvStrt())
-                        continue
-                    elif iLine.Parameter == "gammaE":
-                        nTlt += 1
-                        iBLE.getdvStrt()[2] = float(iLine.Value)
-                        if cls.getDebug():
-                            print("                ----> Tilt",
-                                  Name, ", nTlt =", nTlt, \
-                                  ": dv =", iBLE.getdvStrt())
-                        continue
-
-            else:
-                if iBLE != None:
-                    print(" HereHere:", iBLE.getName(), iBLE.getdvStrt())
+                            print("                 ---->", \
+                                  iLine.Parameter)
+                        if iLine.Parameter == "dx":
+                            nShft += 1
+                            iBLE.getdrStrt()[0] = float(iLine.Value)
+                            if cls.getDebug():
+                                print("                ----> Shift",
+                                      Name, ", nShft =", nShft, \
+                                      ": dr =", iBLE.getdrStrt())
+                            continue
+                        elif iLine.Parameter == "dy":
+                            nShft += 1
+                            iBLE.getdrStrt()[1] = float(iLine.Value)
+                            if cls.getDebug():
+                                print("                 <---- Shift",
+                                      Name, ", nShft =", nShft, \
+                                      ": dr =", iBLE.getdrStrt())
+                            continue
+                        elif "tilt"  in iLine.Type.lower():
+                            if iLine.Parameter == "alphaE":
+                                nTlt += 1
+                                iBLE.getdvStrt()[0] = float(iLine.Value)
+                                if cls.getDebug():
+                                    print("                ----> Tilt",
+                                          Name, ", nTlt =", nTlt, \
+                                          ": dv =", iBLE.getdvStrt())
+                                continue
+                            elif iLine.Parameter == "betaE":
+                                nTlt += 1
+                                iBLE.getdvStrt()[1] = float(iLine.Value)
+                                if cls.getDebug():
+                                    print("                ----> Tilt",
+                                          Name, ", nTlt =", nTlt, \
+                                          ": dv =", iBLE.getdvStrt())
+                                continue
+                            elif iLine.Parameter == "gammaE":
+                                nTlt += 1
+                                iBLE.getdvStrt()[2] = float(iLine.Value)
+                                if cls.getDebug():
+                                    print("                ----> Tilt",
+                                          Name, ", nTlt =", nTlt, \
+                                          ": dv =", iBLE.getdvStrt())
+                                continue
+                else:
                     if np.linalg.norm(iBLE.getdvStrt()) != 0:
                         iBLE.setdvStrt(iBLE.getdvStrt())
-                
+                    if cls.getDebug():
+                        print("     <---- Tilt:", iBLE.getdvStrt())
+                        print(iBLE.getdRotStrt())
+                        print(iBLE.getdRotStrtINV())
+                                    
             if NewElement:
                 nShft = 0
                 nTlt = 0
@@ -1009,14 +1020,14 @@ class BeamLine(object):
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
 
             if cls.getDebug():
-                print("                 ---->", Name, \
+                print("     ---->", Name, \
                       "beam line element created.")
-                print("                     ----> reference particle:")
-                print("                         Position:", \
+                print("         ----> reference particle:")
+                print("               Position:", \
                       refPrtcl.getRrIn()[0])
-                print("                         Momentum:", \
+                print("               Momentum:", \
                       refPrtcl.getPrIn()[0])
-                print("                 <---- Done.")
+                print("     <---- Done.")
 
         cls.__str__(cls.getinstances())
 
