@@ -1,4 +1,4 @@
-3#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Class BeamLineElement:
@@ -223,6 +223,10 @@ class BeamLineElement:
         print("     ---->            Orientation: \n", self.getvStrt())
         print("     ---->        Position offset:", self.getdrStrt())
         print("     ---->     Orientation offset:", self.getdvStrt())
+        print(" Here!", np.linalg.norm(self.getdvStrt()))
+        if np.linalg.norm(self.getdvStrt()) != 0.:
+            print("          ---->    drRotStrt:", self.getdRotStrt())
+            print("          ----> drRotStrtINV:", self.getdRotStrtINV())
         print("     ---->    Start to end vector:", self.getStrt2End())
         print("     ----> Rotate to lab at start: \n", self.getRot2LbStrt())
         print("     ---->   Rotate to lab at end: \n", self.getRot2LbEnd())
@@ -232,7 +236,13 @@ class BeamLineElement:
         return " <---- BeamLineElement parameter dump complete."
 
     def SummaryStr(self):
-        Str = "Pos: [x, y, z] = " + str(self.getrStrt())
+        Str = "Pos = " + str(self.getrStrt()) + \
+              " dr = " + str(self.getdrStrt()) + \
+              " dv = " + str(self.getdvStrt())
+        if np.linalg.norm(self.getdvStrt()) != 0.:
+            Str += \
+              "\n dR = " + str(self.getdRotStrt()) + \
+              "\n dRINV = " + str(self.getdRotStrtINV())
         return Str
 
     
@@ -287,11 +297,39 @@ class BeamLineElement:
         self._drStrt = _drStrt
         
     def setdvStrt(self, _dvStrt):
+        self.setDebug(True)
         if not isinstance(_dvStrt, np.ndarray):
             raise badParameter(" BeamLineElement.setdvStrt:", \
                                " bad orienttion offset:", \
                                _dvStrt)
         self._dvStrt = _dvStrt
+
+        #.. Also calculate rotation matrix:
+        R1 = np.array( [ [ mth.cos(_dvStrt[0]), -mth.sin(_dvStrt[0]), 0.], \
+                         [ mth.sin(_dvStrt[0]),  mth.cos(_dvStrt[0]), 0.], \
+                         [                  0.,                   0., 1.] ] )
+        R2 = np.array( [ [ mth.cos(_dvStrt[1]), 0., -mth.sin(_dvStrt[1])], \
+                         [                  0., 1.,                   0.], \
+                         [ mth.sin(_dvStrt[1]), 0.,  mth.cos(_dvStrt[1])] ] )
+        R3 = np.array( [ [ mth.cos(_dvStrt[2]), -mth.sin(_dvStrt[2]), 0.], \
+                         [ mth.sin(_dvStrt[2]),  mth.cos(_dvStrt[2]), 0.], \
+                         [                  0.,                   0., 1.] ] )
+
+        self._dRotStrt    = np.matmul( R3, np.matmul(R2, R1) )
+        self._dRotStrtINV = np.linalg.inv(self._dRotStrt)
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" BeamLineElement: setdvStrt:")
+                print("     ----> dv:", self.getdvStrt())
+                print("         ----> R1:", R1)
+                print("         ----> R2:", R2)
+                print("         ----> R3:", R3)
+                print("     ---->    dRot:", self.getdRotStrt())
+                print("     ----> dRotINV:", self.getdRotStrtINV())
+                print(" <---- Done.")
+
+        self.setDebug(False)
 
     def setLength(self, _Length):
         self._Length = _Length
@@ -393,6 +431,12 @@ class BeamLineElement:
     def getdvStrt(self):
         return self._dvStrt
 
+    def getdRotStrt(self):
+        return self._dRotStrt
+    
+    def getdRotStrtINV(self):
+        return self._dRotStrtINV
+    
     def getLength(self):
         return self._Length
 
@@ -1412,7 +1456,8 @@ class Aperture(BeamLineElement):
         Str  = "Aperture         : " + BeamLineElement.SummaryStr(self) + \
             "; Type = " + str(self.getType()) + \
             "; Parameters = " + str(self.getParams()) + \
-            "; dr = " + str(self.getdrStrt())
+            "; dr = " + str(self.getdrStrt()) + \
+            "; dv = " + str(self.getdvStrt())
         return Str
 
     
@@ -1830,7 +1875,9 @@ class FocusQuadrupole(BeamLineElement):
             "; Length = " + str(self.getLength()) + \
             "; Strength (gradient) = " + str(self.getStrength()) + \
             "; kFQ = " + str(self.getkFQ()) + \
-            "; dr = " + str(self.getdrStrt())
+            "; dr = " + str(self.getdrStrt()) + \
+            "; dv = " + str(self.getdvStrt())
+
         return Str
 
     
@@ -2398,7 +2445,9 @@ class DefocusQuadrupole(BeamLineElement):
             "; Length = " + str(self.getLength()) + \
             "; Strength = " + str(self.getStrength()) + \
             "; kDQ = " + str(self.getkDQ()) + \
-            "; dr = " + str(self.getdrStrt())
+            "; dr = " + str(self.getdrStrt()) + \
+            "; dv = " + str(self.getdvStrt())
+
         return Str
 
     

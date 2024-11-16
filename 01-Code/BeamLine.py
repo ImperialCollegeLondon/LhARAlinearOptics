@@ -541,6 +541,7 @@ class BeamLine(object):
 
     @classmethod
     def addBeamline(cls):
+        cls.setDebug(True)
         if cls.getDebug():
             print("            BeamLine.addBeamline starts:")
             
@@ -565,7 +566,9 @@ class BeamLine(object):
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
                                     iRefPrtcl.getPrIn()[0][:3]))
 
-        iBLE = None
+        iBLE  = None
+        nShft = 0
+        nTlt  = 0
         for iLine in pndsBeamline.itertuples():
             Name = BLE.BeamLineElement.getinstances()[0].getName() + ":" \
                            + str(iLine.Stage) + ":"  \
@@ -580,7 +583,10 @@ class BeamLine(object):
                       Name, iLst.getName())
 
             elementKEY = iLine.Element
-            
+
+            if iBLE != None: print(" Here:", \
+                                   iBLE.getName(),
+                                   iLine.Type, Name, Name0)
             if iBLE != None and \
                isinstance(iLine.Type, str) and \
                    Name0 == Name:
@@ -601,12 +607,41 @@ class BeamLine(object):
                                   Name, ", nShft =", nShft, \
                                   ": dr =", iBLE.getdrStrt())
                         continue
-                        
-                    if nShft != 0 and nShft != 2: 
-                        raise badSHIFT()
-                                        
+                elif "tilt"  in iLine.Type.lower():
+                    if iLine.Parameter == "alphaE":
+                        nTlt += 1
+                        iBLE.getdvStrt()[0] = float(iLine.Value)
+                        if cls.getDebug():
+                            print("                ----> Tilt",
+                                  Name, ", nTlt =", nTlt, \
+                                  ": dv =", iBLE.getdvStrt())
+                        continue
+                    elif iLine.Parameter == "betaE":
+                        nTlt += 1
+                        iBLE.getdvStrt()[1] = float(iLine.Value)
+                        if cls.getDebug():
+                            print("                ----> Tilt",
+                                  Name, ", nTlt =", nTlt, \
+                                  ": dv =", iBLE.getdvStrt())
+                        continue
+                    elif iLine.Parameter == "gammaE":
+                        nTlt += 1
+                        iBLE.getdvStrt()[2] = float(iLine.Value)
+                        if cls.getDebug():
+                            print("                ----> Tilt",
+                                  Name, ", nTlt =", nTlt, \
+                                  ": dv =", iBLE.getdvStrt())
+                        continue
+
+            else:
+                if iBLE != None:
+                    print(" HereHere:", iBLE.getName(), iBLE.getdvStrt())
+                    if np.linalg.norm(iBLE.getdvStrt()) != 0:
+                        iBLE.setdvStrt(iBLE.getdvStrt())
+                
             if NewElement:
                 nShft = 0
+                nTlt = 0
                 Name0 = Name
                 rStrt = iLst.getrStrt() + iLst.getStrt2End()
                 vStrt = iLst.getvEnd()
@@ -982,7 +1017,9 @@ class BeamLine(object):
                 print("                         Momentum:", \
                       refPrtcl.getPrIn()[0])
                 print("                 <---- Done.")
-        
+
+        cls.__str__(cls.getinstances())
+
     @classmethod
     def addBeamLineElement(cls, iBLE=False):
         if cls.getDebug():
