@@ -642,7 +642,6 @@ class BeamLineElement:
         return _Rprime
 
     def Tilt2Local(self, _R):
-        self.setDebug(True)
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Tilt2Local: bad input vector:", \
@@ -656,16 +655,17 @@ class BeamLineElement:
         _Rprime = deepcopy(_R)
 
         if np.linalg.norm(self.getdvStrt()) != 0:
-            r       = np.array([_Rprime[0], _Rprime[2], _Rprime[4]])
-            rPRM    = np.matmul(self.getdRotStrtINV(), r)
+            r    = np.array([_Rprime[0], _Rprime[2], _Rprime[4]])
+            rPRM = np.matmul(self.getdRotStrtINV(), r)
             if self.getDebug():
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
                     print("     ---->       r:", r)
                     print("     ----> dRotINV: \n", self.getdRotStrtINV())
                     print("     <----    rPRM:", rPRM)
-        
-            vec     = np.array([_Rprime[1], _Rprime[3], 1.])
-            vecPRM  = np.matmul(self.getdRotStrtINV(), vec)
+                    
+            dzds   = mth.sqrt(1. - _Rprime[1]**2 - _Rprime[3]**2)
+            vec    = np.array([_Rprime[1], _Rprime[3], dzds])
+            vecPRM = np.matmul(self.getdRotStrtINV(), vec)
             if self.getDebug():
                 with np.printoptions(linewidth=500,precision=7,suppress=True):
                     print("     ---->    vec:", vec)
@@ -682,7 +682,6 @@ class BeamLineElement:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(" <---- Rprime:", _Rprime)
         
-        self.setDebug(False)
         return _Rprime
 
     def Shift2RPLC(self, _R):
@@ -694,6 +693,49 @@ class BeamLineElement:
         _Rprime    = deepcopy(_R)
         _Rprime[0] += self._drStrt[0]
         _Rprime[2] += self._drStrt[1]
+        
+        return _Rprime
+
+    def Tilt2RPLC(self, _R):
+        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
+            raise badParameter( \
+                        " BeamLineElement.Tilt2RPLC: bad input vector:", \
+                                _R)
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" Tilt2RPLC: R:", _R)
+                print("     ----> Norm(dv):", np.linalg.norm(self.getdvStrt()))
+
+        _Rprime = deepcopy(_R)
+
+        if np.linalg.norm(self.getdvStrt()) != 0:
+            r    = np.array([_Rprime[0], _Rprime[2], _Rprime[4]])
+            rPRM = np.matmul(self.getdRotStrt(), r)
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ---->       r:", r)
+                    print("     ----> dRot: \n", self.getdRotStrt())
+                    print("     <----    rPRM:", rPRM)
+                    
+            dzds   = mth.sqrt(1. - _Rprime[1]**2 - _Rprime[3]**2)
+            vec    = np.array([_Rprime[1], _Rprime[3], dzds])
+            vecPRM = np.matmul(self.getdRotStrt(), vec)
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ---->    vec:", vec)
+                    print("     ---->   dRot: \n", self.getdRotStrt())
+                    print("     <---- vecPRM:", vecPRM)
+                
+            _Rprime[0] = rPRM[0]
+            _Rprime[1] = vecPRM[0]
+            _Rprime[2] = rPRM[1]
+            _Rprime[3] = vecPRM[1]
+            _Rprime[4] = rPRM[2]
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Rprime:", _Rprime)
         
         return _Rprime
 
