@@ -33,7 +33,7 @@ Name = "BLE1"
 rStrt = np.array([0.,0.,0.])
 vStrt = np.array([[np.pi/2.,np.pi/2.],[0.,0.]])
 drStrt = np.array([0.,0.,0.])
-dvStrt = np.array([[0.,0.],[0.,0.]])
+dvStrt = np.array([0.,0.,0.])
 BmLnElmnt = BLE.BeamLineElement(Name, rStrt, vStrt, drStrt, dvStrt)
     
 #.. __repr__
@@ -83,7 +83,27 @@ if Norm > 1E-6:
     raise Exception(" !!!!----> FAILED: coordinate transformations", \
                     " inconsistent.")
 else:
-    print(" <---- Drift coordinate transformation test successful.")
+    print(" <---- Coordinate transformation test successful.")
+
+R      = np.array([0.5, 0.1, -0.3, -0.2, 0., 0.])
+print("     ----> Input phase-space vector:", R)
+BmLnElmnt.setdvStrt(np.array([0.4, 0.5, 0.6]))
+print("     ----> Tilt of element:", BmLnElmnt.getdvStrt())
+Rprime = BmLnElmnt.Tilt2Local(R)
+print("         ----> Phase-space vector in element-local coordiantes:", \
+      Rprime)
+R2prime = BmLnElmnt.Tilt2RPLC(Rprime)
+print("         ----> Phase-space vector back in RPLC coordinates:", \
+      R2prime)
+Diff       = np.subtract(R, R2prime)
+Norm       = np.linalg.norm(Diff)
+print("     ----> Difference R - R2prime:", Diff)
+print("     ----> Magnitude of Diff:", Norm)
+if Norm > 1E-6:
+    raise Exception(" !!!!----> FAILED: coordinate transformations", \
+                    " inconsistent.")
+else:
+    print(" <---- Coordinate transformation test successful.")
     
 
 ##! Complete:

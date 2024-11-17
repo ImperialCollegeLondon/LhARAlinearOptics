@@ -563,6 +563,12 @@ class BeamLineElement:
                 print("     ----> Shift to element-centred coordinates:")
                 print("           _R:", _R)
                 
+        _R = self.Tilt2Local(_R)
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Tilt to element-centred coordinates:")
+                print("           _R:", _R)
+                
         if self.getDebug():
             print("     ----> Outside:", self.OutsideBeamPipe(_R))
             print("     ----> Expansion parameter fail:", \
@@ -599,10 +605,11 @@ class BeamLineElement:
                 print("     ----> Rprime:", _Rprime)
 
         if isinstance(_Rprime, np.ndarray):
+            _Rprime = self.Tilt2RPLC(_Rprime)
             _Rprime = self.Shift2RPLC(_Rprime)
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Shift to element-centred coordinates:")
+                print("     ----> Shift back from element-centred coordinates:")
                 print("           _Rprime:", _Rprime)
                 
         if self.getDebug():
@@ -632,6 +639,50 @@ class BeamLineElement:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(" <---- Rprime:", _Rprime)
         
+        return _Rprime
+
+    def Tilt2Local(self, _R):
+        self.setDebug(True)
+        if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
+            raise badParameter( \
+                        " BeamLineElement.Tilt2Local: bad input vector:", \
+                                _R)
+        
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" Tilt2Local: R:", _R)
+                print("     ----> Norm(dv):", np.linalg.norm(self.getdvStrt()))
+
+        _Rprime = deepcopy(_R)
+
+        if np.linalg.norm(self.getdvStrt()) != 0:
+            r       = np.array([_Rprime[0], _Rprime[2], _Rprime[4]])
+            rPRM    = np.matmul(self.getdRotStrtINV(), r)
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ---->       r:", r)
+                    print("     ----> dRotINV: \n", self.getdRotStrtINV())
+                    print("     <----    rPRM:", rPRM)
+        
+            vec     = np.array([_Rprime[1], _Rprime[3], 1.])
+            vecPRM  = np.matmul(self.getdRotStrtINV(), vec)
+            if self.getDebug():
+                with np.printoptions(linewidth=500,precision=7,suppress=True):
+                    print("     ---->    vec:", vec)
+                    print("     ----> dRotINV: \n", self.getdRotStrtINV())
+                    print("     <---- vecPRM:", vecPRM)
+                
+            _Rprime[0] = rPRM[0]
+            _Rprime[1] = vecPRM[0]
+            _Rprime[2] = rPRM[1]
+            _Rprime[3] = vecPRM[1]
+            _Rprime[4] = rPRM[2]
+
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" <---- Rprime:", _Rprime)
+        
+        self.setDebug(False)
         return _Rprime
 
     def Shift2RPLC(self, _R):
