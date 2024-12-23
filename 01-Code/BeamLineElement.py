@@ -6703,10 +6703,103 @@ class QuadTriplet(BeamLineElement):
             
     def getQ3(self):
         return self._iQ3
-                
+
     
 # -------- Utilities:
+#
+#..  Thin lens approximation functions:
+    @classmethod
+    def getTLAr(cls, _d=None, _f=None):
+        if cls.getDebug():
+            print(" BeamLineElement.QuadTriplet.TLA_r:", \
+                  " inter-quad separation, focal length:", _d, _f)
+
+        r = None
+
+        if _d == None or _f == None:
+            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                               str(_d) + ", " + str(_f))
+        s1 = _f
+        s2 = _d
+
+        r1 = s2**2 * (2.*s1**2 + 3.*s1*s2 + 2.*s2**2)**2
+        r2 = 8.*s1**2*s2**3*(s1+s2)
+
+        if r1 < r2:
+            r = None
+        else:
+            r = mth.sqrt(r1 - r2)
+
+        return r
     
+    @classmethod
+    def getTLAr(cls, _d=None, _f=None):
+        if cls.getDebug():
+            print(" BeamLineElement.QuadTriplet.TLA_r:", \
+                  " inter-quad separation, focal length:", _d, _f)
+
+        r = None
+
+        if _d == None or _f == None:
+            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                               str(_d) + ", " + str(_f))
+        s1 = _f
+        s2 = _d
+
+        r1 = s2**2 * (2.*s1**2 + 3.*s1*s2 + 2.*s2**2)**2
+        r2 = 8.*s1**2*s2**3*(s1+s2)
+
+        if r1 < r2:
+            r = None
+        else:
+            r = mth.sqrt(r1 - r2)
+
+        return r
+
+    @classmethod
+    def getTLAf1(cls, _d=None, _f=None):
+
+        f1 = None
+
+        if _d == None or _f == None:
+            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                               str(_d) + ", " + str(_f))
+        s1 = _f
+        s2 = _d
+
+        r = cls.getTLAr(s2, s1)
+
+        t = -r + s2*(2.*s1**2 + 3.*s1*s2 +2.*s2**2)
+        b = 2.*(s1+s2)
+
+        f1 = mth.sqrt(t/b)
+
+        return f1
+
+    @classmethod
+    def getTLAf1nf2(cls, _d=None, _f=None, FDF=True):
+
+        f1 = None
+
+        if _d == None or _f == None:
+            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                               str(_d) + ", " + str(_f))
+        s1 = _f
+        s2 = _d
+
+        r  = cls.getTLAr(s2, s1)
+        f1 = cls.getTLAf1(s2, s1)
+
+        sgn = -1.
+        if not FDF: sgn = 1
+
+        t = r - s2*(2.*s1**2 + 5.*s1*s2 +2.*s2**2)
+        b = 4.*(s1+s2) * sgn*f1
+
+        f2 = t/b
+
+        return f1, f2
+
     
 """
 Derived class RPLCswitch:
