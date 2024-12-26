@@ -804,7 +804,7 @@ class BeamLine(object):
                     FqS = float(iLine.Value)
                 elif iLine.Parameter == "kq":
                     kq   = float(iLine.Value)
-                    Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+                    Brho = (1./(speed_of_light*1.E-9))*p0/1000.
                     FqS  = kq * Brho
 
                 if iLnsFQ < nLnsFQ:
