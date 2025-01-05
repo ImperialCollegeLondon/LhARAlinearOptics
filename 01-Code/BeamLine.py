@@ -417,6 +417,8 @@ class BeamLine(object):
     def parseSource(cls):
         SrcMode  = None
         SrcParam = None
+        SigmaX   = None
+        SigmaY   = None
         if cls.getDebug():
             print("                 ----> BeamLine.parseSource starts:")
 
@@ -489,10 +491,18 @@ class BeamLine(object):
              pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             MinCTheta = float( \
              pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+        elif SrcMode == 4:               #.. Uniform disc
+            MeanE  = float( \
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
+            SigmaE = float( \
+             pndsSource[pndsSource["Parameter"]== \
+                        "SigmaEnergy"]["Value"].iloc[0])
+            MaxRadius = float( \
+             pndsSource[pndsSource["Parameter"]=="Radius"]["Value"].iloc[0])
         elif SrcMode == 3:               #.. Read from file
             pass
 
-        if SrcMode != 3:
+        if SrcMode != 3 and SrcMode !=4:
             SigmaX  = float( \
                 pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
             SigmaY  = float( \
@@ -508,7 +518,7 @@ class BeamLine(object):
                       Emin, Emax, nPnts, Power, Energy, Wavelength, \
                       Duration, Thickness, Intensity, DivAngle,     \
                       SigmaThetaS0, SlopeThetaS)
-            elif SrcMode == 1:
+            elif SrcMode == 1 or SrcMode == 4:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
             elif SrcMode == 2:
@@ -525,6 +535,9 @@ class BeamLine(object):
 
         elif SrcMode == 2:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax]
+        elif SrcMode == 4:
+            SrcParam = [MeanE, SigmaE, MaxRadius]
+
         elif SrcMode == 3:
             SrcParam = []
 
@@ -536,7 +549,7 @@ class BeamLine(object):
         if cls.getDebug():
             print("                 <---- Name, SrcMode, SrcParam:", \
                   Name, SrcMode, SrcParam)
-        
+            
         return Name, SrcMode, SrcParam
 
     @classmethod

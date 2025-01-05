@@ -5026,6 +5026,12 @@ Derived class Source:
              [3] - Kinetic energy - MeV
              [4] - Sigma of gaussian - MeV
 
+
+           Uniform disc (Mode=4):
+             [0] - Kinetic energy - MeV
+             [1] - Sigma of gaussian - MeV
+             [2] - Radius of disc
+
     
   Methods:
   --------
@@ -5096,27 +5102,30 @@ class Source(BeamLineElement):
     instances  = []
     __Debug    = False
 
-    ModeList   = [0, 1, 2, 3]
+    ModeList   = [0, 1, 2, 3, 4]
     ModeText   = ["Parameterised laser driven", "Gaussian", "Flat", \
-                  "Read from file"]
+                  "Read from file", "UniformDisc"]
     
     ParamUnit  = [ ["$\\mu$m", "$\\mu$m", "", "MeV", "MeV", "", "W", \
                     "J", "$\\mu$m", "s", "$\\mu$m", "J$/m^2$",       \
                     "degrees", "degrees", "degrees"], \
                    ["m", "m", "MeV", "MeV", ""], \
-                   [], [] ]
+                   [], [], \
+                   ["MeV", "MeV", "m"] ]
     
     ParamText  = [ [], \
                    ["SigmaX", "SigmaY", "MinCTheta", \
                     "MeanEnergy", "SigmaEnergy"],    \
-                   [], [] ]
+                   [], [], \
+                   ["MeanEnergy", "SigmaEnergy", "MaxRadius"] ]
     
     ParamList  = [ [float, float, float, float, float, int,   \
                     float, float, float, float, float, float, \
                     float, float, float],                        \
                    [float, float, float, float, float],          \
                    [float, float, float, float, float],          \
-                   [] ]
+                   [], \
+                   [float, float, float] ]
     ParamLaTeX  = [ ["$\\sigma_x$", "$\\sigma_y$",                       \
                      "$\\cos\\theta_S |_{\\rm min}$",                    \
                      "$\\varepsilon_{\\rm min}$",                        \
@@ -5132,7 +5141,10 @@ class Source(BeamLineElement):
                      "\\cos\\theta_S |_{\\rm min}",                      \
                      "Mean kinetic energy",                              \
                      "Kinetic energy standard deviation"],               \
-                    [], []]
+                    [], [], \
+                    ["Mean kinetic energy",                              \
+                     "Kinetic energy standard deviation",                \
+                     "Maximum radius"] ]
 
     Lsrdrvng_E = None
     LsrDrvnIni = False
@@ -5357,15 +5369,24 @@ class Source(BeamLineElement):
             cosTheta, Phi = self.getFlatThetaPhi()
             KE            = rnd.uniform(self.getParameters()[3], \
                                         self.getParameters()[4])
+        elif self._Mode == 4:
+            KE            = rnd.gauss(self.getParameters()[0], \
+                                      self.getParameters()[1])
+            rd            = self.getParameters()[2] * mth.sqrt(rnd.random())
+            phi           = 2. * mth.pi * rnd.random()
+            X             = rd * mth.cos(phi)
+            Y             = rd * mth.sin(phi)
+            xp            = 0.
+            yp            = 0.
 
         if self.getDebug():
-            print("     ----> X, Y, KE, cosTheta, Phi:", \
-                  X, Y, KE, cosTheta, Phi)
+            print("     ----> X, Y, KE, cosTheta, Phi, xp, yp:", \
+                  X, Y, KE, cosTheta, Phi, xp, yp)
             
         if self.getDebug():
             print(" <---- BeamLineElement(Source).getParticle, done.", \
                   '  --------  --------  --------  --------  --------')
-            
+
         return X, Y, KE, cosTheta, Phi, xp, yp
     
     def getFlatThetaPhi(self):
