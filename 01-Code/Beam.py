@@ -710,7 +710,7 @@ class Beam:
                     print("                CovMtrx: \n", \
                           self.getCovarianceMatrix()[iAddr]) 
 
-    def evaluateBeam(self, TrackBeam=False, nEvtStopClean=1000):
+    def evaluateBeam(self, TrackBeam=False):
         if self.getDebug():
             print(" Beam.evaluateBeam: ", \
                   "perform` sums to get covariance matrices")
@@ -728,7 +728,7 @@ class Beam:
         nEvtMax = self.getnEvtMax()
         if nEvtMax == None:
             nEvtMax = 1000
-        iEvtStopClean = max(0, nEvtMax-nEvtStopClean)
+        iEvtStopClean = max(0, nEvtMax-1000000)
         while not EndOfFile:
             EndOfFile = self.getBeamIOread().readBeamDataRecord()
             if not EndOfFile:
@@ -1469,7 +1469,6 @@ class extrapolateBeam(Beam):
         if self.getDebug():
             print("     <---- done.")
         
-        self.setDebug(False)
 
 #--------  Utilities:
     @classmethod
