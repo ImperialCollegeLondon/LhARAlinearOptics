@@ -170,8 +170,9 @@ class Simulation(object):
               self.getBeamLineSpecificationFile())
         print(" data file directory for output:", self.getdataFileDir())
         print("       data filename for output:", self.getdataFileName())
-        print("                Input file path:", self.getinputFILE()[0])
-        print("               Input file BDSIM:", self.getinputFILE()[1])
+        if self.getinputFILE() != None:
+            print("                Input file path:", self.getinputFILE()[0])
+            print("               Input file BDSIM:", self.getinputFILE()[1])
         print(" BeamIO output file instance id:", id(self.getiBmIOw()))
         print("  BeamIO input file instance id:", id(self.getiBmIOr()))
             
