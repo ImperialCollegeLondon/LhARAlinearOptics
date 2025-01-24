@@ -1368,7 +1368,7 @@ class extrapolateBeam(Beam):
                                      suppress=True):
                     print("         ----> Transfer matrix: \n", \
                           TrnsfrMtrx)
-                    print("         ----> Transpose of transfer matrix: \n", \
+                    print("         ----> Transpose of transfer matrix: \n",\
                           TrnspsTrnsfrMtrx)
                     print("         ----> iLoc, covariance matrix:", \
                           iLoc, " \n", \
@@ -1387,7 +1387,8 @@ class extrapolateBeam(Beam):
 
     def extrapolateBeam(self):
         if self.getDebug():
-            print(" extrapolateBeam.extrapolateBeam: transport beam envelope")
+            print(" extrapolateBeam.extrapolateBeam: transport", \
+                  "beam envelope")
             print(" BeamLine: nBLs:", id(BL.BeamLine.getinstances()))
             print(BL.BeamLine.getinstances())
         
@@ -1440,7 +1441,8 @@ class extrapolateBeam(Beam):
                     if self.getDebug():
                         print("     ----> Cleaned:", Cleaned)
 
-                    if self.getnEvtMax() != None and iEvt >= self.getnEvtMax():
+                    if self.getnEvtMax() != None and iEvt >= \
+                       self.getnEvtMax():
                         break
             
             if self.getDebug():

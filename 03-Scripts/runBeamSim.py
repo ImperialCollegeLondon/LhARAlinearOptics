@@ -13,21 +13,21 @@ def main(argv):
     """
        Parse input arguments:
     """
-    opts, args = getopt.getopt(argv,"hdi:o:b:n:",\
-                               ["ifile=","ofile=","bfile", "nEvts"])
+    opts, args = getopt.getopt(argv,"hdi:o:b:n:z:",\
+                       ["ifile=","ofile=","bfile", "nEvts", "BDSIMfile"])
 
     beamlinefile = None
     inputfile    = None
     outputfile   = None
     Debug        = False
     nEvts        = 10000
+    BDSIMfile    = False
     for opt, arg in opts:
         if opt == '-h':
             print ( \
                     'runBEAMsim.py -b <beamlinefile>'  + \
                     ' -i <inputfile> -o <outputfile>' + \
-                    ' -n <nEvts>')
-            print("     ----> <input file> not yet implemented.>")
+                    ' -n <nEvts> -z <BDSIMfile>' )
             sys.exit()
         if opt == '-d':
             Debug = True
@@ -39,14 +39,15 @@ def main(argv):
             outputfile = arg
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
+        elif opt in ("-z", "--BDSIMfile"):
+            BDSIMfile = bool(arg)
 
     if beamlinefile == None or \
        outputfile    == None:
         print ( \
                 'runBEAMsim.py -b <beamlinefile>'  + \
                 ' -i <inputfile> -o <outputfile>' + \
-                ' -n <nEvts>')
-        print("     ----> <input file> not yet implemented.>")
+                    ' -n <nEvts> -z <BDSIMfile>' )
         sys.exit()
 
     print(" runBEAMsim: start")
@@ -78,12 +79,15 @@ def main(argv):
         sys.exit(1)
 
     if inputfile != None:
-        if os.path.isfile(inputfile): 
-            print("             ----> Input file not implemented.")
+        if not os.path.isfile(inputfile):
+            print("                 ----> Input file", \
+                  inputfile, "does not exist.")
             print("                   Exit.")
             sys.exit(1)
-    #print("             ----> Input file:", inputfile)
-    
+        print("             ----> Read from file:", inputfile)
+        if BDSIMfile:
+            print("                 ----> BDSIM file:", BDSIMfile)
+            
     if not os.path.isabs(outputfile): 
         outputfile = os.path.join(HOMEPATH, outputfile)
     if not os.path.isdir(os.path.dirname(outputfile)):
@@ -92,9 +96,10 @@ def main(argv):
         print("                   Exit.")
         sys.exit(1)
 
-    print("             ----> Write beamline summary file to:", outputfile)
+    print("             ----> Write to putput file:", outputfile)
     
-    Smltn = Simu.Simulation(nEvts, beamlinefile, None, outputfile)
+    Smltn = Simu.Simulation(nEvts, beamlinefile, None, outputfile, \
+                            inputfile, BDSIMfile)
 
     print("     <---- Initialisation complete.")
 

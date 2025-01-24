@@ -302,6 +302,20 @@ class BeamLineElement:
             raise badParameter(" BeamLineElement.setdvStrt:", \
                                " bad orienttion offset:", \
                                _dvStrt)
+
+        if self.getDebug():
+            print(" BeamLineElement.setdvStrt: dvStrt:", _dvStrt, \
+                  _dvStrt.shape)
+
+        if str(_dvStrt.shape) == "(2, 2)":
+            if _dvStrt[0][0] == 0 and \
+               _dvStrt[0][1] == 0 and \
+               _dvStrt[1][0] == 0 and \
+               _dvStrt[1][1] == 0:
+                _dvStrt = [0., 0., 0.]
+            else:
+                raise need2convertdvStrt()
+     
         self._dvStrt = _dvStrt
 
         #.. Also calculate rotation matrix:
@@ -320,7 +334,6 @@ class BeamLineElement:
 
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(" BeamLineElement: setdvStrt:")
                 print("     ----> dv:", self.getdvStrt())
                 print("         ----> R1:", R1)
                 print("         ----> R2:", R2)
@@ -7189,4 +7202,7 @@ class KillInfiniteLoop(Exception):
     pass
 
 class cantFINDfile(Exception):
+    pass
+
+class need2convertdvStrt(Exception):
     pass

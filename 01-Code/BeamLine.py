@@ -1153,12 +1153,13 @@ class BeamLine(object):
                 if isinstance(cls.getSrcTrcSpc(), np.ndarray):
                     if cls.getDebug():
                         print("     ----> Start using:", iEvt)
-                    Name = BLE.BeamLineElement.getinstances()[0].getName() + \
+                    Name = BLE.BeamLineElement.getinstances()[0].getName()+\
                         ":Source:User"
                     SrcTrcSpc = cls.getSrcTrcSpc()
                 else:
                     if cls.getDebug():
-                        print("     ----> Start by calling getSourceTraceSpace")
+                        print("     ----> Start by calling", \
+                              "getSourceTraceSpace")
                     Name = cls.getElement()[1].getName()
                     SrcTrcSpc = \
                         cls.getElement()[1].getParticleFromSource()
