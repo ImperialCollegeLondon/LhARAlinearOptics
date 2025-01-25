@@ -93,60 +93,9 @@ def main(argv):
     EndOfFile = False
     EndOfFile = ibmIOr.readBeamDataRecord()
 
-    print(BL.BeamLine.getinstances())
-
-    """
-    R = np.zeros(6)
-    for iBLE in BLE.BeamLineElement.getinstances():
-        print(type(iBLE))
-        if isinstance(iBLE, BLE.Facility) or \
-           isinstance(iBLE, BLE.Source):
-            pass
-        elif np.all(iBLE.getTransferMatrix() != None):
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(iBLE.getName(), \
-                      np.linalg.det(iBLE.getTransferMatrix()), \
-                      iBLE.ExpansionParameterFail(R), \
-                      "\n", iBLE.getTransferMatrix())
-        else:
-            iBLE.setTransferMatrix(R)
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(iBLE.getName(), \
-                      np.linalg.det(iBLE.getTransferMatrix()), \
-                      iBLE.ExpansionParameterFail(R), \
-                      "\n", iBLE.getTransferMatrix())
-    """
-
-    
     #.. Read particles to plot:
     for i in range(nEvts):
         ibmIOr.readBeamDataRecord()
-
-    """
-    print(" ------------------------------------------")
-    for iPrtcl in Prtcl.Particle.getParticleInstances():
-        if isinstance(iPrtcl, Prtcl.ReferenceParticle):
-            continue
-        for iBLE in range(len(BLE.BeamLineElement.getinstances())):
-            if isinstance(BLE.BeamLineElement.getinstances()[iBLE], \
-                          BLE.FocusQuadrupole) or \
-               isinstance(BLE.BeamLineElement.getinstances()[iBLE], \
-                          BLE.DefocusQuadrupole):
-                          
-                iAddr = iBLE - 1
-                print(iAddr, len(iPrtcl.getTraceSpace()))
-                if iAddr < len(iPrtcl.getTraceSpace()):
-                    R = iPrtcl.getTraceSpace()[iAddr]
-                    Dmmy = BLE.BeamLineElement.getinstances()[iBLE].ExpansionParameterFail(R)
-                    print(Dmmy)
-                    if Dmmy:
-                        R = np.zeros(6)
-                        for iAddr1 in range(len(iPrtcl._TrcSpc)):
-                            iPrtcl._TrcSpc[iAddr1] = R
-        print(iPrtcl)
-
-
-    """
     
     Prtcl.Particle.fillPhaseSpaceAll()
         

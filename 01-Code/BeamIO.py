@@ -346,9 +346,10 @@ class BeamIO:
                           self.getdataFILEversion())
                 if nVersion >= 3:
                     repoVERSION = self.readREPOversion()
-                
-                print(" BeamIO.readBeamDataRecord:", \
-                      "reading data file version", Version)
+
+                if self.getDebug():
+                    print(" BeamIO.readBeamDataRecord:", \
+                          "reading data file version", Version)
                     
                 BL.BeamLine.readBeamLine(self.getdataFILE())
 

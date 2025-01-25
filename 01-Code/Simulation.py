@@ -103,7 +103,7 @@ class Simulation(object):
     
     __RandomSeed = __T.time()
 
-    __Debug      = True
+    __Debug      = False
     __PrgrssPrnt = True
     __instance   = None
 
