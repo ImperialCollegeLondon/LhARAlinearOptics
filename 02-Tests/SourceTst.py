@@ -52,7 +52,7 @@ except:
 #.. Create valid instance:
 Mode  = 0
 Param = [0.000004, 0.000004, 0.999691155, 1., 25., 1000, 2.5E+15, 70., \
-         0.8, 2.80E-14, 0.0000004, 4.00E+20, 25., 20., 15.]
+         0.8, 2.80E-14, 0.0000004, 4.00E+20, 25., 20., 15., None]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
@@ -210,7 +210,7 @@ print("SourceTest:", SourceTest, \
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
                   0, [0.000004, 0.000004, 0.999691155, 1., 25., 1000, \
                       2.5E+15, 70., 0.8, 2.80E-14, 0.0000004, 4.00E+20, 25., \
-                      20., 15.])
+                      20., 15., None])
 print(Src1)
 print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \

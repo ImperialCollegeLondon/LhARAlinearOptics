@@ -5193,6 +5193,8 @@ class Source(BeamLineElement):
             raise badBeamLineElement( \
                   " Source: bad specification for source!"
                                       )
+        if _Mode == 0 and len(_Param) > 15:
+            if _Param[15] == None: _Param[15] = -9999.
         ValidSourceParam = self.CheckSourceParam(_Mode, _Param)
         if not ValidSourceParam:
             print(" BeamLineElement(Source).__init__:", \
