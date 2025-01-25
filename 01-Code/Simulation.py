@@ -135,6 +135,17 @@ class Simulation(object):
             if _inputFILE != None:
                 cls.setinputFILE(_inputFILE, _BDSIMfile)
 
+            # Open file for read:
+            if _inputFILE != None:
+                cls._iBmIOr = BmIO.BeamIO(None, _inputFILE, False, _BDSIMfile)
+            print("             ----> Input file:", _inputFILE)
+            if not cls.getiBmIOr().getBDSIMfile():
+                print(" Need to read first record and delete stuff")
+                cls.getiBmIOr().readBeamDataRecord()
+                BL.BeamLine.cleaninstance()
+                BLE.BeamLineElement.cleaninstances()
+                Prtcl.Particle.cleanAllParticles()
+    
             # Create Facility instance:
             cls.setFacility(BL.BeamLine(filename))
 
@@ -142,11 +153,6 @@ class Simulation(object):
             if _dataFileDir != None or _dataFileName != None:
                 cls._iBmIOw = BmIO.BeamIO(_dataFileDir, _dataFileName, True)
             
-            # Open file for read:
-            if _inputFILE != None:
-                cls._iBmIOr = BmIO.BeamIO(None, _inputFILE, False, _BDSIMfile)
-            print("             ----> Input file:", _inputFILE)
-    
             # Summarise initialisation
             if cls.getDebug():
                 cls.print(cls)
@@ -328,6 +334,8 @@ class Simulation(object):
             #   transport particles through facility:
             EndOfFile = False
             iEvt      = 0
+            Scl  = 10
+            iCnt = 1
             while not EndOfFile:
                 try:
                     EndOfFile = Prtcl.Particle.readParticle( \
@@ -337,6 +345,16 @@ class Simulation(object):
 
                 if not EndOfFile and iEvt < self.getNEvt():
                     iEvt += 1
+
+                    if (iEvt % Scl) == 0:
+                        if (self.getDebug() or NEvts > 1) and \
+                           self.getProgressPrint():
+                            print("         ----> Generating event ", iEvt)
+                        if iCnt == 10:
+                            iCnt = 1
+                            Scl  = Scl * 10
+                        iCnt += 1
+                    
                     iPrtcl = Prtcl.Particle.getinstances()[-1]
                     nEvt = self.getFacility().trackBeam(1, dataFILE, iPrtcl)
 

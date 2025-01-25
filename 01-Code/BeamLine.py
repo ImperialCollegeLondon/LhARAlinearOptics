@@ -1324,8 +1324,9 @@ class BeamLine(object):
 
         EoF = False
 
-        refPrtcl  = Prtcl.ReferenceParticle()
-            
+        if Prtcl.ReferenceParticle.getinstances() == None:
+            refPrtcl  = Prtcl.ReferenceParticle()
+
         brecord = beamlineFILE.read(4)
         if brecord == b'':
             if cls.getDebug():
