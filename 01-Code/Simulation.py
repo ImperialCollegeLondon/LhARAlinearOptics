@@ -138,13 +138,12 @@ class Simulation(object):
             # Open file for read:
             if _inputFILE != None:
                 cls._iBmIOr = BmIO.BeamIO(None, _inputFILE, False, _BDSIMfile)
-            print("             ----> Input file:", _inputFILE)
-            if not cls.getiBmIOr().getBDSIMfile():
-                print(" Need to read first record and delete stuff")
-                cls.getiBmIOr().readBeamDataRecord()
-                BL.BeamLine.cleaninstance()
-                BLE.BeamLineElement.cleaninstances()
-                Prtcl.Particle.cleanAllParticles()
+                if not cls.getiBmIOr().getBDSIMfile():
+                    print(" Need to read first record and delete stuff")
+                    cls.getiBmIOr().readBeamDataRecord()
+                    BL.BeamLine.cleaninstance()
+                    BLE.BeamLineElement.cleaninstances()
+                    Prtcl.Particle.cleanAllParticles()
     
             # Create Facility instance:
             cls.setFacility(BL.BeamLine(filename))

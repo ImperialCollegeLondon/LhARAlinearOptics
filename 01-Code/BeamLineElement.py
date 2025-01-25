@@ -788,7 +788,7 @@ class BeamLineElement:
         dataFILE.write(record)
         if self.getDebug():
             print("         ----> rStrt, vStrt:", \
-                      strct.unpack(">14d",record))
+                      strct.unpack(">13d",record))
         
         if self.getDebug():
             print(" <---- BeamLineElement.writeElement done.")
@@ -5032,6 +5032,7 @@ Derived class Source:
             [12] - theta_degrees: Electron divergence angle [degrees]
             [13] - Intercept of sigma_{theta_S} at K=0 [degrees]
             [14] - Scaled slope of sigma_{theta_S}     [degrees]
+            [15] - rp max
            Gaussian (Mode=1):
              [0] - Sigma of x gaussian - m
              [1] - Sigma of y gaussian - m
@@ -5121,7 +5122,7 @@ class Source(BeamLineElement):
     
     ParamUnit  = [ ["$\\mu$m", "$\\mu$m", "", "MeV", "MeV", "", "W", \
                     "J", "$\\mu$m", "s", "$\\mu$m", "J$/m^2$",       \
-                    "degrees", "degrees", "degrees"], \
+                    "degrees", "degrees", "degrees", ""], \
                    ["m", "m", "MeV", "MeV", ""], \
                    [], [], \
                    ["MeV", "MeV", "m"] ]
@@ -5134,13 +5135,13 @@ class Source(BeamLineElement):
     
     ParamList  = [ [float, float, float, float, float, int,   \
                     float, float, float, float, float, float, \
-                    float, float, float],                        \
+                    float, float, float, float],                 \
                    [float, float, float, float, float],          \
                    [float, float, float, float, float],          \
                    [], \
                    [float, float, float] ]
     ParamLaTeX  = [ ["$\\sigma_x$", "$\\sigma_y$",                       \
-                     "$\\cos\\theta_S |_{\\rm min}$",                    \
+                     "$\\cos\\theta_S_{\\rm min}$",                      \
                      "$\\varepsilon_{\\rm min}$",                        \
                      "$\\varepsilon_{\\rm max}$",                        \
                      "nPnts", "Laser power",                             \
@@ -5149,7 +5150,7 @@ class Source(BeamLineElement):
                      "Laser intensity",                                  \
                      "Electron divergence angle",                        \
                      "Intercept of $\\sigma_{\\theta_S}$",               \
-                     "Scaled slope of $\\sigma_{\\theta_S}$"],           \
+                     "Scaled slope of $\\sigma_{\\theta_S}$", "$r_p"],   \
                     ["\\sigma_x", "\\sigma_y",                           \
                      "\\cos\\theta_S |_{\\rm min}",                      \
                      "Mean kinetic energy",                              \
@@ -5356,9 +5357,18 @@ class Source(BeamLineElement):
                 if self.getDebug():
                     print("     ----> grp:", grp)
 
+                Accept = False
                 if rnd.random() < grp:
-                    Accept = True
-            
+                    if self.getParameters()[15] == -9999.:
+                        Accept = True
+                    else:
+                        rp = mth.sqrt(xp**2 + yp**2)
+                        """
+                        print(rp, self.getParameters()[15])
+                        """
+                        if rp < self.getParameters()[15]:
+                            Accept = True
+                    
             if xp == yp:
                 print(" Help, equal xp and yp")
 
@@ -5766,7 +5776,7 @@ class Source(BeamLineElement):
             print(' <---- BeamLineElement(Source).CheckSourceParam,', \
                   ' done.  --------', \
                   '  --------  --------  --------  --------  --------')
-            
+
         return ValidSourceParam
 
     @classmethod
@@ -5952,7 +5962,7 @@ class Source(BeamLineElement):
                 dataFILE.write(record)
                 if self.getDebug():
                     print("         ----> iPrm, value:", \
-                          iPrm, strct.unpack(">i", record))
+                          iPrm, strct.unpack(">d", record))
             iPrm += 1
         if self.getDebug():
             print("     <---- Done.")

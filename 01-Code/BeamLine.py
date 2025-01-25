@@ -441,6 +441,7 @@ class BeamLine(object):
         if SrcMode == 0:               #.. Laser driven:
             SigmaThetaS0 = 20.
             SlopeThetaS  = 15.
+            rpmax        = -9999.
             Emin  = float( \
              pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
             Emax = float( \
@@ -473,6 +474,12 @@ class BeamLine(object):
                 SlopeThetaS  = float( \
                         pndsSource[pndsSource["Parameter"]== \
                                    "SlopeThetaS"]["Value"].iloc[0])
+            except:
+                pass
+            try:
+                rpmax = float( \
+                        pndsSource[pndsSource["Parameter"]== \
+                                   "rpmax"]["Value"].iloc[0])
             except:
                 pass
             
@@ -517,7 +524,7 @@ class BeamLine(object):
                       " Thickness, Intensity, DivAngle:", \
                       Emin, Emax, nPnts, Power, Energy, Wavelength, \
                       Duration, Thickness, Intensity, DivAngle,     \
-                      SigmaThetaS0, SlopeThetaS)
+                      SigmaThetaS0, SlopeThetaS, rpmax)
             elif SrcMode == 1 or SrcMode == 4:
                 print("                         ----> Mean and sigma:", \
                       MeanE, SigmaE)
@@ -528,7 +535,8 @@ class BeamLine(object):
         if SrcMode == 0:
             SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts, \
                         Power, Energy, Wavelength, Duration, Thickness, \
-                        Intensity, DivAngle, SigmaThetaS0, SlopeThetaS]
+                        Intensity, DivAngle, SigmaThetaS0, SlopeThetaS, \
+                        rpmax]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
@@ -550,6 +558,7 @@ class BeamLine(object):
             print("                 <---- Name, SrcMode, SrcParam:", \
                   Name, SrcMode, SrcParam)
             
+        cls.setDebug(False)
         return Name, SrcMode, SrcParam
 
     @classmethod
