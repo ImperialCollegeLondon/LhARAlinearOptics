@@ -382,11 +382,15 @@ class Beam:
             print(" Beam.setsigmaxy: start")
 
         for iAddr in range(len(self.getCovarianceMatrix())):
+            if self.getDebug():
+                print("     ----> sx2, sy2:", \
+                      self.getCovarianceMatrix()[iAddr][0,0], \
+                      self.getCovarianceMatrix()[iAddr][2,2])
             sx1  = mth.sqrt(self.getCovarianceMatrix()[iAddr][0,0])
             sy1  = mth.sqrt(self.getCovarianceMatrix()[iAddr][2,2])
                 
             if self.getDebug():
-                print(" Beam.getsigmaxy: iAddr, sx1, sy1:", \
+                print("     <---- iAddr, sx1, sy1:", \
                       iAddr, sx1, sy1)
                 
             self._sigmaxy.append([sx1, sy1])
@@ -1092,7 +1096,6 @@ class Beam:
             
         if self.getDebug():
             print(" <----  Beam.plotBeamProgression done.")
-        self.setDebug(False)
 
                 
 """
@@ -1408,7 +1411,7 @@ class extrapolateBeam(Beam):
             pass
         else:
             if self.getDebug():
-                print("     ----: event loop")
+                print("     ----:>event loop")
 
             nEvtMax = self.getnEvtMax()
             if nEvtMax == None:

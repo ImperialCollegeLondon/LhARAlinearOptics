@@ -191,19 +191,19 @@ class Report:
         self._Lines = Lines
 
     def getName(self):
-        return Name
+        return self._Name
 
     def getReportPath(self):
-        return ReportPath
+        return self._ReportPath
 
     def getFileName(self):
-        return FileName
+        return self._FileName
 
     def getHeader(self):
-        return Header
+        return self._Header
 
     def getLines(self):
-        return Lines
+        return self._Lines
 
     def getDebug(self):
         return self.__Debug

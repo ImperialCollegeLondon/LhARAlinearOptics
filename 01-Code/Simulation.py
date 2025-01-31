@@ -346,7 +346,7 @@ class Simulation(object):
                     iEvt += 1
 
                     if (iEvt % Scl) == 0:
-                        if (self.getDebug() or NEvts > 1) and \
+                        if (self.getDebug() or self.getNEvt() > 1) and \
                            self.getProgressPrint():
                             print("         ----> Generating event ", iEvt)
                         if iCnt == 10:
