@@ -223,6 +223,9 @@ class Beam:
         if iBm == None:
             self.setbeamlineSpecificationCSVfile( \
                                         _beamlineSpecificationCSVfile)
+            if self.getbeamlineSpecificationCSVfile() == None:
+                raise badBeam(" No beam line read from i/p data file and " + \
+                              "no beam-line specification csv file given.")
             iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
 
         #.. Set beam line instance:
@@ -821,7 +824,7 @@ class Beam:
             print("     ----> Start location:", iLocMin)
         
         for iLoc in range(iLocMin, \
-                          len(BLE.BeamLineElement.getinstances())-1):
+                          len(BLE.BeamLineElement.getinstances())):
             iAddr = iLoc - iLocMin
             if self.getDebug():
                 print("         ----> iLoc, Name, iAddr:", \
