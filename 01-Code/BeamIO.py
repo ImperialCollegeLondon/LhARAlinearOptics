@@ -368,7 +368,7 @@ class BeamIO:
                 print("     <---- BeamIO.readBeamDataRecord particle read.")
             
         if self.getDebug():
-            print(" <---- BeamIO.readBeamDataRecord Done.")
+            print(" <---- BeamIO.readBeamDataRecord Done. EoF:", EoF)
 
         return EoF
 

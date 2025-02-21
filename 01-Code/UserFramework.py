@@ -189,8 +189,9 @@ def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvtsIn):
     if UsrFw_Debug:
         if iUsrAnl.getnIter() == 0:        
             print("         ----> Read data file:")
-        
-    while not (EndOfFile and iEvt >= nEvts):
+
+    EndOfRun = False
+    while not EndOfRun:
         #.. Generate or read event:
         if ibmIOr != None:
             EndOfFile = ibmIOr.readBeamDataRecord()
@@ -213,8 +214,8 @@ def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvtsIn):
         if iEvt <0:
             if UsrFw_Debug:
                 print(Prtcl.Particle.getParticleInstances()[iEvt])
-        if nEvts != None and iEvt == nEvts:
-            break
+        if nEvts != None and iEvt == nEvts or EndOfFile:
+            EndOfRun = True
 
     if UsrFw_Debug:
         if iUsrAnl.getnIter() == 0:
