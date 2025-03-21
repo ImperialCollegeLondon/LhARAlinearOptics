@@ -898,10 +898,29 @@ class Beam:
                 'color':  'darkred', \
                 }
         plt.rcParams["figure.figsize"] = (10., 7.5)
+
+        iLocMin = self.getstartlocation()
+        nLocs = len(BLE.BeamLineElement.getinstances()) - iLocMin
+    
+        s     = [None]*nLocs
+        sx    = [None]*nLocs
+        sy    = [None]*nLocs
+
+        ex    = [None]*nLocs
+        ey    = [None]*nLocs
+        exy   = [None]*nLocs
+
+        ax    = [None]*nLocs
+        ay    = [None]*nLocs
+        bx    = [None]*nLocs
+        by    = [None]*nLocs
+        gx    = [None]*nLocs
+        gy    = [None]*nLocs
         
-        s     = []
+        """
         sx    = []
         sy    = []
+        
         ex    = []
         ey    = []
         exy   = []
@@ -912,6 +931,7 @@ class Beam:
         by    = []
         gx    = []
         gy    = []
+        """
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
@@ -919,8 +939,6 @@ class Beam:
             print(BL.BeamLine.getinstances())
             print(self)
         
-        iLocMin = self.getstartlocation()
-
         if self.getDebug():
             print("     ----> Start location:", self.getstartlocation())
             print("     ----> Number of locations:", \
@@ -935,21 +953,21 @@ class Beam:
                 print("         ----> iLoc, iAddr:", iLoc, iAddr)
 
                   
-            s.append(iRefPrtcl.getsOut()[iLoc-1])
+            s[iAddr] = iRefPrtcl.getsOut()[iLoc-1]
             if iAddr < len(self.getsigmaxy()):
-                sx.append(self.getsigmaxy()[iAddr][0])
-                sy.append(self.getsigmaxy()[iAddr][1])
+                sx[iAddr] = self.getsigmaxy()[iAddr][0]
+                sy[iAddr] = self.getsigmaxy()[iAddr][1]
                 if iAddr < len(self.getemittance()):
-                    ex.append(self.getemittance()[iAddr][0])
-                    ey.append(self.getemittance()[iAddr][1])
-                    exy.append(self.getemittance()[iAddr][3])
+                    ex[iAddr] = self.getemittance()[iAddr][0]
+                    ey[iAddr] = self.getemittance()[iAddr][1]
+                    exy[iAddr] = self.getemittance()[iAddr][3]
 
-                    bx.append(self.getTwiss()[iAddr][0][1])
-                    by.append(self.getTwiss()[iAddr][1][1])
-                    ax.append(self.getTwiss()[iAddr][0][0])
-                    ay.append(self.getTwiss()[iAddr][1][0])
-                    gx.append(self.getTwiss()[iAddr][0][2])
-                    gy.append(self.getTwiss()[iAddr][1][2])
+                    bx[iAddr] = self.getTwiss()[iAddr][0][1]
+                    by[iAddr] = self.getTwiss()[iAddr][1][1]
+                    ax[iAddr] = self.getTwiss()[iAddr][0][0]
+                    ay[iAddr] = self.getTwiss()[iAddr][1][0]
+                    gx[iAddr] = self.getTwiss()[iAddr][0][2]
+                    gy[iAddr] = self.getTwiss()[iAddr][1][2]
             
             if self.getDebug():
                 if iAddr < len(self.getsigmaxy()):
