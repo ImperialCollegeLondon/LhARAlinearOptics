@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+import cProfile
+"""
+
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
@@ -164,6 +168,9 @@ def main(argv):
    Execute main"
 """
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    """
+    cProfile.run('main(sys.argv[1:])', '99-Scratch/restats')
+    """
+    main(sys.argv[1:])
 
 sys.exit(1)

@@ -17,4 +17,4 @@ p.sort_stats(SortKey.TIME, SortKey.CUMULATIVE).print_stats(.5, 'init')
 
 """
 
-p.sort_stats(SortKey.TIME).print_stats(20)
+p.sort_stats(SortKey.TIME).print_stats(60)
