@@ -5292,25 +5292,26 @@ class Source(BeamLineElement):
         
 #--------  Processing methods:
     def getParticleFromSource(self):
-        if self.__Debug:
+        self.setDebug(True)
+        if self.getDebug():
             print(" BeamLineElement(Source).getParticleFromSource: start")
 
         #.. Generate initial particle:
         x, y, K, cTheta, Phi, xp, yp = self.getParticle()
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> x, y, K, cTheta, Phi:", \
                   x, y, K, cTheta, Phi)
 
         #.. Convert to trace space:
         TrcSpc = self.getTraceSpace(x, y, K, cTheta, Phi, xp, yp)
-        if self.__Debug:
+        if self.getDebug():
             print("     ----> Trace space:", TrcSpc)
 
         if not isinstance(TrcSpc, np.ndarray):
-            if self.__Debug:
+            if self.getDebug():
                 raise FailToCreateTraceSpaceAtSource()
                 
-        if self.__Debug:
+        if self.getDebug():
             print(" <---- BeamLineElement(Source).getParticleFromSource,", \
                   " done.", \
                   '  --------  --------  --------  --------  --------')
@@ -5394,6 +5395,9 @@ class Source(BeamLineElement):
             cosTheta, Phi = self.getFlatThetaPhi()
             KE            = rnd.uniform(self.getParameters()[3], \
                                         self.getParameters()[4])
+        elif self.getMode() == 3:
+            raise badSOURCE(" Source Mode, read from file." + \
+                            " Should not get here!")
         elif self._Mode == 4:
             KE            = rnd.gauss(self.getParameters()[0], \
                                       self.getParameters()[1])
@@ -7217,4 +7221,7 @@ class cantFINDfile(Exception):
     pass
 
 class need2convertdvStrt(Exception):
+    pass
+
+class badSOURCE(Exception):
     pass

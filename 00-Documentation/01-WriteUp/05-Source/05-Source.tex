@@ -137,6 +137,7 @@ Carrying out the integration yields:
                                    -\sqrt{\frac{2K}{T_{e}}}
                              \right)
                    \right] \, ;
+  \label{Eq:Src:GofK}
 \end{equation}
 and the normalisation constant is given by:
 \begin{equation}
@@ -148,9 +149,10 @@ and the normalisation constant is given by:
                              -\sqrt{\frac{2K_{\rm min}}{T_{e}}}
                              \right) -
                          \exp\left(
-                                   -\sqrt{\frac{2K}{T_{e}}}
+                                   -\sqrt{\frac{2K_{\rm max}}{T_{e}}}
                               \right)
              \right] \, .
+  \label{Eq:Src:calN}
 \end{equation}
 
 The kinetic energy spectrum may now be obtained by choosing a value
@@ -158,13 +160,32 @@ for $G(K)$ using a probability distribution uniform over the
 range $0 < G(K) < 1$.
 The generated value of $K$ is obtained by evaluating:
 \begin{equation}
-  K = \left[
-                      \sqrt{K_{\rm min}} -
-                      \sqrt{\frac{T_e}{2}} \ln \left(
-                     1 - \frac{G(K)}{G(K_{\rm max})}
-                                               \right)
-                \right]^2 \, .
+  K = \left[ \sqrt{K_{\rm min}} - \sqrt{\frac{T_e}{2}}
+             \ln \left( 1 - \frac{G(K)}{G(K_{\rm max})} \right)
+      \right]^2 \, .
+  \label{Eq:Src:K}
 \end{equation}
+
+\subsubsection{Implementation}
+Substituting ${\cal N}$ from equation~\ref{Eq:Src:calN} into
+equation~\ref{Eq:Src:GofK} yields:
+\begin{equation}
+  G(K) =
+  \frac{1-\exp\left[-\sqrt{\frac{2}{T_e}}\left(\sqrt{K}-\sqrt{K_{\rm min}}\right)\right]}
+       {1-\exp\left[-\sqrt{\frac{2}{T_e}}\left(\sqrt{K_{\rm max}}-\sqrt{K_{\rm min}}\right)\right]}\,.
+\end{equation}
+So, defining:
+\begin{equation}
+  \Lambda_{\rm max} =
+       1-\exp\left[-\sqrt{\frac{2}{T_e}}\left(\sqrt{K_{\rm max}}-\sqrt{K_{\rm min}}\right)\right]^{-1}\,;
+\end{equation}
+equation~\ref{Eq:Src:K} may be rewritten:
+\begin{equation}
+  K = \left[ \sqrt{K_{\rm min}} - \sqrt{\frac{T_e}{2}}
+             \ln \left( 1 - \frac{G(K)}{\Lambda_{\rm max}} \right)
+      \right]^2 \, .
+\end{equation}
+
 
 \subsection{Angular Distribution}
 
