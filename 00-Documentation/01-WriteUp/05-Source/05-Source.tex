@@ -10,7 +10,7 @@ acceleration (TNSA) model presented in~\cite{10.1038/nphys199} .
 The implementation of this model is summarised below.
 The laboratory and RPLC reference frames coincide at the target,
 therefore trace- and phase-coordinates are not distinguished in the
-presentatiaon of the particle-production model.
+presentation of the particle-production model.
 
 \subsection{Energy distribution}
 
@@ -54,7 +54,7 @@ in table~\ref{table:EnergySpectrumParameters}.
       $E_{laser}$ & Laser energy & $70$ & J \\  
       $f$ & Energy conversion efficiency & $1.2 \times 10^{-15} I^{0.75}$, max=0.5  & - \\   % valid only for I < 3.1x10^19 W/cm2
       $I$ & Laser intensity & $4 \times 10^{20}$ & $W/cm^{2}$ \\ 
-      $T_{e}$ & Hot electron temperature & $m_{e} c^{2} [\sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}} -1} ]$ & J \\ 
+      $T_{e}$ & Hot electron temperature &  & J \\ 
       $m_{e}$ & Electron mass & $9.11 \times 10^{-31}$ & Kg \\ 
       $c$ & Speed of light & $3 \times 10^{8}$ & m/s \\ 
       $\lambda$ & Laser wavelength & 0.8 & $\mu$m \\  
@@ -78,6 +78,64 @@ in table~\ref{table:EnergySpectrumParameters}.
     \end{tabular}
   \end{center}
 \end{table}
+
+The hot electron temperature may be calculated using ponderomotive
+scaling by evaluating:
+\begin{equation}
+  T_e = m_{e} c^{2} \sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}} -1}
+      = m_{e} c^{2} \sqrt{1 + \left(\frac{p_t}{m_e c}\right)^2 -1} \,
+      ;
+  \label{Eq:ElectronTemp}
+\end{equation}
+where $I$ is the laser intensity, $\lambda$ is the laser wavelength,
+$m_e$ is the electron mass, and $p_t$ is the maximum transverse
+momentum to which an electron may be accelerated.
+Measurements of proton spectra indicate that $T_e$ is a function of
+the laser spot size.
+Small laser spot size limits the effective distance over which an
+electron may be accelerated, leading to a suppression of the electron
+energy gain, a reduction in the value for the maximum electron
+momentum, $p_t$, and therefore a lower electron temperature that that
+which would be predicted by ponderomotive scaling.
+
+The ponderomotive-scaling approach yields a maximum electron
+transverse momentum given by:
+\begin{equation}
+  p_{t0} = a_0 m_e c \, ;
+  \label{Eq:pyPond}
+\end{equation}
+where $a_0$ is the magnitude of the scaled vector potential, and an
+effective transverse acceleration length given by:
+\begin{equation}
+  y_0 = \frac{a_0 \lambda}{2\pi} \, .
+\end{equation}
+To take into account the reduced acceleration that results from a
+small laser spot size, equation \ref{Eq:pyPond} may be rewritten:
+\begin{equation}
+  p_t = p_{t0} \left[
+                1 - \left(
+                      1 - \frac{r_{Le}}{y_0}
+                    \right)^2
+              \right]^\frac{1}{2} \, ;
+\end{equation}
+where:
+\begin{equation}
+  r_{Le} = r_0 \frac{1}{2 \ln 2} \, ;
+\end{equation}
+and $r_0$ is the radius of the laser spot.
+The value of $T_e$ obtained using equation \ref{Eq:ElectronTemp} may
+now be used in equation \ref{Eq:Spct:0} to determine the proton energy
+spectrum.
+
+The hot electron temperature obtained using the procedure outlined
+above yields a value for $T_e$ that is closer to values obtained from
+experiment.
+However, the shape of the proton energy spectrum obtained using
+equation \ref{Eq:Spct:0} is found to over estimate the proton flux at
+large $K$.
+Better agreement with measurement may be obtained by treating $T_e$ as
+an effective parameter and tuning the value used in the simulation so
+that the generated proton spectrum agrees more closely with data.
 
 Equation~\ref{Eq:Spct:0} is based on time-limited fluid-dynamical
 models which are unable to predict the cut-off kinetic energy
@@ -116,7 +174,7 @@ normalisation constant ${\cal N}$:
 \begin{equation}
   g(K) = \frac{1}{\cal N} \frac{dN}{dK} \, .
 \end{equation}
-The cumulative distribution funtion, $G(K)$, is given by:
+The cumulative distribution function, $G(K)$, is given by:
 \begin{equation}
   G(K) = \int_{K_{\rm min}}^{K_{\rm max}} g(K)
                                                dK \,;
@@ -173,11 +231,13 @@ equation~\ref{Eq:Src:GofK} yields:
   G(K) =
   \frac{1-\exp\left[-\sqrt{\frac{2}{T_e}}\left(\sqrt{K}-\sqrt{K_{\rm min}}\right)\right]}
        {1-\exp\left[-\sqrt{\frac{2}{T_e}}\left(\sqrt{K_{\rm max}}-\sqrt{K_{\rm min}}\right)\right]}\,.
+  \label{Eq:Src:CumDst}
 \end{equation}
 So, defining:
 \begin{equation}
   \Lambda_{\rm max} =
        1-\exp\left[-\sqrt{\frac{2}{T_e}}\left(\sqrt{K_{\rm max}}-\sqrt{K_{\rm min}}\right)\right]^{-1}\,;
+  \label{Eq:Src:IntCumDst}
 \end{equation}
 equation~\ref{Eq:Src:K} may be rewritten:
 \begin{equation}
@@ -186,6 +246,12 @@ equation~\ref{Eq:Src:K} may be rewritten:
       \right]^2 \, .
 \end{equation}
 
+By default, the value of $T_e$ used in equations \ref{Eq:Src:CumDst}
+and \ref{Eq:Src:IntCumDst} is calculated using equation
+\ref{Eq:ElectronTemp}. 
+To allow the proton energy spectrum to be tuned to reproduce the
+experimental distribution of interest, the option for an effective
+value for $T_e$ to be specified is included.
 
 \subsection{Angular Distribution}
 
@@ -244,13 +310,13 @@ by the radius of the laser spot focused on the target.
   \end{center}
   \caption{Kinematic distributions of particles at the point of
     production.
-    \underline{Top:} The generated kinetic energy disribution is shown
+    \underline{Top:} The generated kinetic energy distribution is shown
     as the solid histogram. 
     The required distribution (equation~\ref{Eq:Spct:0}), normalised
     to the lowest kinetic-energy bin, is shown as the solid red line.
     \underline{Second row:} Generated $r^\prime$ and $\phi_S$
     distributions. 
-    \underline{Third row:} Generataed $x^\prime$ and $y^\prime$
+    \underline{Third row:} Generated $x^\prime$ and $y^\prime$
     distributions. 
     \underline{Bottom:} RMS of the $\theta_S$ distribution versus
     kinetic energy.
@@ -276,7 +342,7 @@ by the radius of the laser spot focused on the target.
     particle-production point.
     \underline{Top right:} The distribution of $\theta_S$ versus
     kinetic energy.
-    \underline{Centre left, right:} Gemerated disributions of
+    \underline{Centre left, right:} Generated distributions of
     $x^\prime$ and $y^\prime$.
     \underline{Bottom left:} Generated distribution of $\delta$.
     \underline{Bottom right:} Generated distribution of $\theta_S$.
