@@ -79,12 +79,13 @@ in table~\ref{table:EnergySpectrumParameters}.
   \end{center}
 \end{table}
 
-The hot electron temperature may be calculated using ponderomotive
-scaling by evaluating:
+The hot electron temperature ($T_e$) may be calculated using
+ponderomotive potential ($T_P$) by
+evaluating~\cite{10.1038/nphys199}: 
 \begin{equation}
-  T_e = m_{e} c^{2} \sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}} -1}
-      = m_{e} c^{2} \sqrt{1 + \left(\frac{p_t}{m_e c}\right)^2 -1} \,
-      ;
+  T_P T_e = m_{e} c^{2} \sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}}} -1
+          = m_{e} c^{2} \sqrt{1 + \left(\frac{p_t}{m_e c}\right)^2} -1 \,
+          ;
   \label{Eq:ElectronTemp}
 \end{equation}
 where $I$ is the laser intensity, $\lambda$ is the laser wavelength,
@@ -102,15 +103,44 @@ The ponderomotive-scaling approach yields a maximum electron
 transverse momentum given by:
 \begin{equation}
   p_{t0} = a_0 m_e c \, ;
-  \label{Eq:pyPond}
+  \label{Eq:pt0Pond}
 \end{equation}
 where $a_0$ is the magnitude of the scaled vector potential, and an
 effective transverse acceleration length given by:
 \begin{equation}
   y_0 = \frac{a_0 \lambda}{2\pi} \, .
+  \label{Eq:y0Pond}
 \end{equation}
+The scaled vector potential is given by:
+\begin{equation}
+  a_0 = \frac{e E_0}{m_e c \omega} \, ;
+\end{equation}
+where $e$ is the modulus of the charge on the electron, $E_0$ is the
+magnitude of the electric field of the laser and $\omega$ is its 
+angular frequency.
+In terms of the laser power, $P$, and wavelength, $\lambda$, of the
+electromagnetic field, $a_0$ may be written:
+\begin{equation}
+  a_0 = \frac{e \lambda}{2\pi r_0 m_e c^2}
+           \sqrt{\frac{2 P}{\pi \epsilon_0 c}} \, ;
+\end{equation}
+where $r_0$ is the radius of the laser spot on target.
+This expresson for $a_0$ allows equations \ref{Eq:pt0Pond}
+and \ref{Eq:y0Pond} to be written:
+\begin{equation}
+  p_{t0} = \frac{e \lambda}{2\pi r_0 c} 
+           \sqrt{\frac{2 P}{\pi \epsilon_0 c}} \, ;
+  \label{Eq:pt0Pond1}
+\end{equation}
+and:
+\begin{equation}
+  y_0 = \frac{e \lambda^2}{4\pi^2 r_0 m_e c^2} 
+           \sqrt{\frac{2 P}{\pi \epsilon_0 c}} \, .
+  \label{Eq:y0Pond1}
+\end{equation}
+
 To take into account the reduced acceleration that results from a
-small laser spot size, equation \ref{Eq:pyPond} may be rewritten:
+small laser spot size, equation \ref{Eq:pt0Pond} may be rewritten:
 \begin{equation}
   p_t = p_{t0} \left[
                 1 - \left(
@@ -126,6 +156,7 @@ and $r_0$ is the radius of the laser spot.
 The value of $T_e$ obtained using equation \ref{Eq:ElectronTemp} may
 now be used in equation \ref{Eq:Spct:0} to determine the proton energy
 spectrum.
+
 
 The hot electron temperature obtained using the procedure outlined
 above yields a value for $T_e$ that is closer to values obtained from
