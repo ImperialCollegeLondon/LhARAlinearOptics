@@ -163,7 +163,6 @@ The value of $T_e$ obtained using equation \ref{Eq:ElectronTemp} may
 now be used in equation \ref{Eq:Spct:0} to determine the proton energy
 spectrum.
 
-
 The hot electron temperature obtained using the procedure outlined
 above yields a value for $T_e$ that is closer to values obtained from
 experiment.
@@ -196,6 +195,34 @@ where $X$ is obtained by solving:
 Here $t_0$ is the time over which the ion acceleration may be treated
 as ballistic and $K_{i,\infty}$ is given in
 table~\ref{table:EnergySpectrumParameters}.
+$t_0$ may be obtained by evaluating:
+\begin{equation}
+  t_0 = \frac{\left( r_0 + l_{\rm trgt} \tan\theta_e \right)}
+             {v_{\rm max}} \, ;
+\end{equation}
+where $l_{\rm trgt}$ is the thickness of the target, $\theta_e$ is the
+half angle of the cone swept out as the electrons travel through the
+target and $v_{\rm max}$ is obtained from the non-relativistic
+expression:
+\begin{equation}
+  v_{\rm max} = \sqrt{ \frac{2 K_\infty}{m_i} } \, ;
+\end{equation}
+where $m_i$ is the mass of the ion and $K_\infty$, the maximum kinetic
+energy an ion could obtain for a given laser power over an infinitely
+long acceleration, is given by:
+\begin{equation}
+  K_\infty = q_i 2m_i c^2 \sqrt{\frac{\eta P}{P_R}} \, ;
+\end{equation}
+where $q_i$ is the ion charge and $P_R$ is given in
+table~\ref{table:EnergySpectrumParameters}.
+The efficiency with which laser energy is converted into hot electron
+energy, $\eta$, is given by:
+\begin{equation}
+  \eta = {\rm Min} \left[
+                         \left( 1.2 \times 10^{-15} I^{\frac{3}{4}} \right) ,
+                         0.5
+                   \right] \, .
+\end{equation}
 
 To generate the kinetic energy spectrum, the probability density
 function, $g(K)$, is defined such that the probability,
