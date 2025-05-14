@@ -85,6 +85,7 @@ class PhysicalConstants(object):
         print("      ----> version:", self.CdVrsn())
         print("      ----> PDG reference:", self.PDGref())
         print("      ----> speed of light (m/s):", self.SoL())
+        print("      ----> electron mass (MeV/c2):", self.me())
         print("      ----> proton mass (MeV/c2):", self.mp())
         print("      ----> Permitivity of free space (N/A**2):", self.mu0())
         print("      ----> debug flag:", self.getDebug())
@@ -147,6 +148,12 @@ class PhysicalConstants(object):
                                _Species + " not allowed!")
         return particleMASS
     
+    def me(self):
+        return 0.51099895000
+
+    def meSI(self):
+        return 9.1093837015E-31
+
     def mp(self):
         return 938.27208816
 
@@ -158,6 +165,12 @@ class PhysicalConstants(object):
 
     def mu0(self):
         return sp.constants.mu_0
+
+    def epsilon0(self):
+        return 8.8541878128E-12
+
+    def electricCHARGE(self):
+        return 1.602176634E-19
 
 
 #--------  Utilities:
