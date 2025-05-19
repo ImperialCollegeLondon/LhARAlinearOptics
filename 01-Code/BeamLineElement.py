@@ -5292,7 +5292,6 @@ class Source(BeamLineElement):
         
 #--------  Processing methods:
     def getParticleFromSource(self):
-        self.setDebug(True)
         if self.getDebug():
             print(" BeamLineElement(Source).getParticleFromSource: start")
 
@@ -5476,16 +5475,26 @@ class Source(BeamLineElement):
 
     # Calculates the rest of the parameters needed for the parametrisation
     def parameters(self, P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
-
+        if self.getDebug():
+            print("Source(BeamLineElement).parameter: starts.")
+        
         c = 3e8               # Speed of light in vacuum [m/s]
         m_e = 9.11e-31        # Electron mass [Kg]
         m_i = 1836*9.1e-31    # Proton mass [kg]
         k_B = 1.380649e-23    # Boltzman constant [J/K]
         Z = 1                 # Ion charge number   
 
+        if self.getDebug():
+            print("     ----> m_e, c, I, lamda:", m_e, c, I, lamda)
+
         # Laser ponderomotive potential [J], intensity in [W/cm2]
         T_p = m_e*(c**2)*(np.sqrt(1 + (I*(lamda**2)/(1.37*1e18)))-1)    
         T_e = T_p   # Hot electron temperature [J]
+
+        if self.getDebug():
+            T_eMeV = T_e / (1.6E-19 * 1.e6)
+            print("     ---->: T_e:", T_e)
+            print("          : T_e:", T_eMeV)
 
         # Fraction of laser energy converted into hot electron energy,
         # intensity in [W/cm2]
@@ -5495,22 +5504,34 @@ class Source(BeamLineElement):
         else:
             f = 0.5
 
+        if self.getDebug():
+            print("     ---->: f:", f)
+
         # Total number of electrons accelerated into the targe
         N_E = f*E_laser/T_p    
 
         I_m = I*10000                    # Convert intensity from W/cm2 to W/m2
         r0 = np.sqrt(P_L/(I_m*np.pi))    # Radius of the laser spot [m]
+        
+        if self.getDebug():
+            print("     ---->: N_E, I_m, r0:", N_E, I_m, r0)
 
         # Area over which electrons are accelerated and spread [m^2]
         theta = mth.radians(theta_degrees)  # Half-angle divergence [radians] 
         B = r0 + (d * np.tan(theta))
         s_sheath = np.pi*(B)**2 
 
+        if self.getDebug():
+            print("     ---->: theta, d, B, s_sheath:", theta, d, B, s_sheath)
+
         ne_0 = N_E/(c*t_laser*s_sheath)      # Hot electron density [pp/m^3]
         c_s = np.sqrt(Z*k_B*T_e/m_i)         # Ion-acoustic velocity [m/s]
 
         r_e = 2.82e-15              # Electron radius [m]
         P_R = m_e * (c**3) / r_e    # Relativistic power unit [W]
+
+        if self.getDebug():
+            print("     ---->: ne_0, c_s, r_e, P_R:", ne_0, c_s, r_e, P_R)
 
         # Maximum possible energy without considering the laser pulse
         # length (infinite acceleration)
@@ -5520,6 +5541,9 @@ class Source(BeamLineElement):
         v_inf = np.sqrt((2*E_i_inf/m_i))
         t_0 = B/v_inf
 
+        if self.getDebug():
+            print("     ---->: E_i_inf, v_inf, t_0:", E_i_inf, v_inf, t_0)
+
         # Solves the equation numerically for X
         initial_guess = mth.acos(0.5)
         Theta_solution = fsolve( \
@@ -5528,6 +5552,11 @@ class Source(BeamLineElement):
         X = mth.cos(Theta_solution[0])
 
         E_max = E_i_inf*(X**2)  # [J]
+
+        if self.getDebug():
+            print("     ---->: initial_guess, Theta_solution:", \
+                  initial_guess, Theta_solution)
+            print("          : E_max:", E_max)
 
         return ne_0, c_s, s_sheath, T_e, E_max
 

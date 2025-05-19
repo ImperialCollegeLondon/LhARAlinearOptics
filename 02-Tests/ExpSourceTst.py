@@ -38,7 +38,7 @@ filename = os.path.join(HOMEPATH, \
 BLI  = BL.BeamLine(filename)
 
 iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
-
+print(BLI)
 
 ##! Start:
 print("========  Source: tests start  ========")
