@@ -15,8 +15,9 @@ presentation of the particle-production model.
 \subsection{Energy distribution}
 
 The typical kinetic energy, $K$, spectrum produced in target-normal
-sheath acceleration falls rapidly with kinetic energy before dropping
-rapidly to zero above a maximum ``cut off'' energy $K_{\rm max}$.
+sheath acceleration falls exponentially with kinetic energy before
+dropping rapidly to zero above a maximum ``cut off'' energy
+$K_{\rm max}$. 
 The kinetic-energy spectrum of the TNSA model presented
 in~\cite{10.1038/nphys199} is given by:
 \begin{equation}
@@ -79,30 +80,30 @@ in table~\ref{table:EnergySpectrumParameters}.
   \end{center}
 \end{table}
 
-The hot electron temperature ($T_e$) may be calculated using
-ponderomotive potential ($T_P$) by
+The hot electron temperature, $T_e$, may be calculated using the 
+ponderomotive potential, $T_P$, by
 evaluating~\cite{10.1038/nphys199}: 
 \begin{equation}
-  T_P = T_e = m_{e} c^{2}
+  T_e = T_P = m_{e} c^{2}
                 \left[
-                  \sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}}} - 1
+                  \sqrt{1 + \left(\frac{p_t}{m_e c}\right)^2} - 1
                 \right]
             = m_{e} c^{2}
                 \left[
-                  \sqrt{1 + \left(\frac{p_t}{m_e c}\right)^2} - 1
-                \right] \,
-            ;
+                  \sqrt{1 + \frac{I \lambda^{2}}{1.37 \times 10^{18}}} - 1
+                \right]
+            \, ;
   \label{Eq:ElectronTemp}
 \end{equation}
-where $I$ is the laser intensity, $\lambda$ is the laser wavelength,
-$m_e$ is the electron mass, and $p_t$ is the maximum transverse
-momentum to which an electron may be accelerated.
+where $m_e$ is the electron mass, $p_t$ is the maximum transverse
+momentum to which an electron may be accelerated, $I$ is the laser
+intensity, and $\lambda$ is the laser wavelengt.
 Measurements of proton spectra indicate that $T_e$ is a function of
 the laser spot size.
 Small laser spot size limits the effective distance over which an
 electron may be accelerated, leading to a suppression of the electron
 energy gain, a reduction in the value for the maximum electron
-momentum, $p_t$, and therefore a lower electron temperature that that
+momentum, $p_t$, and therefore a lower electron temperature than that
 which would be predicted by ponderomotive scaling.
 
 The ponderomotive-scaling approach yields a maximum electron
@@ -112,7 +113,7 @@ transverse momentum given by:
   \label{Eq:pt0Pond}
 \end{equation}
 where $a_0$ is the magnitude of the scaled vector potential, and an
-effective transverse acceleration length given by:
+effective transverse acceleration length given by~\cite{DOVER2020100847}:
 \begin{equation}
   y_0 = \frac{a_0 \lambda}{2\pi} \, .
   \label{Eq:y0Pond}
@@ -124,8 +125,7 @@ The scaled vector potential is given by:
 where $e$ is the modulus of the charge on the electron, $E_0$ is the
 magnitude of the electric field of the laser and $\omega$ is its 
 angular frequency.
-In terms of the laser power, $P$, and wavelength, $\lambda$, of the
-electromagnetic field, $a_0$ may be written:
+In terms of the laser power, $P$, $a_0$ may be written:
 \begin{equation}
   a_0 = \frac{e \lambda}{2\pi r_0 m_e c^2}
            \sqrt{\frac{2 P}{\pi \epsilon_0 c}} \, ;
@@ -146,7 +146,8 @@ and:
 \end{equation}
 
 To take into account the reduced acceleration that results from a
-small laser spot size, equation \ref{Eq:pt0Pond} may be rewritten:
+small laser spot size, equation \ref{Eq:pt0Pond} may be
+written~\cite{DOVER2020100847}: 
 \begin{equation}
   p_t = p_{t0} \left[
                 1 - \left(
@@ -156,7 +157,7 @@ small laser spot size, equation \ref{Eq:pt0Pond} may be rewritten:
 \end{equation}
 where:
 \begin{equation}
-  r_{Le} = r_0 \frac{1}{2 \ln 2} \, ;
+  r_{Le} = \frac{r_0}{2 \ln 2} \, ;
 \end{equation}
 and $r_0$ is the radius of the laser spot.
 The value of $T_e$ obtained using equation \ref{Eq:ElectronTemp} may
@@ -165,7 +166,7 @@ spectrum.
 
 The hot electron temperature obtained using the procedure outlined
 above yields a value for $T_e$ that is closer to values obtained from
-experiment.
+experiment~\cite{DOVER2020100847}.
 However, the shape of the proton energy spectrum obtained using
 equation \ref{Eq:Spct:0} is found to over estimate the proton flux at
 large $K$.
@@ -173,9 +174,8 @@ Better agreement with measurement may be obtained by treating $T_e$ as
 an effective parameter and tuning the value used in the simulation so
 that the generated proton spectrum agrees more closely with data.
 
-Equation~\ref{Eq:Spct:0} is based on time-limited fluid-dynamical
-models which are unable to predict the cut-off kinetic energy
-accurately. 
+Equation~\ref{Eq:Spct:0} is based on models which are unable to
+predict the cut-off kinetic energy accurately. 
 The cut-off energy is taken to be that given by the model described
 in~\cite{10.1103/PhysRevLett.97.045005} in which the time over which
 the laser pulse creates the conditions necessary for acceleration is
@@ -218,7 +218,7 @@ table~\ref{table:EnergySpectrumParameters}.
 The efficiency with which laser energy is converted into hot electron
 energy, $\eta$, is given by:
 \begin{equation}
-  \eta = {\rm Min} \left[
+  \eta = {\rm min} \left[
                          \left( 1.2 \times 10^{-15} I^{\frac{3}{4}} \right) ,
                          0.5
                    \right] \, .
@@ -316,6 +316,14 @@ and \ref{Eq:Src:IntCumDst} is calculated using equation
 To allow the proton energy spectrum to be tuned to reproduce the
 experimental distribution of interest, the option for an effective
 value for $T_e$ to be specified is included.
+
+By default, $K_{\rm max}$ is calculated as described above.
+Comparison of the model described here with experimental data
+indicates that the specification of a value for $K_{\rm max}$ smaller
+than that obtained by evaluating equation~\ref{eq:Eq:Spct:2} gives a
+better description of data.
+Therefore, the option for an effective value for $K_{\rm max}$ to be
+specified is also included.
 
 \subsection{Angular Distribution}
 
@@ -434,28 +442,30 @@ The generated $\phi_S$ distribution is flat in the range
 $0^\circ < \phi_S < 360^\circ$ and the $(x, y)$ distribution is
 Gaussian in both the $x$ and $y$ projections.
 \begin{table}
-  \caption{Parameterised laser driven}
+  \caption{
+    Parameters used to generate the proton phase space using
+    the model described in the text.
+    The parameters above the line were used to specify the model.
+    The paramters below the line were calculated using the procedures
+    described in the text.
+  }
   \label{Tab:Src:Param}
   \begin{center}
     \begin{tabular}{|l|c|l|}
       \hline
         \textbf{Parameter} & \textbf{Value} & \textbf{Unit} \\ 
         \hline
-        $\sigma_x$&4e-06&$\mu$m \\ 
-        $\sigma_y$&4e-06&$\mu$m \\ 
-        $\cos\theta_S |_{\rm min}$&0.998& \\ 
-        $K_{\rm min}$&1.0&MeV \\ 
-        $K_{\rm max}$&25.0&MeV \\ 
-        nPnts&1000& \\ 
-        Laser power&$2.5\times10^{15}$&W \\ 
-        Laser energy&70.0&J \\ 
         Laser wavelength&0.8&$\mu$m \\ 
+        Laser power&$2.5\times10^{14}$&W \\ 
+        $r_0$&1.5e-06&$\mu$m \\
         Laser pulse duration&2.8e-14&s \\ 
-        Laser spot size&4e-07&$\mu$m \\ 
-        Laser intensity&4e+20&J$/m^2$ \\ 
+        $K_{\rm min}$&1.0&MeV \\
+        Target thickness&0.4&$\mu$m \\
         Electron divergence angle&25.0&degrees \\
-        RMS $\theta_S$ at $K=0$\,MeV & 20 & degrees \\
-        Scaled slope of RMS $\theta_S$ versus $K$ & 15 & degrees \\
+        Scaled slope of RMS $\theta_S$ at $K=0$\,MeV & 20 & degrees \\
+      \hline
+        $T_e$&12.21&MeV \\
+        $K_{\rm max}$&26.34&MeV \\
       \hline
     \end{tabular}
   \end{center}
