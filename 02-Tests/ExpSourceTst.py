@@ -21,24 +21,23 @@ import BeamLine          as BL
 import Particle          as Prtcl
 import PhysicalConstants as PhysCnst
 
+print()
+print("SourceTest: initialising:")
+
+print("     ----> MatPlotLib options:")
 mpl.rc('text', usetex=True)
 mpl.rcParams['text.latex.preamble']="\\usepackage{bm}"
 mpl.rcParams["figure.autolayout"]=True
 mpl.rcParams['figure.constrained_layout.use'] = True
 
 cm = 1./2.54  # centimeters in inches
+print("     <---- MatPlotLib done.")
 
 #.. Physical Constants
+print("     ----> Physical constants:")
 constants_instance = PhysCnst.PhysicalConstants()
 protonMASS         = constants_instance.mp()
-
-HOMEPATH = os.getenv('HOMEPATH')
-filename = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
-BLI  = BL.BeamLine(filename)
-
-iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
-print(BLI)
+print("     <---- Physical constants done.")
 
 ##! Start:
 print("========  Source: tests start  ========")
@@ -63,14 +62,11 @@ try:
     Src = BLE.Source(rStrt, vStrt, drStrt, dvStrt)
 except:
     print('      ----> Correctly trapped no Source paramters exception.')
-
 #.. Create valid instance:
 Mode  = 0
-Param = [0.000004, 0.000004, 0.998,    \
-          1., 25., 1000, 2.50e15, 70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, \
-         25., 20., 15., None]
+Param = [ 0.8, 2.5E14, 1.5E-6, 2.8E-14, 10., 1., 20., 20., 15., -9999. ]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
-    
+
 #.. __repr__
 print("    __repr__:")
 print("      ---->", repr(Src))
@@ -82,22 +78,33 @@ print("    <---- __str__ done.")
 
 print(" <---- Creation and built in method tests done!  --------  --------")
 
+BLE.Source.cleaninstances()
 
 ##! Next: check paramterised laser-driven source distribution:
+HOMEPATH = os.getenv('HOMEPATH')
+filename = os.path.join(HOMEPATH, \
+                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+print("     ----> Load beamline parameters from:", \
+      filename)
+BL.BeamLine(filename)
+
+Src = BLE.BeamLineElement.getinstances()[1]
+
+iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+print("     ----> Load beamline parameters done:")
+print(BL.BeamLine.getinstances())
+
 SourceTest += 1
 print()
 print("SourceTest:", SourceTest, \
       " test parameterised laser-driven source distribution", \
       "check.")
-Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
-                  0, [0.000004, 0.000004, 0.998, 1., 25., 1000, 2.50e15, \
-                  70., 0.8, 2.80e-14, 4.00e-07, 4.00e20, 25., 20., 15., None])
-print(Src1)
+print(Src)
 print(" Test generation:")
 print("     ----> First particle: KE, cosThetaPhi:", \
-      Src1.getParticle())
+      Src.getParticle())
 
-##! Next: Get data for plots:
+#! Next: Get data for plots:
 PrtclX   = np.array([])
 PrtclY   = np.array([])
 
@@ -114,16 +121,16 @@ SrcRp    = np.array([])
 SrcZ     = np.array([])
 SrcE     = np.array([])
 
-g_E       = Src1.getLaserDrivenProtonEnergyProbDensity()
-E_max_MeV = Src1.getderivedParameters()[4] / (1.6e-19 * 1e6)
-E_min_MeV = Src1.getderivedParameters()[5] / (1.6e-19 * 1e6)
+g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
+E_min_MeV = Src.getParameters()[5]
+E_max_MeV = Src.getParameters()[6]
 
 iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")
 for i in range(100000):
-    TrcSpcFrmSrc = Src1.getParticleFromSource()
+    TrcSpcFrmSrc = Src.getParticleFromSource()
     PhsSpcFrmSrc = Prtcl.Particle.RPLCTraceSpace2PhaseSpace(TrcSpcFrmSrc)
     
     SrcX         = np.append(SrcX,  TrcSpcFrmSrc[0])
@@ -180,7 +187,8 @@ n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='k', \
                             histtype='step', label='Generated Distribution')
 
-Ee, g_E = Src1.getLaserDrivenProtonEnergyProbDensity()
+print(Src)
+Ee, g_E = Src.getLaserDrivenProtonEnergyProbDensity()
 
 dE2     = (E_max_MeV - E_min_MeV) / 100. / 2.
 Ee[-1] -= dE2
@@ -217,8 +225,8 @@ cumPROB = []
 sigT    = []
 for eps in Ee:
     eps1 = eps * (1.6e-19 * 1e6)
-    cumPROB.append(Src1.getLaserCumProb(eps1))
-    sigT.append(Src1.g_theta(eps))
+    cumPROB.append(Src.getLaserCumProb(eps1))
+    sigT.append(Src.g_theta(eps))
 
 plt.plot(Ee, cumPROB, color='k', label='Required Distribution', linewidth=1)
 

@@ -10,6 +10,7 @@ Test script for "Simulation" class ... simulation processing tasks
 
 import os
 import Simulation as Simu
+import BeamLine   as BL
 
 ##! Start:
 print("========  Simulation: start  ========")
@@ -24,7 +25,7 @@ datafiledir = os.path.join(HOMEPATH, '99-Scratch')
 Smltn = Simu.Simulation(100000, filename, datafiledir, 'LIONsimu.dat')
 print()
 print(" <---- Simulation initialised.")
-
+print(BL.BeamLine.getinstances())
 ##! Start:
 print(" ----> Run simulation test:")
 print()
