@@ -101,8 +101,11 @@ import Particle as Prtcl
 import PhysicalConstants as PhysCnst
 import LhARALinearOptics as LLO
 
+#--------  Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
+
 protonMASS         = constants_instance.mp()
+
 
 class BeamIO:
     instances = []

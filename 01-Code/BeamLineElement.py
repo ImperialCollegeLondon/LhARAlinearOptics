@@ -151,31 +151,31 @@ import LaTeX             as LTX
 import BeamIO            as bmIO
 
 #--------  Physical Constants
-
-#.. Constants from scipy; SI units:
-speed_of_light   = scipy.constants.speed_of_light
-alpha            = scipy.constants.alpha
-epsilon0SI       = scipy.constants.epsilon_0
-electronCHARGESI = scipy.constants.elementary_charge
-electronMASSSI   = scipy.constants.electron_mass
-protonMASSSI     = scipy.constants.proton_mass
-
-#.. Natural units:
 constants_instance = PhysCnst.PhysicalConstants()
-protonMASS         = constants_instance.mp()
-electricCHARGE     = mth.sqrt(4.*mth.pi*alpha)
-epsilon0           = 1.
 
-Joule2MeV          = 6241509074000.
-m2InvMeV           = 5067730717679.4
+#.. SI units:
+alpha              = constants_instance.alpha()
+epsilon0SI         = constants_instance.epsilon0SI()
+electronCHARGESI   = constants_instance.electricCHARGE()
 
-electronMASS       = constants_instance.me()
-SIelectronMASS     = constants_instance.meSI()
+electronMASSSI     = constants_instance.meSI()
+protonMASSSI       = constants_instance.mpSI()
 
 speed_of_light     = constants_instance.SoL()
 
+
+#.. Natural units:
+electricCHARGE     = mth.sqrt(4.*mth.pi*alpha)
+epsilon0           = 1.
 eps0               = constants_instance.epsilon0()
-electricCHRG       = constants_instance.electricCHARGE()
+
+electronMASS       = constants_instance.me()
+protonMASS         = constants_instance.mp()
+
+
+#.. Conversion factors and units:
+Joule2MeV          = constants_instance.Joule2MeV()
+m2InvMeV           = constants_instance.m2InvMeV()
 
 
 class BeamLineElement:
@@ -5445,10 +5445,10 @@ class Source(BeamLineElement):
     def calculateTe(cls, wavelength, r0, power):
         if cls.getDebug():
             print(" Source(BeamLineElement).calculateTe:", \
-                  "wavelength, electricCHRG, electronMASS,", \
-                  "SIelectronMASS:", \
-                  wavelength, electricCHRG, electronMASS, \
-                  SIelectronMASS)
+                  "wavelength, electronCHARGESI, electronMASS,", \
+                  "electronMASSSI:", \
+                  wavelength, electronCHARGESI, electronMASS, \
+                  electronMASSSI)
             print("              ", \
                   "speed of light, r0, power, eps0           ", \
                   "                                  :", \
@@ -5460,8 +5460,8 @@ class Source(BeamLineElement):
                   "                              :", I)
             print(" ")
 
-        a0 = (wavelength * electricCHRG) / \
-            (2.*mth.pi*SIelectronMASS*speed_of_light**2*r0) * \
+        a0 = (wavelength * electronCHARGESI) / \
+            (2.*mth.pi*electronMASSSI*speed_of_light**2*r0) * \
             mth.sqrt(2.*power / (mth.pi*eps0*speed_of_light))
 
         if cls.getDebug():
@@ -5494,7 +5494,7 @@ class Source(BeamLineElement):
                 mth.sqrt(1. + (pt/(electronMASSSI*speed_of_light))**2) \
                                                     -1. )
 
-        Te /= electricCHRG * 1.E6
+        Te /= electronCHARGESI * 1.E6
         
         if cls.getDebug():
             print(" <---- Te:", Te)

@@ -1,3 +1,66 @@
+--------  --------  --------  --------  --------  --------  --------  20May25
+Update PhysicalConstants and other modules to take constants from
+PhysicalConstants rather than scipy.constants.  Reason is for control and so
+that there is a clear reference for later puboication.
+
+Means need to do tests again!
+
+Tests:
+OK - ApertureTst.py
+OK - BeamIOTst-rd-BDSIM.py
+OK - BeamIOTst-wrt.py
+OK - BeamIOTst-rd.py
+OK - BeamLineElementTst.py
+OK - BeamLineTst.py
+OK - BeamTst.py
+OK - CylindricalRFCavityTst.py
+OK - DRACOfacilityTst.py
+OK - DefocusQuadTst.py
+OK - DipoleTst.py
+OK - DriftTst.py
+OK - ExpSourceTst.py
+OK - ExpSourceTst_rms_KE.py
+OK - FacilityTst.py
+OK - FocusQuadTst.py
+OK - GaborLensTst.py
+OK - LIONfacilityTst.py
+OK - LaTexTst.py
+OK - LhARAFacility-from-datafile-Tst.py
+OK - LhARAFacilityTst.py
+OK - LhARALinearOpticsTst.py
+OK - LhARAMagnetTable.py
+OK - ParticleTst.py
+OK - PhysicalConstantsTst.py
+OK - QuadDoubletTst.py
+OK - QuadTripletTst.py
+OK - RPLCswitchTst.py
+OK - ReferenceParticleTst.py
+OK - RunDRACOsimulation.py
+OK - RunLIONsimulation.py
+OK - RunLhARAsimulation.py
+OK - ReadDRACOsimu.py
+OK - ReadLIONsimu.py
+OK - ReadLhARAsimu.py
+OK - RunSimulationTst.py
+OK - SimulationTst.py
+OK - SolenoidTst.py
+OK - SourceTst.py
+OK - TestWrite.py
+OK - TestRead.py
+OK - extrapolatedBeamTst.py
+OK - plotTrajectory.py
+OK - visualiseTst.py
+Fail - OctupoleTst.py
+Fail - plotQuadTriplet.py
+
+Scripts:
+OK - 2BDSIM.py
+OK - plotBeam.py
+OK - plotextrapolatedBeam.py
+OK - runBeamSim.py
+OK - readBeamSim.py
+OK - visualiseBeam.py
+
 --------  --------  --------  --------  --------  --------  --------  19May25
 Long gap in note taking; mainly teaching.  Now have incldued Source updates
 from Nadirah and Zaynab.  Back to tests

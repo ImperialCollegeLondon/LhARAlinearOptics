@@ -157,6 +157,9 @@ class PhysicalConstants(object):
     def mp(self):
         return 938.27208816
 
+    def mpSI(self):
+        return 1.67262192360E-27
+
     def mPion(self):
         return 139.57061
 
@@ -169,8 +172,20 @@ class PhysicalConstants(object):
     def epsilon0(self):
         return 8.8541878128E-12
 
+    def epsilon0SI(self):
+        return 8.8541878128E-12
+
     def electricCHARGE(self):
         return 1.602176634E-19
+
+    def alpha(self):
+        return 1./137.035999084
+
+    def Joule2MeV(self):
+        return 6241509074000.
+
+    def m2InvMeV(self):
+        return 5067730717679.4
 
 
 #--------  Utilities:

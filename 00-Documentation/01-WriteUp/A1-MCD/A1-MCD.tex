@@ -2093,31 +2093,18 @@ table~\ref{Tab:Source:Methods}.
   \begin{center}
     \begin{tabular}{|l|c|c|p{10cm}|}
       \hline
-      \textbf{Attribute} & \textbf{Type}      & \textbf{Unit} & \textbf{Comment}                    \\
-      \hline
-      \texttt{Mode}      & integer &          & \texttt{Mode}$=0$; parameterised laser-driven source.        \\
-      \hline
-       \texttt{Param[0]} & float   & m        & Standard deviation of normal distribution from which $x$ coordinate is sampled. \\
-       \texttt{Param[1]} & float   & m        & Standard deviation of normal distribution from which $y$ coordinate is sampled. \\
-       \texttt{Param[2]} & float   &          & Minimum $\cos\theta_S$.
-                                                The specification of a minimum for $\cos\theta_S$ improves the efficiency of
-                                                generation as it may be used to restrice generation to the set of partices that
-                                                will enter the downstream acceptane.                                            \\
-       \texttt{Param[3]} & float   & MeV      & Minimum kinetic energy ($K_{\rm min}$.                                          \\
-       \texttt{Param[4]} & float   & MeV      & Maximum kinetic energy ($K_{\rm max}$.
-                                                Value entered here is overwritten when calculated in
-                                                \texttt{getLaserDrivenParticleEnergy} during initialisation.                    \\
-       \texttt{Param[5]} & integer &          & \texttt{nPnts}: Number of points to sample for integration of PDF (kept for
-                                                backward compatibility).                                                        \\
-       \texttt{Param[6]} & float   & W        & $P_L$: Laser power.                                                             \\
-       \texttt{Param[7]} & float   & J        & $E_L$: Laser energy.                                                            \\
-       \texttt{Param[8]} & float   & $\mu$m   & $\lambda$: Laser wavelength.                                                     \\
-       \texttt{Param[9]} & float   & s        & $t_{\rm laser}$: Laser pulse duration.                                            \\
-      \texttt{Param[10]} & float   & m        & $d$: Diameter of laser spot at focus.                                           \\
-      \texttt{Param[11]} & float   & W/cm$^2$ & I: Laser intensity                                                              \\
-      \texttt{Param[12]} & float   & $^\circ$ & $\theta_{\rm degrees}$: Electron divergence angle.                                \\
-      \texttt{Param[13]} & float   & $^\circ$ & Intercept of $\alpha$, maximum half opening angle at $K=0$.                      \\
-      \texttt{Param[14]} & float   & $^\circ$ & Scaled slope of $\alpha(K)$.                                                     \\
+      \texttt{Param[0]} & float   & $\mu$m   & $\lambda$: Laser wavelength.                                  \\
+      \texttt{Param[1]} & float   & W        & $P_L$: Laser power.                                           \\
+      \texttt{Param[2]} & float   & m        & $d$: Diameter of laser spot at focus.                        \\
+      \texttt{Param[3]} & float   & s        & $t_{\rm laser}$: Laser pulse duration.                          \\
+      \texttt{Param[4]} & float   & MeV      & Hot electron temperature.                                      \\
+      \texttt{Param[5]} & float   & MeV      & Minimum kinetic energy ($K_{\rm min}$).                          \\
+      \texttt{Param[6]} & float   & MeV      & Maximum kinetic energy ($K_{\rm max}$).                          \\
+      \texttt{Param[7]} & float   & $^\circ$ & $\theta_{\rm degrees}$: Electron divergence angle.               \\
+      \texttt{Param[8]} & float   & $^\circ$ & Intercept of $\alpha$, maximum half opening angle at $K=0$.    \\
+      \texttt{Param[9]} & float   & $^\circ$ & Scaled slope of $\alpha(K)$.                                   \\
+      \texttt{Param[10]} & float  &         & Maximum $\partial r / \partial s$. If given as -9999., then all values
+                                              of $\partial r / \partial s$ are accepted.                               \\
       \hline
     \end{tabular}
   \end{center}
