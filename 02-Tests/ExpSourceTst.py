@@ -64,7 +64,7 @@ except:
     print('      ----> Correctly trapped no Source paramters exception.')
 #.. Create valid instance:
 Mode  = 0
-Param = [ 0.8, 2.5E14, 1.5E-6, 2.8E-14, 10., 1., 20., 20., 15., -9999. ]
+Param = [ 0.8, 2.5E14, 0.6, 1.5E-6, 2.8E-14, 10., 1., 20., 20., 15., -9999. ]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
 
 #.. __repr__
@@ -187,7 +187,6 @@ n, bins, patches = plt.hist(PrtclKE, \
                             bins=100, color='k', \
                             histtype='step', label='Generated Distribution')
 
-print(Src)
 Ee, g_E = Src.getLaserDrivenProtonEnergyProbDensity()
 
 dE2     = (E_max_MeV - E_min_MeV) / 100. / 2.

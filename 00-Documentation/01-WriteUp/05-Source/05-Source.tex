@@ -310,6 +310,21 @@ equation~\ref{Eq:Src:K} may be rewritten:
       \right]^2 \, .
 \end{equation}
 
+Aberations in the optics delivering the laser beam to the target often
+distort the focal spot so that not all the power in the beam is
+delivered in a spot of radius $r_0$.
+The ``Strehl ratio'', ${\cal S}$, is the ratio of the maximum
+intensity of the spot delivered to the target devided by the intensity
+that would have been delivered by a perfect, diffraction-limited,
+optical system. 
+If the power of the laser specified for the system is $P_{\rm L}$,
+then the effective power delivered to the target, $P$, is given by:
+\begin{equation}
+  P = {\cal S} P_{\rm L} \, .
+\end{equation}
+$P$ can now be used to evaluate the calculation of the parameters that
+define the proton-energy spectrum.
+
 By default, the value of $T_e$ used in equations \ref{Eq:Src:CumDst}
 and \ref{Eq:Src:IntCumDst} is calculated using equation
 \ref{Eq:ElectronTemp}. 
@@ -447,7 +462,8 @@ Gaussian in both the $x$ and $y$ projections.
     the model described in the text.
     The parameters above the line were used to specify the model.
     The paramters below the line were calculated using the procedures
-    described in the text.
+    described in the text and are representative of the J-KAREN-P
+    laser that underpins the analysis in~\cite{DOVER2020100847}.
   }
   \label{Tab:Src:Param}
   \begin{center}
@@ -457,12 +473,15 @@ Gaussian in both the $x$ and $y$ projections.
         \hline
         Laser wavelength&0.8&$\mu$m \\ 
         Laser power&$2.5\times10^{14}$&W \\ 
+        Strehl ratio&0.6& \\ 
         $r_0$&1.5e-06&$\mu$m \\
-        Laser pulse duration&2.8e-14&s \\ 
+        Laser pulse duration&40e-15&s \\ 
         $K_{\rm min}$&1.0&MeV \\
-        Target thickness&0.4&$\mu$m \\
+        Target thickness&5&$\mu$m \\
         Electron divergence angle&25.0&degrees \\
-        Scaled slope of RMS $\theta_S$ at $K=0$\,MeV & 20 & degrees \\
+        Intercept of RMS $\theta_S$ at $K=0$\,MeV & 20 & degrees \\
+        Change of RMS $\theta_S$ between $K=0$\,MeV and $K_{\rm max}$
+                            & 17 & degrees \\
       \hline
         $T_e$&12.21&MeV \\
         $K_{\rm max}$&26.34&MeV \\

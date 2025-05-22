@@ -3,8 +3,7 @@
 0,Facility,Global,Reference particle,Kinetic energy,20,MeV,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
 1,Source,Source,Parameterised TNSA,SourceMode,0,,Gaussian kinetic energy
-1,Source,Source,Parameterised TNSA,Wavelength,0.8,um,Laser wavelength
-1,Source,Source,Parameterised TNSA,rpmax,0.005,,Max r prime
+1,Source,Source,Parameterised TNSA,rpmax-dummy,0.005,,Max r prime
 1,Capture,Drift,,Length,0.04034,m,Length of first drift
 1,Capture,Aperture,Elliptical,RadiusX,0.003,m,Half aperture in x of elliptical colimator
 1,Capture,Aperture,Elliptical,RadiusY,0.0015,m,Half aperture in y of ellipseof elliptical colimator

@@ -5035,14 +5035,15 @@ Derived class Source:
            Parameterised laser-driven source (Mode=0):
              [0] - Wavelength - microns
              [1] - Power - W
-             [2] - Focal spot radius - m
-             [3] - Laser-pulse duration - s
-             [4] - Hot electron temperature - MeV
-             [5] - Minimum proton kinetic energy - MeV
-             [6] - Maximum proton kinetic energy - MeV
-             [7] - Intercept of sigma_{theta_S} at K=0 [degrees]
-             [8] - Scaled slope of sigma_{theta_S}     [degrees]
-             [9] - rp max
+             [2] - Strehl ratio
+             [3] - Focal spot radius - m
+             [4] - Laser-pulse duration - s
+             [5] - Hot electron temperature - MeV
+             [6] - Minimum proton kinetic energy - MeV
+             [7] - Maximum proton kinetic energy - MeV
+             [8] - Intercept of sigma_{theta_S} at K=0 [degrees]
+             [9] - Scaled slope of sigma_{theta_S}     [degrees]
+            [10] - rp max
 
            Gaussian (Mode=1):
              [0] - Sigma of x gaussian - m
@@ -5137,14 +5138,15 @@ class Source(BeamLineElement):
     ModeText   = ["Parameterised laser driven", "Gaussian", "Flat", \
                   "Read from file", "UniformDisc"]
     
-    ParamUnit  = [ ["$\\mu$m", "W", "m", "s", "MeV", \
+    ParamUnit  = [ ["$\\mu$m", "W", " ", "m", "s", "MeV", \
                     "MeV", "MeV", \
                     "degrees", "degrees", " "], \
                    ["m", "m", "MeV", "MeV", ""], \
                    [], [], \
                    ["MeV", "MeV", "m"] ]
     
-    ParamText  = [ ["Wavelength", "Power", "r0", "Duration", "Te", \
+    ParamText  = [ ["Wavelength", "Power", "Strehl ratio", "r0", \
+                    "Duration", "Te", \
                     "Kmin", "Kmax", \
                     "SigmaThetaS0", "SlopeThetaS", "rpmax"], \
                    ["SigmaX", "SigmaY", "MinCTheta", \
@@ -5153,12 +5155,13 @@ class Source(BeamLineElement):
                    ["MeanEnergy", "SigmaEnergy", "MaxRadius"] ]
     
     ParamList  = [ [float, float, float, float, float, float, \
-                    float, float, float, float], \
+                    float, float, float, float, float], \
                    [float, float, float, float, float],          \
                    [float, float, float, float, float],          \
                    [], \
                    [float, float, float] ]
-    ParamLaTeX  = [ ["Wavelength", "Power", "Focal spot radius",         \
+    ParamLaTeX  = [ ["Wavelength", "Power", "Strehl ratio", \
+                     "Focal spot radius",         \
                      "Electron Temperature", "Duration", \
                      "$K_{\\rm min}$", "$K_{\\rm max}$", \
                      "Intercept of $\\sigma_{\\theta_S}$",               \
@@ -5390,13 +5393,14 @@ class Source(BeamLineElement):
                   "Dover et al,", \
                   "High Energy Density Physics 37 (2020) 100847.")
 
-        wavelength   = 0.8
+        wavelength   = 0.8                   #.. microns
 
         E_laser      = 10.                   #.. J
         Duration     = 40.E-15               #.. s
         power        = E_laser / Duration    #.. W
+        strhlRATIO   = 3./5.
 
-        r0           = 2.5E-6                #.. m
+        r0           = 1.5E-6                #.. m
         Thickness    = 5.E-6                 #.. m
         
         Te           = 10.                   #.. MeV
@@ -5410,16 +5414,15 @@ class Source(BeamLineElement):
         rpmax        = -9999.
 
         if cls.getDebug():
-            print("     ----> wavelength, power, r0, Duration,", \
+            print("     ----> wavelength, power, strhlRATIO, r0, Duration,", \
                   "Te, Kmin, Kmax, Thickness, DivAngle, SigmaThetaS0,", \
-                  "SlopeThetaS, rpmax:", wavelength, power, r0, Duration, \
-                   Te, Kmin, Kmax, Thickness, DivAngle, SigmaThetaS0,\
-                   SlopeThetaS, rpmax)
+                  "SlopeThetaS, rpmax:", wavelength, power, strhlRATIO, r0, \
+                   Duration, Te, Kmin, Kmax, Thickness, DivAngle, \
+                   SigmaThetaS0, SlopeThetaS, rpmax)
             print(" <---- Defaults set.")
         
-        return wavelength, power, r0, Duration, Te, Kmin, Kmax, \
-               Thickness, DivAngle,                       \
-               SigmaThetaS0, SlopeThetaS, rpmax
+        return wavelength, power, strhlRATIO, r0, Duration, Te, Kmin, Kmax, \
+               Thickness, DivAngle, SigmaThetaS0, SlopeThetaS, rpmax
 
     @classmethod
     #.. Parse one parameter from Pandas data frame:
@@ -5455,7 +5458,7 @@ class Source(BeamLineElement):
         return value
 
     @classmethod
-    def calculateTe(cls, wavelength, r0, power):
+    def calculateTe(cls, wavelength, r0, power, strhlRATIO):
         if cls.getDebug():
             print(" Source(BeamLineElement).calculateTe:", \
                   "wavelength, electronCHARGESI, electronMASS,", \
@@ -5463,11 +5466,11 @@ class Source(BeamLineElement):
                   wavelength, electronCHARGESI, electronMASS, \
                   electronMASSSI)
             print("              ", \
-                  "speed of light, r0, power, eps0           ", \
+                  "speed of light, r0, power, strhlRATIO, eps0 ", \
                   "                                  :", \
                   speed_of_light, r0, power, eps0SI       )
 
-            I = power / (mth.pi * r0**2 * 10000.)
+            I = power*strhlRATIO / (mth.pi * r0**2 * 10000.)
             print("              ", \
                   "I                                             ", \
                   "                              :", I)
@@ -5475,7 +5478,7 @@ class Source(BeamLineElement):
 
         a0 = (wavelength * electronCHARGESI) / \
             (2.*mth.pi*electronMASSSI*speed_of_light**2*r0) * \
-            mth.sqrt(2.*power / (mth.pi*eps0SI*speed_of_light))
+            mth.sqrt(2.*power*strhlRATIO / (mth.pi*eps0SI*speed_of_light))
 
         if cls.getDebug():
             print("     ----> a0:", a0)
@@ -5515,18 +5518,17 @@ class Source(BeamLineElement):
         return Te
     
     @classmethod
-    def calculatet0(cls, power, r0, Thickness, DivAngle):
-        cls.setDebug(True)
+    def calculatet0(cls, power, strhlRATIO, r0, Thickness, DivAngle):
         t0 = None
         if cls.getDebug():
             print(" Source(BeamLineElement).calculatet0:", \
-                  "power, r0, Thickness, DivAngle:", \
-                   power, r0, Thickness, DivAngle)
+                  "power, strhlRATIO, r0, Thickness, DivAngle:", \
+                   power, strhlRATIO, r0, Thickness, DivAngle)
 
         qi      = 1.                                #!! Fix h/wired number
         PR      = 8.71E9                            #!! Fix h/wired number
         theta_e = DivAngle * mth.pi / 180.
-        intnsty = power / (mth.pi * r0**2) * 1E-4
+        intnsty = power*strhlRATIO / (mth.pi * r0**2) * 1E-4
         if cls.getDebug():
             print("     ----> qi, PR, theta_e, intnsty:", \
                   qi, PR, theta_e, intnsty)
@@ -5538,7 +5540,7 @@ class Source(BeamLineElement):
             print("     ----> eta:", eta)
 
         Kinfnty = 2.*electronMASSSI * speed_of_light**2 * \
-            mth.sqrt(eta*power/PR)
+            mth.sqrt(eta*power*strhlRATIO/PR)
         if cls.getDebug():
             print("     ----> Kinfnty:", Kinfnty)
 
@@ -5551,7 +5553,6 @@ class Source(BeamLineElement):
         if cls.getDebug():
             print(" <---- t0:", t0)
 
-        cls.setDebug(False)
         return t0, Kinfnty
     
     def getParticle(self):
@@ -5580,8 +5581,8 @@ class Source(BeamLineElement):
                 print("     <---- KE:", KE)
 
             #.. position at production:
-            X      = rnd.gauss(0., self.getParameters()[0])
-            Y      = rnd.gauss(0., self.getParameters()[0])
+            X      = rnd.gauss(0., self.getParameters()[3])
+            Y      = rnd.gauss(0., self.getParameters()[3])
             
             #.. x' and y' at production:
             upmax  = mth.sin(np.radians(self.g_theta(KE)))
@@ -5606,14 +5607,14 @@ class Source(BeamLineElement):
 
                 Accept = False
                 if rnd.random() < grp:
-                    if self.getParameters()[9] == -9999.:
+                    if self.getParameters()[10] == -9999.:
                         Accept = True
                     else:
                         rp = mth.sqrt(xp**2 + yp**2)
                         if self.getDebug():
                             print("     ----> rp, rpamx:", \
-                                  rp, self.getParameters()[9])
-                        if rp < self.getParameters()[9]:
+                                  rp, self.getParameters()[10])
+                        if rp < self.getParameters()[10]:
                             Accept = True
                     
             if xp == yp:
@@ -5674,15 +5675,15 @@ class Source(BeamLineElement):
     #    decreasing paramterisation presented in documentation:
     #..  Used for Mode 0
     def g_theta(self, energy):
-        Kmax  = self.getParameters()[6]
+        Kmax  = self.getParameters()[7]
         if self.getDebug():
             print(" BeamLineElement(Source).g_theta:")
             print("     ----> enegy, Kmax:", energy, Kmax)
             print("     ----> theta_S(0), theta_S(slope):", \
-                  self.getParameters()[7], self.getParameters()[8])
+                  self.getParameters()[8], self.getParameters()[9])
             
-        theta = self.getParameters()[7] - \
-            self.getParameters()[8] * energy / Kmax
+        theta = self.getParameters()[8] - \
+            self.getParameters()[9] * energy / Kmax
         
         if self.getDebug():
             print(" <---- theta:", theta)
@@ -5724,9 +5725,9 @@ class Source(BeamLineElement):
 
             self.getLaserCumProbParam()
 
-        Te   = self.getParameters()[4]
-        Kmin = self.getParameters()[5]
-        Kmax = self.getParameters()[6]
+        Te   = self.getParameters()[5]
+        Kmin = self.getParameters()[6]
+        Kmax = self.getParameters()[7]
 
         Gamma = self.getderivedParameters()[0]
 
@@ -5756,9 +5757,9 @@ class Source(BeamLineElement):
         if self.getDebug():
             print(" Source(BeamLineElement).getLaserCumProbParam: start.")
             
-        Te   = self.getParameters()[4]
-        Kmin = self.getParameters()[5]
-        Kmax = self.getParameters()[6]
+        Te   = self.getParameters()[5]
+        Kmin = self.getParameters()[6]
+        Kmax = self.getParameters()[7]
 
         if self.getDebug():
             print("     ----> Te, Kmin, Kmax:", Te, Kmin, Kmax)
@@ -5785,9 +5786,9 @@ class Source(BeamLineElement):
             print( \
         " Source(BeamLineElement).getLaserDrivenProtonEnergyProbDensity:")
 
-        Te   = self.getParameters()[4]
-        Kmin = self.getParameters()[5]
-        Kmax = self.getParameters()[6]
+        Te   = self.getParameters()[5]
+        Kmin = self.getParameters()[6]
+        Kmax = self.getParameters()[7]
 
         if self.getDebug():
             print("     ----> Te, Kmin, Kmmax:", Te, Kmin, Kmax)
@@ -5825,11 +5826,11 @@ class Source(BeamLineElement):
     #..  Used for Mode 0
     def getLaserCumProb(self, E):
         CumProb = 1.
-        if E >= self.getParameters()[6]:
+        if E >= self.getParameters()[7]:
             return CumProb
 
-        T_e      = self.getParameters()[4]
-        E_min    = self.getParameters()[5]
+        T_e      = self.getParameters()[5]
+        E_min    = self.getParameters()[6]
         
         gam = mth.sqrt(2./T_e)*(mth.sqrt(E) - mth.sqrt(E_min))
         Gam = 1. - mth.exp(-gam)

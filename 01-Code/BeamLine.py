@@ -457,9 +457,8 @@ class BeamLine(object):
 
             
             #.. Set defaults:
-            wavelength, power, r0, Duration, Te, Kmin, Kmax, \
-                Thickness, DivAngle,                   \
-                SigmaThetaS0, SlopeThetaS, rpmax = \
+            wavelength, power, strhlRATIO, r0, Duration, Te, Kmin, Kmax, \
+                Thickness, DivAngle, SigmaThetaS0, SlopeThetaS, rpmax = \
                     BLE.Source.setDEFAULTparams()
 
             #.. Wavelength:
@@ -471,6 +470,11 @@ class BeamLine(object):
             val = BLE.Source.parseSINGLEparam(cleanedSource, "Power", \
                                                            power    )
             if val != None: power = val
+
+            #.. Strehl ratio
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Strehl ratio", \
+                                                           strhlRATIO    )
+            if val != None: strhlRATIO = val
 
             #.. Laser spot radius
             val = BLE.Source.parseSINGLEparam(cleanedSource, "r0", \
@@ -494,7 +498,8 @@ class BeamLine(object):
                           "Hot electron temperature is not defined;", \
                           "it will be calculated.")
 
-                    Te = BLE.Source.calculateTe(wavelength, r0, power)
+                    Te = BLE.Source.calculateTe(wavelength, r0, \
+                                                power, strhlRATIO)
                     
                     if cls.getDebug():
                         print("         ----> Te:", Te)
@@ -523,8 +528,8 @@ class BeamLine(object):
             
             if Kmax == None:
                 #.. Calculate t0:
-                t0, Kinfnty = BLE.Source.calculatet0( \
-                                        power, r0, Thickness, DivAngle)
+                t0, Kinfnty = BLE.Source.calculatet0(power, strhlRATIO, r0, \
+                                                     Thickness, DivAngle)
 
                 # Solve for "X" to get Kmax:
                 initial_guess = 0.5
@@ -601,10 +606,10 @@ class BeamLine(object):
                 print("     ----> SigmaX, SigmaY:", \
                       SigmaX, SigmaY)
             if SrcMode == 0:
-                print("     ----> wavelength, power, r0, Te, Kmin, Kmax,", \
-                      "Thickness, DivAngle:", \
-                      wavelength, power, r0, Duration, Te, Kmin, Kmax, \
-                      Thickness, DivAngle)
+                print("     ----> wavelength, power, strhlRATIO, r0, Te,", \
+                      "Kmin, Kmax, Thickness, DivAngle:", \
+                      wavelength, power, strhlRATIO, r0, Duration, Te, \
+                      Kmin, Kmax, Thickness, DivAngle)
                 print("           SigmaThetaS0, SlopeThetaS, rpmax:", \
                       SigmaThetaS0, SlopeThetaS, rpmax)
             elif SrcMode == 1 or SrcMode == 4:
@@ -615,8 +620,8 @@ class BeamLine(object):
                       MinE, MaxE)
 
         if SrcMode == 0:
-            SrcParam = [wavelength, power, r0, Duration, Te, Kmin, Kmax, \
-                        SigmaThetaS0, SlopeThetaS, rpmax]
+            SrcParam = [wavelength, power, strhlRATIO, r0, Duration, Te, \
+                        Kmin, Kmax, SigmaThetaS0, SlopeThetaS, rpmax]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
