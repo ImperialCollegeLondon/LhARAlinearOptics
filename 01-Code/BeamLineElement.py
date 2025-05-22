@@ -157,21 +157,19 @@ constants_instance = PhysCnst.PhysicalConstants()
 alpha              = constants_instance.alpha()
 epsilon0SI         = constants_instance.epsilon0SI()
 electronCHARGESI   = constants_instance.electricCHARGE()
+eps0SI               = constants_instance.epsilon0()
 
 electronMASSSI     = constants_instance.meSI()
 protonMASSSI       = constants_instance.mpSI()
 
 speed_of_light     = constants_instance.SoL()
 
-
 #.. Natural units:
 electricCHARGE     = mth.sqrt(4.*mth.pi*alpha)
 epsilon0           = 1.
-eps0               = constants_instance.epsilon0()
 
 electronMASS       = constants_instance.me()
 protonMASS         = constants_instance.mp()
-
 
 #.. Conversion factors and units:
 Joule2MeV          = constants_instance.Joule2MeV()
@@ -426,7 +424,6 @@ class BeamLineElement:
             print(" <---- BeamLineElement.setRot2LbEnd: done.")
 
             
-        
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 
@@ -4357,7 +4354,6 @@ class GaborLens(BeamLineElement):
              " <---- GaborLens(BeamLineElement).writeElement done.")
 
         return
-
     
     @classmethod
     def readElement(cls, dataFILE):
@@ -5390,19 +5386,36 @@ class Source(BeamLineElement):
     def setDEFAULTparams(cls):
         if cls.getDebug():
             print(" BeamLineElement.Source.setDEFAULTparams starts.")
+            print("     ----> Default to J-KAREN-P to compare with", \
+                  "Dover et al,", \
+                  "High Energy Density Physics 37 (2020) 100847.")
 
         wavelength   = 0.8
-        power        = 2.5E14
-        r0           = 1.5E-6
-        Duration     = 2.8E-14
-        Te           = 10.
-        Kmin         = 1.
-        Kmax         = None
-        Thickness    = 0.4E-6
-        DivAngle     = 25.
-        SigmaThetaS0 = 20.
-        SlopeThetaS  = 15.
+
+        E_laser      = 10.                   #.. J
+        Duration     = 40.E-15               #.. s
+        power        = E_laser / Duration    #.. W
+
+        r0           = 2.5E-6                #.. m
+        Thickness    = 5.E-6                 #.. m
+        
+        Te           = 10.                   #.. MeV
+        Kmin         = 1.                    #.. MeV
+        Kmax         = None                  #.. MeV
+        
+        DivAngle     = 25.                   #.. degrees
+        
+        SigmaThetaS0 = 20.                   #.. degrees
+        SlopeThetaS  = 15.                   #.. degrees
         rpmax        = -9999.
+
+        if cls.getDebug():
+            print("     ----> wavelength, power, r0, Duration,", \
+                  "Te, Kmin, Kmax, Thickness, DivAngle, SigmaThetaS0,", \
+                  "SlopeThetaS, rpmax:", wavelength, power, r0, Duration, \
+                   Te, Kmin, Kmax, Thickness, DivAngle, SigmaThetaS0,\
+                   SlopeThetaS, rpmax)
+            print(" <---- Defaults set.")
         
         return wavelength, power, r0, Duration, Te, Kmin, Kmax, \
                Thickness, DivAngle,                       \
@@ -5452,7 +5465,7 @@ class Source(BeamLineElement):
             print("              ", \
                   "speed of light, r0, power, eps0           ", \
                   "                                  :", \
-                  speed_of_light, r0, power, eps0       )
+                  speed_of_light, r0, power, eps0SI       )
 
             I = power / (mth.pi * r0**2 * 10000.)
             print("              ", \
@@ -5462,7 +5475,7 @@ class Source(BeamLineElement):
 
         a0 = (wavelength * electronCHARGESI) / \
             (2.*mth.pi*electronMASSSI*speed_of_light**2*r0) * \
-            mth.sqrt(2.*power / (mth.pi*eps0*speed_of_light))
+            mth.sqrt(2.*power / (mth.pi*eps0SI*speed_of_light))
 
         if cls.getDebug():
             print("     ----> a0:", a0)
@@ -5503,23 +5516,24 @@ class Source(BeamLineElement):
     
     @classmethod
     def calculatet0(cls, power, r0, Thickness, DivAngle):
+        cls.setDebug(True)
         t0 = None
         if cls.getDebug():
             print(" Source(BeamLineElement).calculatet0:", \
                   "power, r0, Thickness, DivAngle:", \
                    power, r0, Thickness, DivAngle)
 
-        qi      = 1.
-        PR      = 8.71E9
+        qi      = 1.                                #!! Fix h/wired number
+        PR      = 8.71E9                            #!! Fix h/wired number
         theta_e = DivAngle * mth.pi / 180.
-        intnsty = power / (mth.pi * r0**2)
+        intnsty = power / (mth.pi * r0**2) * 1E-4
         if cls.getDebug():
             print("     ----> qi, PR, theta_e, intnsty:", \
                   qi, PR, theta_e, intnsty)
         
         #.. Power conversion efficiency, eta:
-        eta = 1.2E-15 * intnsty**(3./4.)
-        if eta > 0.5: eta = 0.5
+        eta = 1.2E-15 * intnsty**(3./4.)            #!! Fix h/wired number
+        if eta > 0.5: eta = 0.5                     #!! Fix h/wired number
         if cls.getDebug():
             print("     ----> eta:", eta)
 
@@ -5537,6 +5551,7 @@ class Source(BeamLineElement):
         if cls.getDebug():
             print(" <---- t0:", t0)
 
+        cls.setDebug(False)
         return t0, Kinfnty
     
     def getParticle(self):
@@ -5677,22 +5692,24 @@ class Source(BeamLineElement):
     # Defines the function to solve for f(x) = 0
     #..  Used for Mode 0
     @classmethod
-    def DurationBYt0equation(self, Theta, t_laser, t_0):
+    def DurationBYt0equation(self, X, t_laser, t_0):
         if self.getDebug():
             print(" Source(BeamLineElement).DurationBYt0equation start:")
-            print("     ----> Theta, t_laser, t_0:", 
-                  Theta, t_laser, t_0)
-        X = mth.cos(Theta)
+            print("     ----> X, t_laser, t_0:", 
+                  X, t_laser, t_0)
+        if   X >  0.9999: X = 0.9999
+        elif X < -0.9999: X = -0.9999
+
         if self.getDebug():
             print("     ----> X:", X)
 
-        cTheta = (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
+        eps= (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
                  (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
 
         if self.getDebug():
-            print(" <---- cos(Theta):", cTheta)
+            print(" <---- eps:", eps)
 
-        return cTheta
+        return eps
 
     # Generates energy values for the distribution
     #..  Used for Mode 0
@@ -7360,160 +7377,3 @@ class cantFINDfile(Exception):
 
 class need2convertdvStrt(Exception):
     pass
-
-"""
-    # Calculates the rest of the parameters needed for the parametrisation
-    def parameters(self):
-
-        c = 3e8               # Speed of light in vacuum [m/s]
-        m_e = 9.11e-31        # Electron mass [Kg]
-        m_i = 1836*9.1e-31    # Proton mass [kg]
-        k_B = 1.380649e-23    # Boltzman constant [J/K]
-        Z = 1                 # Ion charge number
-        lamda=1.
-
-        # Intensity in [W/cm2], laser ponderomotive potential [J]
-        I        = self.getParameters()[4]
-        ElecTemp = self.getParameters()[5]
-        
-        if I > 1e21:
-            if ElecTemp == 0.0:
-
-                particle = Prtcl.Particle()
-        
-                # Mocking or providing trace space data
-                #trace_space_mock = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-                # Example array
-                #particle.setTraceSpace(trace_space_mock) 
-                
-                #py = particle.getRPLCPhaseSpace()[1][1]
-
-                #sourceTest = Source()
-                #trace_space_mock = sourceTest.getParticleFromSource()
-                
-                #trace_space_mock = self.getTraceSpace()
-                #particle.setTraceSpace(trace_space_mock)
-
-                #particle.setLocation()
-                #particle.fillPhaseSpace()
-                #print("outcome: ", particle.fillPhaseSpace() )
-                
-                
-                # Mocking or providing trace space data; Example array
-                trace_space_mock = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-                particle.setTraceSpace(trace_space_mock) 
-                py = particle.RPLCTraceSpace2PhaseSpace(trace_space_mock)[1][1]
-                if self.getDebug():
-                    print("     ----> Calculated py:", py)
-
-                #py = particle.setRPLCPhaseSpace()[1][1]
-
-                #py = particle.calcRPLCPhaseSpace(nLoc=0)[1][1]
-                py=np.abs(py)
-                a_0 = py/(m_e*c)
-                print("     ----> THIS IS A_0: ", a_0)
-                if self.getDebug():
-                    print("     ----> THIS IS A_0: ", a_0)
-
-                #.. gets the focal spot size radius
-                r_l = BL.BeamLine.parseSource()[2][16] 
-                r_Le = r_l/np.sqrt(2*np.log(2))
-                y_0 = a_0*lamda/(2*np.pi)
-                pf = py*np.sqrt(1 - (1 - (r_Le/y_0))**2)
-
-                T_p = m_e*(c**2)*(np.sqrt(1 +(pf/(m_e*c))**2)-1)  
-                T_e = T_p
-            else: 
-                T_p = ElecTemp
-                T_e = T_p
-        else:  
-            # Laser ponderomotive potential [J], intensity in [W/cm2]
-            T_p = m_e*(c**2)*(np.sqrt(1 + (I*(lamda**2)/(1.37*1e18)))-1)    
-            T_e = T_p   # Hot electron temperature [J]
-        
-        # Fraction of laser energy converted into hot electron energy,
-        # intensity in [W/cm2]
-        f = 1.2* (10**(-15)) * (I**(0.75)) 
-        if f < 0.5:
-            f = f
-        else:
-            f = 0.5
-
-        # Total number of electrons accelerated into the targe
-        E_laser=1.
-        N_E = f*E_laser/T_p 
-        if self.getDebug():
-            print("     ----> Number of electrons accelerated into target:", \
-                  N_E)
-
-        I_m = I*10000                    # Convert intensity from W/cm2 to W/m2
-        P_L = 1.
-        r0 = np.sqrt(P_L/(I_m*np.pi))    # Radius of the laser spot [m]
-
-        # Area over which electrons are accelerated and spread [m^2]
-        theta_degrees=1.
-        theta = mth.radians(theta_degrees)  # Half-angle divergence [radians]
-        d = 1.
-        B = r0 + (d * np.tan(theta))
-        s_sheath = np.pi*(B)**2 
-
-        t_laser=1.
-        ne_0 = N_E/(c*t_laser*s_sheath)      # Hot electron density [pp/m^3]
-        c_s = np.sqrt(Z*k_B*T_e/m_i)         # Ion-acoustic velocity [m/s]
-
-        r_e = 2.82e-15              # Electron radius [m]
-        P_R = m_e * (c**3) / r_e    # Relativistic power unit [W]
-
-        # Maximum possible energy without considering the laser pulse
-        # length (infinite acceleration)
-        E_i_inf = Z * 2 * m_e * (c**2) * np.sqrt((f*P_L)/P_R)  # [J]
-
-        # Calculates the ballistic time [s]
-        v_inf = np.sqrt((2*E_i_inf/m_i))
-        t_0 = B/v_inf
-
-        # Solves the equation numerically for X
-        initial_guess = mth.acos(0.5)
-        Theta_solution = fsolve( \
-                        self.equation, initial_guess, args=(t_laser, t_0) \
-                                )
-        X = mth.cos(Theta_solution[0])
-
-        E_max = E_i_inf*(X**2)  # [J]
-
-        return ne_0, c_s, s_sheath, T_e, E_max
-
-    # Single angle generator with acceptance-rejection
-    def angle_generator(self, E_MeV):
-
-        theta_E = self.g_theta(E_MeV)         # [degrees]
-        theta_E = np.radians(theta_E)         # [rad]
-        
-        phi = rnd.uniform(0., 2. * math.pi)  # [rad]
- 
-        theta = abs(np.random.normal(0., theta_E))  # [rad]
-
-        return theta, phi
-
-    def getGaussianThetaPhi(self, E_MeV):
-
-        theta = self.angle_generator(E_MeV)[0]
-        cosTheta = np.cos(theta)
-        Phi = self.angle_generator(E_MeV)[1]
-
-        return cosTheta, Phi
-
-    def getKmax(self):
-        t_laser = self.getParameters()[4]
-        
-        # Solves the DurationBYt0equation numerically for X
-        initial_guess = mth.acos(0.5)
-        Theta_solution = fsolve( \
-                        self.DurationBYt0equation, initial_guess, args=(t_laser, t_0) \
-                                )
-        X = mth.cos(Theta_solution[0])
-
-        E_max = E_i_inf*(X**2)  # [J]
-            
-        
-"""

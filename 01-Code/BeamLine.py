@@ -527,18 +527,16 @@ class BeamLine(object):
                                         power, r0, Thickness, DivAngle)
 
                 # Solve for "X" to get Kmax:
-                initial_guess = mth.acos(0.5)
-                t0 = 5.2426148296990066e-14
-                Theta_solution = sp.optimize.fsolve( \
+                initial_guess = 0.5
+                solution = sp.optimize.fsolve( \
                                 BLE.Source.DurationBYt0equation, \
                                     initial_guess, args=(Duration, t0) )
 
                 if cls.getDebug():
-                    print("     ----> initial_guess, Theta_solution:", \
-                          initial_guess, Theta_solution)
+                    print("     ----> initial_guess, solution:", \
+                          initial_guess, solution)
 
-                Kinfnty = 6.207680726326058e-11
-                X    = mth.cos(Theta_solution[0])
+                X     = float(solution[0])
                 KmaxJ = Kinfnty*(X**2)
                 Kmax  = KmaxJ / (electricCHRG * 1.E6)
 
