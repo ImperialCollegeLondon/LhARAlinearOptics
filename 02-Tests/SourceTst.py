@@ -51,7 +51,7 @@ except:
 
 #.. Create valid instance:
 Mode  = 0
-Param = [ 0.8, 2.5E14, 1.5E-6, 2.8E-14, 10., 1., 20., 20., 15., -9999. ]
+Param = [ 0.8, 2.5E14, 0.6, 1.5E-6, 2.8E-14, 10., 1., 20., 20., 15., -9999. ]
 Src = BLE.Source("Source0", rStrt, vStrt, drStrt, dvStrt, Mode, Param)
     
 #.. __repr__
@@ -207,7 +207,7 @@ print("SourceTest:", SourceTest, \
       " test parameterised laser-driven source distribution ", \
       "check.")
 Src1 = BLE.Source("Source2", rStrt, vStrt, drStrt, dvStrt, \
-                  0, [ 0.8, 2.5E14, 1.5E-6, 2.8E-14, 10., 1., \
+                  0, [ 0.8, 2.5E14, 0.6, 1.5E-6, 2.8E-14, 10., 1., \
                        20., 20., 15., -9999. ])
 
 print(Src1)
