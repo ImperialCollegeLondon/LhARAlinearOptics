@@ -27,9 +27,9 @@ Class BeamIO:
   --------------------
    All instance attributes are initialised to Null
 
-            _dataFile : Data file to be read or written;
+            _dataFILE : Data file to be read or written;
            _Rd1stRcrd : Boolean, True, if first record has been read from
-                        _dataFile.
+                        _dataFILE.
      _dataFILEversion : _dataFILEversion version of data file being read:
                   = 1 : First version, does not have geometry record as
                         first record in file.
@@ -37,6 +37,7 @@ Class BeamIO:
                  >= 3 : Also has repo version stored in _repoVERSION
                  >= 4 : Include drStrt and dvStrt for beam line elements
                  >= 5 : Convert dvStrt to Euler angles
+                 >= 6 : Revised source paramter format
          _repoVERSION : [ [tagNAME, tagDATETIME],
                           [commitSTRING, commitDATETIME] ]
            _BDSIMfile : If True, read file in BDSIM format.
@@ -118,9 +119,9 @@ class BeamIO:
             print(' BeamIO.__init__: ', \
                   'creating BeamIO object')
 
-        BeamIO.instances.append(self)
-
         self.setAll2None()
+
+        BeamIO.instances.append(self)
 
         #.. Sanity checks on i/p arguments:
         if not isinstance(_create, bool):
@@ -201,9 +202,9 @@ class BeamIO:
         print("\n BeamIO:")
         print(" -------")
         print("     ----> Debug flag:", self.getDebug())
-        print("     ----> Data file:", self.getdataFILE())
-        print("     ---->    Create:", self.getcreate())
-        print("     ----> BDSIMfile:", self.getBDSIMfile())
+        print("     ---->  Data file:", self.getdataFILE())
+        print("     ---->     Create:", self.getcreate())
+        print("     ---->  BDSIMfile:", self.getBDSIMfile())
 
         
 #--------  "Set method" only Debug
@@ -216,7 +217,7 @@ class BeamIO:
         cls.__Debug = Debug
         
     def setAll2None(self):
-        self._dataFile        = None
+        self._dataFILE        = None
         self._Rd1stRcrd       = False
         self._dataFILEversion = None
         self._create          = None

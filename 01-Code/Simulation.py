@@ -335,7 +335,7 @@ class Simulation(object):
             iEvt      = 0
             Scl  = 10
             iCnt = 1
-            while not EndOfFile:
+            while not EndOfFile and iEvt < self.getNEvt():
                 try:
                     EndOfFile = Prtcl.Particle.readParticle( \
                                               self.getinputFILE()[0])
