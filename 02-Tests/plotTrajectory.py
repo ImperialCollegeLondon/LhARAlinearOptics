@@ -43,7 +43,7 @@ while not EndOfFile:
 
     if BL.BeamLine.getinstances() == None:
         filename     = os.path.join(HOMEPATH, \
-                        '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
+                        '12-Data4Tests/LIONBeamLine-Params-LsrDrvn.csv')
         BLI  = BL.BeamLine(filename)
 
     else:

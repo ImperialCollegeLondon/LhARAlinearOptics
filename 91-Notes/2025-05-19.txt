@@ -43,22 +43,20 @@ OK - RunSimulationTst.py
 OK - SimulationTst.py
 OK - SolenoidTst.py
 OK - SourceTst.py
- - TestWrite.py
- - TestRead.py
- - extrapolatedBeamTst.py
- - plotTrajectory.py
- - testGitRepoId.py
- - visualiseTst.py
- - OctupoleTst.py
- - plotQuadTriplet.py
+OK - TestWrite.py
+OK - TestRead.py
+OK - extrapolatedBeamTst.py
+OK - plotTrajectory.py
+OK - visualiseTst.py
+Fl - OctupoleTst.py
+Fl - plotQuadTriplet.py
 
 Scripts:
- - 2BDSIM.py
- - list.txt
- - plotBeam.py
- - plotextrapolatedBeam.py
+OK - 2BDSIM.py
+OK - plotBeam.py
+OK - plotextrapolatedBeam.py
 OK - runBeamSim.py
- - readBeamSim.py
+OK - readBeamSim.py
 OK - visualiseBeam.py
 
 --------  --------  --------  --------  --------  --------  --------  20May25
@@ -186,3 +184,59 @@ OK - visualiseBeam.py
 
 
 --------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+   - ApertureTst.py
+   - BeamIOTst-rd-BDSIM.py
+   - BeamIOTst-wrt.py
+   - BeamIOTst-rd.py
+   - BeamLineElementTst.py
+   - BeamLineTst.py
+   - BeamTst.py
+   - CylindricalRFCavityTst.py
+   - DRACOfacilityTst.py
+   - DefocusQuadTst.py
+   - DipoleTst.py
+   - DriftTst.py
+   - ExpSourceTst.py
+   - ExpSourceTst_rms_KE.py
+   - FacilityTst.py
+   - FocusQuadTst.py
+   - GaborLensTst.py
+   - LIONfacilityTst.py
+   - LaTexTst.py
+   - LhARAFacility-from-datafile-Tst.py
+   - LhARAFacilityTst.py
+   - LhARALinearOpticsTst.py
+   - LhARAMagnetTable.py
+   - ParticleTst.py
+   - PhysicalConstantsTst.py
+   - QuadDoubletTst.py
+   - QuadTripletTst.py
+   - RPLCswitchTst.py
+   - ReferenceParticleTst.py
+   - RunDRACOsimulation.py
+   - ReadDRACOsimu.py
+   - RunLIONsimulation.py
+   - ReadLIONsimu.py
+   - RunLhARAsimulation.py
+   - ReadLhARAsimu.py
+   - RunSimulationTst.py
+   - SimulationTst.py
+   - SolenoidTst.py
+   - SourceTst.py
+   - TestWrite.py
+   - TestRead.py
+   - extrapolatedBeamTst.py
+   - plotTrajectory.py
+   - visualiseTst.py
+Fl - OctupoleTst.py
+Fl - plotQuadTriplet.py
+
+Scripts:
+   - 2BDSIM.py
+   - plotBeam.py
+   - plotextrapolatedBeam.py
+   - runBeamSim.py
+   - readBeamSim.py
+   - visualiseBeam.py
+

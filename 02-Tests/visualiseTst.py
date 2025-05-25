@@ -27,7 +27,7 @@ print("========  visualise: tests start  ========")
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
 #                             '99-Scratch/LION-test.dat')
-                             '11-Parameters/LhARAdata4tests.dat')
+                             '12-Data4Tests/LhARAdata4tests.dat')
 #                             '11-Parameters/Data4Tests.dat')
 #                             '99-Scratch/HorizLeft.dat')
 #                             '99-Scratch/HorizRight.dat')
