@@ -132,6 +132,8 @@ Created on Mon 12Jun23: Version history:
 @author: kennethlong
 """
 
+import warnings as wrnngs
+
 from copy import deepcopy
 import matplotlib.patches as patches
 import scipy  as sp
@@ -817,9 +819,11 @@ class BeamLineElement:
             print(" <---- BeamLineElement.writeElement done.")
         
     @classmethod
-    def readElement(cls, dataFILE):        #<---- class BeamLineElement:
+    def readElement(cls, dataFILEinst):        #<---- class BeamLineElement:
         if cls.getDebug():
             print(" BeamLineElement.readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -1203,9 +1207,11 @@ class Facility(BeamLineElement):
             print(" <---- Facility(BeamLineElement).writeElement done.")
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Facility(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -1434,9 +1440,11 @@ class Drift(BeamLineElement):
     
     
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Drift(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -1811,9 +1819,11 @@ class Aperture(BeamLineElement):
             print(" <---- Aperture(BeamLineElement).writeElement done.")
         
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Aperture(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -2396,9 +2406,11 @@ class FocusQuadrupole(BeamLineElement):
              " <---- FocusQuadrupole(BeamLineElement).writeElement done.")
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" FocusQuadrupole(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -2969,9 +2981,11 @@ class DefocusQuadrupole(BeamLineElement):
              " <---- DefocusQuadrupole(BeamLineElement).writeElement done.")
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" DefocusQuadrupole(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -3380,9 +3394,11 @@ class SectorDipole(BeamLineElement):
         return
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" SectorDipole(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -3861,9 +3877,11 @@ class Solenoid(BeamLineElement):
         return self._ksol
     
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Solenoid(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -4356,9 +4374,11 @@ class GaborLens(BeamLineElement):
         return
     
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" GaborLens(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -4984,9 +5004,11 @@ class CylindricalRFCavity(BeamLineElement):
         return
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Source(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -5128,8 +5150,6 @@ getLaserDrivenProtonEnergy: Generate proton energy at source using
 
 """
 
-import warnings as wrnngs
-
 class Source(BeamLineElement):
     instances  = []
     __Debug    = False
@@ -5214,7 +5234,15 @@ class Source(BeamLineElement):
             print("     ----> Before parameter checks; Mode, Param:", \
                   _Mode, _Param)
 
-        ValidSourceParam = self.CheckSourceParam(_Mode, _Param)
+        params = _Param
+        try:
+            ValidSourceParam = self.CheckSourceParam(_Mode, _Param)
+        except:
+            if len(_Param) == 16:
+                params = self.paramsFROMlegacyPARAMS(_Param)
+
+        ValidSourceParam = self.CheckSourceParam(_Mode, params)
+
         if not ValidSourceParam:
             print(" BeamLineElement(Source).__init__:", \
                   " bad source input; :", \
@@ -5227,7 +5255,7 @@ class Source(BeamLineElement):
         self.setMode(_Mode)
         self.setModeText(Source.ModeText[_Mode])
         self.setParameterText(Source.ParamText[_Mode])
-        self.setParameters(_Param)
+        self.setParameters(params)
         self.setParameterUnit(Source.ParamUnit[_Mode])
                 
         if self.__Debug:
@@ -5554,7 +5582,29 @@ class Source(BeamLineElement):
             print(" <---- t0:", t0)
 
         return t0, Kinfnty
-    
+
+    def paramsFROMlegacyPARAMS(self, legacyPARAMS):
+        r0 = mth.sqrt(legacyPARAMS[0]**2 + legacyPARAMS[1]**2)
+        params = [ legacyPARAMS[8],  \
+                   legacyPARAMS[6],  \
+                   3./5.,            \
+                   r0,               \
+                   legacyPARAMS[4],  \
+                   10.,              \
+                   legacyPARAMS[3],  \
+                   legacyPARAMS[4],  \
+                   legacyPARAMS[13], \
+                   legacyPARAMS[14], \
+                   legacyPARAMS[15] ]
+
+        print(" Source(BeamLineElement).paramsFROMlegacyPARAMS:")
+        print("     ---->", \
+              "Attempt to convert parameters to present structure.")
+        print("          Legacy params:", legacyPARAMS)
+        print(" <---- Converted params:", params)
+
+        return params
+        
     def getParticle(self):
         if self.getDebug():
             print(" BeamLineElement(Source).getParticle: start")
@@ -6135,9 +6185,11 @@ class Source(BeamLineElement):
             print(" <---- Source(BeamLineElement).writeElement done.")
                             
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Source(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -6162,8 +6214,61 @@ class Source(BeamLineElement):
         nPrm = record[0]
         if cls.getDebug():
             print("     ----> Number of parameters:", nPrm)
+            print("     ----> Data file version:", \
+                  dataFILEinst.getdataFILEversion())
 
-        Params = []
+        """
+        Data file version 6 or greater:
+          Have laser-drivern source specified using the set of parameters
+          defined in "revision 1" of the LhARA linear optics documentation.
+          In this case the paramters are:
+             [0] - Wavelength - microns
+             [1] - Power - W
+             [2] - Strehl ratio
+             [3] - Focal spot radius - m
+             [4] - Laser-pulse duration - s
+             [5] - Hot electron temperature - MeV
+             [6] - Minimum proton kinetic energy - MeV
+             [7] - Maximum proton kinetic energy - MeV
+             [8] - Intercept of sigma_{theta_S} at K=0 [degrees]
+             [9] - Scaled slope of sigma_{theta_S}     [degrees]
+            [10] - rp max
+
+        Data file versions 5 and below:
+          Laser-driven source specified by subset of paramters:
+             [0] - Sigma of x gaussian - m
+             [1] - Sigma of y gaussian - m
+             [2] - Minimum cos theta to generate
+             [3] - E_min: MeV min energy to generate
+             [4] - E_max: MeV max energy to generate;
+                     overwritten when calculated in
+                     getLaserDrivenParticleEnergy
+             [5] - nPnts: Number of points to sample for integration of PDF
+             [6] - P_L: Laser power [W]
+             [7] - E_L: Laser energy [J]
+             [8] - lamda: Laser wavelength [um]
+             [9] - t_laser: Laser pulse duration [s]
+            [10] - d: Laser thickness [m]
+            [11] - I: Laser intensity [W/cm2]
+            [12] - theta_degrees: Electron divergence angle [degrees]
+            [13] - Intercept of sigma_{theta_S} at K=0 [degrees]
+            [14] - Scaled slope of sigma_{theta_S}     [degrees]
+            [15] - rp max
+          So, need to check against "ParamListOLD"
+
+        """
+
+        ParamListCHK = cls.ParamList
+        Params       = []
+        if dataFILEinst.getdataFILEversion() < 6:
+            ParamListCHK = [ [float, float, float, float, float, int,    \
+                               float, float, float, float, float, float, \
+                               float, float, float, float],              \
+                              [float, float, float, float, float],       \
+                              [float, float, float, float, float],       \
+                              [],                                        \
+                              [float, float, float] ]
+            
         for iPrm in range(nPrm):
             brecord = dataFILE.read((1*8))
             if brecord == b'':
@@ -6171,12 +6276,15 @@ class Source(BeamLineElement):
         
             record  = strct.unpack(">d", brecord)
             var     = float(record[0])
-            if cls.ParamList[Mode][iPrm] == int:
+            if cls.getDebug():
+                print(" iPrm, var:", iPrm, var)
+            if ParamListCHK[Mode][iPrm] == int:
                 var = int(var)
             Params.append(var)
+            
         if cls.getDebug():
             print("     ----> Parameters:", Params)
-            
+
         return EoF, Mode, Params
 
 
@@ -7280,9 +7388,11 @@ class RPLCswitch(BeamLineElement):
             print(" <---- RPLCswitch(BeamLineElement).writeElement done.")
         
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" RPLCswitch(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 

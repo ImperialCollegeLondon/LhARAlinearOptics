@@ -1420,13 +1420,14 @@ class BeamLine(object):
             print(" <---- BeamLine.writeBeamLine done.")
 
     @classmethod
-    def readBeamLine(cls, beamlineFILE=None):
+    def readBeamLine(cls, beamlineFILEinst=None):
         if cls.getDebug():
             print(" BeamLine.readBeamLine starts.")
 
         #.. Initialise BeamLine instance:
         cls.__new__(cls, None, True)
-        
+
+        beamlineFILE = beamlineFILEinst.getdataFILE()
         if not isinstance(beamlineFILE, io.BufferedReader):
             raise noFILE( \
                     " BeamLine.readBeamLine: file does not exist.")
@@ -1471,53 +1472,53 @@ class BeamLine(object):
                 print("                   Derived class:", derivedCLASS)
 
             if derivedCLASS == "Facility":
-                EoF, p0, VCMVr = BLE.Facility.readElement(beamlineFILE)
+                EoF, p0, VCMVr = BLE.Facility.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Source":
-                EoF, Mode, Params = BLE.Source.readElement(beamlineFILE)
+                EoF, Mode, Params = BLE.Source.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Drift":
-                EoF, Length = BLE.Drift.readElement(beamlineFILE)
+                EoF, Length = BLE.Drift.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Aperture":
-                EoF, Type, Params = BLE.Aperture.readElement(beamlineFILE)
+                EoF, Type, Params = BLE.Aperture.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "GaborLens":
                 EoF, Bz, VA, RA, Rp, Ln, St = \
-                    BLE.GaborLens.readElement(beamlineFILE)
+                    BLE.GaborLens.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Solenoid":
                 EoF, Ln, St, kSol = \
-                    BLE.Solenoid.readElement(beamlineFILE)
+                    BLE.Solenoid.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "CylindricalRFCavity":
                 EoF, Grdnt, Frqncy, Phs = \
-                    BLE.CylindricalRFCavity.readElement(beamlineFILE)
+                    BLE.CylindricalRFCavity.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "SectorDipole":
                 EoF, Angl, B = \
-                    BLE.SectorDipole.readElement(beamlineFILE)
+                    BLE.SectorDipole.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "DefocusQuadrupole":
                 EoF, Ln, St, kDQ = \
-                    BLE.DefocusQuadrupole.readElement(beamlineFILE)
+                    BLE.DefocusQuadrupole.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "FocusQuadrupole":
                 EoF, Ln, St, kFQ = \
-                    BLE.FocusQuadrupole.readElement(beamlineFILE)
+                    BLE.FocusQuadrupole.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "RPLCswitch":
-                EoF = BLE.RPLCswitch.readElement(beamlineFILE)
+                EoF = BLE.RPLCswitch.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             else:
@@ -1526,7 +1527,7 @@ class BeamLine(object):
                 sys.exit(1)
 
             EoF, Loc, r, v, dr, dv = \
-                BLE.BeamLineElement.readElement(beamlineFILE)
+                BLE.BeamLineElement.readElement(beamlineFILEinst)
             
             if derivedCLASS == "Facility":
                 instBLE = BLE.Facility(Loc, r, v, dr, dv, p0, VCMVr)

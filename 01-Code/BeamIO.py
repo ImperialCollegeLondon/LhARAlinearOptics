@@ -37,9 +37,10 @@ Class BeamIO:
                  >= 3 : Also has repo version stored in _repoVERSION
                  >= 4 : Include drStrt and dvStrt for beam line elements
                  >= 5 : Convert dvStrt to Euler angles
-                 >= 6 : Revised source paramter format
+                 >= 6 : Revised source parameter format
          _repoVERSION : [ [tagNAME, tagDATETIME],
                           [commitSTRING, commitDATETIME] ]
+              _create : Boolean; if true create file.
            _BDSIMfile : If True, read file in BDSIM format.
 
   Methods:
@@ -164,7 +165,7 @@ class BeamIO:
                     print("         ----> File opened for write.")
                 
                 self.writeFIRSTword()
-                self.writeVersion("BeamIO v5")
+                self.writeVersion("BeamIO v6")
                 self.writeREPOversion()
                 
             else:
@@ -201,10 +202,14 @@ class BeamIO:
     def print(self):
         print("\n BeamIO:")
         print(" -------")
-        print("     ----> Debug flag:", self.getDebug())
-        print("     ---->  Data file:", self.getdataFILE())
-        print("     ---->     Create:", self.getcreate())
-        print("     ---->  BDSIMfile:", self.getBDSIMfile())
+        print("     ---->        Debug flag:", self.getDebug())
+        print("     ---->      Path to file:", self.getpathFILE())
+        print("     ---->         Data file:", self.getdataFILE())
+        print("     ---->   Read 1st record:", self.getReadFirstRecord())
+        print("     ----> Data file version:", self.getdataFILEversion())
+        print("     ---->      Repo version:", self.getrepoVERSION())
+        print("     ---->            Create:", self.getcreate())
+        print("     ---->         BDSIMfile:", self.getBDSIMfile())
 
         
 #--------  "Set method" only Debug
@@ -217,9 +222,11 @@ class BeamIO:
         cls.__Debug = Debug
         
     def setAll2None(self):
+        self._pathFILE       = None
         self._dataFILE        = None
         self._Rd1stRcrd       = False
         self._dataFILEversion = None
+        self._repoVERSION     = None
         self._create          = None
         self._BDSIMfile       = None
 
@@ -238,6 +245,9 @@ class BeamIO:
         if not isinstance(dataFILEversion, int):
             raise badArgument()
         self._dataFILEversion = dataFILEversion
+
+    def setrepoVERSION(self, repoVERSION):
+        self._repoVERSION = repoVERSION
 
     def setcreate(self, _create):
         if not isinstance(_create, bool):
@@ -260,14 +270,20 @@ class BeamIO:
     def getinstances(cls):
         return cls.instances
 
-    def getpathFILE(self):
-        return self._pathFILE
-
     def getdataFILE(self):
         return self._dataFILE
 
+    def getpathFILE(self):
+        return self._pathFILE
+
     def getReadFirstRecord(self):
         return self._Rd1stRcrd
+    
+    def getReadFirstRecord(self):
+        return self._Rd1stRcrd
+
+    def getrepoVERSION(self):
+        return self._repoVERSION
 
     def getdataFILEversion(self):
         return self._dataFILEversion
@@ -350,12 +366,13 @@ class BeamIO:
                           self.getdataFILEversion())
                 if nVersion >= 3:
                     repoVERSION = self.readREPOversion()
+                    self.setrepoVERSION(repoVERSION)
 
                 if self.getDebug():
                     print(" BeamIO.readBeamDataRecord:", \
                           "reading data file version", Version)
                     
-                BL.BeamLine.readBeamLine(self.getdataFILE())
+                BL.BeamLine.readBeamLine(self)
 
             else:
                 if self.getDebug():

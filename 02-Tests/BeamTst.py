@@ -37,7 +37,7 @@ Bm.Beam.cleanBeams()
 ##! Now create pointer to input data file:
 HOMEPATH = os.getenv('HOMEPATH')
 inputdatafile = os.path.join(HOMEPATH, \
-                       '11-Parameters/Data4Tests.dat')
+                       '12-Data4Tests/Data4Tests.dat')
 
 ##! Now create pointer to output data file:
 outputdatafile = os.path.join(HOMEPATH, \

@@ -122,8 +122,8 @@ SrcZ     = np.array([])
 SrcE     = np.array([])
 
 g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
-E_min_MeV = Src.getParameters()[5]
-E_max_MeV = Src.getParameters()[6]
+E_min_MeV = Src.getParameters()[6]
+E_max_MeV = Src.getParameters()[7]
 
 iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 p0 = iRefPrtcl.getMomentumIn(0)
@@ -202,6 +202,7 @@ plt.plot(Ee, g_scaled, color='r', label='Required Distribution', linewidth=1)
 
 y_max_cutoff = g_scaled[-1]
 x            = E_max_MeV
+print(" x, ymax:", x, y_max_cutoff)
 plt.vlines(x, ymin=0, ymax=y_max_cutoff, color='r', \
            linestyle='-', linewidth=1)  # [MeV]
 
@@ -216,6 +217,7 @@ plt.savefig('99-Scratch/SourceTst_K.pdf')
 plt.close()
 
 print("         <---- Done.")
+
 
 #.. ----> Cumulative probability:
 print("         ----> Cumulative probability:")
