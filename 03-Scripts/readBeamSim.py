@@ -102,7 +102,7 @@ def main(argv):
                     Scl  = Scl * 10
         if iEvt < 1:
             print(BL.BeamLine.getinstance())
-            print(Prtcl.Particle.getParticleInstances()[iEvt-1])
+            print(Prtcl.Particle.getinstances()[iEvt-1])
         if nEvts != None and iEvt == nEvts:
             break
 

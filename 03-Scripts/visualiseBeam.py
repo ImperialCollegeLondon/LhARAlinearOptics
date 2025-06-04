@@ -122,9 +122,9 @@ def main(argv):
         Facility = BL.BeamLine.getElement()[0].getName()
         Ttl = Facility + " (reference particle local coordinates)"
         fig.suptitle(Ttl, fontdict=font)
-        axs[0].set_xlim(-0.1, 21.5)
+        axs[0].set_xlim(-0.1, 2.1)
         axs[0].set_ylim(-0.1,  0.1)
-        axs[1].set_xlim(-0.1, 21.5)
+        axs[1].set_xlim(-0.1, 2.15)
         axs[1].set_ylim(-0.1,  0.1)
 
         ivisRPLCx.Particles(axs[0], nEvts)
@@ -147,10 +147,10 @@ def main(argv):
         Ttl = Facility + " (laboratory reference frame)"
         fig.suptitle(Ttl, fontdict=font)
 
-        axs[0].set_xlim(-0.10, 18.0)
+        axs[0].set_xlim(-0.10, 2.1)
         axs[0].set_ylim(-0.10,  0.1)
-        axs[1].set_xlim(-0.10, 18.0)
-        axs[1].set_ylim(-0.75,  6.0)
+        axs[1].set_xlim(-0.10, 2.1)
+        axs[1].set_ylim(-0.1,  0.1)
 
         ivisLabx.Particles(axs[0], nEvts)
         ivisLabx.BeamLine(axs[0])

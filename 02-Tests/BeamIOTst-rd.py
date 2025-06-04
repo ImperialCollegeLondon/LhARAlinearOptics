@@ -48,7 +48,7 @@ while not EndOfFile:
                 iCnt = 1
                 Scl  = Scl * 10
     if iEvt <-1:
-        print(Prtcl.Particle.getParticleInstances()[iEvt])
+        print(Prtcl.Particle.getinstances()[iEvt])
     if iEvt == nEvt:
         break
 
@@ -86,7 +86,7 @@ while not EndOfFile:
                 iCnt = 1
                 Scl  = Scl * 10
     if iEvt <-1:
-        print(Prtcl.Particle.getParticleInstances()[iEvt])
+        print(Prtcl.Particle.getinstances()[iEvt])
     if iEvt == nEvt:
         break
 
@@ -124,7 +124,7 @@ while not EndOfFile:
                 iCnt = 1
                 Scl  = Scl * 10
     if iEvt <-1:
-        print(Prtcl.Particle.getParticleInstances()[iEvt])
+        print(Prtcl.Particle.getinstances()[iEvt])
     if iEvt == nEvt:
         break
 
@@ -162,7 +162,7 @@ while not EndOfFile:
                 iCnt = 1
                 Scl  = Scl * 10
     if iEvt <-1:
-        print(Prtcl.Particle.getParticleInstances()[iEvt])
+        print(Prtcl.Particle.getinstances()[iEvt])
     if iEvt == nEvt:
         break
 
@@ -200,7 +200,7 @@ while not EndOfFile:
                 iCnt = 1
                 Scl  = Scl * 10
     if iEvt <-1:
-        print(Prtcl.Particle.getParticleInstances()[iEvt])
+        print(Prtcl.Particle.getinstances()[iEvt])
     if iEvt == nEvt:
         break
 

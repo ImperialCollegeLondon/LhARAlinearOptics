@@ -71,13 +71,13 @@ print("     ----> Find one event that made it to end of beam line:")
 Prt    = False
 iPrtcl = 0
 
-print(" Here:", len(Prtcl.Particle.getParticleInstances()))
+print(" Here:", len(Prtcl.Particle.getinstances()))
 
 while not Prt:
     OK = DRACObI.trackDRACO(1)
-    print(" HereHere:", len(Prtcl.Particle.getParticleInstances()))
+    print(" HereHere:", len(Prtcl.Particle.getinstances()))
     iPrtclInst = Prtcl.Particle.instances[ \
-                            len(Prtcl.Particle.getParticleInstances())-1]
+                            len(Prtcl.Particle.getinstances())-1]
     if iPrtcl >= NEvt:
         print("         ----> No events made it to end of delivery section.")
         Prt = True

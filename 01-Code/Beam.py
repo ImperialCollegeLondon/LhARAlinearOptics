@@ -399,6 +399,7 @@ class Beam:
             self._sigmaxy.append([sx1, sy1])
 
         if len(self._sigmaxy) >= len(BLE.BeamLineElement.getinstances()):
+            print(len(self._sigmaxy), len(BLE.BeamLineElement.getinstances()))
             raise BadCovMtrx(" too many sigmaxy!")
         if self.getDebug():
             print(" <---- Beam.setsigmaxy: done.")
@@ -455,11 +456,11 @@ class Beam:
                 print("                e24:", e24)
                 print("                e24:", e26)
 
-            if e2X < 0. and abs(e2X) < 0.01: e2X = 0.
-            if e2Y < 0. and abs(e2Y) < 0.01: e2Y = 0.
-            if e2L < 0. and abs(e2L) < 0.01: e2L = 0.
-            if e24 < 0. and abs(e24) < 0.01: e24 = 0.
-            if e26 < 0. and abs(e26) < 0.01: e26 = 0.
+            if e2X < 0.: e2X = 0.
+            if e2Y < 0.: e2Y = 0.
+            if e2L < 0.: e2L = 0.
+            if e24 < 0.: e24 = 0.
+            if e26 < 0.: e26 = 0.
             self._emittance.append([                \
                                      mth.sqrt(e2X), \
                                      mth.sqrt(e2Y), \
@@ -1413,7 +1414,8 @@ class extrapolateBeam(Beam):
         if self.getDebug():
             print(" extrapolateBeam.extrapolateBeam: transport", \
                   "beam envelope")
-            print(" BeamLine: nBLs:", id(BL.BeamLine.getinstances()))
+            print("     ----> BeamLine: id(BL):", \
+                  id(BL.BeamLine.getinstances()))
             print(BL.BeamLine.getinstances())
         
         EndOfFile = False

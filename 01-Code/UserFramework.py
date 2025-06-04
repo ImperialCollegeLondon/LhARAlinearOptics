@@ -213,7 +213,7 @@ def EventLoop(iUsrAnl, ibmIOr, ibmIOw, nEvtsIn):
 
         if iEvt <0:
             if UsrFw_Debug:
-                print(Prtcl.Particle.getParticleInstances()[iEvt])
+                print(Prtcl.Particle.getinstances()[iEvt])
         if nEvts != None and iEvt == nEvts or EndOfFile:
             EndOfRun = True
 

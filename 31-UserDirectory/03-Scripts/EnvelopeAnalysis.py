@@ -16,7 +16,8 @@ import UserFramework        as UsrFw
 
 def main(argv):
 
-    Success, Debug, beamspecfile, inputfile, outputfile, nEvts = \
+    Success, Debug, \
+        beamspecfile, inputfile, bdsimfile, outputfile, nEvts = \
         UsrFw.startAnalysis(argv)
     if not Success:
         print(" <---- Failed at UsrFw.startAnalysis, exit")
@@ -24,7 +25,8 @@ def main(argv):
 
     Success, ibmIOr, ibmIOw = UsrFw.handleFILES(beamspecfile, \
                                                 inputfile, \
-                                                outputfile)
+                                                outputfile, \
+                                                bdsimfile)
     if not Success:
         print(" <---- Failed at UsrFw.handleFILES, exit")
         exit(1)
@@ -38,9 +40,9 @@ def main(argv):
     Prtcl.Particle.cleanParticles()
     
     ibmIOwStrt = bmIO.BeamIO(None, '99-Scratch/ParticlesStrt.dat', True)
-    BL.BeamLine.getinstance().writeBeamLine(ibmIOwStrt.getdataFILE())
+    BL.BeamLine.getinstances().writeBeamLine(ibmIOwStrt.getdataFILE())
 
-    nEvtGen = BL.BeamLine.getinstance().trackBeam(nEvts, \
+    nEvtGen = BL.BeamLine.getinstances().trackBeam(nEvts, \
                                         ibmIOwStrt.getdataFILE(),
                                         None, None, False)
     iexBm.plotBeamProgression('99-Scratch/BeamProgressStrt.pdf')
@@ -67,7 +69,7 @@ def main(argv):
         
         if Debug:
             print("     New extrapolated beam:")
-            iBm = Bm.Beam.getBeamInstances()[0]
+            iBm = Bm.Beam.getinstances()[0]
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ---->   sigmaxy[0]:", iBm.getsigmaxy()[0])
                 print("     ----> emittance[0]:", iBm.getemittance()[0])
@@ -81,10 +83,10 @@ def main(argv):
     ibmIOr   = iEO.setupIteration(beamspecfile, ibmIOr, iEO, False)
     dataFILE = ibmIOw.getdataFILE()
     
-    BL.BeamLine.getinstance().writeBeamLine(dataFILE)
-    print(BL.BeamLine.getinstance())
+    BL.BeamLine.getinstances().writeBeamLine(dataFILE)
+    print(BL.BeamLine.getinstances())
 
-    nEvtGen  = BL.BeamLine.getinstance().trackBeam(nEvts,     \
+    nEvtGen  = BL.BeamLine.getinstances().trackBeam(nEvts,     \
                                                    dataFILE, \
                                                    None, None, False)
 

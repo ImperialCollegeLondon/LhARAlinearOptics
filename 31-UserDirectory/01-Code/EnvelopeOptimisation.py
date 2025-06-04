@@ -92,7 +92,7 @@ class UserAnal:
         if self.getDebug():
             print(" EnvelopeOptimisation.UserEnd: start")
 
-        iBm = Bm.Beam.getBeamInstances()[0]
+        iBm = Bm.Beam.getinstances()[0]
         if self.getDebug():
             print("     ----> Dump of Beam instance: \n", iBm)
 
@@ -145,14 +145,15 @@ class UserAnal:
 
         self.setBeamLine()
         
-        iBm = Bm.Beam.getBeamInstances()[0]
+        iBm = Bm.Beam.getinstances()[0]
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> Initial Beam instance: \n", iBm)
 
-        iBm._sigmaxy    = [iBm._sigmaxy[0]]
-        iBm._emittance  = [iBm._emittance[0]]
-        iBm._Twiss      = [iBm._Twiss[0]]
+        iBm._CovMtrx    = [iBm._CovMtrx[0]]
+        iBm._sigmaxy    = []
+        iBm._emittance  = []
+        iBm._Twiss      = []
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ---->   sigmaxy[0]:", iBm.getsigmaxy()[0])
@@ -199,8 +200,8 @@ class UserAnal:
         if self.getDebug():
             print("\n Envelopeptimisation.setBeamLine: start")
         #--------  Get beam line defined so far and reference particle:
-        iBL      = BL.BeamLine.getinstance()
-        refPrtcl = Prtcl.ReferenceParticle.getinstance()
+        iBL      = BL.BeamLine.getinstances()
+        refPrtcl = Prtcl.ReferenceParticle.getinstances()
 
         #.. Last beam line element:
         iLst = iBL.getElement()[-1]
@@ -212,14 +213,14 @@ class UserAnal:
         rStrt  = iLst.getrStrt() + iLst.getStrt2End()
         vStrt  = iLst.getvEnd()
         drStrt = np.array([0.,0.,0.])
-        dvStrt = np.array([[0.,0.],[0.,0.]])
+        dvStrt = np.array([0.,0.,0.])
 
         #.. Add drift 1:
         iBLE    = BLE.Drift(self.getBLEparams()[0][0],    \
                             rStrt, vStrt, drStrt, dvStrt, \
                             self.getBLEparams()[0][1])
         BL.BeamLine.addBeamLineElement(iBLE)
-        refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+        refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
         
         #.. Quad doublet:
         rStrt  = iBLE.getrStrt() + iBLE.getStrt2End()
@@ -228,14 +229,14 @@ class UserAnal:
                             self.getBLEparams()[1][1],           \
                             self.getBLEparams()[1][2])
         BL.BeamLine.addBeamLineElement(iBLE)
-        refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+        refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
         
         rStrt  = iBLE.getrStrt() + iBLE.getStrt2End()
         iBLE    = BLE.Drift(self.getBLEparams()[2][0],    \
                             rStrt, vStrt, drStrt, dvStrt, \
                             self.getBLEparams()[2][1])
         BL.BeamLine.addBeamLineElement(iBLE)
-        refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+        refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
         
         rStrt  = iBLE.getrStrt() + iBLE.getStrt2End()
         iBLE    = BLE.DefocusQuadrupole(self.getBLEparams()[3][0], \
@@ -243,21 +244,21 @@ class UserAnal:
                             self.getBLEparams()[3][1],             \
                             self.getBLEparams()[3][2])
         BL.BeamLine.addBeamLineElement(iBLE)
-        refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+        refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
         
         #.. Add drift to energy selection collimator:
         rStrt  = iBLE.getrStrt() + iBLE.getStrt2End()
-        length = 1. - rStrt[2]
+        length = 2. - rStrt[2]
         iBLE    = BLE.Drift(self.getBLEparams()[4][0],    \
                             rStrt, vStrt, drStrt, dvStrt, \
                             length)
         BL.BeamLine.addBeamLineElement(iBLE)
-        refPrtclSet = refPrtcl.setReferenceParticleAtDrift(iBLE)
+        refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
         
         #--------  Print at end:
         if self.getDebug():
             print(" UserAnal.UserInit: Beam line:")
-            print(BL.BeamLine.getinstance())
+            print(BL.BeamLine.getinstances())
             if BL.BeamLine.getinstance() == None:
                 print("     ----> No beam line!  Quit.")
                 exit(1)
@@ -350,7 +351,7 @@ class UserAnal:
     def EventLoop(self, ibmIOw):
 
         nPrtcl = 0
-        for iPrtcl in Prtcl.Particle.getParticleInstances():
+        for iPrtcl in Prtcl.Particle.getinstances():
             nPrtcl += 1
             if isinstance(iPrtcl, Prtcl.ReferenceParticle):
                 iRefPrtcl = iPrtcl

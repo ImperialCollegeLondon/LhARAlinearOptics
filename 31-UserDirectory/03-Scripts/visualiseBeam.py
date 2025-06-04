@@ -124,7 +124,7 @@ def main(argv):
 
     """
     print(" ------------------------------------------")
-    for iPrtcl in Prtcl.Particle.getParticleInstances():
+    for iPrtcl in Prtcl.Particle.getinstances():
         if isinstance(iPrtcl, Prtcl.ReferenceParticle):
             continue
         for iBLE in range(len(BLE.BeamLineElement.getinstances())):
