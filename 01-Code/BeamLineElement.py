@@ -1943,11 +1943,11 @@ class FocusQuadrupole(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None, _Strength=None, _kFQ=None):
-        
+
         if self.getDebug():
             print(' FocusQuadrupole.__init__: ', \
                   'creating the FocusQuadrupole object: Length=', \
-                  _Length, ', Strength=', _Strength)
+                  _Length, ', Strength=', _Strength, ', kFQ=', _kFQ)
 
         FocusQuadrupole.instances.append(self)
 
@@ -6970,17 +6970,29 @@ class QuadTriplet(BeamLineElement):
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(TrnsfrQ3)
 
-        TrnsMtrx = TrnsfrD1.dot(TrnsfrQ1)
-        TrnsMtrx = TrnsfrQ2.dot(TrnsMtrx)
-        TrnsMtrx = TrnsfrD2.dot(TrnsMtrx)
-        TrnsMtrx = TrnsfrQ3.dot(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrD2, TrnsfrQ3)
+        if self.getDebug():
+            print("     ----> Transfer matrix for D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrQ2, TrnsMtrx)
+        if self.getDebug():
+            print("     ----> Transfer matrix for Q2*D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrD1, TrnsMtrx)
+        if self.getDebug():
+            print("     ----> Transfer matrix for D1*Q2*D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrQ1, TrnsMtrx)
+        if self.getDebug():
+            print("     ----> Transfer matrix for Q1*D1*Q2*D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
                 
         if self.getDebug():
             print("     ----> Transfer matrix for QuadTriplet:")
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(TrnsMtrx)
-
-        if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(TrnsMtrx)
 
