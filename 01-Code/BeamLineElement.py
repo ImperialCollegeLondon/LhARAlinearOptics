@@ -6666,7 +6666,6 @@ class QuadTriplet(BeamLineElement):
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _FDForDFD=None, _Q1par=None, _d1=None, _Q2par=None,     \
                                               _d2=None, _Q3par=None     ):
-        
         if self.getDebug():
             print(' QuadTriplet.__init__: ', \
                   'creating the QuadTriplet object: ')
@@ -6721,7 +6720,8 @@ class QuadTriplet(BeamLineElement):
         self.setQ2par(_Q2par)
         self.setSeparation2(_d2)
         self.setQ3par(_Q3par)
-        
+
+        lenTRPLT = 0.
         if self.getFDForDFD() == "FDF":
             iQ1 = FocusQuadrupole(_Name+":FQ1", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
@@ -6733,6 +6733,7 @@ class QuadTriplet(BeamLineElement):
         iD1 = Drift(_Name+":sep1", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
                             self.getSeparation1())
+        lenTRPLT += iQ1.getLength() + iD1.getLength()
         if self.getFDForDFD() == "FDF":
             iQ2 = DefocusQuadrupole(_Name+":DQ2", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
@@ -6744,6 +6745,7 @@ class QuadTriplet(BeamLineElement):
         iD2 = Drift(_Name+":sep2", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
                             self.getSeparation2())
+        lenTRPLT += iQ2.getLength() + iD2.getLength()
         if self.getFDForDFD() == "FDF":
             iQ3 = FocusQuadrupole(_Name+":FQ3", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
@@ -6752,7 +6754,8 @@ class QuadTriplet(BeamLineElement):
             iQ3 = DefocusQuadrupole(_Name+":DQ3", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
                 self.getQ3par()[0], self.getQ3par()[1], self.getQ3par()[2])
-
+        lenTRPLT += iQ3.getLength()
+        
         if self.getDebug():
             print("     ----> Dump componenets:")
             print(iQ1)
@@ -6760,6 +6763,11 @@ class QuadTriplet(BeamLineElement):
             print(iQ2)
             print(iD2)
             print(iQ3)
+            print("     <---- Total length:", lenTRPLT)
+
+        self.setLength(lenTRPLT)
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
 
         BeamLineElement.removeInstance(iQ1)
         BeamLineElement.removeInstance(iD1)
@@ -7031,8 +7039,9 @@ class QuadTriplet(BeamLineElement):
         r = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -7055,8 +7064,9 @@ class QuadTriplet(BeamLineElement):
         r = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -7076,8 +7086,9 @@ class QuadTriplet(BeamLineElement):
         f1 = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -7096,8 +7107,9 @@ class QuadTriplet(BeamLineElement):
         f1 = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
