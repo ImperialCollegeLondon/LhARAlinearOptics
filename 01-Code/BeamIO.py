@@ -107,7 +107,7 @@ import LhARALinearOptics as LLO
 constants_instance = PhysCnst.PhysicalConstants()
 
 protonMASS         = constants_instance.mp()
-
+pionMASS           = constants_instance.mPion()
 
 class BeamIO:
     instances = []
@@ -325,13 +325,40 @@ class BeamIO:
             record = record.lstrip()
             record = record.rstrip('\n')
             TrcSpc = np.asarray(record.split(' '), dtype=float)
+            if self.getDebug():
+                print("     ----> BDSIM file: number of fields:", len(TrcSpc))
+
             iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             E0        = iRefPrtcl.getPrOut()[0][3]
             p0        = mth.sqrt(E0**2 - protonMASS**2)
-            TrcSpc[5] = (1000.*TrcSpc[5] - E0) / p0
+            
+            TrcSpc1 = np.zeros(6)
+            if len(TrcSpc) == 9:
+                #.. nuSTORM FLUKA version of BDSIM file
+                TrcSpc1[0] = TrcSpc[0] / 100.
+                TrcSpc1[1] = TrcSpc[3]
+                TrcSpc1[2] = TrcSpc[1] / 100.
+                TrcSpc1[3] = TrcSpc[4]
+                TrcSpc1[4] = 0.          #.. come back to this!
+                pPrtcl     = TrcSpc[5] * 1000.
+                
+                #.. len(TrcSpc) = 9, so, no particle code, assume pion:
+                EPrtcl     = mth.sqrt( pPrtcl**2 + pionMASS**2)
+                TrcSpc1[5] = (EPrtcl - E0) / p0
+                if self.getDebug():
+                    print("     <---- TrcSpc1:", TrcSpc1)
+            else:
+                TrcSpc1[0] = TrcSpc[0]
+                TrcSpc1[1] = TrcSpc[1]
+                TrcSpc1[2] = TrcSpc[2]
+                TrcSpc1[3] = TrcSpc[3]
+                TrcSpc1[4] = TrcSpc[3]
+                TrcSpc1[5] = (1000.*TrcSpc[5] - E0) / p0
+                if self.getDebug():
+                    print("     <---- TrcSpc1:", TrcSpc1)
             
             iPrtcl = Prtcl.Particle()
-            iPrtcl.recordParticle('Source', 0., 0., TrcSpc)
+            iPrtcl.recordParticle('Source', 0., 0., TrcSpc1)
             if self.getDebug():
                 print("     <---- ", \
                       "BeamIO.readBeamDataRecord BDSIM particle read.")
