@@ -335,17 +335,19 @@ class BeamIO:
             TrcSpc1 = np.zeros(6)
             if len(TrcSpc) == 9:
                 #.. nuSTORM FLUKA version of BDSIM file
-                TrcSpc1[0] = TrcSpc[0] / 100.
-                TrcSpc1[1] = TrcSpc[3]
-                TrcSpc1[2] = TrcSpc[1] / 100.
-                TrcSpc1[3] = TrcSpc[4]
-                TrcSpc1[4] = 0.          #.. come back to this!
-                pPrtcl     = TrcSpc[5] * 1000.
-                
                 #.. len(TrcSpc) = 9, so, no particle code, assume pion:
-                EPrtcl     = mth.sqrt( pPrtcl**2 + pionMASS**2)
-                TrcSpc1[5] = (EPrtcl - E0) / p0
+                TrcSpc1[0] = TrcSpc[0] / 100.
+                TrcSpc1[1] = TrcSpc[6]
+                TrcSpc1[2] = TrcSpc[1] / 100.
+                TrcSpc1[3] = TrcSpc[7]
+                TrcSpc1[4] = 0.          #.. come back to this!
+                
+                p0        = mth.sqrt(E0**2 - pionMASS**2)
+                TrcSpc1[5] = (TrcSpc[8]*1000. - E0) / p0
+                
                 if self.getDebug():
+                    print("         ----> E0, p0::", E0, p0)
+                    print("         ----> TrcSpc::", TrcSpc)
                     print("     <---- TrcSpc1:", TrcSpc1)
             else:
                 TrcSpc1[0] = TrcSpc[0]
