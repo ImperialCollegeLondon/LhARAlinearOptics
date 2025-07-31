@@ -139,14 +139,30 @@ class Simulation(object):
             if _inputFILE != None:
                 cls._iBmIOr = BmIO.BeamIO(None, _inputFILE, False, _BDSIMfile)
                 if not cls.getiBmIOr().getBDSIMfile():
-                    print(" Need to read first record and delete stuff")
+                    print("     ----> Reading particles from file:")
+                    print("         ----> Need to read & skip first record")
                     cls.getiBmIOr().readBeamDataRecord()
+                    p0iBmIOr = BLE.Facility.getinstances().getp0()
+                    print("             ---->", \
+                          "Reference particle momentum from input file:", \
+                          p0iBmIOr)
                     BL.BeamLine.cleaninstance()
                     BLE.BeamLineElement.cleaninstances()
                     Prtcl.Particle.cleanAllParticles()
     
             # Create Facility instance:
             cls.setFacility(BL.BeamLine(filename))
+            p0BLfile = BLE.Facility.getinstances().getp0()
+            print("             ---->", \
+                  "Reference particle momentum from beam line file:", \
+                  p0BLfile)
+            if p0iBmIOr != p0BLfile:
+                print("     ****", \
+                  "Reference particle momentum from beam line file", \
+                  " is not the same as that read from input file, abort.", \
+                  "****" )
+                raise referenceMOMENTUMmismatch()
+            print("         <---- Beam line set up.")
 
             # Open file for write:
             if _dataFileDir != None or _dataFileName != None:
@@ -363,4 +379,7 @@ class Simulation(object):
 
 #--------  Exceptions:
 class badParameter(Exception):
+    pass
+
+class referenceMOMENTUMmismatch(Exception):
     pass
