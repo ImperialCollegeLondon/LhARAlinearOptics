@@ -136,6 +136,7 @@ class Simulation(object):
                 cls.setinputFILE(_inputFILE, _BDSIMfile)
 
             # Open file for read:
+            p0iBmIOr = None
             if _inputFILE != None:
                 cls._iBmIOr = BmIO.BeamIO(None, _inputFILE, False, _BDSIMfile)
                 if not cls.getiBmIOr().getBDSIMfile():
@@ -156,7 +157,7 @@ class Simulation(object):
             print("             ---->", \
                   "Reference particle momentum from beam line file:", \
                   p0BLfile)
-            if p0iBmIOr != p0BLfile:
+            if p0iBmIOr != p0BLfile and _inputFILE != None:
                 print("     ****", \
                   "Reference particle momentum from beam line file", \
                   " is not the same as that read from input file, abort.", \
