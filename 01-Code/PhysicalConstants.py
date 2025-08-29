@@ -47,12 +47,14 @@ Created on Mon 12Jun23: Version history:
 ----------------------------------------
  1.0: 12Jun23: First implementation
  1.1: 21Mar24: Add mass of the pion and mass of the muon
+ 1.2: 06Aug25: Add the lifetime of the pion, muon, proton and neutrino
 
 @author: kennethlong
 """
 
 import scipy           as sp
 import scipy.constants
+import math
 
 
 class PhysicalConstants(object):
@@ -87,6 +89,13 @@ class PhysicalConstants(object):
         print("      ----> speed of light (m/s):", self.SoL())
         print("      ----> electron mass (MeV/c2):", self.me())
         print("      ----> proton mass (MeV/c2):", self.mp())
+        print("      ----> proton lifetime (s):", self.tauP())
+        print("      ----> pion mass (MeV/c2):", self.mPion())
+        print("      ----> pion lifetime (s):", self.tauPion())
+        print("      ----> muon mass (MeV/c2):", self.mMuon())
+        print("      ----> muon lifetime (s):", self.tauMuon())
+        print("      ----> neutrino mass (MeV/c2):", self.mNeutrino())
+        print("      ----> neutrino lifetime (s):", self.tauNeutrino())
         print("      ----> Permitivity of free space (N/A**2):", self.mu0())
         print("      ----> debug flag:", self.getDebug())
         return " <---- PhysicalConstants dump complete."
@@ -142,12 +151,31 @@ class PhysicalConstants(object):
             elif _Species.lower() == "muon":
                 particleMASS = self.mMuon()
             elif _Species.lower() == "neutrino":
-                particleMASS = 0.
+                particleMASS = self.mNeutrino()
         else:
             raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
                                _Species + " not allowed!")
         return particleMASS
     
+    def getparticleLifeTime(self, _Species):
+        particleLifeTime = None
+        if not isinstance(_Species, str):
+            raise badParameter("PhysicalConstants.getParticleLifeTime:", \
+                               " Species " + _Species + " not a string!")
+        if _Species.lower() in PhysicalConstants.getSpecies():
+            if   _Species.lower() == "proton":
+                particleLifeTime = self.tauP()
+            elif _Species.lower() == "pion":
+                particleLifeTime = self.tauPion()
+            elif _Species.lower() == "muon":
+                particleLifeTime = self.tauMuon()
+            elif _Species.lower() == "neutrino":
+                particleLifeTime = self.tauNeutrino()
+        else:
+            raise badParameter("PhysicalConstants.getParticleLifeTime: Species " + \
+                               _Species + " not allowed!")
+        return particleLifeTime
+
     def me(self):
         return 0.51099895000
 
@@ -165,6 +193,21 @@ class PhysicalConstants(object):
 
     def mMuon(self):
         return 105.6583745
+
+    def mNeutrino(self):
+        return 0.
+
+    def tauPion(self):
+        return 26.033E-9
+
+    def tauMuon(self):
+        return 2.1969811E-6
+
+    def tauP(self):
+        return math.inf
+
+    def tauNeutrino(self):
+        return math.inf
 
     def mu0(self):
         return sp.constants.mu_0

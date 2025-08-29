@@ -1651,13 +1651,120 @@ class ReferenceParticle(Particle):
                  linestyle='dashed', zorder=3)
         axs.set_xlabel('s (m)')
         axs.set_ylabel(axl + ' (m)')
+ 
+"""
+Derived class UnstableParticle(Particle):
+==========================================
+
+  Provides unstable particle.  Derived from Particle class.
+
+  Class attributes:
+  -----------------
+
+      
+  Instance attributes:
+  --------------------
+   Particle instance attributes.
+
+   _meanLife        : mean life time in seconds
+   _remainingPath   : path left before the particle decays, in the lab frame
+
+   _meanLife initilised from value in PhysicalConstants.py
+
+
+  Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__ : Creates instance of UnstableParticle class.
+      __repr__: One liner with call.
+      __str__ : Dump of constants
+
+  Get methods:
+    getmeanLife:        Returns the mean lifetime of the particle.
+    getremainingPath:   gets path left before the particle decays
+    initremainingPath:  sets initial value of the remaining path, given the mean life time and the particle
+                        momentum. Value in the laboratory frame.
+
+  Set methods:
+
+    setremainingPath : sets remainingPath to a new value
+    setmeanLife      : set the value of the mean lifetime from PhysicalConstants unless
+                    a value is given to override it
+
+    print:  prints out the subclass variables and calls super.print to print out the values in
+            the base class
+
+  I/o methods:
+     None so far.
+
+  Exceptions:
+    unKnownUnstableParticle(Exception)
     
+Created on Mon 05Aug25: Version history:
+----------------------------------------
+ 1.0: 05Aug25: First implementation
+
+@author: paulkyberd
+"""
+class UnstableParticle(Particle):
+    def __init__(self, species):
+        UnstableSpecies = {"pion", "muon","proton"}
+
+        if species.lower() in UnstableSpecies:
+            super().__init__(species)
+            self._meanLife = iPhysclCnstnts.getparticleLifeTime(species)
+            self._remainingPath = None
+        else:
+            raise unKnownUnstableParticle(Exception)
+
+    def __repr__(self):
+        return "UnstableParticle()"
+
+    def __str__(self):
+        super().__str__()
+#        super().print()
+        print(f"     ----> Mean Life: {self._meanLife}")
+        print(f"     ----> Remaining Path: {self._remainingPath}") 
+        return " UnstableParticle __str__ done."
+
+    # Getters
+    def getmeanLife(self):
+        return self._meanLife
+
+    def getremainingPath(self):
+        return self._remainingPath
+
+    def initremainingPath(self, p):
+        #   Get a decay time which is an exponential with the mean life as constant
+        decayTime = np.random.exponential(self._meanLife)
+        #   Turn the decay time in the rest frame, into a path length in the laboratory frame
+        self._remainingPath = p*iPhysclCnstnts.SoL()*decayTime/iPhysclCnstnts.getparticleMASS(self.getSpecies())
+
+    # Setters
+    def setmeanLife(self, meanLife=None):
+        if meanLife != None:
+            self._meanLife = iPhysclCnstnts.getparticleLifeTime(species)
+        else:
+            self._meanLife = meanLife
+
+    def setremainingPath(self, remainingPath):
+        self._remainingPath = remainingPath
+
+    # print
+    def print(self):
+        super().print()
+#        print(f"Unstable Particle species: {self.getSpecies()}")
+        print(f"     ----> Mean Life: {self._meanLife}")
+        print(f"     ----> Remaining Path: {self._remainingPath}") 
     
 #--------  Exceptions:
 class noReferenceParticle(Exception):
     pass
 
 class unKnownReferenceParticle(Exception):
+    pass
+
+class unKnownUnstableParticle(Exception):
     pass
 
 class badParticle(Exception):
