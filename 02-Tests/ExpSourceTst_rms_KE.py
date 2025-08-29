@@ -61,8 +61,8 @@ PrtclcT  = np.array([])
 PrtclT   = np.array([])
 
 g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
-E_max_MeV = Src.getderivedParameters()[4] / (1.6e-19 * 1e6)
-E_min_MeV = Src.getderivedParameters()[5] / (1.6e-19 * 1e6)
+E_min_MeV = Src.getParameters()[6]
+E_max_MeV = Src.getParameters()[7]
 
 for i in range(100000):
     TrcSpcFrmSrc = Src.getParticleFromSource()
@@ -128,12 +128,12 @@ y_fit = linear_fit(x_fit)
 fig = plt.figure(figsize=(18.*cm, 6.*cm))
 plt.scatter(energy_bins_center, rms_theta, s=5, color='black')
 
-thmax = np.radians(Src.getParameters()[13])
+thmax = np.radians(Src.getParameters()[8])
 upmax = mth.sin(thmax)
 Scl = 0.5 * mth.sqrt( 1. /18. / upmax**3 * ( \
                                              -12.*thmax*mth.cos(3*thmax) + (-14.+9.*thmax**2+(26.-9.*thmax**2)*mth.cos(2.*thmax))*upmax)
-                     ) * 180. / mth.pi / Src.getParameters()[13]
-expectation = [-Src.getParameters()[14]/E_max_MeV*Scl, Src.g_theta(0.)*Scl]
+                     ) * 180. / mth.pi / Src.getParameters()[8]
+expectation = [-Src.getParameters()[9]/E_max_MeV*Scl, Src.g_theta(0.)*Scl]
 plt.plot(x_fit, y_fit, color='red', \
          label=f'    Linear Fit:    RMS $\\theta_S = ({coefficients[0]:.3f} \\pm {slope_error:.3f})$K$ + ({coefficients[1]:.2f} \\pm {intercept_error:.2f})$')
 plt.plot([], [], ' ', \

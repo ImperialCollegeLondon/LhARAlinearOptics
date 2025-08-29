@@ -32,6 +32,13 @@ J.~Fuchs, P.~Antici, {\em et~al.}, ``Laser-driven proton scaling laws and new
   \href{https://dx.doi.org/10.1038/nphys199}{{\em Nature Physics} {\bfseries 2}
   (01, 2006) }.
 
+\bibitem{DOVER2020100847}
+N.~Dover, M.~Nishiuchi, {\em et~al.}, ``Demonstration of repetitive energetic
+  proton generation by ultra-intense laser interaction with a tape target,''
+  \href{https://dx.doi.org/https://doi.org/10.1016/j.hedp.2020.100847}{{\em
+  High Energy Density Physics} {\bfseries 37} (2020) 100847}.
+  \url{https://www.sciencedirect.com/science/article/pii/S1574181820300884}.
+
 \bibitem{10.1103/PhysRevLett.97.045005}
 J.~Schreiber, F.~Bell, {\em et~al.}, ``Analytical Model for Ion Acceleration by
   High-Intensity Laser Pulses,''
@@ -39,10 +46,12 @@ J.~Schreiber, F.~Bell, {\em et~al.}, ``Analytical Model for Ion Acceleration by
   letters} {\bfseries 97} (08, 2006) 045005}.
 
 \bibitem{10.1063/1.3086424}
-F.~Nürnberg, M.~Schollmeier, {\em et~al.}, ``{Radiochromic film imaging
+F.~N\"urnberg, M.~Schollmeier, {\em et~al.}, ``{Radiochromic film imaging
   spectroscopy of laser-accelerated proton beams},''
   \href{https://dx.doi.org/10.1063/1.3086424}{{\em Review of Scientific
-  Instruments} {\bfseries 80} no.~3, (03, 2009) 033301}.
+  Instruments} {\bfseries 80} no.~3, (03, 2009) 033301},
+  \href{https://arxiv.org/abs/https://pubs.aip.org/aip/rsi/article-pdf/doi/10.1063/1.3086424/13601448/033301\_1\_online.pdf}{{\ttfamily
+  https://pubs.aip.org/aip/rsi/article-pdf/doi/10.1063/1.3086424/13601448/033301\_1\_online.pdf}}.
   \url{https://doi.org/10.1063/1.3086424}.
 
 \end{thebibliography}\endgroup

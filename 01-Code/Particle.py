@@ -161,6 +161,7 @@ import BeamLineElement   as BLE
 
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
+
 iPhysclCnstnts = PhysicalConstants()
 
 
@@ -402,7 +403,6 @@ class Particle:
         return Success
     
     def fillPhaseSpace(self):
-        Success = False
         if self.getDebug():
             print(" Particle.fillPhaseSpace, start:")
             print("     ----> fill phase space for particle with", \
@@ -495,7 +495,8 @@ class Particle:
         
         p = mth.sqrt(E**2 - particleMASS**2)
         
-        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
+        #rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ]) #.. Here!
+        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], 0. ]) #.. Here!
 
         px = TrcSpc[1]*p0
         py = TrcSpc[3]*p0

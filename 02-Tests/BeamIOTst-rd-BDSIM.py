@@ -28,7 +28,7 @@ BeamIOTest = 1
 print()
 print("BeamIOTest:", BeamIOTest, " check file can be read OK.")
 
-ibmIOr = bmIO.BeamIO("11-Parameters", "BDSIM-Data4Tests.dat", False, True)
+ibmIOr = bmIO.BeamIO("12-Data4Tests", "BDSIM-Data4Tests.dat", False, True)
 
 filename     = os.path.join('11-Parameters', 'LhARA-Stage1-BeamDelivery.csv')
 
@@ -51,7 +51,7 @@ while not EndOfFile:
                 iCnt = 1
                 Scl  = Scl * 10
     if iEvt < 1:
-        print(Prtcl.Particle.getParticleInstances()[iEvt])
+        print(Prtcl.Particle.getinstances()[iEvt])
     if iEvt == nEvt:
         break
 

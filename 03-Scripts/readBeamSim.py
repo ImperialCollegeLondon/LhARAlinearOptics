@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+import cProfile
+"""
+
 import os
 import sys, getopt
 import struct
@@ -18,30 +22,28 @@ def main(argv):
                                ["ifile=","ofile=","bfile", "nEvts"])
 
     inputfile    = None
-    outputfile   = None
+    beamlinesummaryfile   = None
     Debug        = False
     nEvts        = None
     for opt, arg in opts:
         if opt == '-h':
             print ( \
-                    'readBEAMsim.py -i <inputfile> -o <outputfile>' + \
-                    ' -n <nEvts>')
-            print("     ----> <output file> not yet implemented.>")
+                'readBEAMsim.py -i <inputfile> -o <beamlinesummaryfile>' + \
+                ' -n <nEvts>')
             sys.exit()
         if opt == '-d':
             Debug = True
         elif opt in ("-i", "--ifile"):
             inputfile = arg
         elif opt in ("-o", "--ofile"):
-            outputfile = arg
+            beamlinesummaryfile = arg
         elif opt in ("-n", "--nEvts"):
             nEvts = int(arg)
 
     if inputfile    == None:
         print ( \
-                'readBEAMsim.py -i <inputfile> -o <outputfile>' + \
+                'readBEAMsim.py -i <inputfile> -o <beamlinesummaryfile>' + \
                 ' -n <nEvts>')
-        print("     ----> <output file> not yet implemented.>")
         sys.exit()
 
     print(" readBEAMsim: start")
@@ -52,7 +54,7 @@ def main(argv):
     print("         ----> HOMEPATH:", HOMEPATH)
         
     #.. File handling:
-    print("         ----> Check input and output files:")
+    print("         ----> Check input and beamlinesummary files:")
 
     #.. ----> Input file, if specified:
     if inputfile != None and not os.path.isfile(inputfile):
@@ -66,16 +68,18 @@ def main(argv):
     #ibmIOr = bmIO.BeamIO("99-Scratch", "Data4Tests.dat")
     print("             ----> Input file:", inputfile)
     
-    if outputfile != None and not os.path.isabs(outputfile): 
-        outputfile = os.path.join(HOMEPATH, outputfile)
-    if outputfile != None and not os.path.isdir(os.path.dirname(outputfile)):
-        print("                 ----> Directory for output file", \
-              os.path.dirname(outputfile), "does not exist.")
+    if beamlinesummaryfile != None and not os.path.isabs(beamlinesummaryfile): 
+        beamlinesummaryfile = os.path.join(HOMEPATH, beamlinesummaryfile)
+    if beamlinesummaryfile != None and \
+       not os.path.isdir(os.path.dirname(beamlinesummaryfile)):
+        print("                 ----> Directory for beamlinesummary file", \
+              os.path.dirname(beamlinesummaryfile), "does not exist.")
     else:
-        print("             ----> Write beamline summary file to:", outputfile)
+        print("             ----> Write beamline summary file to:",
+              beamlinesummaryfile)
     #    print("                   Exit.")
     #    sys.exit(1)
-        print("                   Output file not implemented.")
+        print("                   Beamlinesummary file not implemented.")
     
     print("     <---- Initialisation complete.")
 
@@ -98,7 +102,7 @@ def main(argv):
                     Scl  = Scl * 10
         if iEvt < 1:
             print(BL.BeamLine.getinstance())
-            print(Prtcl.Particle.getParticleInstances()[iEvt-1])
+            print(Prtcl.Particle.getinstances()[iEvt-1])
         if nEvts != None and iEvt == nEvts:
             break
 
@@ -119,6 +123,9 @@ def main(argv):
    Execute main"
 """
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    """
+    cProfile.run('main(sys.argv[1:])', '99-Scratch/restats')
+    """
+    main(sys.argv[1:])
 
 sys.exit(1)

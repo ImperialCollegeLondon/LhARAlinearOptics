@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+import cProfile
+"""
+
 import os
 import sys, getopt
 
@@ -115,6 +119,9 @@ def main(argv):
    Execute main"
 """
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    main(sys.argv[1:])
+    """
+    cProfile.run('main(sys.argv[1:])', '99-Scratch/restats')
+    """
 
 sys.exit(1)

@@ -90,6 +90,9 @@ To be added ...
 
 Created on Mon 02Oct23: Version history:
 ----------------------------------------
+ 2.1: 08Apr25: Include electron temperature update from Sadur and Zakhir.
+               Also, slim down input arguments required for laser-driven
+               source.
  2.0: 11Dec23: Refactor to make code generate beamline based on input
                specificaiton file and not tie it to or another
                hard-coded facility.
@@ -104,6 +107,7 @@ import os
 import io
 import math   as mth
 import numpy  as np
+import scipy  as sp
 import pandas as pnds
 import struct as strct
 
@@ -116,9 +120,14 @@ from PhysicalConstants import PhysicalConstants
 
 constants_instance = PhysicalConstants()
 
+electronMASS       = constants_instance.me()
+SIelectronMASS     = constants_instance.meSI()
 protonMASS         = constants_instance.mp()
 speed_of_light     = constants_instance.SoL()
+
 mu0                = constants_instance.mu0()
+eps0               = constants_instance.epsilon0()
+electricCHRG       = constants_instance.electricCHARGE()
 
 class BeamLine(object):
     __BeamLineInst = None
@@ -370,8 +379,11 @@ class BeamLine(object):
             print("                 ---->", Name, \
                   "beam line element created.")
             print("                     ----> reference particle:")
-            print("                         Position:", refPrtcl.getRrIn()[0])
-            print("                         Momentum:", refPrtcl.getPrIn()[0])
+            print("                         Position:", \
+                  refPrtcl.getRrIn()[0])
+            print("                         Momentum:", \
+                  refPrtcl.getPrIn()[0])
+            print(SourceBLE)
             print("                 <---- Done.")
 
     @classmethod
@@ -420,7 +432,7 @@ class BeamLine(object):
         SigmaX   = None
         SigmaY   = None
         if cls.getDebug():
-            print("                 ----> BeamLine.parseSource starts:")
+            print(" BeamLine.parseSource starts:")
 
         #.. Get "sub" pandas data frame with source parameters only:
         pndsSource = cls.getBeamLineParamPandas()[ \
@@ -431,76 +443,148 @@ class BeamLine(object):
             if cls.getDebug():
                 print(" Beamline.parseSource: empty source, return.")
             return None, None, None
-            
+
         SrcMode = int( \
-           pndsSource[pndsSource["Parameter"]=="SourceMode"]["Value"].iloc[0] \
+           pndsSource[pndsSource["Parameter"] == \
+                      "SourceMode"]["Value"].iloc[0] \
                        )
         if cls.getDebug():
-            print("                     ----> Mode:", SrcMode)
+            print("     ----> Mode:", SrcMode)
             
         if SrcMode == 0:               #.. Laser driven:
-            SigmaThetaS0 = 20.
-            SlopeThetaS  = 15.
-            rpmax        = -9999.
-            Emin  = float( \
-             pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
-            Emax = float( \
-             pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
-            nPnts = \
-             int(pndsSource[pndsSource["Parameter"]=="nPnts"]["Value"].iloc[0])
-            MinCTheta = float( \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
-            Power = float( \
-             pndsSource[pndsSource["Parameter"]=="Power"]["Value"].iloc[0])
-            Energy = float( \
-             pndsSource[pndsSource["Parameter"]=="Energy"]["Value"].iloc[0])
-            Wavelength = float( \
-             pndsSource[pndsSource["Parameter"]=="Wavelength"]["Value"].iloc[0])
-            Duration = float( \
-             pndsSource[pndsSource["Parameter"]=="Duration"]["Value"].iloc[0])
-            Thickness = float( \
-             pndsSource[pndsSource["Parameter"]=="Thickness"]["Value"].iloc[0])
-            Intensity = float( \
-             pndsSource[pndsSource["Parameter"]=="Intensity"]["Value"].iloc[0])
-            DivAngle = float( \
-             pndsSource[pndsSource["Parameter"]=="DivAngle"]["Value"].iloc[0])
-            try:
-                SigmaThetaS0 = float( \
-                        pndsSource[pndsSource["Parameter"]== \
-                                   "SigmaThetaS0"]["Value"].iloc[0])
-            except:
-                pass
-            try:
-                SlopeThetaS  = float( \
-                        pndsSource[pndsSource["Parameter"]== \
-                                   "SlopeThetaS"]["Value"].iloc[0])
-            except:
-                pass
-            try:
-                rpmax = float( \
-                        pndsSource[pndsSource["Parameter"]== \
-                                   "rpmax"]["Value"].iloc[0])
-            except:
-                pass
+            #.. Scan and report legacy parameters:
+            cleanedSource = BLE.Source.scanLEGACY(pndsSource)
+
+            
+            #.. Set defaults:
+            wavelength, power, strhlRATIO, r0, Duration, Te, Kmin, Kmax, \
+                Thickness, DivAngle, SigmaThetaS0, SlopeThetaS, rpmax = \
+                    BLE.Source.setDEFAULTparams()
+
+            #.. Wavelength:
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Wavelength", \
+                                                           wavelength    )
+            if val != None: wavelength = val/1000000.
+            
+            #.. Power
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Power", \
+                                                           power    )
+            if val != None: power = val
+
+            #.. Strehl ratio
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Strehl ratio", \
+                                                           strhlRATIO    )
+            if val != None: strhlRATIO = val
+
+            #.. Laser spot radius
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "r0", \
+                                                           r0    )
+            if val != None: r0 = val
+            
+            #.. Laser pulse length
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Duration", \
+                                                           Duration    )
+            if val != None: Duration = val
+            
+            #.. Hot electron temperature:
+            Te  = -99.
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Te", \
+                                                           Te    )
+            if val != None:
+                if val == -99.:
+                    Te = None
+
+                    print("     ---->", \
+                          "Hot electron temperature is not defined;", \
+                          "it will be calculated.")
+
+                    Te = BLE.Source.calculateTe(wavelength, r0, \
+                                                power, strhlRATIO)
+                    
+                    if cls.getDebug():
+                        print("         ----> Te:", Te)
+                else:
+                    Te = val
+            
+            #.. Kmin:
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Kmin", \
+                                                           Kmin    )
+            if val != None: Kmin = val
+            
+            #.. Kmax:
+            val = BLE.Source.parseSINGLEparam(cleanedSource, "Kmax", \
+                                                           Kmax    )
+            if val != None: Kmax = val
+            
+            #.. Target thickness and electron divergence angle:
+            val = BLE.Source.parseSINGLEparam(cleanedSource, \
+                                              "Thickness", \
+                                               Thickness    )
+            if val != None: Thickness = val
+            val = BLE.Source.parseSINGLEparam(cleanedSource, \
+                                              "DivAngle", \
+                                               DivAngle    )
+            if val != None: DivAngle = val
+            
+            if Kmax == None:
+                #.. Calculate t0:
+                t0, Kinfnty = BLE.Source.calculatet0(power, strhlRATIO, r0, \
+                                                     Thickness, DivAngle)
+
+                # Solve for "X" to get Kmax:
+                initial_guess = 0.5
+                solution = sp.optimize.fsolve( \
+                                BLE.Source.DurationBYt0equation, \
+                                    initial_guess, args=(Duration, t0) )
+
+                if cls.getDebug():
+                    print("     ----> initial_guess, solution:", \
+                          initial_guess, solution)
+
+                X     = float(solution[0])
+                KmaxJ = Kinfnty*(X**2)
+                Kmax  = KmaxJ / (electricCHRG * 1.E6)
+
+                if cls.getDebug():
+                    print("     ----> X, Kmax, KmaxJ:", X, Kmax, KmaxJ)
+            
+            #.. Parameters determining angular distribution:
+            val = BLE.Source.parseSINGLEparam(cleanedSource, \
+                                              "SigmaThetaS0", \
+                                               SigmaThetaS0    )
+            if val != None: SigmaThetaS0 = val
+            
+            val = BLE.Source.parseSINGLEparam(cleanedSource, \
+                                              "SlopeThetaS", \
+                                               SlopeThetaS    )
+            if val != None: SlopeThetaS = val
+            
+            val = BLE.Source.parseSINGLEparam(cleanedSource, \
+                                              "rpmax", rpmax)
+            if val != None: rpmax = val
             
         elif SrcMode == 1:               #.. Gaussian:
             MeanE  = float( \
-             pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"] \
+                            ["Value"].iloc[0])
             SigmaE = float( \
              pndsSource[pndsSource["Parameter"]== \
                         "SigmaEnergy"]["Value"].iloc[0])
             MinCTheta = float(\
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"] \
+                              ["Value"].iloc[0])
         elif SrcMode == 2:               #.. Flat
-            Emin  = float( \
-             pndsSource[pndsSource["Parameter"]=="Emin"]["Value"].iloc[0])
+            Kmin  = float( \
+             pndsSource[pndsSource["Parameter"]=="Kmin"]["Value"].iloc[0])
             Emax = float( \
              pndsSource[pndsSource["Parameter"]=="Emax"]["Value"].iloc[0])
             MinCTheta = float( \
-             pndsSource[pndsSource["Parameter"]=="MinCTheta"]["Value"].iloc[0])
+             pndsSource[pndsSource["Parameter"]=="MinCTheta"] \
+                               ["Value"].iloc[0])
         elif SrcMode == 4:               #.. Uniform disc
             MeanE  = float( \
-             pndsSource[pndsSource["Parameter"]=="MeanEnergy"]["Value"].iloc[0])
+             pndsSource[pndsSource["Parameter"]=="MeanEnergy"] \
+                            ["Value"].iloc[0])
             SigmaE = float( \
              pndsSource[pndsSource["Parameter"]== \
                         "SigmaEnergy"]["Value"].iloc[0])
@@ -509,21 +593,24 @@ class BeamLine(object):
         elif SrcMode == 3:               #.. Read from file
             pass
 
-        if SrcMode != 3 and SrcMode !=4:
+        if SrcMode != 0 and SrcMode != 3 and SrcMode !=4:
             SigmaX  = float( \
-                pndsSource[pndsSource["Parameter"]=="SigmaX"]["Value"].iloc[0])
+                pndsSource[pndsSource["Parameter"]=="SigmaX"] \
+                             ["Value"].iloc[0])
             SigmaY  = float( \
-                pndsSource[pndsSource["Parameter"]=="SigmaY"]["Value"].iloc[0])
+                pndsSource[pndsSource["Parameter"]=="SigmaY"] \
+                             ["Value"].iloc[0])
         
         if cls.getDebug():
-            print("                         ----> SigmaX, SigmaY:", \
-                  SigmaX, SigmaY)
+            if SrcMode != 0 and SrcMode != 3 and SrcMode !=4:
+                print("     ----> SigmaX, SigmaY:", \
+                      SigmaX, SigmaY)
             if SrcMode == 0:
-                print("                         ----> Emin, Emax,", \
-                      " nPnts, Power, Energy, Wavelength, Duration,", \
-                      " Thickness, Intensity, DivAngle:", \
-                      Emin, Emax, nPnts, Power, Energy, Wavelength, \
-                      Duration, Thickness, Intensity, DivAngle,     \
+                print("     ----> wavelength, power, strhlRATIO, r0, Te,", \
+                      "Kmin, Kmax, Thickness, DivAngle:", \
+                      wavelength, power, strhlRATIO, r0, Duration, Te, \
+                      Kmin, Kmax, Thickness, DivAngle)
+                print("           SigmaThetaS0, SlopeThetaS, rpmax:", \
                       SigmaThetaS0, SlopeThetaS, rpmax)
             elif SrcMode == 1 or SrcMode == 4:
                 print("                         ----> Mean and sigma:", \
@@ -533,16 +620,14 @@ class BeamLine(object):
                       MinE, MaxE)
 
         if SrcMode == 0:
-            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax, nPnts, \
-                        Power, Energy, Wavelength, Duration, Thickness, \
-                        Intensity, DivAngle, SigmaThetaS0, SlopeThetaS, \
-                        rpmax]
+            SrcParam = [wavelength, power, strhlRATIO, r0, Duration, Te, \
+                        Kmin, Kmax, SigmaThetaS0, SlopeThetaS, rpmax]
 
         elif SrcMode == 1:
             SrcParam = [SigmaX, SigmaY, MinCTheta, MeanE, SigmaE]
 
         elif SrcMode == 2:
-            SrcParam = [SigmaX, SigmaY, MinCTheta, Emin, Emax]
+            SrcParam = [SigmaX, SigmaY, MinCTheta, Kmin, Emax]
         elif SrcMode == 4:
             SrcParam = [MeanE, SigmaE, MaxRadius]
 
@@ -555,10 +640,9 @@ class BeamLine(object):
                        + pndsSource["Element"].iloc[0]
 
         if cls.getDebug():
-            print("                 <---- Name, SrcMode, SrcParam:", \
+            print(" <---- Name, SrcMode, SrcParam:", \
                   Name, SrcMode, SrcParam)
             
-        cls.setDebug(False)
         return Name, SrcMode, SrcParam
 
     @classmethod
@@ -1064,6 +1148,7 @@ class BeamLine(object):
             
         ConsChk = False
 
+        #.. Check length is consistent:
         iBLE = BLE.BeamLineElement.getinstances()[-1]
         iRfP = Prtcl.ReferenceParticle.getinstances()
         if self.getDebug():
@@ -1092,6 +1177,20 @@ class BeamLine(object):
         else:
             return ConsChk
 
+        #.. Check no beam-line-element names are unique:
+        Names = []
+        for iBLE in BLE.BeamLineElement.getinstances():
+            Names.append(iBLE.getName())
+
+        if self.getDebug():
+            print("     ----> Names:", Names)
+
+        for iBLE in BLE.BeamLineElement.getinstances():
+            nName = Names.count(iBLE.getName())
+            if self.getDebug():
+                print("         ---->", nName, iBLE.getName())
+                
+            if nName != 1: return ConsChk
 
         return True
 
@@ -1245,6 +1344,7 @@ class BeamLine(object):
             print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
 
+        
 #--------  I/o methods:
     def csv2pandas(_filename):
         ParamsPandas = pnds.read_csv(_filename)
@@ -1320,13 +1420,14 @@ class BeamLine(object):
             print(" <---- BeamLine.writeBeamLine done.")
 
     @classmethod
-    def readBeamLine(cls, beamlineFILE=None):
+    def readBeamLine(cls, beamlineFILEinst=None):
         if cls.getDebug():
             print(" BeamLine.readBeamLine starts.")
 
         #.. Initialise BeamLine instance:
         cls.__new__(cls, None, True)
-        
+
+        beamlineFILE = beamlineFILEinst.getdataFILE()
         if not isinstance(beamlineFILE, io.BufferedReader):
             raise noFILE( \
                     " BeamLine.readBeamLine: file does not exist.")
@@ -1371,53 +1472,53 @@ class BeamLine(object):
                 print("                   Derived class:", derivedCLASS)
 
             if derivedCLASS == "Facility":
-                EoF, p0, VCMVr = BLE.Facility.readElement(beamlineFILE)
+                EoF, p0, VCMVr = BLE.Facility.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Source":
-                EoF, Mode, Params = BLE.Source.readElement(beamlineFILE)
+                EoF, Mode, Params = BLE.Source.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Drift":
-                EoF, Length = BLE.Drift.readElement(beamlineFILE)
+                EoF, Length = BLE.Drift.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Aperture":
-                EoF, Type, Params = BLE.Aperture.readElement(beamlineFILE)
+                EoF, Type, Params = BLE.Aperture.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "GaborLens":
                 EoF, Bz, VA, RA, Rp, Ln, St = \
-                    BLE.GaborLens.readElement(beamlineFILE)
+                    BLE.GaborLens.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Solenoid":
                 EoF, Ln, St, kSol = \
-                    BLE.Solenoid.readElement(beamlineFILE)
+                    BLE.Solenoid.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "CylindricalRFCavity":
                 EoF, Grdnt, Frqncy, Phs = \
-                    BLE.CylindricalRFCavity.readElement(beamlineFILE)
+                    BLE.CylindricalRFCavity.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "SectorDipole":
                 EoF, Angl, B = \
-                    BLE.SectorDipole.readElement(beamlineFILE)
+                    BLE.SectorDipole.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "DefocusQuadrupole":
                 EoF, Ln, St, kDQ = \
-                    BLE.DefocusQuadrupole.readElement(beamlineFILE)
+                    BLE.DefocusQuadrupole.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "FocusQuadrupole":
                 EoF, Ln, St, kFQ = \
-                    BLE.FocusQuadrupole.readElement(beamlineFILE)
+                    BLE.FocusQuadrupole.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "RPLCswitch":
-                EoF = BLE.RPLCswitch.readElement(beamlineFILE)
+                EoF = BLE.RPLCswitch.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             else:
@@ -1426,7 +1527,7 @@ class BeamLine(object):
                 sys.exit(1)
 
             EoF, Loc, r, v, dr, dv = \
-                BLE.BeamLineElement.readElement(beamlineFILE)
+                BLE.BeamLineElement.readElement(beamlineFILEinst)
             
             if derivedCLASS == "Facility":
                 instBLE = BLE.Facility(Loc, r, v, dr, dv, p0, VCMVr)

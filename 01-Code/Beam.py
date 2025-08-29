@@ -223,6 +223,9 @@ class Beam:
         if iBm == None:
             self.setbeamlineSpecificationCSVfile( \
                                         _beamlineSpecificationCSVfile)
+            if self.getbeamlineSpecificationCSVfile() == None:
+                raise badBeam(" No beam line read from i/p data file and " + \
+                              "no beam-line specification csv file given.")
             iBm = BL.BeamLine(self.getbeamlineSpecificationCSVfile())
 
         #.. Set beam line instance:
@@ -396,6 +399,7 @@ class Beam:
             self._sigmaxy.append([sx1, sy1])
 
         if len(self._sigmaxy) >= len(BLE.BeamLineElement.getinstances()):
+            print(len(self._sigmaxy), len(BLE.BeamLineElement.getinstances()))
             raise BadCovMtrx(" too many sigmaxy!")
         if self.getDebug():
             print(" <---- Beam.setsigmaxy: done.")
@@ -452,11 +456,11 @@ class Beam:
                 print("                e24:", e24)
                 print("                e24:", e26)
 
-            if e2X < 0. and abs(e2X) < 0.01: e2X = 0.
-            if e2Y < 0. and abs(e2Y) < 0.01: e2Y = 0.
-            if e2L < 0. and abs(e2L) < 0.01: e2L = 0.
-            if e24 < 0. and abs(e24) < 0.01: e24 = 0.
-            if e26 < 0. and abs(e26) < 0.01: e26 = 0.
+            if e2X < 0.: e2X = 0.
+            if e2Y < 0.: e2Y = 0.
+            if e2L < 0.: e2L = 0.
+            if e24 < 0.: e24 = 0.
+            if e26 < 0.: e26 = 0.
             self._emittance.append([                \
                                      mth.sqrt(e2X), \
                                      mth.sqrt(e2Y), \
@@ -821,7 +825,7 @@ class Beam:
             print("     ----> Start location:", iLocMin)
         
         for iLoc in range(iLocMin, \
-                          len(BLE.BeamLineElement.getinstances())-1):
+                          len(BLE.BeamLineElement.getinstances())):
             iAddr = iLoc - iLocMin
             if self.getDebug():
                 print("         ----> iLoc, Name, iAddr:", \
@@ -895,10 +899,29 @@ class Beam:
                 'color':  'darkred', \
                 }
         plt.rcParams["figure.figsize"] = (10., 7.5)
+
+        iLocMin = self.getstartlocation()
+        nLocs = len(BLE.BeamLineElement.getinstances()) - iLocMin
+    
+        s     = [None]*nLocs
+        sx    = [None]*nLocs
+        sy    = [None]*nLocs
+
+        ex    = [None]*nLocs
+        ey    = [None]*nLocs
+        exy   = [None]*nLocs
+
+        ax    = [None]*nLocs
+        ay    = [None]*nLocs
+        bx    = [None]*nLocs
+        by    = [None]*nLocs
+        gx    = [None]*nLocs
+        gy    = [None]*nLocs
         
-        s     = []
+        """
         sx    = []
         sy    = []
+        
         ex    = []
         ey    = []
         exy   = []
@@ -909,6 +932,7 @@ class Beam:
         by    = []
         gx    = []
         gy    = []
+        """
 
         iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
 
@@ -916,8 +940,6 @@ class Beam:
             print(BL.BeamLine.getinstances())
             print(self)
         
-        iLocMin = self.getstartlocation()
-
         if self.getDebug():
             print("     ----> Start location:", self.getstartlocation())
             print("     ----> Number of locations:", \
@@ -932,21 +954,21 @@ class Beam:
                 print("         ----> iLoc, iAddr:", iLoc, iAddr)
 
                   
-            s.append(iRefPrtcl.getsOut()[iLoc-1])
+            s[iAddr] = iRefPrtcl.getsOut()[iLoc-1]
             if iAddr < len(self.getsigmaxy()):
-                sx.append(self.getsigmaxy()[iAddr][0])
-                sy.append(self.getsigmaxy()[iAddr][1])
+                sx[iAddr] = self.getsigmaxy()[iAddr][0]
+                sy[iAddr] = self.getsigmaxy()[iAddr][1]
                 if iAddr < len(self.getemittance()):
-                    ex.append(self.getemittance()[iAddr][0])
-                    ey.append(self.getemittance()[iAddr][1])
-                    exy.append(self.getemittance()[iAddr][3])
+                    ex[iAddr] = self.getemittance()[iAddr][0]
+                    ey[iAddr] = self.getemittance()[iAddr][1]
+                    exy[iAddr] = self.getemittance()[iAddr][3]
 
-                    bx.append(self.getTwiss()[iAddr][0][1])
-                    by.append(self.getTwiss()[iAddr][1][1])
-                    ax.append(self.getTwiss()[iAddr][0][0])
-                    ay.append(self.getTwiss()[iAddr][1][0])
-                    gx.append(self.getTwiss()[iAddr][0][2])
-                    gy.append(self.getTwiss()[iAddr][1][2])
+                    bx[iAddr] = self.getTwiss()[iAddr][0][1]
+                    by[iAddr] = self.getTwiss()[iAddr][1][1]
+                    ax[iAddr] = self.getTwiss()[iAddr][0][0]
+                    ay[iAddr] = self.getTwiss()[iAddr][1][0]
+                    gx[iAddr] = self.getTwiss()[iAddr][0][2]
+                    gy[iAddr] = self.getTwiss()[iAddr][1][2]
             
             if self.getDebug():
                 if iAddr < len(self.getsigmaxy()):
@@ -1392,7 +1414,8 @@ class extrapolateBeam(Beam):
         if self.getDebug():
             print(" extrapolateBeam.extrapolateBeam: transport", \
                   "beam envelope")
-            print(" BeamLine: nBLs:", id(BL.BeamLine.getinstances()))
+            print("     ----> BeamLine: id(BL):", \
+                  id(BL.BeamLine.getinstances()))
             print(BL.BeamLine.getinstances())
         
         EndOfFile = False

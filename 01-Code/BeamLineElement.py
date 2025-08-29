@@ -121,13 +121,18 @@ OutsideBeamPipe : Returns true of  particle outside beam pipe defined in
 
 
 Created on Mon 12Jun23: Version history:
-----------------------------------------
+---------------------------------------- 
+ 2.0: 09Apr25: Include electron temperature update from Sadur and Zakhir.
+               Also, slim down input arguments required for laser-driven
+               source.
  1.1: 10Jan24: Update setTraceSpaceAtSource to make it match documented
                definititions.
  1.0: 12Jun23: First implementation
 
 @author: kennethlong
 """
+
+import warnings as wrnngs
 
 from copy import deepcopy
 import matplotlib.patches as patches
@@ -139,33 +144,38 @@ import scipy
 from scipy.optimize import fsolve
 import struct as strct
 import math
+import pandas as pnds
 
+import BeamLine          as BL
 import PhysicalConstants as PhysCnst
 import Particle          as Prtcl
 import LaTeX             as LTX
 import BeamIO            as bmIO
 
 #--------  Physical Constants
+constants_instance = PhysCnst.PhysicalConstants()
 
-#.. Constants from scipy; SI units:
-speed_of_light   = scipy.constants.speed_of_light
-alpha            = scipy.constants.alpha
-epsilon0SI       = scipy.constants.epsilon_0
-electronCHARGESI = scipy.constants.elementary_charge
-electronMASSSI   = scipy.constants.electron_mass
-protonMASSSI     = scipy.constants.proton_mass
+#.. SI units:
+alpha              = constants_instance.alpha()
+epsilon0SI         = constants_instance.epsilon0SI()
+electronCHARGESI   = constants_instance.electricCHARGE()
+eps0SI               = constants_instance.epsilon0()
+
+electronMASSSI     = constants_instance.meSI()
+protonMASSSI       = constants_instance.mpSI()
+
+speed_of_light     = constants_instance.SoL()
 
 #.. Natural units:
-constants_instance = PhysCnst.PhysicalConstants()
-protonMASS         = constants_instance.mp()
 electricCHARGE     = mth.sqrt(4.*mth.pi*alpha)
 epsilon0           = 1.
 
+electronMASS       = constants_instance.me()
+protonMASS         = constants_instance.mp()
 
-Joule2MeV          = 6241509074000.
-m2InvMeV           = 5067730717679.4
-
-
+#.. Conversion factors and units:
+Joule2MeV          = constants_instance.Joule2MeV()
+m2InvMeV           = constants_instance.m2InvMeV()
 
 
 class BeamLineElement:
@@ -223,7 +233,8 @@ class BeamLineElement:
         print("     ---->            Orientation: \n", self.getvStrt())
         print("     ---->        Position offset:", self.getdrStrt())
         print("     ---->     Orientation offset:", self.getdvStrt())
-        print(" Here!", np.linalg.norm(self.getdvStrt()))
+        print("     ---->    Magnitude of dvStrt:", \
+                                              np.linalg.norm(self.getdvStrt()))
         if np.linalg.norm(self.getdvStrt()) != 0.:
             print("          ---->    drRotStrt:", self.getdRotStrt())
             print("          ----> drRotStrtINV:", self.getdRotStrtINV())
@@ -415,7 +426,6 @@ class BeamLineElement:
             print(" <---- BeamLineElement.setRot2LbEnd: done.")
 
             
-        
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 
@@ -503,6 +513,21 @@ class BeamLineElement:
 
         return vEnd
 
+    def getMode(self):
+        return self._Mode
+    
+    def getModeText(self):
+        return self._ModeText
+    
+    def getParameterText(self):
+        return self._ParameterText
+    
+    def getParameterUnit(self):
+        return self._ParameterUnit
+    
+    def getParameters(self):
+        return self._Params
+    
     def getTransferMatrix(self):
         return self._TrnsMtrx
 
@@ -794,9 +819,11 @@ class BeamLineElement:
             print(" <---- BeamLineElement.writeElement done.")
         
     @classmethod
-    def readElement(cls, dataFILE):        #<---- class BeamLineElement:
+    def readElement(cls, dataFILEinst):        #<---- class BeamLineElement:
         if cls.getDebug():
             print(" BeamLineElement.readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -948,7 +975,6 @@ class BeamLineElement:
                                    
         if self.getDebug():
             print(" <---- BeamLineElement.visualise: ends.")
-
 
 #--------  Derived classes  --------  --------  --------  --------  --------
 """
@@ -1181,9 +1207,11 @@ class Facility(BeamLineElement):
             print(" <---- Facility(BeamLineElement).writeElement done.")
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Facility(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -1412,9 +1440,11 @@ class Drift(BeamLineElement):
     
     
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Drift(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -1495,7 +1525,7 @@ setAoertureParameters: Sets aperture parameters:
   Get methods:
      getDebug: get debug flag, bool
       getType: Get type, return Type, int
-    getParams: Return Params, list
+    getParameters: Return Params, list
    getLenbgth: Returns length of aperture (presently 0)
 
   Utilities:
@@ -1546,20 +1576,20 @@ class Aperture(BeamLineElement):
         print("     ----> Type:", self.getType())
         if self.getType() == 0:
             print("     ----> Circular:")
-            print("     ----> Radius (m)", self.getParams()[0])
+            print("     ----> Radius (m)", self.getParameters()[0])
         elif self.getType() == 1:
             print("     ----> Elliptical:")
-            print("     ----> Radius x, y (m)", self.getParams())
+            print("     ----> Radius x, y (m)", self.getParameters())
         elif self.getType() == 2:
             print("     ----> Rectangular:")
-            print("     ----> Half length x, y (m)", self.getParams())
+            print("     ----> Half length x, y (m)", self.getParameters())
         BeamLineElement.__str__(self)
         return " <---- Aperture parameter dump complete."
 
     def SummaryStr(self):
         Str  = "Aperture         : " + BeamLineElement.SummaryStr(self) + \
             "; Type = " + str(self.getType()) + \
-            "; Parameters = " + str(self.getParams())
+            "; Parameters = " + str(self.getParameters())
         return Str
 
     
@@ -1628,9 +1658,6 @@ class Aperture(BeamLineElement):
     def getType(self):
         return self._Type
     
-    def getParams(self):
-        return self._Params
-
     def getLength(self):
         return 0.
 
@@ -1644,19 +1671,19 @@ class Aperture(BeamLineElement):
 
         if self.getDebug():
             print(" Aperture(BeamLineElement).passTHROUGH:", \
-                  self.getType(), self.getParams())
+                  self.getType(), self.getParameters())
             
         NotCut = True
         if self.getType() == 0:
             Rad = np.sqrt(_R[0]**2 + _R[2]**2)
             if self.getDebug():
                 print("     ----> Aperture cut: R, Raptr:", \
-                      Rad, self.getParams()[0])
-            if Rad >= self.getParams()[0]:
+                      Rad, self.getParameters()[0])
+            if Rad >= self.getParameters()[0]:
                 NotCut = False
         elif self.getType() == 1:
-            RadX2 = (_R[0]/self.getParams()[0])**2
-            RadY2 = (_R[2]/self.getParams()[1])**2
+            RadX2 = (_R[0]/self.getParameters()[0])**2
+            RadY2 = (_R[2]/self.getParameters()[1])**2
             #print(" Aperture cut: RadX2, RapY2:", RadX2, RadY2)
             if (RadX2+RadY2) >= 1.:
                 NotCut = False
@@ -1664,8 +1691,8 @@ class Aperture(BeamLineElement):
             lenX = abs(_R[0])
             lenY = abs(_R[2])
             #print(" Aperture cut: RadX2, RapY2:", RadX2, RadY2)
-            if lenX > self.getParams()[0] or \
-               lenY > self.getParams()[1]:
+            if lenX > self.getParameters()[0] or \
+               lenY > self.getParameters()[1]:
                 NotCut = False
 
         if self.getDebug():
@@ -1690,10 +1717,10 @@ class Aperture(BeamLineElement):
             print("     ----> ytot, yzero:", ytot, yzero)
 
         Typ  = self.getType()
-        xmin = self.getParams()[0]
-        ymin = self.getParams()[0]
+        xmin = self.getParameters()[0]
+        ymin = self.getParameters()[0]
         if Typ == 1 or Typ == 2:
-            ymin = self.getParams()[1]
+            ymin = self.getParameters()[1]
         if self.getDebug():
             print("     ----> xmin, ymin:", xmin, ymin)
             
@@ -1769,7 +1796,7 @@ class Aperture(BeamLineElement):
         if self.getDebug():
             print("     ----> Type:", strct.unpack(">i", record))
 
-        record = strct.pack(">i", len(self.getParams()))
+        record = strct.pack(">i", len(self.getParameters()))
         dataFILE.write(record)
         if self.getDebug():
             print("     ----> Number of paramters:", \
@@ -1777,8 +1804,8 @@ class Aperture(BeamLineElement):
 
         if self.getDebug():
             print("     ----> Write parameters:")
-        for iPrm in range(len(self.getParams())):
-            record = strct.pack(">d", self.getParams()[iPrm])
+        for iPrm in range(len(self.getParameters())):
+            record = strct.pack(">d", self.getParameters()[iPrm])
             dataFILE.write(record)
             if self.getDebug():
                 print("         ----> iPrm, value:", \
@@ -1792,9 +1819,11 @@ class Aperture(BeamLineElement):
             print(" <---- Aperture(BeamLineElement).writeElement done.")
         
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Aperture(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -1914,11 +1943,11 @@ class FocusQuadrupole(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None, _Strength=None, _kFQ=None):
-        
+
         if self.getDebug():
             print(' FocusQuadrupole.__init__: ', \
                   'creating the FocusQuadrupole object: Length=', \
-                  _Length, ', Strength=', _Strength)
+                  _Length, ', Strength=', _Strength, ', kFQ=', _kFQ)
 
         FocusQuadrupole.instances.append(self)
 
@@ -2377,9 +2406,11 @@ class FocusQuadrupole(BeamLineElement):
              " <---- FocusQuadrupole(BeamLineElement).writeElement done.")
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" FocusQuadrupole(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -2950,9 +2981,11 @@ class DefocusQuadrupole(BeamLineElement):
              " <---- DefocusQuadrupole(BeamLineElement).writeElement done.")
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" DefocusQuadrupole(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -3361,9 +3394,11 @@ class SectorDipole(BeamLineElement):
         return
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" SectorDipole(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -3842,9 +3877,11 @@ class Solenoid(BeamLineElement):
         return self._ksol
     
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Solenoid(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -4335,12 +4372,13 @@ class GaborLens(BeamLineElement):
              " <---- GaborLens(BeamLineElement).writeElement done.")
 
         return
-
     
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" GaborLens(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -4966,9 +5004,11 @@ class CylindricalRFCavity(BeamLineElement):
         return
 
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Source(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -5015,24 +5055,18 @@ Derived class Source:
   _Mode  : Int, Mode
   _Param : List of parameters,
            Parameterised laser-driven source (Mode=0):
-             [0] - Sigma of x gaussian - m
-             [1] - Sigma of y gaussian - m
-             [2] - Minimum cos theta to generate
-             [3] - E_min: MeV min energy to generate
-             [4] - E_max: MeV max energy to generate;
-                     overwritten when calculated in
-                     getLaserDrivenParticleEnergy
-             [5] - nPnts: Number of points to sample for integration of PDF
-             [6] - P_L: Laser power [W]
-             [7] - E_L: Laser energy [J]
-             [8] - lamda: Laser wavelength [um]
-             [9] - t_laser: Laser pulse duration [s]
-            [10] - d: Laser thickness [m]
-            [11] - I: Laser intensity [W/cm2]
-            [12] - theta_degrees: Electron divergence angle [degrees]
-            [13] - Intercept of sigma_{theta_S} at K=0 [degrees]
-            [14] - Scaled slope of sigma_{theta_S}     [degrees]
-            [15] - rp max
+             [0] - Wavelength - microns
+             [1] - Power - W
+             [2] - Strehl ratio
+             [3] - Focal spot radius - m
+             [4] - Laser-pulse duration - s
+             [5] - Hot electron temperature - MeV
+             [6] - Minimum proton kinetic energy - MeV
+             [7] - Maximum proton kinetic energy - MeV
+             [8] - Intercept of sigma_{theta_S} at K=0 [degrees]
+             [9] - Scaled slope of sigma_{theta_S}     [degrees]
+            [10] - rp max
+
            Gaussian (Mode=1):
              [0] - Sigma of x gaussian - m
              [1] - Sigma of y gaussian - m
@@ -5040,6 +5074,9 @@ Derived class Source:
              [3] - Kinetic energy - MeV
              [4] - Sigma of gaussian - MeV
 
+           Flat (Mode=2)
+
+           Read from file (Mode=3)
 
            Uniform disc (Mode=4):
              [0] - Kinetic energy - MeV
@@ -5112,6 +5149,7 @@ getLaserDrivenProtonEnergy: Generate proton energy at source using
 
 
 """
+
 class Source(BeamLineElement):
     instances  = []
     __Debug    = False
@@ -5120,37 +5158,34 @@ class Source(BeamLineElement):
     ModeText   = ["Parameterised laser driven", "Gaussian", "Flat", \
                   "Read from file", "UniformDisc"]
     
-    ParamUnit  = [ ["$\\mu$m", "$\\mu$m", "", "MeV", "MeV", "", "W", \
-                    "J", "$\\mu$m", "s", "$\\mu$m", "J$/m^2$",       \
-                    "degrees", "degrees", "degrees", ""], \
+    ParamUnit  = [ ["$\\mu$m", "W", " ", "m", "s", "MeV", \
+                    "MeV", "MeV", \
+                    "degrees", "degrees", " "], \
                    ["m", "m", "MeV", "MeV", ""], \
                    [], [], \
                    ["MeV", "MeV", "m"] ]
     
-    ParamText  = [ [], \
+    ParamText  = [ ["Wavelength", "Power", "Strehl ratio", "r0", \
+                    "Duration", "Te", \
+                    "Kmin", "Kmax", \
+                    "SigmaThetaS0", "SlopeThetaS", "rpmax"], \
                    ["SigmaX", "SigmaY", "MinCTheta", \
                     "MeanEnergy", "SigmaEnergy"],    \
                    [], [], \
                    ["MeanEnergy", "SigmaEnergy", "MaxRadius"] ]
     
-    ParamList  = [ [float, float, float, float, float, int,   \
-                    float, float, float, float, float, float, \
-                    float, float, float, float],                 \
+    ParamList  = [ [float, float, float, float, float, float, \
+                    float, float, float, float, float], \
                    [float, float, float, float, float],          \
                    [float, float, float, float, float],          \
                    [], \
                    [float, float, float] ]
-    ParamLaTeX  = [ ["$\\sigma_x$", "$\\sigma_y$",                       \
-                     "$\\cos\\theta_S_{\\rm min}$",                      \
-                     "$\\varepsilon_{\\rm min}$",                        \
-                     "$\\varepsilon_{\\rm max}$",                        \
-                     "nPnts", "Laser power",                             \
-                     "Laser energy", "Laser wavelength",                 \
-                     "Laser pulse duration", "Laser spot size",          \
-                     "Laser intensity",                                  \
-                     "Electron divergence angle",                        \
+    ParamLaTeX  = [ ["Wavelength", "Power", "Strehl ratio", \
+                     "Focal spot radius",         \
+                     "Electron Temperature", "Duration", \
+                     "$K_{\\rm min}$", "$K_{\\rm max}$", \
                      "Intercept of $\\sigma_{\\theta_S}$",               \
-                     "Scaled slope of $\\sigma_{\\theta_S}$", "$r_p"],   \
+                     "Scaled slope of $\\sigma_{\\theta_S}$", "rpmax"],  \
                     ["\\sigma_x", "\\sigma_y",                           \
                      "\\cos\\theta_S |_{\\rm min}",                      \
                      "Mean kinetic energy",                              \
@@ -5162,14 +5197,15 @@ class Source(BeamLineElement):
 
     Lsrdrvng_E = None
     LsrDrvnIni = False
-    
+
+#--------  Initialisation and built-in methods  --------  --------  --------
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Mode=None, _Param=[]):
-        
+
         Source.LsrDrvnIni = False
         
-        if self.__Debug:
+        if self.getDebug():
             print(' Source.__init__: ', \
                   'creating the Source object')
             print("     ----> Parameters:", _Param)
@@ -5179,8 +5215,9 @@ class Source(BeamLineElement):
         self.setAll2None()
         
         #.. BeamLineElement class initialisation:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
-
+        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, \
+                                              _drStrt, _dvStrt)
+        
         self.setLength(0.)
         self.setStrt2End(np.array([0., 0., self.getLength()]))
         self.setRot2LbEnd(self.getRot2LbStrt())
@@ -5191,11 +5228,21 @@ class Source(BeamLineElement):
                   " bad source paramters:", \
                       _Mode, _Param)
             raise badBeamLineElement( \
-                  " Source: bad specification for source!"
-                                      )
-        if _Mode == 0 and len(_Param) > 15:
-            if _Param[15] == None: _Param[15] = -9999.
-        ValidSourceParam = self.CheckSourceParam(_Mode, _Param)
+                    " Source: bad specification for source!")
+        
+        if self.getDebug():
+            print("     ----> Before parameter checks; Mode, Param:", \
+                  _Mode, _Param)
+
+        params = _Param
+        try:
+            ValidSourceParam = self.CheckSourceParam(_Mode, _Param)
+        except:
+            if len(_Param) == 16:
+                params = self.paramsFROMlegacyPARAMS(_Param)
+
+        ValidSourceParam = self.CheckSourceParam(_Mode, params)
+
         if not ValidSourceParam:
             print(" BeamLineElement(Source).__init__:", \
                   " bad source input; :", \
@@ -5205,11 +5252,10 @@ class Source(BeamLineElement):
                         " bad source paramters. Exit", \
                         _Name
                                                             )
-
         self.setMode(_Mode)
         self.setModeText(Source.ModeText[_Mode])
         self.setParameterText(Source.ParamText[_Mode])
-        self.setParameters(_Param)
+        self.setParameters(params)
         self.setParameterUnit(Source.ParamUnit[_Mode])
                 
         if self.__Debug:
@@ -5235,7 +5281,7 @@ class Source(BeamLineElement):
             str(self.getParameters())
         return Str
 
-#--------  "Set methods".
+#--------  "Set methods"  --------  --------  --------  --------  --------
 #.. Methods believed to be self documenting(!)
     def setAll2None(self):
         self._Mode         = None
@@ -5261,7 +5307,7 @@ class Source(BeamLineElement):
     def setParameters(self, _Param):
         if self.getDebug():
             print(" Source.setParamters; Parameters:", _Param)
-        self._Param = _Param
+        self._Params = _Param
          
     def setParameterUnit(self, _ParameterUnit):
         if self.getDebug():
@@ -5269,27 +5315,17 @@ class Source(BeamLineElement):
         self._ParameterUnit = _ParameterUnit
 
         
-#--------  "get methods"
+#--------  "get methods"  --------  --------  --------  --------  --------
 #.. Methods believed to be self documenting(!)
-    def getMode(self):
-        return self._Mode
-    
-    def getModeText(self):
-        return self._ModeText
-    
-    def getParameterText(self):
-        return self._ParameterText
-    
-    def getParameters(self):
-        return self._Param
-    
     def getderivedParameters(self):
-        return self._derivedParam
-    
-    def getParameterUnit(self):
-        return self._ParameterUnit
-    
+        """
+            [0] - Gamma - Normalisation constant for cumulative
+                          probability
+        """
         
+        return self._derivedParam
+
+    
 #--------  Processing methods:
     def getParticleFromSource(self):
         if self.__Debug:
@@ -5317,6 +5353,258 @@ class Source(BeamLineElement):
 
         return TrcSpc
 
+#--------  "Management" methods  --------  --------  --------  --------
+    #.. clean all source instances:
+    @classmethod
+    def cleaninstances(cls):
+        if cls.getDebug():
+            print(" Source(BeamLineElement).cleaninstance:")
+        for inst in cls.getinstances():
+            if cls.getDebug():
+                print("     ----> Kill:", inst.getName())
+                
+            iAddrBLE = BeamLineElement.getinstances().index(inst)
+            BeamLineElement.getinstances().pop(iAddrBLE)
+
+            del inst
+
+        cls.instances = []
+        if cls.getDebug():
+            print(' <---- Instances removed.')
+
+    @classmethod
+    #.. Check through data frame and report legacy lines:
+    def scanLEGACY(cls, pndsDF):
+        if cls.getDebug():
+            print(" BeamLineElement.Source.scanLEGACY starts.", \
+                  "Source data frame:")
+            print(pndsDF)
+            
+        cleanedPNDS = pndsDF
+        
+        legacyPARAMs = ["SigmaX", "SigmaY", "Emax", "nPnts", "MinCTheta", \
+                        "Energy", "Intensity"]
+        
+        cleanedPNDS = pndsDF[~pndsDF['Parameter'].isin(legacyPARAMs)]
+
+        #.. Minimum kinetic energy:
+        if bool(cleanedPNDS[cleanedPNDS["Parameter"] == \
+                           "Emin"].any().any()):
+            print(" BeamLine.parseSource: Depricated parameter Emin,", \
+                  "use Kmin.")
+
+            cleanedPNDS.loc[ \
+                cleanedPNDS["Parameter"]=="Emin", ["Parameter"]] = "Kmin"
+
+        if cls.getDebug():
+            print("     ----> Cleaned DF:")
+            print(cleanedPNDS)
+
+        if len(cleanedPNDS) > len(pndsDF):
+            print(" Source(BeamLineElement).scanLEGACY:", \
+              "The following legacy parameters will be ignored:")
+            legacyPNDS   = pndsDF['Parameter'].isin(legacyPARAMs)
+            legacyMASKED = pndsDF[legacyPNDS]
+            print(legacyMASKED)
+            print("     ----> Remaining parameters:")
+            print(cleanedPNDS)
+            print(" <---- BeamLineElement.Source.scanLEGACY: Done.")
+
+        return cleanedPNDS
+
+    @classmethod
+    #.. Check through data frame and report legacy lines:
+    def setDEFAULTparams(cls):
+        if cls.getDebug():
+            print(" BeamLineElement.Source.setDEFAULTparams starts.")
+            print("     ----> Default to J-KAREN-P to compare with", \
+                  "Dover et al,", \
+                  "High Energy Density Physics 37 (2020) 100847.")
+
+        wavelength   = 0.8                   #.. microns
+
+        E_laser      = 10.                   #.. J
+        Duration     = 40.E-15               #.. s
+        power        = E_laser / Duration    #.. W
+        strhlRATIO   = 3./5.
+
+        r0           = 1.5E-6                #.. m
+        Thickness    = 5.E-6                 #.. m
+        
+        Te           = 10.                   #.. MeV
+        Kmin         = 1.                    #.. MeV
+        Kmax         = None                  #.. MeV
+        
+        DivAngle     = 25.                   #.. degrees
+        
+        SigmaThetaS0 = 20.                   #.. degrees
+        SlopeThetaS  = 15.                   #.. degrees
+        rpmax        = -9999.
+
+        if cls.getDebug():
+            print("     ----> wavelength, power, strhlRATIO, r0, Duration,", \
+                  "Te, Kmin, Kmax, Thickness, DivAngle, SigmaThetaS0,", \
+                  "SlopeThetaS, rpmax:", wavelength, power, strhlRATIO, r0, \
+                   Duration, Te, Kmin, Kmax, Thickness, DivAngle, \
+                   SigmaThetaS0, SlopeThetaS, rpmax)
+            print(" <---- Defaults set.")
+        
+        return wavelength, power, strhlRATIO, r0, Duration, Te, Kmin, Kmax, \
+               Thickness, DivAngle, SigmaThetaS0, SlopeThetaS, rpmax
+
+    @classmethod
+    #.. Parse one parameter from Pandas data frame:
+    def parseSINGLEparam(cls, pndsDF=None, Name=None, default=None):
+        if cls.getDebug():
+            print(" BeamLineElement.Source.parseSINGLEparam starts.", \
+                  "id(pndsDF), Name, default:", id(pndsDF), Name, default)
+
+        value = None
+
+        if isinstance(pndsDF, pnds.core.frame.DataFrame) != None and \
+           Name != None:
+            if bool(pndsDF[pndsDF["Parameter"]==Name].any().any()):
+                value = float( \
+                 pndsDF[pndsDF["Parameter"]==Name]["Value"].iloc[0])
+            else:
+                if Name != "Te":
+                    print("     ---->", Name, "is not defined;", \
+                          "it will be set to", default)
+                value = default
+
+        else:
+            raise badParameter(" BeamLineElement.Source.parseSINGLEparam:"+\
+                              "id(pndsDF), Name, default:" + \
+                              str(id(pndsDF)) + "," + \
+                              str(Name) + "," + \
+                              str(default))
+
+        if cls.getDebug():
+            print(" BeamLineElement.Source.parseSINGLEparam:", \
+                  "Name=", Name, "; value:", value)
+        
+        return value
+
+    @classmethod
+    def calculateTe(cls, wavelength, r0, power, strhlRATIO):
+        if cls.getDebug():
+            print(" Source(BeamLineElement).calculateTe:", \
+                  "wavelength, electronCHARGESI, electronMASS,", \
+                  "electronMASSSI:", \
+                  wavelength, electronCHARGESI, electronMASS, \
+                  electronMASSSI)
+            print("              ", \
+                  "speed of light, r0, power, strhlRATIO, eps0 ", \
+                  "                                  :", \
+                  speed_of_light, r0, power, eps0SI       )
+
+            I = power*strhlRATIO / (mth.pi * r0**2 * 10000.)
+            print("              ", \
+                  "I                                             ", \
+                  "                              :", I)
+            print(" ")
+
+        a0 = (wavelength * electronCHARGESI) / \
+            (2.*mth.pi*electronMASSSI*speed_of_light**2*r0) * \
+            mth.sqrt(2.*power*strhlRATIO / (mth.pi*eps0SI*speed_of_light))
+
+        if cls.getDebug():
+            print("     ----> a0:", a0)
+            print(" ")
+
+        pt0 = a0 * electronMASSSI * speed_of_light
+        y0  = a0 * wavelength / (2.*mth.pi)
+                    
+        if cls.getDebug():
+            print("     ----> pt0, y0:", pt0, y0)
+            print(" ")
+
+        rLe = r0 / (2. * mth.log(2.))
+                    
+        if cls.getDebug():
+            print("     ----> r0, rLe:", r0, rLe)
+            print(" ")
+                
+        if rLe < y0:
+            pt = pt0 * mth.sqrt(1. - (1. - rLe/y0)**2 )
+        else:
+            pt = pt0
+
+        if cls.getDebug():
+            print("     ----> pt:", pt)
+            print(" ")
+
+        Te = electronMASSSI * speed_of_light**2 * ( \
+                mth.sqrt(1. + (pt/(electronMASSSI*speed_of_light))**2) \
+                                                    -1. )
+
+        Te /= electronCHARGESI * 1.E6
+        
+        if cls.getDebug():
+            print(" <---- Te:", Te)
+
+        return Te
+    
+    @classmethod
+    def calculatet0(cls, power, strhlRATIO, r0, Thickness, DivAngle):
+        t0 = None
+        if cls.getDebug():
+            print(" Source(BeamLineElement).calculatet0:", \
+                  "power, strhlRATIO, r0, Thickness, DivAngle:", \
+                   power, strhlRATIO, r0, Thickness, DivAngle)
+
+        qi      = 1.                                #!! Fix h/wired number
+        PR      = 8.71E9                            #!! Fix h/wired number
+        theta_e = DivAngle * mth.pi / 180.
+        intnsty = power*strhlRATIO / (mth.pi * r0**2) * 1E-4
+        if cls.getDebug():
+            print("     ----> qi, PR, theta_e, intnsty:", \
+                  qi, PR, theta_e, intnsty)
+        
+        #.. Power conversion efficiency, eta:
+        eta = 1.2E-15 * intnsty**(3./4.)            #!! Fix h/wired number
+        if eta > 0.5: eta = 0.5                     #!! Fix h/wired number
+        if cls.getDebug():
+            print("     ----> eta:", eta)
+
+        Kinfnty = 2.*electronMASSSI * speed_of_light**2 * \
+            mth.sqrt(eta*power*strhlRATIO/PR)
+        if cls.getDebug():
+            print("     ----> Kinfnty:", Kinfnty)
+
+        vmax = mth.sqrt(2.*Kinfnty/protonMASSSI)
+        if cls.getDebug():
+            print("     ----> vmax:", vmax)
+
+        t0 = (r0 + Thickness*mth.tan(theta_e))/vmax
+
+        if cls.getDebug():
+            print(" <---- t0:", t0)
+
+        return t0, Kinfnty
+
+    def paramsFROMlegacyPARAMS(self, legacyPARAMS):
+        r0 = mth.sqrt(legacyPARAMS[0]**2 + legacyPARAMS[1]**2)
+        params = [ legacyPARAMS[8],  \
+                   legacyPARAMS[6],  \
+                   3./5.,            \
+                   r0,               \
+                   legacyPARAMS[4],  \
+                   10.,              \
+                   legacyPARAMS[3],  \
+                   legacyPARAMS[4],  \
+                   legacyPARAMS[13], \
+                   legacyPARAMS[14], \
+                   legacyPARAMS[15] ]
+
+        print(" Source(BeamLineElement).paramsFROMlegacyPARAMS:")
+        print("     ---->", \
+              "Attempt to convert parameters to present structure.")
+        print("          Legacy params:", legacyPARAMS)
+        print(" <---- Converted params:", params)
+
+        return params
+        
     def getParticle(self):
         if self.getDebug():
             print(" BeamLineElement(Source).getParticle: start")
@@ -5334,11 +5622,19 @@ class Source(BeamLineElement):
 
         #-------- Laser driven:
         if self._Mode == 0:
+            #.. Proton kinetic energy:
+            if self.getDebug():
+                print("     ----> Calling getLaserDrivenProtonEnergy:")
+                
             KE     = self.getLaserDrivenProtonEnergy()  # [MeV]
+            if self.getDebug():
+                print("     <---- KE:", KE)
+
+            #.. position at production:
+            X      = rnd.gauss(0., self.getParameters()[3])
+            Y      = rnd.gauss(0., self.getParameters()[3])
             
-            X      = rnd.gauss(0., self.getParameters()[0])
-            Y      = rnd.gauss(0., self.getParameters()[1])
-            
+            #.. x' and y' at production:
             upmax  = mth.sin(np.radians(self.g_theta(KE)))
             if self.getDebug():
                 print("     ----> upmax:", upmax)
@@ -5361,26 +5657,21 @@ class Source(BeamLineElement):
 
                 Accept = False
                 if rnd.random() < grp:
-                    if self.getParameters()[15] == -9999.:
+                    if self.getParameters()[10] == -9999.:
                         Accept = True
                     else:
                         rp = mth.sqrt(xp**2 + yp**2)
-                        """
-                        print(rp, self.getParameters()[15])
-                        """
-                        if rp < self.getParameters()[15]:
+                        if self.getDebug():
+                            print("     ----> rp, rpamx:", \
+                                  rp, self.getParameters()[10])
+                        if rp < self.getParameters()[10]:
                             Accept = True
                     
             if xp == yp:
-                print(" Help, equal xp and yp")
-
+                wrnngs.warn(" BeamLineElement.Source.getParticle:", \
+                            " eqaual xp adn yp")
             
-            cosTheta, Phi = None, None # self.getGaussianThetaPhi(KE)
-            """
-              Rolled back to: self.getGaussianThetaPhi(), KL: 08Mar24
-              Rolled back to: self.getGaussianThetaPhi(), KL: 06Mar24
-              Replace, self.getFlatThetaPhi(),            KL: 05Mar24
-            """
+            cosTheta, Phi = None, None # Backward compatibility!
 
         elif self._Mode == 1:
             X             = rnd.gauss(0., self.getParameters()[0])
@@ -5413,12 +5704,16 @@ class Source(BeamLineElement):
                   '  --------  --------  --------  --------  --------')
 
         return X, Y, KE, cosTheta, Phi, xp, yp
-    
+
+    #..  Used for Modes 1 and 2:
     def getFlatThetaPhi(self):
         cosTheta = rnd.uniform(self.getParameters()[2], 1.)
         Phi      = rnd.uniform( 0., 2.*mth.pi)
         return cosTheta, Phi
-    
+
+    #..  Calculate cumulative probability for parabolic distribution
+    #    with max extent upmax:
+    #..  Used for Mode 0
     def getgofrp(self, upmax, xp, yp):
         Nrm = 1./upmax**2
         rp2 = xp**2 + yp**2 
@@ -5426,267 +5721,181 @@ class Source(BeamLineElement):
         
         return grp
     
-
-    ### Gaussian Angular Distribution ###   KL working on this now
-    # Divergence angle: 20 degrees for low energies down to 5 degrees for E_max
-    def g_theta(self,energy):
-        Emax  = self.getderivedParameters()[4] / (1.6e-19*1e6)
-
+    #..  Gaussian Angular Distribution with RMS determined by linearly
+    #    decreasing paramterisation presented in documentation:
+    #..  Used for Mode 0
+    def g_theta(self, energy):
+        Kmax  = self.getParameters()[7]
         if self.getDebug():
-            print(" Source.g_theta: intercept, slope:", \
-                  self.getParameters()[13], self.getParameters()[14])
-            print("     ----> enegy, Emax:", energy, Emax)
+            print(" BeamLineElement(Source).g_theta:")
+            print("     ----> enegy, Kmax:", energy, Kmax)
+            print("     ----> theta_S(0), theta_S(slope):", \
+                  self.getParameters()[8], self.getParameters()[9])
             
-        theta = self.getParameters()[13] - \
-            self.getParameters()[14] * energy / Emax
+        theta = self.getParameters()[8] - \
+            self.getParameters()[9] * energy / Kmax
         
         if self.getDebug():
             print(" <---- theta:", theta)
-        
+
         return theta
     
-    # Single angle generator with acceptance-rejection
-    def angle_generator(self, E_MeV):
-
-        theta_E = self.g_theta(E_MeV)         # [degrees]
-        theta_E = np.radians(theta_E)         # [rad]
-        
-        phi = rnd.uniform(0., 2. * math.pi)  # [rad]
- 
-        theta = abs(np.random.normal(0., theta_E))  # [rad]
-
-        return theta, phi
-
-    def getGaussianThetaPhi(self, E_MeV):
-
-        """
-           E_MeV = self.getLaserDrivenProtonEnergy(self, \
-                    P_L, E_laser, lamda, t_laser, d, I, theta_degrees)
-        """
-
-        theta = self.angle_generator(E_MeV)[0]
-        cosTheta = np.cos(theta)
-        Phi = self.angle_generator(E_MeV)[1]
-
-        return cosTheta, Phi
-
-    # Calculates the rest of the parameters needed for the parametrisation
-    def parameters(self, P_L, E_laser, lamda, t_laser, d, I, theta_degrees):
-
-        c = 3e8               # Speed of light in vacuum [m/s]
-        m_e = 9.11e-31        # Electron mass [Kg]
-        m_i = 1836*9.1e-31    # Proton mass [kg]
-        k_B = 1.380649e-23    # Boltzman constant [J/K]
-        Z = 1                 # Ion charge number   
-
-        # Laser ponderomotive potential [J], intensity in [W/cm2]
-        T_p = m_e*(c**2)*(np.sqrt(1 + (I*(lamda**2)/(1.37*1e18)))-1)    
-        T_e = T_p   # Hot electron temperature [J]
-
-        # Fraction of laser energy converted into hot electron energy,
-        # intensity in [W/cm2]
-        f = 1.2* (10**(-15)) * (I**(0.75)) 
-        if f < 0.5:
-            f = f
-        else:
-            f = 0.5
-
-        # Total number of electrons accelerated into the targe
-        N_E = f*E_laser/T_p    
-
-        I_m = I*10000                    # Convert intensity from W/cm2 to W/m2
-        r0 = np.sqrt(P_L/(I_m*np.pi))    # Radius of the laser spot [m]
-
-        # Area over which electrons are accelerated and spread [m^2]
-        theta = mth.radians(theta_degrees)  # Half-angle divergence [radians] 
-        B = r0 + (d * np.tan(theta))
-        s_sheath = np.pi*(B)**2 
-
-        ne_0 = N_E/(c*t_laser*s_sheath)      # Hot electron density [pp/m^3]
-        c_s = np.sqrt(Z*k_B*T_e/m_i)         # Ion-acoustic velocity [m/s]
-
-        r_e = 2.82e-15              # Electron radius [m]
-        P_R = m_e * (c**3) / r_e    # Relativistic power unit [W]
-
-        # Maximum possible energy without considering the laser pulse
-        # length (infinite acceleration)
-        E_i_inf = Z * 2 * m_e * (c**2) * np.sqrt((f*P_L)/P_R)  # [J]
-
-        # Calculates the ballistic time [s]
-        v_inf = np.sqrt((2*E_i_inf/m_i))
-        t_0 = B/v_inf
-
-        # Solves the equation numerically for X
-        initial_guess = mth.acos(0.5)
-        Theta_solution = fsolve( \
-                        self.equation, initial_guess, args=(t_laser, t_0) \
-                                )
-        X = mth.cos(Theta_solution[0])
-
-        E_max = E_i_inf*(X**2)  # [J]
-
-        return ne_0, c_s, s_sheath, T_e, E_max
-
     # Defines the function to solve for f(x) = 0
-    def equation(self, Theta, t_laser, t_0):
-        X = mth.cos(Theta)
+    #..  Used for Mode 0
+    @classmethod
+    def DurationBYt0equation(self, X, t_laser, t_0):
         if self.getDebug():
-            print(" equation: Theta, X, t_laser, t_0:", Theta, X, t_laser, t_0)
-        return (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
-            (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
+            print(" Source(BeamLineElement).DurationBYt0equation start:")
+            print("     ----> X, t_laser, t_0:", 
+                  X, t_laser, t_0)
+        if   X >  0.9999: X = 0.9999
+        elif X < -0.9999: X = -0.9999
+
+        if self.getDebug():
+            print("     ----> X:", X)
+
+        eps= (X * (1 + (0.5 / (1 - (X**2) ) ) ) ) + \
+                 (0.25 * mth.log((1 + X) / (1 - X))) - (t_laser/t_0)
+
+        if self.getDebug():
+            print(" <---- eps:", eps)
+
+        return eps
 
     # Generates energy values for the distribution
+    #..  Used for Mode 0
     def getLaserDrivenProtonEnergy(self):
         if not Source.LsrDrvnIni:
             if self.__Debug:
                 print( \
                     " BeamLineElement(Source).getLaserDrivenProtonEnergy:", \
                     " initialise")
+                
             Source.LsrDrvnIni = True
-
-            P_L = self.getParameters()[6]
-            E_laser = self.getParameters()[7]
-            lamda = self.getParameters()[8]
-            t_laser = self.getParameters()[9]
-            d = self.getParameters()[10]
-            I = self.getParameters()[11]
-            theta_degrees = self.getParameters()[12]
-
-            derivedPARAMETERS = self.parameters(P_L, E_laser, \
-                                                lamda, t_laser, \
-                                                d, I, \
-                                                theta_degrees)
-            
-            self.getderivedParameters().append(derivedPARAMETERS[0])
-            self.getderivedParameters().append(derivedPARAMETERS[1])
-            self.getderivedParameters().append(derivedPARAMETERS[2])
-            self.getderivedParameters().append(derivedPARAMETERS[3])
-            self.getderivedParameters().append(derivedPARAMETERS[4])
-            self.getParameters()[4] = derivedPARAMETERS[4] / (1.6e-19*1e6)
-            E_min = self.getParameters()[3] * 1.6e-19*1e6
-            self.getderivedParameters().append(E_min)
 
             self.getLaserCumProbParam()
 
-            if self.getDebug():
-                print("     ----> First call, set paramters:")
-                print("                        P_L:", P_L)
-                print("                    E_laser:", E_laser)
-                print("                      lamda:", lamda)
-                print("                    t_laser:" , t_laser)
-                print("                          d:", d)
-                print("                          I:", I)
-                print("           theta (degrees):", theta_degrees)
-                print("                      ne_0:", \
-                      self.getderivedParameters()[0])
-                print("                       c_s:", \
-                      self.getderivedParameters()[1])
-                print("                  s_sheath:", \
-                      self.getderivedParameters()[2])
-                print("                       T_e:", \
-                      self.getderivedParameters()[3])
-                
-                print("                     E_max:", \
-                      self.getderivedParameters()[4])
-                print("                     E_min:", \
-                      self.getderivedParameters()[5])
-                
-                print("                     Gamma:", \
-                      self.getderivedParameters()[6])
+        Te   = self.getParameters()[5]
+        Kmin = self.getParameters()[6]
+        Kmax = self.getParameters()[7]
 
-        E_max = self.getderivedParameters()[4]
-        E_min = self.getderivedParameters()[5]
-
-        T_e   = self.getderivedParameters()[3]
-        Gamma = self.getderivedParameters()[6]
+        Gamma = self.getderivedParameters()[0]
 
         if self.getDebug():
-            print("     ----> Get E:")
+            print("     ----> Get kinetic energy:")
             
         GE = rnd.random()
 
         if self.getDebug():
-            print("         ----> E_min, GE, Gamma:", E_min, GE, Gamma)
-            
-        sqrtE = ( mth.sqrt(E_min) - mth.sqrt(T_e/2.) * mth.log(1.-GE/Gamma))
-        E     = sqrtE**2
-        if self.getDebug():
-            print("     <---- E:", E, " J")
-            
-        E    /= (1.6e-19*1.e6)
-        if self.getDebug():
-            print("     <---- E:", E, " MeV")
-        
-        return E
+            print("         ----> Te, Kmin, Kmax, Gamma, GE:", \
+                  Te, Kmin, Kmax, Gamma, GE)
 
+        sqrtK = ( mth.sqrt(Kmin) - mth.sqrt(Te/2.) * mth.log(1.-GE/Gamma))
+        K     = sqrtK**2
+        
+        if self.getDebug():
+            print("     <---- K:", K, " MeV")
+
+        return K
+
+    # Returns derived parameters for the calculation of the cumulative
+    # probability.
+    #   derivedParamters[0] - Gamma = Normalisation constant; 1/(integral
+    #                                 of probability density function.
+    #..  Used for Mode 0
     def getLaserCumProbParam(self):
+        if self.getDebug():
+            print(" Source(BeamLineElement).getLaserCumProbParam: start.")
+            
+        Te   = self.getParameters()[5]
+        Kmin = self.getParameters()[6]
+        Kmax = self.getParameters()[7]
 
-        T_e      = self.getderivedParameters()[3]
-        E_max    = self.getderivedParameters()[4]
-        E_min    = self.getderivedParameters()[5]
+        if self.getDebug():
+            print("     ----> Te, Kmin, Kmax:", Te, Kmin, Kmax)
+            
+        intgrl = mth.sqrt(2./Te)*(mth.sqrt(Kmax) - mth.sqrt(Kmin))
+        gamMAX = 1. - mth.exp(-intgrl)
         
-        gamMAX = mth.sqrt(2./T_e)*(mth.sqrt(E_max) - mth.sqrt(E_min))
-        GamMAX = 1. - mth.exp(-gamMAX)
+        if self.getDebug():
+            print("     ----> intgrl, gamMAX:", intgrl, gamMAX)
+            
+        Gamma  = 1./gamMAX
 
-        Gamma  = 1./GamMAX
-
+        if self.getDebug():
+            print(" <---- Gamma:", Gamma)
+            
+            
         self.getderivedParameters().append(Gamma)
+
+    # Returns kinetic PDF for kinetic energy distribution and kinetic
+    # energy for 100 points between Kmin and Kmax.
+    #..  Used for Mode 0
+    def getLaserDrivenProtonEnergyProbDensity(self):
+        if self.getDebug():
+            print( \
+        " Source(BeamLineElement).getLaserDrivenProtonEnergyProbDensity:")
+
+        Te   = self.getParameters()[5]
+        Kmin = self.getParameters()[6]
+        Kmax = self.getParameters()[7]
+
+        if self.getDebug():
+            print("     ----> Te, Kmin, Kmmax:", Te, Kmin, Kmax)
+        
+        K   = np.linspace(Kmin, Kmax, 100)
+        dK2 = (Kmax - Kmin) / 100. / 2.
+
+        if self.getDebug():
+            print("     ----> K, dK2:", K, dK2)
+        
+        # Approximate required distribution:
+        eta = self.getderivedParameters()[0]
+        g_K = []
+        Ke  = []
+        if self.getDebug():
+            print("     ----> eta, g_K, Ke:", eta, g_K, Ke)
+
+        for iK in range(len(K)):
+            Ke.append( K[iK] + dK2 )
+            
+            g_K_val = (eta / mth.sqrt(Ke[-1])) \
+                * mth.exp(-mth.sqrt(2. * Ke[-1] / Te))
+
+            g_K.append( g_K_val )
+
+        g_K /= np.sum(g_K)   # Normalize the probability distribution
+
+        if self.getDebug():
+            print("     ----> g_K, sum:", g_K, np.sum(g_K))
+
+        return Ke, g_K
     
+    # Returns cumulative PDF given kinetic energy (E).  Used to plot
+    # cumulative probability for checks.
+    #..  Used for Mode 0
     def getLaserCumProb(self, E):
         CumProb = 1.
-        if E >= self.getderivedParameters()[4]:
+        if E >= self.getParameters()[7]:
             return CumProb
 
-        T_e      = self.getderivedParameters()[3]
-        E_min    = self.getderivedParameters()[5]
+        T_e      = self.getParameters()[5]
+        E_min    = self.getParameters()[6]
         
         gam = mth.sqrt(2./T_e)*(mth.sqrt(E) - mth.sqrt(E_min))
         Gam = 1. - mth.exp(-gam)
 
-        Gamma = self.getderivedParameters()[6]
+        Gamma = self.getderivedParameters()[0]
 
         CumProb = Gamma * Gam
 
         return CumProb
-        
-    def getLaserDrivenProtonEnergyProbDensity(self):
-
-        P_L = self.getParameters()[6]
-        E_laser = self.getParameters()[7]
-        lamda = self.getParameters()[8]
-        t_laser = self.getParameters()[9]
-        d = self.getParameters()[10]
-        I = self.getParameters()[11]
-        theta_degrees = self.getParameters()[12]
-        
-        ne_0      = self.getderivedParameters()[0]
-        c_s       = self.getderivedParameters()[1]
-        s_sheath  = self.getderivedParameters()[2]
-        T_e       = self.getderivedParameters()[3]
-        
-        E_max     = self.getderivedParameters()[4]
-        E_min     = self.getderivedParameters()[5]
-        
-        E  = np.linspace(E_min,E_max,100)  # [J]
-        dE2 = (E_max - E_min) / 100. / 2.
-
-        # Approximate required distribution:
-        eta = ne_0 * c_s * t_laser * s_sheath
-        g_E = []
-        Ee  = []
-        for iE in range(len(E)):
-            Ee.append( E[iE] + dE2 )
-            
-            g_E_val = (eta / mth.sqrt(2. * Ee[-1] * T_e)) * \
-                      mth.exp(-mth.sqrt(2. * Ee[-1] / T_e))
-
-            Ee[-1] /= ( 1.6E-19 * 1.E6 )
-            g_E.append( g_E_val )
-
-        g_E /= np.sum(g_E)   # Normalize the probability distribution
-
-        return Ee, g_E
     
+    # Returns trace space given position (x,y), kinetic energy (K),
+    # cosine of the polar angle (cTheta) and the azimuthal angle (Phi).
+    # If xprime (xp) and yp (yprime) are given, these are used instead
+    # of cTheta and Phi.
+    #..  Used for Mode 0
     def getTraceSpace(self, x, y, K, cTheta, Phi, xp=None, yp=None):
         if self.getDebug():
             print(" Source(BeamLineElement).getTraceSpace: start.")
@@ -5824,7 +6033,8 @@ class Source(BeamLineElement):
                 if cls.getDebug():
                     print("         ----> i, ParamList, _Param:", \
                           i, cls.ParamList[_Mode][i], _Param[i])
-                if isinstance(_Param[i], cls.ParamList[_Mode][i]):
+                if isinstance(_Param[i], cls.ParamList[_Mode][i]) or \
+                   _Param[i] == None:
                     iMtch += 1
                 else:
                     if cls.getDebug():
@@ -5975,9 +6185,11 @@ class Source(BeamLineElement):
             print(" <---- Source(BeamLineElement).writeElement done.")
                             
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" Source(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 
@@ -6002,8 +6214,61 @@ class Source(BeamLineElement):
         nPrm = record[0]
         if cls.getDebug():
             print("     ----> Number of parameters:", nPrm)
+            print("     ----> Data file version:", \
+                  dataFILEinst.getdataFILEversion())
 
-        Params = []
+        """
+        Data file version 6 or greater:
+          Have laser-drivern source specified using the set of parameters
+          defined in "revision 1" of the LhARA linear optics documentation.
+          In this case the paramters are:
+             [0] - Wavelength - microns
+             [1] - Power - W
+             [2] - Strehl ratio
+             [3] - Focal spot radius - m
+             [4] - Laser-pulse duration - s
+             [5] - Hot electron temperature - MeV
+             [6] - Minimum proton kinetic energy - MeV
+             [7] - Maximum proton kinetic energy - MeV
+             [8] - Intercept of sigma_{theta_S} at K=0 [degrees]
+             [9] - Scaled slope of sigma_{theta_S}     [degrees]
+            [10] - rp max
+
+        Data file versions 5 and below:
+          Laser-driven source specified by subset of paramters:
+             [0] - Sigma of x gaussian - m
+             [1] - Sigma of y gaussian - m
+             [2] - Minimum cos theta to generate
+             [3] - E_min: MeV min energy to generate
+             [4] - E_max: MeV max energy to generate;
+                     overwritten when calculated in
+                     getLaserDrivenParticleEnergy
+             [5] - nPnts: Number of points to sample for integration of PDF
+             [6] - P_L: Laser power [W]
+             [7] - E_L: Laser energy [J]
+             [8] - lamda: Laser wavelength [um]
+             [9] - t_laser: Laser pulse duration [s]
+            [10] - d: Laser thickness [m]
+            [11] - I: Laser intensity [W/cm2]
+            [12] - theta_degrees: Electron divergence angle [degrees]
+            [13] - Intercept of sigma_{theta_S} at K=0 [degrees]
+            [14] - Scaled slope of sigma_{theta_S}     [degrees]
+            [15] - rp max
+          So, need to check against "ParamListOLD"
+
+        """
+
+        ParamListCHK = cls.ParamList
+        Params       = []
+        if dataFILEinst.getdataFILEversion() < 6:
+            ParamListCHK = [ [float, float, float, float, float, int,    \
+                               float, float, float, float, float, float, \
+                               float, float, float, float],              \
+                              [float, float, float, float, float],       \
+                              [float, float, float, float, float],       \
+                              [],                                        \
+                              [float, float, float] ]
+            
         for iPrm in range(nPrm):
             brecord = dataFILE.read((1*8))
             if brecord == b'':
@@ -6011,15 +6276,18 @@ class Source(BeamLineElement):
         
             record  = strct.unpack(">d", brecord)
             var     = float(record[0])
-            if cls.ParamList[Mode][iPrm] == int:
+            if cls.getDebug():
+                print(" iPrm, var:", iPrm, var)
+            if ParamListCHK[Mode][iPrm] == int:
                 var = int(var)
             Params.append(var)
+            
         if cls.getDebug():
             print("     ----> Parameters:", Params)
-            
+
         return EoF, Mode, Params
-        
-    
+
+
 """
 To do:
 ------
@@ -6398,7 +6666,6 @@ class QuadTriplet(BeamLineElement):
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _FDForDFD=None, _Q1par=None, _d1=None, _Q2par=None,     \
                                               _d2=None, _Q3par=None     ):
-        
         if self.getDebug():
             print(' QuadTriplet.__init__: ', \
                   'creating the QuadTriplet object: ')
@@ -6453,7 +6720,8 @@ class QuadTriplet(BeamLineElement):
         self.setQ2par(_Q2par)
         self.setSeparation2(_d2)
         self.setQ3par(_Q3par)
-        
+
+        lenTRPLT = 0.
         if self.getFDForDFD() == "FDF":
             iQ1 = FocusQuadrupole(_Name+":FQ1", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
@@ -6465,6 +6733,7 @@ class QuadTriplet(BeamLineElement):
         iD1 = Drift(_Name+":sep1", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
                             self.getSeparation1())
+        lenTRPLT += iQ1.getLength() + iD1.getLength()
         if self.getFDForDFD() == "FDF":
             iQ2 = DefocusQuadrupole(_Name+":DQ2", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
@@ -6476,6 +6745,7 @@ class QuadTriplet(BeamLineElement):
         iD2 = Drift(_Name+":sep2", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
                             self.getSeparation2())
+        lenTRPLT += iQ2.getLength() + iD2.getLength()
         if self.getFDForDFD() == "FDF":
             iQ3 = FocusQuadrupole(_Name+":FQ3", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
@@ -6484,7 +6754,8 @@ class QuadTriplet(BeamLineElement):
             iQ3 = DefocusQuadrupole(_Name+":DQ3", \
                             _rStrt, _vStrt, _drStrt, _dvStrt, \
                 self.getQ3par()[0], self.getQ3par()[1], self.getQ3par()[2])
-
+        lenTRPLT += iQ3.getLength()
+        
         if self.getDebug():
             print("     ----> Dump componenets:")
             print(iQ1)
@@ -6492,6 +6763,11 @@ class QuadTriplet(BeamLineElement):
             print(iQ2)
             print(iD2)
             print(iQ3)
+            print("     <---- Total length:", lenTRPLT)
+
+        self.setLength(lenTRPLT)
+        self.setStrt2End(np.array([0., 0., self.getLength()]))
+        self.setRot2LbEnd(self.getRot2LbStrt())
 
         BeamLineElement.removeInstance(iQ1)
         BeamLineElement.removeInstance(iD1)
@@ -6694,17 +6970,29 @@ class QuadTriplet(BeamLineElement):
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(TrnsfrQ3)
 
-        TrnsMtrx = TrnsfrD1.dot(TrnsfrQ1)
-        TrnsMtrx = TrnsfrQ2.dot(TrnsMtrx)
-        TrnsMtrx = TrnsfrD2.dot(TrnsMtrx)
-        TrnsMtrx = TrnsfrQ3.dot(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrD2, TrnsfrQ3)
+        if self.getDebug():
+            print("     ----> Transfer matrix for D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrQ2, TrnsMtrx)
+        if self.getDebug():
+            print("     ----> Transfer matrix for Q2*D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrD1, TrnsMtrx)
+        if self.getDebug():
+            print("     ----> Transfer matrix for D1*Q2*D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
+        TrnsMtrx = np.matmul(TrnsfrQ1, TrnsMtrx)
+        if self.getDebug():
+            print("     ----> Transfer matrix for Q1*D1*Q2*D2*Q3:")
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(TrnsMtrx)
                 
         if self.getDebug():
             print("     ----> Transfer matrix for QuadTriplet:")
-            with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print(TrnsMtrx)
-
-        if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print(TrnsMtrx)
 
@@ -6763,8 +7051,9 @@ class QuadTriplet(BeamLineElement):
         r = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -6787,8 +7076,9 @@ class QuadTriplet(BeamLineElement):
         r = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -6808,8 +7098,9 @@ class QuadTriplet(BeamLineElement):
         f1 = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -6828,8 +7119,9 @@ class QuadTriplet(BeamLineElement):
         f1 = None
 
         if _d == None or _f == None:
-            raise badParameter("BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
-                               str(_d) + ", " + str(_f))
+            raise badParameter( \
+                        "BeamLineElement.QuadTriplet.TLA_r:, d, f :" + \
+                        str(_d) + ", " + str(_f))
         s1 = _f
         s2 = _d
 
@@ -7120,9 +7412,11 @@ class RPLCswitch(BeamLineElement):
             print(" <---- RPLCswitch(BeamLineElement).writeElement done.")
         
     @classmethod
-    def readElement(cls, dataFILE):
+    def readElement(cls, dataFILEinst):
         if cls.getDebug():
             print(" RPLCswitch(BeamLineElement).readElement starts.")
+
+        dataFILE = dataFILEinst.getdataFILE()
 
         EoF = False
 

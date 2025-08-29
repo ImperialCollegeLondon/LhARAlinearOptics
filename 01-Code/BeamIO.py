@@ -27,9 +27,9 @@ Class BeamIO:
   --------------------
    All instance attributes are initialised to Null
 
-            _dataFile : Data file to be read or written;
+            _dataFILE : Data file to be read or written;
            _Rd1stRcrd : Boolean, True, if first record has been read from
-                        _dataFile.
+                        _dataFILE.
      _dataFILEversion : _dataFILEversion version of data file being read:
                   = 1 : First version, does not have geometry record as
                         first record in file.
@@ -37,8 +37,10 @@ Class BeamIO:
                  >= 3 : Also has repo version stored in _repoVERSION
                  >= 4 : Include drStrt and dvStrt for beam line elements
                  >= 5 : Convert dvStrt to Euler angles
+                 >= 6 : Revised source parameter format
          _repoVERSION : [ [tagNAME, tagDATETIME],
                           [commitSTRING, commitDATETIME] ]
+              _create : Boolean; if true create file.
            _BDSIMfile : If True, read file in BDSIM format.
 
   Methods:
@@ -101,8 +103,11 @@ import Particle as Prtcl
 import PhysicalConstants as PhysCnst
 import LhARALinearOptics as LLO
 
+#--------  Physical Constants
 constants_instance = PhysCnst.PhysicalConstants()
+
 protonMASS         = constants_instance.mp()
+pionMASS           = constants_instance.mPion()
 
 class BeamIO:
     instances = []
@@ -115,9 +120,9 @@ class BeamIO:
             print(' BeamIO.__init__: ', \
                   'creating BeamIO object')
 
-        BeamIO.instances.append(self)
-
         self.setAll2None()
+
+        BeamIO.instances.append(self)
 
         #.. Sanity checks on i/p arguments:
         if not isinstance(_create, bool):
@@ -160,7 +165,7 @@ class BeamIO:
                     print("         ----> File opened for write.")
                 
                 self.writeFIRSTword()
-                self.writeVersion("BeamIO v5")
+                self.writeVersion("BeamIO v6")
                 self.writeREPOversion()
                 
             else:
@@ -197,10 +202,14 @@ class BeamIO:
     def print(self):
         print("\n BeamIO:")
         print(" -------")
-        print("     ----> Debug flag:", self.getDebug())
-        print("     ----> Data file:", self.getdataFILE())
-        print("     ---->    Create:", self.getcreate())
-        print("     ----> BDSIMfile:", self.getBDSIMfile())
+        print("     ---->        Debug flag:", self.getDebug())
+        print("     ---->      Path to file:", self.getpathFILE())
+        print("     ---->         Data file:", self.getdataFILE())
+        print("     ---->   Read 1st record:", self.getReadFirstRecord())
+        print("     ----> Data file version:", self.getdataFILEversion())
+        print("     ---->      Repo version:", self.getrepoVERSION())
+        print("     ---->            Create:", self.getcreate())
+        print("     ---->         BDSIMfile:", self.getBDSIMfile())
 
         
 #--------  "Set method" only Debug
@@ -213,9 +222,11 @@ class BeamIO:
         cls.__Debug = Debug
         
     def setAll2None(self):
-        self._dataFile        = None
+        self._pathFILE       = None
+        self._dataFILE        = None
         self._Rd1stRcrd       = False
         self._dataFILEversion = None
+        self._repoVERSION     = None
         self._create          = None
         self._BDSIMfile       = None
 
@@ -234,6 +245,9 @@ class BeamIO:
         if not isinstance(dataFILEversion, int):
             raise badArgument()
         self._dataFILEversion = dataFILEversion
+
+    def setrepoVERSION(self, repoVERSION):
+        self._repoVERSION = repoVERSION
 
     def setcreate(self, _create):
         if not isinstance(_create, bool):
@@ -256,14 +270,20 @@ class BeamIO:
     def getinstances(cls):
         return cls.instances
 
-    def getpathFILE(self):
-        return self._pathFILE
-
     def getdataFILE(self):
         return self._dataFILE
 
+    def getpathFILE(self):
+        return self._pathFILE
+
     def getReadFirstRecord(self):
         return self._Rd1stRcrd
+    
+    def getReadFirstRecord(self):
+        return self._Rd1stRcrd
+
+    def getrepoVERSION(self):
+        return self._repoVERSION
 
     def getdataFILEversion(self):
         return self._dataFILEversion
@@ -305,13 +325,42 @@ class BeamIO:
             record = record.lstrip()
             record = record.rstrip('\n')
             TrcSpc = np.asarray(record.split(' '), dtype=float)
+            if self.getDebug():
+                print("     ----> BDSIM file: number of fields:", len(TrcSpc))
+
             iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
             E0        = iRefPrtcl.getPrOut()[0][3]
             p0        = mth.sqrt(E0**2 - protonMASS**2)
-            TrcSpc[5] = (1000.*TrcSpc[5] - E0) / p0
+            
+            TrcSpc1 = np.zeros(6)
+            if len(TrcSpc) == 9:
+                #.. nuSTORM FLUKA version of BDSIM file
+                #.. len(TrcSpc) = 9, so, no particle code, assume pion:
+                TrcSpc1[0] = TrcSpc[0] / 100.
+                TrcSpc1[1] = TrcSpc[6]
+                TrcSpc1[2] = TrcSpc[1] / 100.
+                TrcSpc1[3] = TrcSpc[7]
+                TrcSpc1[4] = 0.          #.. come back to this!
+                
+                p0        = mth.sqrt(E0**2 - pionMASS**2)
+                TrcSpc1[5] = (TrcSpc[8]*1000. - E0) / p0
+                
+                if self.getDebug():
+                    print("         ----> E0, p0::", E0, p0)
+                    print("         ----> TrcSpc::", TrcSpc)
+                    print("     <---- TrcSpc1:", TrcSpc1)
+            else:
+                TrcSpc1[0] = TrcSpc[0]
+                TrcSpc1[1] = TrcSpc[1]
+                TrcSpc1[2] = TrcSpc[2]
+                TrcSpc1[3] = TrcSpc[3]
+                TrcSpc1[4] = TrcSpc[3]
+                TrcSpc1[5] = (1000.*TrcSpc[5] - E0) / p0
+                if self.getDebug():
+                    print("     <---- TrcSpc1:", TrcSpc1)
             
             iPrtcl = Prtcl.Particle()
-            iPrtcl.recordParticle('Source', 0., 0., TrcSpc)
+            iPrtcl.recordParticle('Source', 0., 0., TrcSpc1)
             if self.getDebug():
                 print("     <---- ", \
                       "BeamIO.readBeamDataRecord BDSIM particle read.")
@@ -346,12 +395,13 @@ class BeamIO:
                           self.getdataFILEversion())
                 if nVersion >= 3:
                     repoVERSION = self.readREPOversion()
+                    self.setrepoVERSION(repoVERSION)
 
                 if self.getDebug():
                     print(" BeamIO.readBeamDataRecord:", \
                           "reading data file version", Version)
                     
-                BL.BeamLine.readBeamLine(self.getdataFILE())
+                BL.BeamLine.readBeamLine(self)
 
             else:
                 if self.getDebug():
@@ -368,7 +418,7 @@ class BeamIO:
                 print("     <---- BeamIO.readBeamDataRecord particle read.")
             
         if self.getDebug():
-            print(" <---- BeamIO.readBeamDataRecord Done.")
+            print(" <---- BeamIO.readBeamDataRecord Done. EoF:", EoF)
 
         return EoF
 

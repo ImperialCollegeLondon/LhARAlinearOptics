@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+import cProfile
+"""
+
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
@@ -118,10 +122,10 @@ def main(argv):
         Facility = BL.BeamLine.getElement()[0].getName()
         Ttl = Facility + " (reference particle local coordinates)"
         fig.suptitle(Ttl, fontdict=font)
-        axs[0].set_xlim(-0.1, 21.5)
-        axs[0].set_ylim(-0.1,  0.1)
-        axs[1].set_xlim(-0.1, 21.5)
-        axs[1].set_ylim(-0.1,  0.1)
+        axs[0].set_xlim(-0.5, 21.5)
+        axs[0].set_ylim(-0.05,  0.05)
+        axs[1].set_xlim(-0.5, 21.5)
+        axs[1].set_ylim(-0.05,  0.05)
 
         ivisRPLCx.Particles(axs[0], nEvts)
         ivisRPLCx.BeamLine(axs[0])
@@ -143,10 +147,10 @@ def main(argv):
         Ttl = Facility + " (laboratory reference frame)"
         fig.suptitle(Ttl, fontdict=font)
 
-        axs[0].set_xlim(-0.10, 18.0)
-        axs[0].set_ylim(-0.10,  0.1)
-        axs[1].set_xlim(-0.10, 18.0)
-        axs[1].set_ylim(-0.75,  6.0)
+        axs[0].set_xlim(-0.5, 18.1)
+        axs[0].set_ylim(-0.075,  0.075)
+        axs[1].set_xlim(-0.5, 18.1)
+        axs[1].set_ylim(-1.5,   5.9)
 
         ivisLabx.Particles(axs[0], nEvts)
         ivisLabx.BeamLine(axs[0])
@@ -164,6 +168,9 @@ def main(argv):
    Execute main"
 """
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    """
+    cProfile.run('main(sys.argv[1:])', '99-Scratch/restats')
+    """
+    main(sys.argv[1:])
 
 sys.exit(1)
