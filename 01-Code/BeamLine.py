@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/Usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 
@@ -111,9 +111,11 @@ import scipy  as sp
 import pandas as pnds
 import struct as strct
 
-import Particle        as Prtcl
-import BeamLineElement as BLE
-import Simulation      as Smltn
+import PhysicalConstants as PhysCnsts
+import Particle          as Prtcl
+import BeamLine          as BL
+import BeamLineElement   as BLE
+import Simulation        as Smltn
 
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
@@ -133,6 +135,8 @@ class BeamLine(object):
     __BeamLineInst = None
     __Debug        = False
     _SrcTrcSpc     = None
+
+    _currentReferenceParticle = None
 
 
 #--------  "Built-in methods":
@@ -185,17 +189,6 @@ class BeamLine(object):
             if cls.getDebug():
                 print("     ----> Build facility:")
 
-#    ----> Create reference particle:  --------  --------  --------  --------
-#..  Instance only at this stage:
-            if cls.getDebug():
-                print("        ----> Create reference particle instance: ")
-            
-            refPrtcl  = Prtcl.ReferenceParticle()
-            
-            if cls.getDebug():
-                print("        <---- Reference particle created. ")
-#    <---- Done reference particle  --------  --------  --------  --------
-
 #    ----> Facility:  --------  --------  --------  --------
             if cls.getDebug():
                 print("         ----> Facility: ")
@@ -205,6 +198,18 @@ class BeamLine(object):
             if cls.getDebug():
                 print("         <---- Facility done.")
 #    <---- Done facility  --------  --------  --------  --------
+
+#    ----> Create reference particle:  --------  --------  --------  --------
+#..  Instance only at this stage:
+            if cls.getDebug():
+                print("        ----> Create reference particle instance: ")
+            
+            refPrtcl  = Prtcl.ReferenceParticle.createReferenceParticles()[0]
+            cls.setcurrentReferenceParticle(refPrtcl)
+            
+            if cls.getDebug():
+                print("        <---- Reference particle created. ")
+#    <---- Done reference particle  --------  --------  --------  --------
 
 #    ----> Source:  --------  --------  --------  --------
             if cls.getDebug():
@@ -261,7 +266,7 @@ class BeamLine(object):
             elif NameStrs[2] != Section:
                 Section = NameStrs[2]
                 print("        ---->", NameStrs[2])
-            print("            ---->", iCnt, ":", iBLE.SummaryStr())            
+            print("            ---->", iCnt, ":", iBLE.SummaryStr())        
         print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
         return " <---- Beam line parameter dump complete."
@@ -281,6 +286,12 @@ class BeamLine(object):
         if Debug or cls.getDebug():
             print(" BeamLine.setdebug: ", Debug)
         cls.__Debug = Debug
+
+    @classmethod
+    def setcurrentReferenceParticle(cls, _currentRefPrtcl):
+        if not isinstance(_currentRefPrtcl, Prtcl.ReferenceParticle):
+            raise badParameter()
+        cls._currentReferenceParticle = _currentRefPrtcl
         
     @classmethod
     def setSrcTrcSpc(cls, SrcTrcSpc=np.array([])):
@@ -311,6 +322,10 @@ class BeamLine(object):
         return cls.__Debug
 
     @classmethod
+    def getcurrentReferenceParticle(cls):
+        return cls._currentReferenceParticle
+
+    @classmethod
     def getBeamLineSpecificationCSVfile(cls):
         return cls._BeamLineSpecificationCSVfile
 
@@ -334,7 +349,7 @@ class BeamLine(object):
             print("             ----> BeamLine.addFacility starts:")
 
         #.. Parse the dataframe to get Facility parameters:
-        Name, K0, VCMVr = cls.parseFacility()
+        Name, K0, species0, VCMVr = cls.parseFacility()
 
         #.. Create the Facility beam line element:
         rStrt = np.array([0.,0.,0.])
@@ -342,16 +357,21 @@ class BeamLine(object):
         drStrt = np.array([0.,0.,0.])
         dvStrt = np.array([0.,0.,0.])
 
-        p0     = mth.sqrt( (protonMASS+K0)**2 - protonMASS**2)
+        p0 = []
+        for id in range(len(species0)):
+            mass   = PhysCnsts.PhysicalConstants().getparticleMASS(  \
+                                                        species0[id] \
+                                                                   )
+            p0.append(mth.sqrt( (mass+K0[id])**2 - mass**2))
 
         FacilityBLE = BLE.Facility(Name, rStrt, vStrt, drStrt, dvStrt, \
-                                   p0, VCMVr)
+                                   p0, VCMVr, species0)
         cls.addBeamLineElement(FacilityBLE)
 
         if cls.getDebug():
             print("             <----", Name, \
-                  "facility initialise.")
-
+                  "facility initialised.")
+            
     @classmethod
     def addSource(cls):
         if cls.getDebug():
@@ -372,7 +392,7 @@ class BeamLine(object):
 
         cls.addBeamLineElement(SourceBLE)
 
-        refPrtcl    = Prtcl.ReferenceParticle.getinstances()
+        refPrtcl    = Prtcl.ReferenceParticle.getinstances()[0]
         refPrtclSet = refPrtcl.setReferenceParticleAtSource()
 
         if cls.getDebug():
@@ -389,7 +409,10 @@ class BeamLine(object):
     @classmethod
     def parseFacility(cls):
         Name  = None
-        p0    = None
+
+        K0       = []
+        p0       = []
+        species0 = []
         if cls.getDebug():
             print("                 ----> BeamLine.parseFacility starts:")
             
@@ -403,27 +426,62 @@ class BeamLine(object):
                         (pndsFacility["Parameter"]=="Name") ]. \
                             iloc[0]["Value"] \
                     )
-        K0   = float(pndsFacility[ \
-                        (pndsFacility["Type"]=="Reference particle") & \
-                        (pndsFacility["Parameter"]=="Kinetic energy") ]. \
-                            iloc[0]["Value"] \
+        VCMVr = float(pndsFacility[ \
+                    (pndsFacility["Type"]=="Vacuum chamber") & \
+                    (pndsFacility["Parameter"]=="Mother volume radius") ]. \
+                    iloc[0]["Value"] \
                     )
 
-        VCMVr = float(pndsFacility[ \
-                        (pndsFacility["Type"]=="Vacuum chamber") & \
-                        (pndsFacility["Parameter"]=="Mother volume radius") ]. \
-                            iloc[0]["Value"] \
-                    )
-        
+        K0.append(float(pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") &   \
+                        (pndsFacility["Parameter"]=="Kinetic energy") ]. \
+                        iloc[0]["Value"]) \
+                  )
+        species0list = pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Species") ]
+        if len(species0list) == 0:
+            species0.append("proton")
+        else:
+            species0.append(pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Species") ]. \
+                        iloc[0]["Value"] \
+                            )
+                  
+        K0list = pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Kinetic energy 1") ]
+        species0list = pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Species 1") ]
+
+        for id in range(1, len(K0list)):
+            print(" id", id)
+            K0.append(float(pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Kinetic energy 1") ]. \
+                            iloc[id]["Value"] \
+                            ) \
+                      )
+            species0.append(str(pndsFacility[ \
+                        (pndsFacility["Type"]=="Reference particle") & \
+                        (pndsFacility["Parameter"]=="Species 1") ]. \
+                            iloc[id]["Value"] \
+                            ) \
+                                )
+
         if cls.getDebug():
             print("                     ----> Name:", Name, \
-                  "; reference particle kinetic energy:", K0, "MeV")
+                  "; reference particle kinetic energy(ies):", K0, "MeV")
+            print("                     ----> Name:", Name, \
+                  "; reference particle species:", species0)
             print( \
         "                     ----> Vacuum chamber mother volume radius:", \
                    VCMVr, "m")
             print("                 <---- Done.")
             
-        return Name, K0, VCMVr
+        return Name, K0, species0, VCMVr
 
     @classmethod
     def parseSource(cls):
@@ -472,7 +530,8 @@ class BeamLine(object):
             if val != None: power = val
 
             #.. Strehl ratio
-            val = BLE.Source.parseSINGLEparam(cleanedSource, "Strehl ratio", \
+            val = BLE.Source.parseSINGLEparam(cleanedSource, \
+                                              "Strehl ratio", \
                                                            strhlRATIO    )
             if val != None: strhlRATIO = val
 
@@ -665,7 +724,7 @@ class BeamLine(object):
         NewElement = True
         s         = 0.
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()[0]
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
@@ -782,6 +841,7 @@ class BeamLine(object):
                 nDpl       = 0
                 nCvty      = 0
 
+            refPrtcl = cls.getcurrentReferenceParticle()
             if elementKEY == "RPLCswitch":
                 if cls.getDebug():
                     print("               ----> Start on RPLCswitch.")
@@ -824,7 +884,6 @@ class BeamLine(object):
                 iBLE = BLE.RPLCswitch(Name, rStrt, vStrt, drStrt, dvStrt)
                 cls.addBeamLineElement(iBLE)
                 s += iBLE.getLength()
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Drift":
                 nDrift   += 1
@@ -836,7 +895,6 @@ class BeamLine(object):
                              rStrt, vStrt, drStrt, dvStrt, Length)
                 cls.addBeamLineElement(iBLE)
                 s += Length
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Aperture":
                 localType = iLine.Type.replace(" ", "")
@@ -893,7 +951,6 @@ class BeamLine(object):
                                     rStrt, vStrt, drStrt, dvStrt, Param)
                 cls.addBeamLineElement(iBLE)
                 s += 0.
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
 
             elif elementKEY == "Fquad":
@@ -927,7 +984,6 @@ class BeamLine(object):
                                     rStrt, vStrt, drStrt, dvStrt, FqL, FqS)
                 cls.addBeamLineElement(iBLE)
                 s += FqL
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Dquad":
                 if NewElement:
@@ -958,7 +1014,6 @@ class BeamLine(object):
                                     rStrt, vStrt, drStrt, dvStrt, DqL, DqS)
                 cls.addBeamLineElement(iBLE)
                 s += DqL
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Solenoid":
                 if NewElement:
@@ -1012,7 +1067,6 @@ class BeamLine(object):
                                 rStrt, vStrt, drStrt, dvStrt, SlndL, B0)
                 cls.addBeamLineElement(iBLE)
                 s += SlndL
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Gabor lens":
                 if NewElement:
@@ -1055,7 +1109,6 @@ class BeamLine(object):
                                 None, None, None, None, GbrLnsL, B0)
                 cls.addBeamLineElement(iBLE)
                 s += GbrLnsL
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Dipole":
                 if NewElement:
@@ -1090,7 +1143,6 @@ class BeamLine(object):
                 cls.addBeamLineElement(BLE.SectorDipole(Name, \
                                 rStrt, vStrt, drStrt, dvStrt, DplA, B))
                 s += cls._Element[len(cls._Element)-1].getLength()
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
             elif elementKEY == "Cavity":
                 if NewElement:
@@ -1121,7 +1173,6 @@ class BeamLine(object):
                                     CylCvtyGrdnt, CylCvtyFrqncy, CylCvtyPhs)
                 cls.addBeamLineElement(iBLE)
                 s += cls._Element[len(cls._Element)-1].getLength()
-                refPrtcl    = Prtcl.ReferenceParticle.getinstances()
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
 
             if cls.getDebug():
@@ -1136,8 +1187,6 @@ class BeamLine(object):
 
     @classmethod
     def addBeamLineElement(cls, iBLE=False):
-        if cls.getDebug():
-            print(" BeamLineElement.addBeamLineElement: ", iBLE.getName())
         if not isinstance(iBLE, BLE.BeamLineElement):
             raise badBeamLineElement()
         cls._Element.append(iBLE)
@@ -1150,7 +1199,7 @@ class BeamLine(object):
 
         #.. Check length is consistent:
         iBLE = BLE.BeamLineElement.getinstances()[-1]
-        iRfP = Prtcl.ReferenceParticle.getinstances()
+        iRfP = BL.BeamLine.getcurrentReferenceParticle()
         if self.getDebug():
             print("     ----> BLE name:", \
                   iBLE.getName(), \
@@ -1215,7 +1264,7 @@ class BeamLine(object):
         Scl  = 10
         iCnt = 1
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
         for iEvt in range(0, NEvts):
             if (iEvt % Scl) == 0:
@@ -1253,7 +1302,7 @@ class BeamLine(object):
                     [iLoc:len(PrtclInst.getLabPhaseSpace())]
                 SrcTrcSpc = PrtclInst.getTraceSpace()[iLoc-1]
             else:
-                PrtclInst   = Prtcl.Particle()
+                PrtclInst   = Prtcl.Particle.createParticle()
                 if cls.getDebug():
                     print("     ----> Created new Particle instance")
 
@@ -1308,6 +1357,10 @@ class BeamLine(object):
                         print("              ---->", \
                               " partice outside acceptance(1)")
                     break
+
+                elif cls.checkDecay(iBLE, iRefPrtcl, PrtclInst, iLoc, TrcSpc):
+                    break
+                
                 else:
                     if iBLE.ExpansionParameterFail(TrcSpc):
                         if cls.getDebug():
@@ -1344,7 +1397,48 @@ class BeamLine(object):
             print("     <---- End of this simulation, ", NEvts, \
                   " events generated")
 
+    @classmethod
+    def checkDecay(cls, iBLE, iRefPrtcl, PrtclInst, iLoc, TrcSpc):
+        decayed = False
+
+        if cls.getDebug():
+            print(" BeamLine.checkDecay: handle unstable particle:")
+            print("             ----> Time left to live:", \
+                  PrtclInst.getRemainingLifetime())
         
+        if PrtclInst.getRemainingLifetime() != mth.inf:
+            if cls.getDebug():
+                print("     ----> Time left to live:", \
+                      PrtclInst.getRemainingLifetime())
+                print("     ----> Length of element:", \
+                      iBLE.getLength())
+                        
+            m = \
+        PhysCnsts.PhysicalConstants().getparticleMASS(PrtclInst.getSpecies())
+            E = iRefPrtcl.getPrOut()[iLoc-1][3] + \
+                         TrcSpc[5] * iRefPrtcl.getMomentumOut(iLoc-1)
+            p = mth.sqrt(E**2 - m**2)
+            if cls.getDebug():
+                print(" iLoc, E, p, mass:", iLoc, E, p, m)
+                        
+            scl = m / p / speed_of_light
+            dt  = iBLE.getLength() * scl
+            if cls.getDebug():
+                print("     ----> Proper time increment:", dt)
+                    
+            if dt > PrtclInst.getRemainingLifetime():
+                if cls.getDebug():
+                    print(" <---- Particle decayed!")
+                decayed = True
+            else:
+                PrtclInst.setRemainingLifetime( \
+                            PrtclInst.getRemainingLifetime() - dt \
+                                               )
+                if cls.getDebug():
+                    print("         <---- Particle survived!")
+
+        return decayed
+                                    
 #--------  I/o methods:
     def csv2pandas(_filename):
         ParamsPandas = pnds.read_csv(_filename)
@@ -1434,8 +1528,8 @@ class BeamLine(object):
 
         EoF = False
 
-        if Prtcl.ReferenceParticle.getinstances() == None:
-            refPrtcl  = Prtcl.ReferenceParticle()
+        if Prtcl.ReferenceParticle.getinstances() == []:
+            refPrtcl  = BL.BeamLine.getcurrentReferenceParticle()
 
         brecord = beamlineFILE.read(4)
         if brecord == b'':
@@ -1533,6 +1627,9 @@ class BeamLine(object):
                 instBLE = BLE.Facility(Loc, r, v, dr, dv, p0, VCMVr)
                 if cls.getDebug():
                     print(instBLE)
+                refPrtcl  = \
+                    Prtcl.ReferenceParticle.createReferenceParticles()[0]
+                cls.setcurrentReferenceParticle(refPrtcl)
             elif derivedCLASS == "Source":
                 instBLE = BLE.Source(Loc, r, v, dr, dv, Mode, Params)
                 if cls.getDebug():
@@ -1611,6 +1708,8 @@ class BeamLine(object):
         del cls.__BeamLineInst
         cls.__BeamLineInst = None
 
+        cls._currentReferenceParticle = None
+        
         if cls.getDebug():
             print(' BeamLine.cleaninstance: instance removed.')
 

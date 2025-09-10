@@ -23,13 +23,13 @@ print()
 print("ReferenceParticleTest:", ReferenceParticleTest, \
       " check if class is a singleton.")
 refPrtcl  = Prtcl.ReferenceParticle()
-try:
-    refPrtcl1 = Prtcl.ReferenceParticle()
-except:
-    print("    refPrtcl singleton test: success")
-else:
+refPrtcl1 = Prtcl.ReferenceParticle()
+if (id(refPrtcl) - id(refPrtcl)) != 0:
     print("    refPrtcl singleton test: FAIL!")
     raise Exception("ReferenceParticle is not a singleton class!")
+else:
+    print("    refPrtcl singleton test: success")
+
 
 ##! Check built-in methods:
 ReferenceParticleTest = 2
@@ -58,12 +58,12 @@ refPrtcl.setRPDebug(False)
 ReferenceParticleTest += 1
 print()
 print("ReferenceParticleTest:", ReferenceParticleTest, \
-      " check get instane method.")
+      " check get instance method.")
 print(Prtcl.ReferenceParticle.getinstances())
 
 
 ##! Load some geometry and then test reference particle load:
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
 ReferenceParticleTest += 1
 print()
 print("ReferenceParticleTest:", ReferenceParticleTest, \
@@ -73,7 +73,6 @@ filename = os.path.join(HOMEPATH, \
                         '11-Parameters/LIONBeamLine-Params-LsrDrvn.csv')
 BLI  = BL.BeamLine(filename)
 print(BLI)
-print(Prtcl.ReferenceParticle.getinstances())
 
 
 ##! Complete:

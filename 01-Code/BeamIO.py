@@ -328,7 +328,7 @@ class BeamIO:
             if self.getDebug():
                 print("     ----> BDSIM file: number of fields:", len(TrcSpc))
 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             E0        = iRefPrtcl.getPrOut()[0][3]
             p0        = mth.sqrt(E0**2 - protonMASS**2)
             

@@ -40,6 +40,7 @@ Created on Thu 22Apr24;11:04: Version history:
 """
 
 import Particle        as Prtcl
+import BeamLine        as BL
 import BeamLineElement as BLE
 
 #--------  visualise class  --------
@@ -153,7 +154,7 @@ class visualise(object):
             print("     ----> Projection:", \
                   self.getProjection())
 
-        Prtcl.ReferenceParticle.getinstances().visualise( \
+        BL.BeamLine.getcurrentReferenceParticle().visualise( \
                             self.getCoordSys(), self.getProjection(), axs)
 
         n2plt = min(nPrtcl, len(Prtcl.Particle.getinstances()))

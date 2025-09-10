@@ -115,7 +115,7 @@ OutsideBeamPipe : Returns true of  particle outside beam pipe defined in
     cleaninstances : Class method: cleans (using "del") instances and resets
                      list.
 
-    removeInstance : Class method: remove (using remoce) instance, inst, from
+    removeInstance : Class method: remove (using remove) instance, inst, from
                      memory and list of instances.
            input: inst; instance of BLE class
 
@@ -144,7 +144,8 @@ import scipy
 from scipy.optimize import fsolve
 import struct as strct
 import math
-import pandas as pnds
+import pandas   as pnds
+import warnings as wrngs
 
 import BeamLine          as BL
 import PhysicalConstants as PhysCnst
@@ -227,14 +228,15 @@ class BeamLineElement:
     def __str__(self):
         print(" BeamLineElement:")
         print(" ----------------")
-        print("     ---->             Debug flag:", BeamLineElement.getDebug())
+        print("     ---->             Debug flag:", \
+              BeamLineElement.getDebug())
         print("     ---->                   Name:", self.getName())
         print("     ---->               Position:", self.getrStrt())
         print("     ---->            Orientation: \n", self.getvStrt())
         print("     ---->        Position offset:", self.getdrStrt())
         print("     ---->     Orientation offset:", self.getdvStrt())
         print("     ---->    Magnitude of dvStrt:", \
-                                              np.linalg.norm(self.getdvStrt()))
+              np.linalg.norm(self.getdvStrt()))
         if np.linalg.norm(self.getdvStrt()) != 0.:
             print("          ---->    drRotStrt:", self.getdRotStrt())
             print("          ----> drRotStrtINV:", self.getdRotStrtINV())
@@ -557,7 +559,7 @@ class BeamLineElement:
                 
         Fail = False
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
         p0    = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[iAddr][:3], \
                                 iRefPrtcl.getPrIn()[iAddr][:3]))
@@ -647,7 +649,8 @@ class BeamLineElement:
             _Rprime = self.Shift2RPLC(_Rprime)
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Shift back from element-centred coordinates:")
+                print( \
+                "     ----> Shift back from element-centred coordinates:")
                 print("           _Rprime:", _Rprime)
                 
         if self.getDebug():
@@ -1015,6 +1018,9 @@ Derived class Facility:
                   define the radius at which a particle trajectory is
                   terminated.  It may be necessary to introduce a beam
                   pipe later.
+ _species0in: str of list of strings :
+                  Gives list of species of reference particles to be
+                  propagated through facility.
     
   Methods:
   --------
@@ -1026,9 +1032,10 @@ Derived class Facility:
   Set methods:
           setp0 : float : e.g. 15 MeV
        setVCMVr : float : e.g. 0.5 m
+    setspecies0 : list of strings : e.g. [pion, muon]
 
   Get methods:
-     getp0, getVCMVr
+     getp0, getVCMVr, getspecies0
 
   I/o methods:
       writeElement : Class method; write element data to "dataFILE"
@@ -1047,7 +1054,7 @@ class Facility(BeamLineElement):
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
-                 _p0=None, _VCMVr=None):
+                 _p0in=None, _VCMVr=None, _species0in=None):
 
         if self.__Debug:
             print(' Facility.__init__: ', \
@@ -1059,9 +1066,11 @@ class Facility(BeamLineElement):
             if self.__Debug:
                 print('     ----> Creating the Facility object:')
                 print("         ----> Name:", _Name)
-                print("         ----> Reference particle momentum:", _p0)
+                print("         ----> Reference particle momentum:", _p0in)
                 print("         ----> Vacuum chamber mother volume radius", \
                       _VCMVr)
+                print("         ----> Species of reference particle(s):", \
+                      _species0in)
 
             Facility.instance = self
 
@@ -1069,17 +1078,47 @@ class Facility(BeamLineElement):
             BeamLineElement.__init__(self, \
                                      _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
 
-            if not isinstance(_p0, float):
+            if _p0in == None:
                 raise badBeamLineElement( \
-                " Facility: bad specification for reference particle mometnum!"
+            " Facility: bad specification for reference particle mometnum!"
                                          )
+            if isinstance(_p0in, float):
+                _p0 = [_p0in]
+            elif isinstance(_p0in, list):
+                _p0 = []
+                for p0 in _p0in:
+                    if isinstance(p0, float):
+                        _p0.append(p0)
+                    else:
+                        raise badBeamLineElement( \
+            " Facility: bad specification for reference particle mometnum!"
+                                                 )
+            
             if not isinstance(_VCMVr, float):
                 raise badBeamLineElement( \
             " Facility: bad specification for vacuum chamber mother volume!"
                                          )
-            
+
+            if _species0in == None:
+                wrngs.warn("Facility(BeamLineElement): no species given," + \
+                           " use default, proton")
+                _species0 = ["proton"]
+            elif isinstance(_species0in, str):
+                _species0 = [_species0in]
+            elif isinstance(_species0in, list):
+                _species0 = _species0in
+            if not self.validspecies0(_species0):
+                raise badBeamLineElement( \
+                        " Facility: bad species0:"+str(_species0in) \
+                                         )
+            if len(_p0) != len(_species0):
+                raise badBeamLineElement( \
+            " Facility: length of p0 and species0 the same!" \
+                                         )
+                
             self.setp0(_p0)
             self.setVCMVr(_VCMVr)
+            self.setspecies0(_species0)
                 
             self.setLength(0.)
             self.setStrt2End(np.array([0., 0., self.getLength()]))
@@ -1106,20 +1145,41 @@ class Facility(BeamLineElement):
         print("     ----> p0 (MeV/c):", self.getp0())
         print("     ----> Vacuum chamber mother volume radius (m):", \
               self.getVCMVr())
+        print("     ----> List of species:", self.getspecies0())
         BeamLineElement.__str__(self)
         return " <---- Facility parameter dump complete."
 
     def SummaryStr(self):
         Str  = "Facility         : " + BeamLineElement.SummaryStr(self) + \
             "; Name = " + self.getName() + "; p0 = " + str(self.getp0()) + \
-            "; VCMVr = " + str(self.getVCMVr())
+            "; VCMVr = " + str(self.getVCMVr()) + \
+            "; species0 = " + str(self.getspecies0()) 
         return Str
 
+    def validspecies0(self, spcs0):
+        if self.getDebug():
+            print(" Facility.validspecies0: start:")
+            print("     ---->   Stable species:", \
+                  Prtcl.Particle.stable_species)
+            print("     ----> Unstable species:", \
+                  Prtcl.Particle.unstable_species)
+            
+        success = True
+        for spcs in spcs0:
+            if self.getDebug():
+                print("     ----> Test:", spcs)
+            if not(spcs in Prtcl.Particle.stable_species) and \
+               not(spcs in Prtcl.Particle.unstable_species):
+                success = False
+        if self.getDebug():
+            print(" <---- Success:", success)
+        
+        return success
 
 #--------  "Set methods"
 #.. Methods believed to be self documenting(!)
     def setp0(self, _p0=None):
-        if not isinstance(_p0, float):
+        if not isinstance(_p0, list):
             raise badParameter( \
                      " BeamLineElement.Facility.setp0: bad p0",
                                 _p0)
@@ -1131,6 +1191,13 @@ class Facility(BeamLineElement):
                      " BeamLineElement.Facility.setVCMVr: bad VCMVr",
                                 _VCMVr)
         self._VCMVr = _VCMVr
+
+    def setspecies0(self, _species0=None):
+        if not isinstance(_species0, list):
+            raise badParameter( \
+                     " BeamLineElement.Facility.setspecies0: bad species0",
+                                _species0)
+        self._species0 = _species0
 
         
 #--------  "get methods"
@@ -1145,6 +1212,10 @@ class Facility(BeamLineElement):
     def getVCMVr(self):
         return self._VCMVr
     
+    def getspecies0(self):
+        return self._species0
+    
+
 #--------  I/o methods:
     def getLines(self):
         Lines = []
@@ -1196,7 +1267,10 @@ class Facility(BeamLineElement):
         if self.getDebug():
             print("         ----> Derived class:", bversion.decode('utf-8'))
 
-        record = strct.pack(">2d", self.getp0(), self.getVCMVr())
+        """
+          Needs fix, hacked [0] to make it run, KL, 05Sep25.
+        """
+        record = strct.pack(">2d", self.getp0()[0], self.getVCMVr())
         dataFILE.write(record)
         if self.getDebug():
             print("         ----> p0, VCMVr:", strct.unpack(">2d",record))
@@ -1342,7 +1416,7 @@ class Drift(BeamLineElement):
         self._Length = _Length
 
     def setTransferMatrix(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -1728,7 +1802,7 @@ class Aperture(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -2052,7 +2126,7 @@ class FocusQuadrupole(BeamLineElement):
         self._kFQ = _kFQ
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2140,7 +2214,7 @@ class FocusQuadrupole(BeamLineElement):
     
 # -------- Utilities:
     def calckFQ(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2166,7 +2240,7 @@ class FocusQuadrupole(BeamLineElement):
         return kFQ
 
     def calcStrength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2211,7 +2285,7 @@ class FocusQuadrupole(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -2622,7 +2696,7 @@ class DefocusQuadrupole(BeamLineElement):
         self._kDQ = _kDQ
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2710,7 +2784,7 @@ class DefocusQuadrupole(BeamLineElement):
     
 # -------- Utilities:
     def calckDQ(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2736,7 +2810,7 @@ class DefocusQuadrupole(BeamLineElement):
         return kDQ
 
     def calcStrength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -2781,7 +2855,7 @@ class DefocusQuadrupole(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -3153,7 +3227,7 @@ class SectorDipole(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -3260,7 +3334,7 @@ class SectorDipole(BeamLineElement):
         self._B = _B
 
     def setLength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3285,7 +3359,7 @@ class SectorDipole(BeamLineElement):
         self._Length = l
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3653,7 +3727,7 @@ class Solenoid(BeamLineElement):
         self._ksol = _ksol
 
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3790,7 +3864,7 @@ class Solenoid(BeamLineElement):
 
 # -------- Utilities:
     def calcksol(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -3816,7 +3890,7 @@ class Solenoid(BeamLineElement):
         return ksol
 
     def calcStrength(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -4114,7 +4188,7 @@ class GaborLens(BeamLineElement):
 
     def setElectronDensity(self):
         if isinstance(self.getStrength(), float):
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
                 raise ReferenceParticleNotSpecified()
 
@@ -4158,7 +4232,7 @@ class GaborLens(BeamLineElement):
             print(" <---- Electron density:", self.getElectronDensity())
             
     def setTransferMatrix(self, _R):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
 
@@ -4242,7 +4316,7 @@ class GaborLens(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -4502,7 +4576,7 @@ class CylindricalRFCavity(BeamLineElement):
         _WaveNumber        = self.getAngularFrequency() / speed_of_light
         self.setWaveNumber(_WaveNumber)
         
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev = len(iRefPrtcl.getPrOut()) - 1
@@ -4750,7 +4824,7 @@ class CylindricalRFCavity(BeamLineElement):
         
         
     def setmrf(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev  = len(iRefPrtcl.getPrOut()) - 1
@@ -4772,7 +4846,7 @@ class CylindricalRFCavity(BeamLineElement):
         self._mrf = _mrf
 
     def setTransferMatrix(self):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev  = len(iRefPrtcl.getPrOut()) - 1
@@ -4824,7 +4898,7 @@ class CylindricalRFCavity(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -4926,7 +5000,7 @@ class CylindricalRFCavity(BeamLineElement):
     
 #--------  Utilities:
     def Transport(self, _R=None):
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         iPrev  = len(iRefPrtcl.getPrOut()) - 1
@@ -5902,7 +5976,7 @@ class Source(BeamLineElement):
             print("     ----> x, y, K, cTheta, Phi:", \
                   x, y, K, cTheta, Phi)
             
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         p0        = iRefPrtcl.getMomentumIn(0)
         E0        = mth.sqrt( protonMASS**2 + p0**2)
         b0        = p0/E0

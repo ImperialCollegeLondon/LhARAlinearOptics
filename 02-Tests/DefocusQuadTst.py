@@ -54,7 +54,7 @@ except:
 BLE.BeamLineElement.cleaninstances()
 
 BLI  = BL.BeamLine(filename)
-iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
 print("     ----> Reference particle set:")
 print("         ----> In:", iRefPrtcl.getPrIn())

@@ -16,7 +16,7 @@ Class Particle:
   Class attributes:
   -----------------
     instances : List of instances of Particle class
-  __Debug     : Debug flag
+ __Debug     : Debug flag
 
       
   Instance attributes:
@@ -149,6 +149,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
 import struct            as strct
+import random            as rnd
 import numpy             as np
 import math              as mth
 import os
@@ -158,6 +159,7 @@ import sys
 import Particle          as Prtcl
 import BeamLine          as BL
 import BeamLineElement   as BLE
+import PhysicalConstants as PhysCnstnts
 
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
@@ -169,12 +171,15 @@ class Particle:
     instances  = []
     __Debug    = False
 
+    stable_species   = {"proton", "neutrino"}
+    unstable_species = {"pion", "muon"}
             
 #--------  "Built-in methods":
     def __init__(self, _species="proton"):
         #.. Must have reference particle as first in the instance list,
         #   ... so ...
-        if not isinstance(ReferenceParticle.getinstances(),ReferenceParticle):
+        if not isinstance(ReferenceParticle.getinstances()[0], \
+                          ReferenceParticle):
             raise noReferenceParticle(" Reference particle, ", \
                                       "not first in particle list.")
 
@@ -199,6 +204,13 @@ class Particle:
         return " Particle __str__ done."
 
     def print(self):
+        try:
+            tst = self.getLocation()
+        except:
+            print("\n Particle: type:", type(self), \
+                  "Particle attributes not yet initialsed.")
+            return " <---- Particle parameter dump complete."
+            
         print("\n Particle: ", self.getSpecies(), "  mass: ", \
               iPhysclCnstnts.getparticleMASS(self.getSpecies()))
         print(" ---------")
@@ -258,14 +270,18 @@ class Particle:
             cls.instances.append(iRefPrtcl)
         
     def setAll2None(self):
-        self._Species      = None
-        self._Location     = []
-        self._z            = []
-        self._s            = []
-        self._TrcSpc       = []
-        self._PhsSpc       = []
-        self._LabPhsSpc    = []
-        
+        self._Species           = None
+        self._Location          = []
+        self._z                 = []
+        self._s                 = []
+        self._TrcSpc            = []
+        self._PhsSpc            = []
+        self._LabPhsSpc         = []
+        self._RemainingLifetime = mth.inf
+
+    def setRemainingLifetime(self, _RemainingLifetime):
+        self._RemainingLifetime = _RemainingLifetime
+
     def setSpecies(self, _Species):
         if not isinstance(_Species, str):
             raise badParameter("Particle.__init__: Species " + \
@@ -351,6 +367,9 @@ class Particle:
     def getinstances(cls):
         return cls.instances
 
+    def getRemainingLifetime(self):
+        return self._RemainingLifetime
+    
     def getSpecies(self):
         return self._Species
             
@@ -374,6 +393,29 @@ class Particle:
 
             
 #--------  Processing methods:
+    @staticmethod
+    def createParticle():
+        if Particle.getDebug():
+            print(" Particle.createParticle:", \
+                  "start.")
+            print("     ----> Primary particle species:", 
+                  BL.BeamLine.getcurrentReferenceParticle().getSpecies())
+
+        species = BL.BeamLine.getcurrentReferenceParticle().getSpecies()
+        if   species == "proton":     iPrtcl = proton()
+        elif species == "pion":       iPrtcl = pion()
+        elif species == "muon":       iPrtcl = muon()
+        elif species == "neutrino":   iPrtcl = neutrino()
+        else:
+            iPrtcl = Particle( \
+                BL.BeamLine.getcurrentReferenceParticle().getSpecies() \
+                              )
+        
+        if Particle.getDebug():
+            print(" <---- Done.")
+
+        return iPrtcl
+    
     @classmethod
     def fillPhaseSpaceAll(cls):
         Success = False
@@ -408,7 +450,7 @@ class Particle:
             print("     ----> fill phase space for particle with", \
                   len(self.getLocation()), "records.")
 
-        iRefPrtcl = ReferenceParticle.getinstances()
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
         nLoc = 0
         for iLoc in self.getLocation():
@@ -473,10 +515,10 @@ class Particle:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> trace space:", TrcSpc)
 
-        species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
+        species      = BL.BeamLine.getcurrentReferenceParticle().getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
-        p0  = BL.BeamLine.getElement()[0].getp0()
+        p0  = BL.BeamLine.getcurrentReferenceParticle().getMomentumOut(0)
         E0  = np.sqrt(particleMASS**2 + p0**2)
         b0  = p0/E0
         E   = E0 + TrcSpc[5]*p0
@@ -604,7 +646,7 @@ class Particle:
             if Projection == "ys":
                 iCrd = 2
                 axl  = "y"
-            sorz = ReferenceParticle.getinstances().getsOut()
+            sorz = BL.BeamLine.getcurrentReferenceParticle().getsOut()
             for TrcSpc in self.getTraceSpace():
                 xory.append(TrcSpc[iCrd])
 
@@ -626,7 +668,7 @@ class Particle:
             print("     ----> len ref. prtcl.:", \
                   len(ReferenceParticle.getinstances().getsOut()))
 
-        if len(ReferenceParticle.getinstances().getsOut()) > len(xory):
+        if len(BL.BeamLine.getcurrentReferenceParticle().getsOut()) > len(xory):
             axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
         else:
             axs.plot(sorz, xory, color='darkgray', linewidth='0.5', zorder=2)
@@ -648,7 +690,7 @@ class Particle:
             
         cls.instances = []
 
-        ReferenceParticle.cleaninstance()
+        ReferenceParticle.cleaninstances()
         
         DoneOK = True
 
@@ -985,10 +1027,10 @@ class Particle:
 
         iAddr = iLoc - 1
         
-        species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
+        species      = BL.BeamLine.getcurrentReferenceParticle().getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
-        p0  = BL.BeamLine.getElement()[0].getp0()
+        p0  = BL.BeamLine.getElement()[0].getp0()[0]
         E0  = np.sqrt(particleMASS**2 + p0**2)
 
         b0  = p0/E0
@@ -1237,33 +1279,47 @@ Created on Mon 15Nov23: Version history:
 @author: kennethlong
 """
 class ReferenceParticle(Particle):
-    __instance = None
-    __RPDebug  = False
+    __instances   = []
+    __RPDebug     = False
+    __speciesLIST = []
 
 #--------  "Built-in methods":
-    def __init__(self, _species="proton"):
-        if ReferenceParticle.getinstances() is None:
-            if self.__RPDebug:
-                print(' ReferenceParticle(Particle).__init__: ', \
-                      'creating the ReferenceParticle object')
-            ReferenceParticle.setinstance(self)
+    def __new__(cls, _species="proton"):
+        if cls.getRPDebug():
+            print(' ReferenceParticle(Particle).__new__:', \
+                  'start; checking if already an instance for', \
+                  'species:', _species)
+            
+        if not _species in cls.getspeciesLIST():
+            cls.setspecies(_species)
+            if cls.getRPDebug():
+                print('     ----> Not yet created; create!')
 
-            #.. Set ReferenceParticle attributes to None:
-            self.setAllRP2None()
+            inst = super(ReferenceParticle, cls).__new__(cls)
 
-            #.. Particle class initialisation:
-            Particle.__init__(self, _species)
-        
-            # Only constants; print values that will be used:
-            if self.getRPDebug():
-                print(self)
-                
+            cls.setinstance(inst)
+
         else:
-            print(' ReferenceParticle(Particle).__init__: ',       \
-                  " attempt to create second reference particle.", \
-                  " Abort!")
-            raise secondReferenceParticle(" Second call not allowed.")
+            inst = cls.getinstance(_species)
 
+        return inst
+        
+    def __init__(self, _species="proton"):
+        if ReferenceParticle.getRPDebug():
+            print(' ReferenceParticle(Particle).__init__:', \
+                  'creating the ReferenceParticle object', \
+                  'for species:', _species)
+        
+        #.. Set ReferenceParticle attributes to None:
+        self.setAllRP2None()
+
+        #.. Particle class initialisation:
+        self.callSPECIEScreator(_species)
+        
+        # Only constants; print values that will be used:
+        if ReferenceParticle.getRPDebug():
+            print(self)
+                
         return
 
     def __repr__(self):
@@ -1273,7 +1329,6 @@ class ReferenceParticle(Particle):
         print(" ReferenceParticle:")
         print(" ==================")
         print("     ----> Debug     :", self.getRPDebug())
-        print("     ----> Location  :", self.getLocation())
         print("     ----> sIn       :", self.getsIn())
         print("     ----> sOut      :", self.getsOut())
         print("     ----> RrIn      :", self.getRrIn())
@@ -1288,14 +1343,65 @@ class ReferenceParticle(Particle):
         print(self.print())
         return " <---- ReferenceParticle __str__ done."
 
-    
+    @staticmethod
+    def createReferenceParticles():
+        if ReferenceParticle.getRPDebug():
+            print(" ReferenceParticle(Particle).createReferenceParticles:", \
+                  "start.")
+            print("     ----> Number of reference particles:", \
+                  len(BLE.Facility.getinstances().getp0()))
+            
+        for id in range(len(BLE.Facility.getinstances().getp0())):
+            if ReferenceParticle.getRPDebug():
+                print("     ---->", \
+                      BLE.Facility.getinstances().getspecies0()[id], \
+                      BLE.Facility.getinstances().getp0()[id] \
+                      )
+            ReferenceParticle(BLE.Facility.getinstances().getspecies0()[id])
+            
+        if ReferenceParticle.getRPDebug():
+            print(" <---- Done.")
+
+        return ReferenceParticle.getinstances()
+
+    def callSPECIEScreator(self, species):
+        if ReferenceParticle.getRPDebug():
+            print(" ReferenceParticle(Particle).callSPECIEScreator:", \
+                  "species:", species)
+            
+        if species == "proton":
+            proton.__init__(self)
+        elif species == "pion":
+            pion.__init__(self)
+        elif species == "muon":
+            muon.__init__(self)
+        elif species == "neutrino":
+            neutrino.__init__(self)
+        else:
+            print(" <---- Species,", species, "not recognised, abort.")
+            raise badParameter()
+
+        if ReferenceParticle.getRPDebug():
+            print(" <---- Done.")
+
+            
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 
     @classmethod
     def getinstances(cls):
-        return cls.__instance
-        
+        return cls.__instances
+
+    @classmethod
+    def getspeciesLIST(cls):
+        return cls.__speciesLIST
+
+    @classmethod
+    def getinstance(cls, species):
+        id = cls.__speciesLIST.index(species)
+        return cls.__instances[id]
+
+    @classmethod
     def getRPDebug(self):
         return self.__RPDebug
 
@@ -1348,22 +1454,31 @@ class ReferenceParticle(Particle):
 
 #--------  "Set methods";
     @classmethod
-    def cleaninstance(cls):
-        if isinstance(cls.__instance, ReferenceParticle):
-            del cls.__instance
-            cls.resetinstance()
+    def cleaninstances(cls):
+        for inst in cls.getinstances():
+            del inst
+        cls.resetinstances()
 
     @classmethod
-    def resetinstance(cls):
-        cls.__instance = None
+    def resetinstances(cls):
+        cls.__instances   = []
+        cls.__speciesLIST = []
+
+    @classmethod
+    def setspecies(cls, species):
+        if isinstance(species, str):
+            cls.__speciesLIST.append(species)
+        else:
+            raise badArgument()
 
     @classmethod
     def setinstance(cls, inst):
         if isinstance(inst, ReferenceParticle):
-            cls.__instance = inst
+            cls.__instances.append(inst)
         else:
             raise badArgument()
 
+    @classmethod
     def setRPDebug(self, Debug):
         if isinstance(Debug, bool):
             self.__RPDebug = Debug
@@ -1442,7 +1557,7 @@ class ReferenceParticle(Particle):
         particleMASS = iPhysclCnstnts.getparticleMASS(self.getSpecies())
         
         nRcrds  = len(self.getsIn())
-        
+
         Success = self.setLocation(BLE.BeamLineElement.getinstances()\
                                    [nRcrds+1].getName())
         if not Success:
@@ -1464,7 +1579,7 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        p0       = BL.BeamLine.getElement()[0].getp0()
+        p0       = BL.BeamLine.getElement()[0].getp0()[0]
         Ref4mmtm = np.array([0., 0., p0,
                              mth.sqrt(p0**2 + particleMASS**2)])
         
@@ -1750,12 +1865,6 @@ class UnstableParticle(Particle):
     def setremainingPath(self, remainingPath):
         self._remainingPath = remainingPath
 
-    # print
-    def print(self):
-        super().print()
-#        print(f"Unstable Particle species: {self.getSpecies()}")
-        print(f"     ----> Mean Life: {self._meanLife}")
-        print(f"     ----> Remaining Path: {self._remainingPath}") 
     
 #--------  Exceptions:
 class noReferenceParticle(Exception):
@@ -1790,3 +1899,103 @@ class secondReferenceParticle(Exception):
 
 class fail2setReferenceParticle(Exception):
     pass
+
+
+class proton(Particle):
+    __instance     = []
+
+#--------  "Built-in methods":
+    def __init__(self):
+        if self.getDebug():
+            print(' proton(Particle).__init__:', \
+                  'creating the proton object')
+
+        proton.__instance.append(self)
+        
+        #.. Particle class initialisation:
+        Particle.__init__(self, "proton")
+        
+        # Only constants; print values that will be used:
+        if self.getDebug():
+            print(" <---- Done:", type(self), "instanciated.")
+
+        return
+
+
+class pion(Particle):
+    __instance     = []
+
+#--------  "Built-in methods":
+    def __init__(self):
+        if self.getDebug():
+            print(' pion(Particle).__init__:', \
+                  'creating the pion object')
+
+        pion.__instance.append(self)
+        
+        #.. Particle class initialisation:
+        Particle.__init__(self, "pion")
+
+        iPhysCnstnts = PhysCnstnts.PhysicalConstants()
+        lifetime     = iPhysCnstnts.tauPion()
+        
+        RemainingLifetime = -lifetime * mth.log(1. - rnd.random())
+        #np.random.exponential(lifetime)
+        self.setRemainingLifetime(RemainingLifetime)
+        
+        # Only constants; print values that will be used:
+        if self.getDebug():
+            print("     ----> pion lifetime:", lifetime, "s")
+            print(" <---- remaining lifetime:", self.getRemainingLifetime())
+
+        return
+
+
+class muon(Particle):
+    __instance     = []
+
+#--------  "Built-in methods":
+    def __init__(self):
+        
+        if self.getDebug():
+            print(' muon(Particle).__init__:', \
+                  'creating the muon object')
+
+        muon.__instance.append(self)
+        
+        #.. Particle class initialisation:
+        Particle.__init__(self, "muon")
+        
+        iPhysCnstnts = PhysCnstnts.PhysicalConstants()
+        lifetime     = iPhysCnstnts.tauMuon()
+        
+        RemainingLifetime = np.random.exponential(lifetime)
+        self.setRemainingLifetime(RemainingLifetime)
+        
+        # Only constants; print values that will be used:
+        if self.getDebug():
+            print("     ----> muon lifetime:", lifetime, "s")
+            print(" <---- remaining lifetime:", self.getRemainingLifetime())
+
+        return
+
+
+class neutrino(Particle):
+    __instance     = []
+    __Debug      = False
+
+#--------  "Built-in methods":
+    def __init__(self):
+        
+        print(' neutrino(Particle).__init__:', \
+                  'creating the neutrino object')
+
+        neutrino.__instance.append(self)
+        
+        #.. Particle class initialisation:
+        Particle.__init__(self, "neutrino")
+        
+        # Only constants; print values that will be used:
+        print("     ----> Type::", type(self))
+        
+        return

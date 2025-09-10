@@ -56,7 +56,8 @@ while not EndOfFile:
 print("     <----", iEvt, "events read")
 
 Prtcl.Particle.cleanParticles()
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
+BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 
@@ -94,7 +95,8 @@ while not EndOfFile:
 print("     <----", iEvt, "events read")
 
 Prtcl.Particle.cleanParticles()
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
+BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 
@@ -130,7 +132,8 @@ while not EndOfFile:
         break
 
 Prtcl.Particle.cleanParticles()
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
+BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 
@@ -170,7 +173,8 @@ while not EndOfFile:
 print("     <----", iEvt, "events read")
 
 Prtcl.Particle.cleanParticles()
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
+BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 
@@ -208,7 +212,8 @@ while not EndOfFile:
 print("     <----", iEvt, "events read")
 
 Prtcl.Particle.cleanParticles()
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
+BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 
@@ -246,7 +251,8 @@ while not EndOfFile:
 print("     <----", iEvt, "events read")
 
 Prtcl.Particle.cleanParticles()
-Prtcl.ReferenceParticle.cleaninstance()
+Prtcl.ReferenceParticle.cleaninstances()
+BL.BeamLine.cleaninstance()
 BLE.BeamLineElement.cleaninstances()
 bmIO.BeamIO.cleanBeamIOfiles()
 

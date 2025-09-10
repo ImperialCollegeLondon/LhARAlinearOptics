@@ -1,0 +1,200 @@
+--------  --------  --------  --------  --------  --------  --------  06Sep25
+First attempt to make decayCHAIN run to produce pion decay.  Seems to work.
+Need now to make sure all standard tests run OK.  So ...
+
+Tests:
+OK - ApertureTst.py
+OK - BeamIOTst-wrt.py
+OK - BeamIOTst-rd.py
+OK - BeamIOTst-rd-BDSIM.py
+OK - BeamLineElementTst.py
+OK - BeamLineTst.py
+OK - BeamTst.py
+OK - CylindricalRFCavityTst.py
+OK - DRACOfacilityTst.py
+OK - decayCHAIN.py
+OK - DefocusQuadTst.py
+OK - DipoleTst.py
+OK - DriftTst.py
+OK - ExpSourceTst.py
+OK - ExpSourceTst_rms_KE.py
+OK - FacilityTst.py
+OK - FocusQuadTst.py
+OK - GaborLensTst.py
+OK - LIONfacilityTst.py
+OK - LaTexTst.py
+OK - LhARAFacility-from-datafile-Tst.py
+OK - LhARAFacilityTst.py
+OK - LhARALinearOpticsTst.py
+OK - LhARAMagnetTable.py
+OK - ParticleTst.py
+OK - PhysicalConstantsTst.py
+OK - QuadDoubletTst.py
+OK - QuadTripletTst.py
+OK - RPLCswitchTst.py
+OK - ReferenceParticleTst.py
+OK - RunDRACOsimulation.py
+OK - RunLIONsimulation.py
+OK - RunLhARAsimulation.py
+OK - ReadDRACOsimu.py
+OK - ReadLIONsimu.py
+OK - ReadLhARAsimu.py
+OK - RunSimulationTst.py
+OK - SimulationTst.py
+OK - SolenoidTst.py
+OK - SourceTst.py
+OK - TestWrite.py
+OK - TestRead.py
+OK - extrapolatedBeamTst.py
+OK - plotTrajectory.py
+OK - visualiseTst.py
+
+!! - OctupoleTst.py
+!! - plotQuadTriplet.py
+
+Scripts:
+OK - 2BDSIM.py
+OK - plotBeam.py
+OK - plotextrapolatedBeam.py
+OK - runBeamSim.py
+OK - readBeamSim.py
+OK - visualiseBeam.py
+
+UserDirectory:
+OK - EnvelopeAnalysis.py
+OK - UserAnalysis.py
+OK - visualiseBeam.py
+
+--------  --------  --------  --------  --------  --------  --------  05Sep25
+Updated to allow multiple ReferenceParticle instances to handle decays during
+propagation.
+
+First wave of tests before continuing.
+
+Tests:
+OK - ApertureTst.py
+OK - BeamIOTst-wrt.py -- fixed, but, need to add functionality
+!! - BeamIOTst-rd.py  -- fails, trips over new reference particle structure
+OK - BeamIOTst-rd-BDSIM.py
+OK - BeamLineElementTst.py
+OK - BeamLineTst.py
+!! - BeamTst.py       -- fails on read; same as BeamIOTst-rd.py
+OK - CylindricalRFCavityTst.py
+OK - decayCHAIN.py
+OK - DRACOfacilityTst.py
+OK - DefocusQuadTst.py
+OK - DipoleTst.py
+OK - DriftTst.py
+OK - ExpSourceTst.py
+OK - ExpSourceTst_rms_KE.py
+OK - FacilityTst.py
+OK - FocusQuadTst.py
+OK - GaborLensTst.py
+OK - LIONfacilityTst.py
+OK - LaTexTst.py
+!! - LhARAFacility-from-datafile-Tst.py -- fails on read; same as BeamIOTst-rd.py
+OK - LhARAFacilityTst.py
+OK - LhARALinearOpticsTst.py
+OK - LhARAMagnetTable.py
+OK - ParticleTst.py
+OK - PhysicalConstantsTst.py
+OK - QuadDoubletTst.py
+OK - QuadTripletTst.py
+OK - RPLCswitchTst.py
+OK - ReferenceParticleTst.py
+OK - RunDRACOsimulation.py
+OK - RunLIONsimulation.py
+OK - RunLhARAsimulation.py
+!! - ReadDRACOsimu.py -- fails on read; same as BeamIOTst-rd.py
+!! - ReadLIONsimu.py -- fails on read; same as BeamIOTst-rd.py
+!! - ReadLhARAsimu.py -- fails on read; same as BeamIOTst-rd.py
+OK - RunSimulationTst.py
+OK - SimulationTst.py
+OK - SolenoidTst.py
+OK - SourceTst.py
+OK - TestWrite.py
+OK - TestRead.py
+!! - extrapolatedBeamTst.py -- fails on read; same as BeamIOTst-rd.py
+!! - plotTrajectory.py -- fails on read; same as BeamIOTst-rd.py
+!! - visualiseTst.py -- fails on read; same as BeamIOTst-rd.py
+
+Fl - OctupoleTst.py
+Fl - plotQuadTriplet.py
+
+Scripts:
+ - 2BDSIM.py
+ - plotBeam.py
+ - plotextrapolatedBeam.py
+ - runBeamSim.py
+ - readBeamSim.py
+ - visualiseBeam.py
+
+UserDirectory:
+OK - EnvelopeAnalysis.py*
+OK - UserAnalysis.py*
+OK - visualiseBeam.py*
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py
+ - BeamIOTst-wrt.py
+ - BeamIOTst-rd.py
+ - BeamIOTst-rd-BDSIM.py
+ - BeamLineElementTst.py
+ - BeamLineTst.py
+ - BeamTst.py
+ - CylindricalRFCavityTst.py
+ - DRACOfacilityTst.py
+ - decayCHAIN.py
+ - DefocusQuadTst.py
+ - DipoleTst.py
+ - DriftTst.py
+ - ExpSourceTst.py
+ - ExpSourceTst_rms_KE.py
+ - FacilityTst.py
+ - FocusQuadTst.py
+ - GaborLensTst.py
+ - LIONfacilityTst.py
+ - LaTexTst.py
+ - LhARAFacility-from-datafile-Tst.py
+ - LhARAFacilityTst.py
+ - LhARALinearOpticsTst.py
+ - LhARAMagnetTable.py
+ - ParticleTst.py
+ - PhysicalConstantsTst.py
+ - QuadDoubletTst.py
+ - QuadTripletTst.py
+ - RPLCswitchTst.py
+ - ReferenceParticleTst.py
+ - RunDRACOsimulation.py
+ - RunLIONsimulation.py
+ - RunLhARAsimulation.py
+ - ReadDRACOsimu.py
+ - ReadLIONsimu.py
+ - ReadLhARAsimu.py
+ - RunSimulationTst.py
+ - SimulationTst.py
+ - SolenoidTst.py
+ - SourceTst.py
+ - TestWrite.py
+ - TestRead.py
+ - extrapolatedBeamTst.py
+ - plotTrajectory.py
+ - visualiseTst.py
+
+ - OctupoleTst.py
+ - plotQuadTriplet.py
+
+Scripts:
+ - 2BDSIM.py
+ - plotBeam.py
+ - plotextrapolatedBeam.py
+ - runBeamSim.py
+ - readBeamSim.py
+ - visualiseBeam.py
+
+UserDirectory:
+ - EnvelopeAnalysis.py
+ - UserAnalysis.py
+ - visualiseBeam.py

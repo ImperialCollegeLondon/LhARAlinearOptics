@@ -53,7 +53,7 @@ BLE.BeamLineElement.cleaninstances()
 
 #.. Create valid instance:
 BLI  = BL.BeamLine(filename)
-iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
 print("     ----> Reference particle set:")
 print("         ----> In:", iRefPrtcl.getPrIn())

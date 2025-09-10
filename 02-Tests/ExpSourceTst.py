@@ -125,7 +125,7 @@ g_E       = Src.getLaserDrivenProtonEnergyProbDensity()
 E_min_MeV = Src.getParameters()[6]
 E_max_MeV = Src.getParameters()[7]
 
-iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 p0 = iRefPrtcl.getMomentumIn(0)
 
 print("     ----> Generate many particles:")

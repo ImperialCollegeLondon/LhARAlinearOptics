@@ -201,7 +201,7 @@ class UserAnal:
             print("\n Envelopeptimisation.setBeamLine: start")
         #--------  Get beam line defined so far and reference particle:
         iBL      = BL.BeamLine.getinstances()
-        refPrtcl = Prtcl.ReferenceParticle.getinstances()
+        refPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
         #.. Last beam line element:
         iLst = iBL.getElement()[-1]
