@@ -15,7 +15,7 @@ import os
 import datetime as dt
 
 def version():
-    Debug = False
+    Debug = True
     
     LLOversion = []
 
@@ -26,7 +26,11 @@ def version():
     if not os.path.isdir(LhARAOpticsPATH):
         raise versionException("LhARAOpticsPATH not set")
 
-    repo = git.Repo(LhARAOpticsPATH)
+    try:
+        repo = git.Repo(LhARAOpticsPATH)
+    except:
+        return ["LhARALinearOptics.version: git repo not found"]
+    
     if Debug:
         print("     ----> git repo:", repo)
 

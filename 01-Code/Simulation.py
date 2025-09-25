@@ -143,7 +143,7 @@ class Simulation(object):
                     print("     ----> Reading particles from file:")
                     print("         ----> Need to read & skip first record")
                     cls.getiBmIOr().readBeamDataRecord()
-                    p0iBmIOr = BLE.Facility.getinstances().getp0()
+                    p0iBmIOr = BLE.Facility.getinstances().getp0()[0]
                     print("             ---->", \
                           "Reference particle momentum from input file:", \
                           p0iBmIOr)
@@ -153,11 +153,14 @@ class Simulation(object):
     
             # Create Facility instance:
             cls.setFacility(BL.BeamLine(filename))
-            p0BLfile = BLE.Facility.getinstances().getp0()
+            p0BLfile = BLE.Facility.getinstances().getp0()[0]
             print("             ---->", \
                   "Reference particle momentum from beam line file:", \
                   p0BLfile)
-            if p0iBmIOr != p0BLfile and _inputFILE != None:
+            if p0iBmIOr != p0BLfile and _inputFILE != None and \
+               not _BDSIMfile:
+                print(" Simulation.__new__: p0iBmIOr =", p0iBmIOr, \
+                      "while p0BLfile =", p0BLfile)
                 print("     ****", \
                   "Reference particle momentum from beam line file", \
                   " is not the same as that read from input file, abort.", \
