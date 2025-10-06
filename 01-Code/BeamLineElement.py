@@ -938,7 +938,7 @@ class BeamLineElement:
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances("All")
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -3804,7 +3804,7 @@ class Solenoid(BeamLineElement):
             if self.getDebug():
                 print("     ----> RPLC:")
                 
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances()
+            iRefPrtcl = Prtcl.ReferenceParticle.getinstances("All")
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():

@@ -118,6 +118,12 @@ printProgression : prints evolution of beam parameters by location.
    evaluateBeam : Read data file and increment sums.  Then, calculate
                   covariance matrix, RMS x and y, emittance, and Twiss
                   paramters
+        Input : TrackBeam (Bool) : If reading particles from file,
+                                       TrackBeam = False
+                                   If needing to read particle at source
+                                   and propagate through beam line,
+                                       TrackBeam = True
+                                  
 
 plotBeamProgression : create standard plots
                       (in 99-Scratch/BeamProgressionPlot.pdf!) of beam
@@ -719,6 +725,7 @@ class Beam:
                           self.getCovarianceMatrix()[iAddr]) 
 
     def evaluateBeam(self, TrackBeam=False):
+        #.. Need to track beam if not reading particles from file.
         if self.getDebug():
             print(" Beam.evaluateBeam: ", \
                   "perform` sums to get covariance matrices")

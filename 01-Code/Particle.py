@@ -178,7 +178,7 @@ class Particle:
     def __init__(self, _species="proton"):
         #.. Must have reference particle as first in the instance list,
         #   ... so ...
-        if not isinstance(ReferenceParticle.getinstances()[0], \
+        if not isinstance(ReferenceParticle.getinstances("All")[0], \
                           ReferenceParticle):
             raise noReferenceParticle(" Reference particle, ", \
                                       "not first in particle list.")
@@ -593,7 +593,7 @@ class Particle:
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> PhsSpx:", PhsSpc)
             
-        species      = Prtcl.ReferenceParticle.getinstances().getSpecies()
+        species      = Prtcl.ReferenceParticle.getinstances("All").getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
         p0        = BL.BeamLine.getElement()[0].getp0()
@@ -666,7 +666,7 @@ class Particle:
             print("     ----> len, sorz:", len(sorz), sorz)
             print("     ----> len, xory:", len(xory), xory)
             print("     ----> len ref. prtcl.:", \
-                  len(ReferenceParticle.getinstances().getsOut()))
+                  len(ReferenceParticle.getinstances("All").getsOut()))
 
         if len(BL.BeamLine.getcurrentReferenceParticle().getsOut()) > len(xory):
             axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
@@ -1362,7 +1362,7 @@ class ReferenceParticle(Particle):
         if ReferenceParticle.getRPDebug():
             print(" <---- Done.")
 
-        return ReferenceParticle.getinstances()
+        return ReferenceParticle.getinstances("All")
 
     def callSPECIEScreator(self, species):
         if ReferenceParticle.getRPDebug():
@@ -1389,8 +1389,12 @@ class ReferenceParticle(Particle):
 #.. Methods believed to be self documenting(!)
 
     @classmethod
-    def getinstances(cls):
-        return cls.__instances
+    def getinstances(cls, which="First"):
+        #.. By default return only "First", primary, reference particle.
+        #   This is for backward compatibility.
+        if not which == "First":
+            return cls.__instances
+        return cls.__instances[0]
 
     @classmethod
     def getspeciesLIST(cls):
@@ -1455,7 +1459,7 @@ class ReferenceParticle(Particle):
 #--------  "Set methods";
     @classmethod
     def cleaninstances(cls):
-        for inst in cls.getinstances():
+        for inst in cls.getinstances("All"):
             del inst
         cls.resetinstances()
 

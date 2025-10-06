@@ -392,7 +392,7 @@ class BeamLine(object):
 
         cls.addBeamLineElement(SourceBLE)
 
-        refPrtcl    = Prtcl.ReferenceParticle.getinstances()[0]
+        refPrtcl    = Prtcl.ReferenceParticle.getinstances("All")[0]
         refPrtclSet = refPrtcl.setReferenceParticleAtSource()
 
         if cls.getDebug():
@@ -724,7 +724,7 @@ class BeamLine(object):
         NewElement = True
         s         = 0.
 
-        iRefPrtcl = Prtcl.ReferenceParticle.getinstances()[0]
+        iRefPrtcl = Prtcl.ReferenceParticle.getinstances("All")[0]
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrIn()[0][:3], \
@@ -1528,7 +1528,7 @@ class BeamLine(object):
 
         EoF = False
 
-        if Prtcl.ReferenceParticle.getinstances() == []:
+        if Prtcl.ReferenceParticle.getinstances("All") == []:
             refPrtcl  = BL.BeamLine.getcurrentReferenceParticle()
 
         brecord = beamlineFILE.read(4)
