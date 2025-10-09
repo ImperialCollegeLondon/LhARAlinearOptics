@@ -612,6 +612,9 @@ class Beam:
             
         CovSums = np.zeros((6,6))
 
+        self._CovSums    = []
+        self._nParticles = []
+
         iLocMin = self.getstartlocation()
             
         for iLoc in range(iLocMin, \
@@ -732,7 +735,7 @@ class Beam:
         ParticleFILE = self.getInputDataFile()
         if self.getDebug():
             print("     ----: event loop")
-        
+
         nEvtMax = self.getnEvtMax()
         if nEvtMax == None:
             nEvtMax = 1000
