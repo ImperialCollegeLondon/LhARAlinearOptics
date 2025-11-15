@@ -1,0 +1,70 @@
+--------  --------  --------  --------  --------  --------  --------  15Nov25
+Decide to push changes that made reference particle an array in
+preparation for decays at nuSTORM.  Reason is that I want to develop
+code to deal with ions in LhARA.
+
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py
+ - BeamIOTst-wrt.py
+ - BeamIOTst-rd.py
+ - BeamIOTst-rd-BDSIM.py
+ - BeamLineElementTst.py
+ - BeamLineTst.py
+ - BeamTst.py
+ - CylindricalRFCavityTst.py
+ - DRACOfacilityTst.py
+ - decayCHAIN.py
+ - DefocusQuadTst.py
+ - DipoleTst.py
+ - DriftTst.py
+ - ExpSourceTst.py
+ - ExpSourceTst_rms_KE.py
+ - FacilityTst.py
+ - FocusQuadTst.py
+ - GaborLensTst.py
+ - LIONfacilityTst.py
+ - LaTexTst.py
+ - LhARAFacility-from-datafile-Tst.py
+ - LhARAFacilityTst.py
+ - LhARALinearOpticsTst.py
+ - LhARAMagnetTable.py
+ - ParticleTst.py
+ - PhysicalConstantsTst.py
+ - QuadDoubletTst.py
+ - QuadTripletTst.py
+ - RPLCswitchTst.py
+ - ReferenceParticleTst.py
+ - RunDRACOsimulation.py
+ - RunLIONsimulation.py
+ - RunLhARAsimulation.py
+ - ReadDRACOsimu.py
+ - ReadLIONsimu.py
+ - ReadLhARAsimu.py
+ - RunSimulationTst.py
+ - SimulationTst.py
+ - SolenoidTst.py
+ - SourceTst.py
+ - TestWrite.py
+ - TestRead.py
+ - extrapolatedBeamTst.py
+ - plotTrajectory.py
+ - visualiseTst.py
+
+ - OctupoleTst.py
+ - plotQuadTriplet.py
+
+Scripts:
+ - 2BDSIM.py
+ - plotBeam.py
+ - plotextrapolatedBeam.py
+ - runBeamSim.py
+ - readBeamSim.py
+ - visualiseBeam.py
+
+UserDirectory:
+ - EnvelopeAnalysis.py
+ - UserAnalysis.py
+ - visualiseBeam.py
