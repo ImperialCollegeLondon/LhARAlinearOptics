@@ -3,6 +3,18 @@ Decide to push changes that made reference particle an array in
 preparation for decays at nuSTORM.  Reason is that I want to develop
 code to deal with ions in LhARA.
 
+First scan code to see what may need to be updated:
+ - BeamLine: uses particle mass to get total energy from kinetic energy.
+ - BeamLineElement: Proton mass widely used!
+                    Need to include charge number in calcultion of transfer
+		    matrix elementx.
+ - Particle: Mass widely used.
+ - PhysicalConstants: Obvously!
+ 
+Process:
+ - Work through spreadsheet/test pairs with new charge state and mass
+   first.  Then follow through with scripts. 
+
 
 
 --------  --------  --------  --------  --------  --------  --------  --------

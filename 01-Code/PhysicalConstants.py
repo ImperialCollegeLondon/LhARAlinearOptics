@@ -60,7 +60,7 @@ import math
 class PhysicalConstants(object):
     __instance = None
     __Debug    = False
-    _Species   = ["proton", "pion", "muon", "neutrino"]
+    _Species   = ["proton", "pion", "muon", "neutrino", "12c6"]
 
 #--------  "Built-in methods":
     def __new__(cls):
@@ -96,6 +96,8 @@ class PhysicalConstants(object):
         print("      ----> muon lifetime (s):", self.tauMuon())
         print("      ----> neutrino mass (MeV/c2):", self.mNeutrino())
         print("      ----> neutrino lifetime (s):", self.tauNeutrino())
+        print("      ----> 12C6 mass (MeV/c2):", self.m12c6())
+        print("      ----> 12C6 lifetime (s):", self.tau12c6())
         print("      ----> Permitivity of free space (N/A**2):", self.mu0())
         print("      ----> debug flag:", self.getDebug())
         return " <---- PhysicalConstants dump complete."
@@ -152,6 +154,8 @@ class PhysicalConstants(object):
                 particleMASS = self.mMuon()
             elif _Species.lower() == "neutrino":
                 particleMASS = self.mNeutrino()
+            elif _Species.lower() == "12c6":
+                particleMASS = self.m12c6()
         else:
             raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
                                _Species + " not allowed!")
@@ -171,6 +175,8 @@ class PhysicalConstants(object):
                 particleLifeTime = self.tauMuon()
             elif _Species.lower() == "neutrino":
                 particleLifeTime = self.tauNeutrino()
+            elif _Species.lower() == "12c6":
+                particleLifeTime = self.tau12c6()
         else:
             raise badParameter("PhysicalConstants.getParticleLifeTime: Species " + \
                                _Species + " not allowed!")
@@ -197,6 +203,9 @@ class PhysicalConstants(object):
     def mNeutrino(self):
         return 0.
 
+    def m12c6(self):
+        return 11174.8
+
     def tauPion(self):
         return 26.033E-9
 
@@ -204,6 +213,9 @@ class PhysicalConstants(object):
         return 2.1969811E-6
 
     def tauP(self):
+        return math.inf
+
+    def tau12c6(self):
         return math.inf
 
     def tauNeutrino(self):
