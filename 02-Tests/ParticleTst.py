@@ -113,6 +113,13 @@ Prtcl.Particle.setDebug(True)
 print(uKInst)
 Prtcl.Particle.setDebug(False)
 
+ParticleTest = 8
+print("ParticleTest:", ParticleTest, " check response to unknown particle type.")
+crbnInst = Prtcl.Particle("12C6")
+Prtcl.Particle.setDebug(True)
+print(crbnInst)
+Prtcl.Particle.setDebug(False)
+
 """
 Legacy; wont work as delete instances after generating ... needs to check
         fillPhaseSpaceAll
