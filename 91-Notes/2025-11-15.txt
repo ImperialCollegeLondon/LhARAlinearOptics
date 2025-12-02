@@ -1,3 +1,160 @@
+--------  --------  --------  --------  --------  --------  --------  19Nov25
+OK, now lets see if we can debug the 12C6 stuff.
+
+
+--------  --------  --------  --------  --------  --------  --------  19Nov25
+Tests:
+ - ApertureTst.py                     - OK
+ - BeamIOTst-wrt.py                   - OK
+ - BeamIOTst-rd.py                    - OK
+ - BeamIOTst-rd-BDSIM.py              - OK
+ - BeamLineElementTst.py              - OK
+ - BeamLineTst.py                     - OK
+ - BeamTst.py                         - OK
+ - CylindricalRFCavityTst.py          - OK
+ - CylindricalRFCavityTst-12C6.py     - OK
+ - DRACOfacilityTst.py                - OK
+ - decayCHAIN.py                      - OK
+ - DefocusQuadTst.py                  - OK
+ - DefocusQuad-12C6-Tst.py            - OK
+ - DipoleTst.py                       - OK
+ - Dipole-12C6-Tst.py                 - OK
+ - DriftTst.py                        - OK
+ - Drift-12C6-Tst.py                  - OK
+ - ExpSourceTst.py                    - OK
+ - ExpSourceTst_rms_KE.py             - OK
+ - FacilityTst.py                     - OK
+ - FocusQuadTst.py                    - OK
+ - FocusQuad-12C6-Tst.py              - OK
+ - GaborLensTst.py                    - OK
+ - GaborLens-12C6-Tst.py              - OK
+ - LIONfacilityTst.py                 - OK
+ - LaTexTst.py                        - OK
+ - LhARAFacility-from-datafile-Tst.py - OK
+ - LhARAFacilityTst.py                - OK
+ - LhARALinearOpticsTst.py            - OK
+ - LhARAMagnetTable.py                - OK
+ - ParticleTst.py                     - OK
+ - PhysicalConstantsTst.py            - OK
+ - QuadDoubletTst.py                  - OK
+ - QuadTripletTst.py                  - OK
+ - RPLCswitchTst.py                   - OK
+ - ReferenceParticleTst.py            - OK
+ - RunDRACOsimulation.py              - OK
+ - RunLIONsimulation.py               - OK
+ - RunLhARAsimulation.py              - OK
+ - ReadDRACOsimu.py                   - OK
+ - ReadLIONsimu.py                    - OK
+ - ReadLhARAsimu.py                   - OK
+ - RunSimulationTst.py                - OK
+ - SimulationTst.py                   - OK
+ - SolenoidTst.py                     - OK
+ - Solenoid-12C6-Tst.py               - OK
+ - SourceTst.py                       - OK
+ - TestWrite.py                       - OK
+ - TestRead.py                        - OK
+ - extrapolatedBeamTst.py             - OK
+ - plotTrajectory.py                  - OK
+ - visualiseTst.py                    - OK
+
+ - OctupoleTst.py                     - Fails
+ - plotQuadTriplet.py                 - OK, no plot!
+
+--------  --------  --------  --------  --------  --------  --------  19Nov25
+Now need to add 12C6; needs charge as 'calculated' quantity.  Classes
+modified:
+ - Particle:
+   - Add 12c6 to list of allowed species.
+   - Add twelveC6 derived class.
+ - PhysicalConstants:
+   - Add getparticleCHARGE method.
+
+Work through beam line elements making new spreadsheets and new test
+scripts:
+ - Drif              - OK
+ - FocusQuadrupole   - OK
+ - DefocusQuadrupole - OK
+ - Dipole            - OK
+ - GaborLens         - OK
+ - CylindricalCavity - OK
+
+Need to do tests!
+
+--------  --------  --------  --------  --------  --------  --------  18Nov25
+Work through classes, led by pion or proton mass; mods:
+ - BeamIO:
+   - No updates; proton or pion mass when reading BDSIM file.
+ - BeamLineElement:
+   - Facility.getLines: did not have translation to new reference particle
+     structure, so, tried to fix it.  Not tested.
+   - getTransferMatrix: general; refers to proton mass, hardwired.  Changed to
+     use present reference particle mass.  Hope now OK.
+Looks like other modules dont need updating.  Still have not addressed the i/o.
+Found, by chance, that user scripts no longer run.  Think this is due to the
+arrays for reference particles, most likely.  Need to loop back.
+
+Outstanding, structural fixes required:
+ - I/o
+ - User code
+ 
+Run tests, then loop back to add charge 12C6!
+
+Tests:
+ - ApertureTst.py                     - OK
+ - BeamIOTst-wrt.py                   - OK
+ - BeamIOTst-rd.py                    - OK
+ - BeamIOTst-rd-BDSIM.py              - OK
+ - BeamLineElementTst.py              - OK
+ - BeamLineTst.py                     - OK
+ - BeamTst.py                         - OK
+ - CylindricalRFCavityTst.py          - OK
+ - DRACOfacilityTst.py                - OK
+ - decayCHAIN.py                      - OK
+ - DefocusQuadTst.py                  - OP
+ - DipoleTst.py                       - OK
+ - DriftTst.py                        - OK
+ - ExpSourceTst.py                    - OK
+ - ExpSourceTst_rms_KE.py             - OK
+ - FacilityTst.py                     - OK
+ - FocusQuadTst.py                    - OK
+ - GaborLensTst.py                    - OK
+ - LIONfacilityTst.py                 - OK
+ - LaTexTst.py                        - OK
+ - LhARAFacility-from-datafile-Tst.py - OK
+ - LhARAFacilityTst.py                - OK
+ - LhARALinearOpticsTst.py            - OK
+ - LhARAMagnetTable.py                - OK
+ - ParticleTst.py                     - OK
+ - PhysicalConstantsTst.py            - OK
+ - QuadDoubletTst.py                  - OK
+ - QuadTripletTst.py                  - OK
+ - RPLCswitchTst.py                   - OK
+ - ReferenceParticleTst.py            - OK
+ - RunDRACOsimulation.py              - OK
+ - RunLIONsimulation.py               - OK
+ - RunLhARAsimulation.py              - OK
+ - ReadDRACOsimu.py                   - OK
+ - ReadLIONsimu.py                    - OK
+ - ReadLhARAsimu.py                   - OK
+ - RunSimulationTst.py                - OK
+ - SimulationTst.py                   - OK
+ - SolenoidTst.py                     - OK
+ - SourceTst.py                       - OK
+ - TestWrite.py                       - OK
+ - TestRead.py                        - OK
+ - extrapolatedBeamTst.py             - OK
+ - plotTrajectory.py                  - OK
+ - visualiseTst.py                    - OK
+
+ - OctupoleTst.py                     - Fails
+ - plotQuadTriplet.py                 - OK, no plot!
+
+Skip scrips and UserDirectory.
+
+     
+--------  --------  --------  --------  --------  --------  --------  17Nov25
+Update Physical Constants to include mass for 12C.
+
 --------  --------  --------  --------  --------  --------  --------  15Nov25
 Decide to push changes that made reference particle an array in
 preparation for decays at nuSTORM.  Reason is that I want to develop
@@ -19,54 +176,61 @@ Process:
 
 --------  --------  --------  --------  --------  --------  --------  --------
 Tests:
- - ApertureTst.py
- - BeamIOTst-wrt.py
- - BeamIOTst-rd.py
- - BeamIOTst-rd-BDSIM.py
- - BeamLineElementTst.py
- - BeamLineTst.py
- - BeamTst.py
- - CylindricalRFCavityTst.py
- - DRACOfacilityTst.py
- - decayCHAIN.py
- - DefocusQuadTst.py
- - DipoleTst.py
- - DriftTst.py
- - ExpSourceTst.py
- - ExpSourceTst_rms_KE.py
- - FacilityTst.py
- - FocusQuadTst.py
- - GaborLensTst.py
- - LIONfacilityTst.py
- - LaTexTst.py
- - LhARAFacility-from-datafile-Tst.py
- - LhARAFacilityTst.py
- - LhARALinearOpticsTst.py
- - LhARAMagnetTable.py
- - ParticleTst.py
- - PhysicalConstantsTst.py
- - QuadDoubletTst.py
- - QuadTripletTst.py
- - RPLCswitchTst.py
- - ReferenceParticleTst.py
- - RunDRACOsimulation.py
- - RunLIONsimulation.py
- - RunLhARAsimulation.py
- - ReadDRACOsimu.py
- - ReadLIONsimu.py
- - ReadLhARAsimu.py
- - RunSimulationTst.py
- - SimulationTst.py
- - SolenoidTst.py
- - SourceTst.py
- - TestWrite.py
- - TestRead.py
- - extrapolatedBeamTst.py
- - plotTrajectory.py
- - visualiseTst.py
+ - ApertureTst.py                     - 
+ - BeamIOTst-wrt.py                   - 
+ - BeamIOTst-rd.py                    - 
+ - BeamIOTst-rd-BDSIM.py              - 
+ - BeamLineElementTst.py              - 
+ - BeamLineTst.py                     - 
+ - BeamTst.py                         - 
+ - CylindricalRFCavityTst.py          - 
+ - CylindricalRFCavityTst-12C6.py     - 
+ - DRACOfacilityTst.py                - 
+ - decayCHAIN.py                      - 
+ - DefocusQuadTst.py                  - 
+ - DefocusQuad-12C6-Tst.py            - 
+ - DipoleTst.py                       - 
+ - Dipole-12C6-Tst.py                 - 
+ - DriftTst.py                        - 
+ - Drift-12C6-Tst.py                  - 
+ - ExpSourceTst.py                    - 
+ - ExpSourceTst_rms_KE.py             - 
+ - FacilityTst.py                     - 
+ - FocusQuadTst.py                    - 
+ - FocusQuad-12C6-Tst.py              - 
+ - GaborLensTst.py                    - 
+ - GaborLens-12C6-Tst.py              - 
+ - LIONfacilityTst.py                 - 
+ - LaTexTst.py                        - 
+ - LhARAFacility-from-datafile-Tst.py - 
+ - LhARAFacilityTst.py                - 
+ - LhARALinearOpticsTst.py            - 
+ - LhARAMagnetTable.py                - 
+ - ParticleTst.py                     - 
+ - PhysicalConstantsTst.py            - 
+ - QuadDoubletTst.py                  - 
+ - QuadTripletTst.py                  - 
+ - RPLCswitchTst.py                   - 
+ - ReferenceParticleTst.py            - 
+ - RunDRACOsimulation.py              - 
+ - RunLIONsimulation.py               - 
+ - RunLhARAsimulation.py              - 
+ - ReadDRACOsimu.py                   - 
+ - ReadLIONsimu.py                    - 
+ - ReadLhARAsimu.py                   - 
+ - RunSimulationTst.py                - 
+ - SimulationTst.py                   - 
+ - SolenoidTst.py                     - 
+ - Solenoid-12C6-Tst.py               - 
+ - SourceTst.py                       - 
+ - TestWrite.py                       - 
+ - TestRead.py                        - 
+ - extrapolatedBeamTst.py             - 
+ - plotTrajectory.py                  - 
+ - visualiseTst.py                    - 
 
- - OctupoleTst.py
- - plotQuadTriplet.py
+ - OctupoleTst.py                     - 
+ - plotQuadTriplet.py                 - 
 
 Scripts:
  - 2BDSIM.py
