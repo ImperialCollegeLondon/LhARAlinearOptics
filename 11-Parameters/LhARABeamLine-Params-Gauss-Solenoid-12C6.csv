@@ -1,0 +1,96 @@
+﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
+0,Facility,Global,Name,Name,LhARA,,
+0,Facility,Global,Reference particle,Kinetic energy,45.6095,MeV,
+0,Facility,Global,Reference particle,Species,12C6,,
+0,Facility,Global,Vacuum chamber,Mother volume radius,0.035,m,
+1,Source,Source,Gauss,SourceMode,1,,Gaussian kinetic energy
+1,Source,Source,Gauss,SigmaX,0.000004,m,"Gaussian width, x"
+1,Source,Source,Gauss,SigmaY,0.000004,m,"Gaussian width, y"
+1,Source,Source,Gauss,MeanEnergy,45.6095,MeV,Mean of guassian kinetic energy
+1,Source,Source,Gauss,SigmaEnergy,0.3,MeV,Sigma of guassian kinetic energy
+1,Source,Source,Gauss,MinCTheta,0.999999,,Minimum theta for flat cos theta
+1,Interface,Drift,,Length,0.05,m,"Length of first, compensated, drift"
+1,Interface,Aperture,Circular,Radius,0.002,m,Inner bore of entry to nozzle
+1,Interface,Drift,,Length,0.05,m,"Length of first, compensated, drift"
+1,Interface,Aperture,Circular,Radius,0.00287,m,Inner bore of exit from nozzle
+1,Capture,Drift,,Length,0.15,m,Drift to solenoid
+1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
+1,Capture,Solenoid,"Length, strength",Strength,2.491694909,rad/m,ks
+1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
+1,Capture,Drift,,Length,0.15,m,Drift to next solenoid
+1,Capture,Solenoid,"Length, strength",Length,0.857,m,Length of solenoid
+1,Capture,Solenoid,"Length, strength",Strength,1.018747261,rad/m,ks
+1,Capture,Drift,,Length,0.15,m,Drift out of solenoid
+1,Energy selection,Drift,,Length,0.183783273,m,Drift before first cavity
+1,Energy selection,Cavity,Cylindrical,Gradient,5,MV/m,Gradient
+1,Energy selection,Cavity,Cylindrical,Frequency,200,MHz,Frequency
+1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
+1,Energy selection,Drift,,Length,0.367566545,m,Drift after first cavity
+1,Energy selection,Drift,,Length,0.15,m,Drift to next solenoid
+1,Energy selection,Solenoid,"Length, strength",Length,0.857,m,
+1,Energy selection,Solenoid,"Length, strength",Strength,1.448564633,rad/m,
+1,Energy selection,Drift,,Length,0.15,m,Drift out of solenoid
+1,Energy selection,Drift,,Length,1.771,m,Drift to energy-selection collimator
+1,Energy selection,Drift,,Length,0.005,m,Space for energy-selection collimator
+1,Energy selection,Aperture,Circular,Radius,0.0025,m,Collimator
+1,Energy selection,Drift,,Length,0.005,m,Space for energy-selection collimator
+1,Energy selection,Drift,,Length,0.06461,m,
+1,Energy selection,Drift,,Length,0.13539,m,
+1,Energy selection,Drift,,Length,0.01,m,Space for energy-selection collimator?
+1,Energy selection,Drift,,Length,0.0546,m,
+1,Energy selection,Drift,,Length,0.183783273,m,Drift before second cavity
+1,Energy selection,Cavity,Cylindrical,Gradient,5,MV/m,Gradient
+1,Energy selection,Cavity,Cylindrical,Frequency,200,MHz,Frequency
+1,Energy selection,Cavity,Cylindrical,Phase,0,degrees,Phase of reference particle
+1,Energy selection,Drift,,Length,0.183783273,m,Drift after second cavity
+1,Matching,Drift,,Length,0.15,m,Drift to next solenoid
+1,Matching,Solenoid,"Length, strength",Length,0.857,m,
+1,Matching,Solenoid,"Length, strength",Strength,1.788858966,rad/m,
+1,Matching,Drift,,Length,0.15,m,Drift out of solenoid
+1,Matching,Drift,,Length,0.3,m,
+1,Matching,Drift,,Length,0.15,m,Drift to next solenoid
+1,Matching,Solenoid,"Length, strength",Length,0.857,m,
+1,Matching,Solenoid,"Length, strength",Strength,1.604339941,rad/m,
+1,Matching,Drift,,Length,0.15,m,Drift out of solenoid
+1,Matching,Drift,,Length,2.5,m,
+1,Matching,Drift,,Length,0.15,m,Drift to next solenoid
+1,Matching,Solenoid,"Length, strength",Length,0.857,m,
+1,Matching,Solenoid,"Length, strength",Strength,1.244814017,rad/m,
+1,Matching,Drift,,Length,0.15,m,Drift out of solenoid
+1,Matching,Drift,,Length,0.3,m,
+1,Matching,Drift,,Length,0.15,m,Drift to next solenoid
+1,Matching,Solenoid,"Length, strength",Length,0.857,m,
+1,Matching,Solenoid,"Length, strength",Strength,1.16596749,rad/m,
+1,Matching,Drift,,Length,0.15,m,Drift out of solenoid
+1,Arc,Drift,,Length,0.2,m,
+1,Arc,RPLCswitch,j,theta,1.570796327,rad,
+1,Arc,RPLCswitch,j,phi,0,rad,
+1,Arc,RPLCswitch,k,theta,0,rad,
+1,Arc,RPLCswitch,k,phi,0,rad,
+1,Arc,Dipole,"Sector (Length, angle)",Length,0.8,m,
+1,Arc,Dipole,"Sector (Length, angle)",Angle,45,degrees,
+1,Arc,Drift,,Length,0.2,m,
+1,Arc,Dquad,,Length,0.1,m,
+1,Arc,Dquad,,kq,22.544,m-2,
+1,Arc,Drift,,Length,0.4,m,
+1,Arc,Fquad,,Length,0.1,m,
+1,Arc,Fquad,,kq,31.3768,m-2,
+1,Arc,Drift,,Length,0.2,m,
+1,Arc,Dquad,,Length,0.1,m,
+1,Arc,Dquad,,kq,31.5123,m-2,
+1,Arc,Drift,,Length,0.195,m,
+1,Arc,Drift,,Length,0.01,m,
+1,Arc,Drift,,Length,0.195,m,
+1,Arc,Dquad,,Length,0.1,m,
+1,Arc,Dquad,,kq,31.5123,m-2,
+1,Arc,Drift,,Length,0.2,m,
+1,Arc,Fquad,,Length,0.1,m,
+1,Arc,Fquad,,kq,31.3768,m-2,
+1,Arc,Drift,,Length,0.4,m,
+1,Arc,Dquad,,Length,0.1,m,
+1,Arc,Dquad,,kq,22.544,m-2,
+1,Arc,Drift,,Length,0.2,m,
+1,Arc,Dipole,"Sector (Length, angle)",Length,0.8,m,
+1,Arc,Dipole,"Sector (Length, angle)",Angle,45,degrees,
+1,Arc,Drift,,Length,0.2,m,
+1,Arc,Drift,,Length,2,m,
