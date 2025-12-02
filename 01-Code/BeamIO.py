@@ -38,6 +38,7 @@ Class BeamIO:
                  >= 4 : Include drStrt and dvStrt for beam line elements
                  >= 5 : Convert dvStrt to Euler angles
                  >= 6 : Revised source parameter format
+                 >= 7 : Write/read particle species
          _repoVERSION : [ [tagNAME, tagDATETIME],
                           [commitSTRING, commitDATETIME] ]
               _create : Boolean; if true create file.
@@ -165,7 +166,7 @@ class BeamIO:
                     print("         ----> File opened for write.")
                 
                 self.writeFIRSTword()
-                self.writeVersion("BeamIO v6")
+                self.writeVersion("BeamIO v7")
                 self.writeREPOversion()
                 
             else:
@@ -222,7 +223,7 @@ class BeamIO:
         cls.__Debug = Debug
         
     def setAll2None(self):
-        self._pathFILE       = None
+        self._pathFILE        = None
         self._dataFILE        = None
         self._Rd1stRcrd       = False
         self._dataFILEversion = None
@@ -413,7 +414,8 @@ class BeamIO:
                 print("     <---- Data file format version:", \
                       self.getdataFILEversion())
         else:
-            EoF = Prtcl.Particle.readParticle(self.getdataFILE())
+            EoF = Prtcl.Particle.readParticle(self.getdataFILE(), \
+                                              self.getdataFILEversion())
             if self.getDebug():
                 print("     <---- BeamIO.readBeamDataRecord particle read.")
             

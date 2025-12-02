@@ -140,10 +140,32 @@ class PhysicalConstants(object):
     def getSpecies(cls):
         return cls._Species
 
+    @classmethod
+    def getparticleCHARGE(cls, _Species):
+        particleCHARGE = None
+        if not isinstance(_Species, str):
+            raise badParameter("PhysicalConstants.getParticleCHARGE:", \
+                               " Species " + _Species + " not a string!")
+        if _Species.lower() in PhysicalConstants.getSpecies():
+            if   _Species.lower() == "proton":
+                particleCHARGE = 1.
+            elif _Species.lower() == "pion":
+                particleCHARGE = 1.
+            elif _Species.lower() == "muon":
+                particleCHARGE = 1.
+            elif _Species.lower() == "neutrino":
+                particleCHARGE = 0.
+            elif _Species.lower() == "12c6":
+                particleCHARGE = 6.
+        else:
+            raise badParameter("PhysicalConstants.getParticleCHARGE:", \
+                               "species " + _Species + " not allowed!")
+        return particleCHARGE
+
     def getparticleMASS(self, _Species):
         particleMASS = None
         if not isinstance(_Species, str):
-            raise badParameter("PhysicalConstants.getParticleMASS:", \
+            raise badParameter("PhysicalConstants.getParticleMASS: " \
                                " Species " + _Species + " not a string!")
         if _Species.lower() in PhysicalConstants.getSpecies():
             if   _Species.lower() == "proton":
@@ -157,8 +179,8 @@ class PhysicalConstants(object):
             elif _Species.lower() == "12c6":
                 particleMASS = self.m12c6()
         else:
-            raise badParameter("PhysicalConstants.getParticleMASS: Species " + \
-                               _Species + " not allowed!")
+            raise badParameter("PhysicalConstants.getParticleMASS: " \
+                               "Species " + _Species + " not allowed!")
         return particleMASS
     
     def getparticleLifeTime(self, _Species):

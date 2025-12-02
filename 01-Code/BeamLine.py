@@ -959,6 +959,9 @@ class BeamLine(object):
                 if NewElement:
                     nLnsFQ = 2
                     iLnsFQ = 0
+                    FqL = None
+                    FqS = None
+                    kq  = None
                 iLnsFQ += 1
                 
                 if iLine.Parameter == "Length":
@@ -967,8 +970,6 @@ class BeamLine(object):
                     FqS = float(iLine.Value)
                 elif iLine.Parameter == "kq":
                     kq   = float(iLine.Value)
-                    Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-                    FqS  = kq * Brho
 
                 if iLnsFQ < nLnsFQ:
                     NewElement = False
@@ -981,7 +982,7 @@ class BeamLine(object):
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.FocusQuadrupole(Name, \
-                                    rStrt, vStrt, drStrt, dvStrt, FqL, FqS)
+                                rStrt, vStrt, drStrt, dvStrt, FqL, FqS, kq)
                 cls.addBeamLineElement(iBLE)
                 s += FqL
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
@@ -989,6 +990,9 @@ class BeamLine(object):
                 if NewElement:
                     nLnsDQ = 2
                     iLnsDQ = 0
+                    DqL = None
+                    DqS = None
+                    kq  = None
                 iLnsDQ += 1
                 
                 if iLine.Parameter == "Length":
@@ -997,21 +1001,19 @@ class BeamLine(object):
                     DqS = float(iLine.Value)
                 elif iLine.Parameter == "kq":
                     kq   = float(iLine.Value)
-                    Brho = (1/(speed_of_light*1.E-9))*p0/1000.
-                    DqS  = kq * Brho
-                    
+                
                 if NewElement or iLnsDQ < nLnsDQ:
                     NewElement = False
                     continue
                 else:
                     NewElement = True
-                    
+
                 nDquad += 1
                 Name       = Name + str(nDquad)
                 if cls.getDebug():
                     print("             ----> Add", Name)
                 iBLE = BLE.DefocusQuadrupole(Name, \
-                                    rStrt, vStrt, drStrt, dvStrt, DqL, DqS)
+                                 rStrt, vStrt, drStrt, dvStrt, DqL, DqS, kq)
                 cls.addBeamLineElement(iBLE)
                 s += DqL
                 refPrtclSet = refPrtcl.setReferenceParticle(iBLE)
@@ -1036,7 +1038,7 @@ class BeamLine(object):
                 elif iLine.Parameter == "Turns":
                     SlndT = float(iLine.Value)
                 elif iLine.Parameter == "Strength":
-                    Slndks = float(iLine.Value)
+                    Slndks = float(iLine.Value) / 2.
                 if iLnSlnd < nLnsSlnd:
                     iLnSlnd += 1
                     NewElement = False
@@ -1056,13 +1058,16 @@ class BeamLine(object):
                     B0     = mu0*nTrns*SlndI/SlndL
                 elif iLine.Type == "Length, strength":
                     Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-                    B0 = Slndks * Brho
+                    chrg = PhysCnsts.PhysicalConstants().getparticleCHARGE( \
+                                                       iRefPrtcl.getSpecies())
+                    B0 = Slndks * (2.*Brho) / chrg
                 else:
                     raise badParameter(" BeamLine.addbeam: Solenoid", \
                                        " Type=", iLine.Type, \
                                        " invalid.")
                 if cls.getDebug():
                     print("             ----> Add", Name)
+                print(" Here: Name, B0:", Name, B0)
                 iBLE = BLE.Solenoid(Name, \
                                 rStrt, vStrt, drStrt, dvStrt, SlndL, B0)
                 cls.addBeamLineElement(iBLE)
@@ -1489,7 +1494,6 @@ class BeamLine(object):
         HeaderList = ["Stage", "Section", "Element", "Type", "Parameter", \
 	              "Value", "Unit", "Comment"]
         return HeaderList
-
         
     def writeBeamLine(self, beamlineFILE=None):
         if self.getDebug():
@@ -1512,7 +1516,7 @@ class BeamLine(object):
         
         if self.getDebug():
             print(" <---- BeamLine.writeBeamLine done.")
-
+        
     @classmethod
     def readBeamLine(cls, beamlineFILEinst=None):
         if cls.getDebug():
@@ -1566,7 +1570,8 @@ class BeamLine(object):
                 print("                   Derived class:", derivedCLASS)
 
             if derivedCLASS == "Facility":
-                EoF, p0, VCMVr = BLE.Facility.readElement(beamlineFILEinst)
+                EoF, p0, VCMVr, species0 = \
+                    BLE.Facility.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
             elif derivedCLASS == "Source":
@@ -1624,7 +1629,8 @@ class BeamLine(object):
                 BLE.BeamLineElement.readElement(beamlineFILEinst)
             
             if derivedCLASS == "Facility":
-                instBLE = BLE.Facility(Loc, r, v, dr, dv, p0, VCMVr)
+                instBLE = BLE.Facility(Loc, r, v, dr, dv, \
+                                       p0, VCMVr, species0)
                 if cls.getDebug():
                     print(instBLE)
                 refPrtcl  = \

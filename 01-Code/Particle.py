@@ -139,7 +139,8 @@ recordParticle: i/p: Location, s, z, TraceSpace:
 Created on Mon 03Jul23: Version history:
 ----------------------------------------
  1.0: 12Jun23: First implementation
- 1.1: 21Mar24: Add particle species, can be proton, muon or pion. proton is default 
+ 1.1: 21Mar24: Add particle species, can be proton, muon or pion.
+               proton is default
 
 @author: kennethlong
 """
@@ -156,7 +157,8 @@ import os
 import io
 import sys
 
-import Particle          as Prtcl
+import BeamIO            as bmIO
+#import Particle          as Prtcl
 import BeamLine          as BL
 import BeamLineElement   as BLE
 import PhysicalConstants as PhysCnstnts
@@ -171,7 +173,7 @@ class Particle:
     instances  = []
     __Debug    = False
 
-    stable_species   = {"proton", "neutrino"}
+    stable_species   = {"proton", "neutrino", "12c6"}
     unstable_species = {"pion", "muon"}
             
 #--------  "Built-in methods":
@@ -207,15 +209,17 @@ class Particle:
         try:
             tst = self.getLocation()
         except:
-            print("\n Particle: type:", type(self), \
+            print(" Particle: type:", type(self), \
                   "Particle attributes not yet initialsed.")
             return " <---- Particle parameter dump complete."
             
-        print("\n Particle: ", self.getSpecies(), "  mass: ", \
+        print(" Particle: ", self.getSpecies(), "  mass: ", \
               iPhysclCnstnts.getparticleMASS(self.getSpecies()))
         print(" ---------")
         print("     ----> Debug flag:", self.getDebug())
         print("     ---->    Species:", self.getSpecies())
+        print("     ---->     Charge:", \
+                   iPhysclCnstnts.getparticleCHARGE(self.getSpecies()))
         print("     ----> Number of phase-space records:", \
               len(self.getLocation()))
         if len(self.getLocation()) > 0:
@@ -284,13 +288,13 @@ class Particle:
 
     def setSpecies(self, _Species):
         if not isinstance(_Species, str):
-            raise badParameter("Particle.__init__: Species " + \
+            raise badParameter("Particle.setSpecies: Species " + \
                                _Species + " not a string!")
         if _Species.lower() in iPhysclCnstnts.getSpecies():
             self._Species = _Species.lower()
             pass
         else:
-            raise badParameter("Particle.__init__: Species " + \
+            raise badParameter("Particle.setSpecies: Species " + \
                                _Species + " not allowed!")
 
     def setLocation(self, Location):
@@ -773,7 +777,13 @@ class Particle:
                 """
                 eps = (p - p0) / p0
                 """
-                
+
+                if cls.getDebug():
+                    print("     ----> species, mass:", \
+                          iPrtcl.getSpecies(), particleMASS)
+                    print("     ----> p0, E0, delta, K:", p0, E0, \
+                          iPrtcl.getTraceSpace()[iLoc][5], E)
+
                 xLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][0])
                 xpLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][1])
                 yLoc[iLoc].append(iPrtcl.getTraceSpace()[iLoc][2])
@@ -975,6 +985,18 @@ class Particle:
             raise noFILE( \
                     " Particle.writeParticle: file does not exist.")
 
+        species = self.getSpecies()
+        bversion = bytes(species, 'utf-8')
+        record   = strct.pack(">i", len(species))
+        ParticleFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of species record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        ParticleFILE.write(record)
+        if self.getDebug():
+            print("         ----> Species:", bversion.decode('utf-8'))
+
         nLoc = len(self.getLocation())
         if self.getDebug():
             print("     ----> Number of locations to store:", nLoc)
@@ -1012,7 +1034,7 @@ class Particle:
         
         if CleanAfterWrite:
             Cleaned = self.cleanParticles()
-        
+
     def writeParticleBDSIM(self, ParticleFILE=None, iLoc=1, \
                            CleanAfterWrite=True):
         if self.getDebug():
@@ -1105,7 +1127,7 @@ class Particle:
         return ParticleFILE
 
     @classmethod
-    def readParticle(cls, ParticleFILE=None):
+    def readParticle(cls, ParticleFILE=None, bmIOversion=None):
         if cls.getDebug():
             print("Particle.readParticle starts.")
 
@@ -1113,19 +1135,48 @@ class Particle:
             raise noFILE( \
                     " Particle.readParticle: file does not exist.")
 
+        if cls.getDebug():
+            print("     ----> bmIOversion:", bmIOversion)
+
+        if bmIOversion >= 7:
+            brecord = ParticleFILE.read(4)
+            if brecord == b'':
+                if cls.getDebug():
+                    print(" <---- end of file, return.")
+                return True
+        
+            record = strct.unpack(">i", brecord)
+            nChr   = record[0]
+            if cls.getDebug():
+                print("     ----> Number of characters:", nChr)
+        
+            brecord = ParticleFILE.read(nChr)
+            species = brecord.decode('utf-8')
+            if cls.getDebug():
+                print("     ----> Species:", species)
+
+        else:
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
+            if cls.getDebug():
+                print("     ----> Reference particle species:", \
+                      iRefPrtcl.getSpecies())
+        
         brecord = ParticleFILE.read(4)
         if brecord == b'':
             if cls.getDebug():
                 print(" <---- end of file, return.")
-            return True
-        
+                return True
         record  = strct.unpack(">i", brecord)
         nLoc    = record[0]
+        
         if cls.getDebug():
             print("     ----> Number of locations to read:", nLoc)
         if nLoc > 0:
-            iPrtcl = Particle()
+            iPrtcl = Particle(species)
 
+        if cls.getDebug():
+            print("     ----> Species:", species)
+        
         for iLoc in range(nLoc):
             brecord = ParticleFILE.read(4)
             record  = strct.unpack(">i", brecord)
@@ -1158,7 +1209,7 @@ class Particle:
             print("     <---- Particle instsance")
             print(iPrtcl)
             print(" <---- readParticle done.")
-            
+
         return False        
         
     @classmethod
@@ -1377,6 +1428,8 @@ class ReferenceParticle(Particle):
             muon.__init__(self)
         elif species == "neutrino":
             neutrino.__init__(self)
+        elif species.lower() == "12c6":
+            twelveC6.__init__(self)
         else:
             print(" <---- Species,", species, "not recognised, abort.")
             raise badParameter()
@@ -1827,7 +1880,7 @@ Created on Mon 05Aug25: Version history:
 """
 class UnstableParticle(Particle):
     def __init__(self, species):
-        UnstableSpecies = {"pion", "muon","proton"}
+        UnstableSpecies = {"pion", "muon", "proton"}
 
         if species.lower() in UnstableSpecies:
             super().__init__(species)
@@ -1991,7 +2044,8 @@ class neutrino(Particle):
 #--------  "Built-in methods":
     def __init__(self):
         
-        print(' neutrino(Particle).__init__:', \
+        if self.getDebug():
+            print(' neutrino(Particle).__init__:', \
                   'creating the neutrino object')
 
         neutrino.__instance.append(self)
@@ -2003,3 +2057,26 @@ class neutrino(Particle):
         print("     ----> Type::", type(self))
         
         return
+
+
+class twelveC6(Particle):
+    __instance     = []
+    __Debug      = False
+
+#--------  "Built-in methods":
+    def __init__(self):
+        
+        if self.getDebug():
+            print(' twelveC6(Particle).__init__:', \
+                  'creating the twelveC6 object')
+
+        twelveC6.__instance.append(self)
+        
+        #.. Particle class initialisation:
+        Particle.__init__(self, "12C6")
+        
+        # Only constants; print values that will be used:
+        print("     ----> Type::", type(self))
+        
+        return
+    

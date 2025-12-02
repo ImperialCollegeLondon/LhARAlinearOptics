@@ -184,8 +184,9 @@ class BeamLineElement:
 #-------- Class attributes  --------  --------
 
 #.. List of instances and debug flag
-    instances  = []
-    __Debug    = False
+    instances      = []
+    __Debug        = False
+    __NOdispersion = False
 
 #--------  "Built-in methods":
     def __init__(self, _Name=None, \
@@ -230,6 +231,9 @@ class BeamLineElement:
         print(" ----------------")
         print("     ---->             Debug flag:", \
               BeamLineElement.getDebug())
+        if BeamLineElement.getNOdispersion():
+            print("     ---->            No dispersion flag:", \
+                  BeamLineElement.getNOdispersion())
         print("     ---->                   Name:", self.getName())
         print("     ---->               Position:", self.getrStrt())
         print("     ---->            Orientation: \n", self.getvStrt())
@@ -267,6 +271,10 @@ class BeamLineElement:
         if self.getDebug():
             print(" BeamLineElement.setdebug: ", Debug)
         self.__Debug = Debug
+
+    @classmethod
+    def setNOdispersion(cls, _NOdispersion):
+        cls.__NOdispersion = _NOdispersion
 
     def setAll2None(self):
         self._Name       = None
@@ -436,6 +444,10 @@ class BeamLineElement:
         return cls.__Debug
 
     @classmethod
+    def getNOdispersion(cls):
+        return cls.__NOdispersion
+        
+    @classmethod
     def getinstances(self):
         return self.instances
 
@@ -584,7 +596,6 @@ class BeamLineElement:
         #.. Protect input vector; planning to transform it to coordinate
         #   system referred to beam-line element
         _R = deepcopy(__R)
-        
         if not isinstance(_R, np.ndarray) or np.size(_R) != 6:
             raise badParameter( \
                         " BeamLineElement.Transport: bad input vector:", \
@@ -637,7 +648,7 @@ class BeamLineElement:
             if error > 1.E-6:
                 print(" BeamLineElement.Transport: detTrnsfrMtrx:", \
                       detTrnsfrMtrx)
-            
+
             _Rprime = self.getTransferMatrix().dot(_R)
 
         if self.getDebug():
@@ -1109,11 +1120,11 @@ class Facility(BeamLineElement):
                 _species0 = _species0in
             if not self.validspecies0(_species0):
                 raise badBeamLineElement( \
-                        " Facility: bad species0:"+str(_species0in) \
+                        " Facility: bad species0:" + str(_species0in) \
                                          )
             if len(_p0) != len(_species0):
                 raise badBeamLineElement( \
-            " Facility: length of p0 and species0 the same!" \
+            " Facility: length of p0 and species0 not the same!" \
                                          )
                 
             self.setp0(_p0)
@@ -1168,8 +1179,8 @@ class Facility(BeamLineElement):
         for spcs in spcs0:
             if self.getDebug():
                 print("     ----> Test:", spcs)
-            if not(spcs in Prtcl.Particle.stable_species) and \
-               not(spcs in Prtcl.Particle.unstable_species):
+            if not(spcs.lower() in Prtcl.Particle.stable_species) and \
+               not(spcs.lower() in Prtcl.Particle.unstable_species):
                 success = False
         if self.getDebug():
             print(" <---- Success:", success)
@@ -1220,6 +1231,12 @@ class Facility(BeamLineElement):
     def getLines(self):
         Lines = []
 
+        print(" TimeBomb!  This routine was modified to deal with", \
+              "list of reference particles; need to check it!")
+        x = 1.
+        y = 0.
+        z = x/y
+
         Stage   = 0
         Section = "Facility"
         Element = "Global"
@@ -1233,14 +1250,35 @@ class Facility(BeamLineElement):
 
         Type    = "Reference particle"
         Param   = "Kinetic energy"
-        p0      = self.getp0()
-        E       = mth.sqrt( protonMASS**2 + p0**2)
-        K       = E - protonMASS
-        Value   = K
         Unit    = "MeV"
-        Lines.append([Stage, Section, Element, Type, \
-                      Param, Value, Unit, Comment])
+        idRfPrtcl = 0
+        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances():
+            p0      = self.getp0()[idRfPrtcl]
+            particleMASS = PhysCnst.PhysicalConstants().getparticleMASS( \
+                                        self.getspecies0() )
+            E       = mth.sqrt( particleMASS**2 + p0**2)
+            K       = E - particleMASS
+            Value   = K
+            Lines.append([Stage, Section, Element, Type, \
+                          Param, Value, Unit, Comment])
+            
+            idRfPrtcl += 1
+            Param = Param + str(idRfPrtcl)
 
+        Type    = "Reference particle"
+        Param   = "Species"
+        Unit    = ""
+        idRfPrtcl = 0
+        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances():
+            Value = self.getSpecies()[idRfPrtcl]
+
+            Value   = K
+            Lines.append([Stage, Section, Element, Type, \
+                          Param, Value, Unit, Comment])
+            
+            idRfPrtcl += 1
+            Param = Param + str(idRfPrtcl)
+            
         Type    = "Vacuum chamber"
         Param   = "Mother volume radius"
         VCMVr   = self.getVCMVr()
@@ -1275,6 +1313,18 @@ class Facility(BeamLineElement):
         if self.getDebug():
             print("         ----> p0, VCMVr:", strct.unpack(">2d",record))
 
+        species = self.getspecies0()[0]
+        bversion = bytes(species, 'utf-8')
+        record   = strct.pack(">i", len(species))
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Length of species record:", \
+                  strct.unpack(">i", record))
+        record   = bversion
+        dataFILE.write(record)
+        if self.getDebug():
+            print("         ----> Species:", bversion.decode('utf-8'))
+        
         BeamLineElement.writeElement(self, dataFILE)
         
         if self.getDebug():
@@ -1287,7 +1337,8 @@ class Facility(BeamLineElement):
 
         dataFILE = dataFILEinst.getdataFILE()
 
-        EoF = False
+        EoF      = False
+        species0 = "proton"
 
         brecord = dataFILE.read((2*8))
         if brecord == b'':
@@ -1296,11 +1347,34 @@ class Facility(BeamLineElement):
         record  = strct.unpack(">2d", brecord)
         p0      = float(record[0])
         VCMVr   = float(record[1])
-        
-        if cls.getDebug():
-            print("     ----> p0, VCMVr:", p0, VCMVr)
 
-        return EoF, p0, VCMVr
+        if cls.getDebug():
+            print("     ----> Data file version:", \
+                  dataFILEinst.getdataFILEversion())
+        if dataFILEinst.getdataFILEversion() < 7:
+            if cls.getDebug():
+                print("     ----> p0, VCMVr, species0:", \
+                      p0, VCMVr, species0)
+            return EoF, p0, VCMVr, species0
+        
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+                return True, p0, VCMVr, species0
+
+        record = strct.unpack(">i", brecord)
+        nChr   = record[0]
+        if cls.getDebug():
+            print("     ----> Number of characters:", nChr)
+        
+        brecord = dataFILE.read(nChr)
+        species0 = brecord.decode('utf-8')
+            
+        if cls.getDebug():
+            print(" <---- p0, VCMVr:", p0, VCMVr, species0)
+
+        return EoF, p0, VCMVr, species0
         
         
 """
@@ -2126,6 +2200,8 @@ class FocusQuadrupole(BeamLineElement):
         self._kFQ = _kFQ
 
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
@@ -2156,11 +2232,13 @@ class FocusQuadrupole(BeamLineElement):
         if self.getFQmode() == 1:
             D = mth.sqrt(1. + 2.*_R[5]/b0 + _R[5]**2)
         else:
+            particleMASS = PhysCnst.PhysicalConstants().getparticleMASS(   \
+                                                   iRefPrtcl.getSpecies() )
             E   = E0 + _R[5]*p0
-            p   = mth.sqrt(E**2 - protonMASS**2)
+            p   = mth.sqrt(E**2 - particleMASS**2)
             if p > 0:
                 Scl = p0 / p
-        
+
         if self.getDebug():
             print("     ----> D:", D)
             print("     ----> E, p, Scl:", E, p, Scl)
@@ -2231,7 +2309,9 @@ class FocusQuadrupole(BeamLineElement):
             print("         ----> p0:", p0)
 
         Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-        kFQ  = self.getStrength() / Brho
+        kFQ  = self.getStrength() / Brho * \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                                   iRefPrtcl.getSpecies() )
 
         if self.getDebug():
             print("     <---- kFQ:", kFQ)
@@ -2604,7 +2684,8 @@ class DefocusQuadrupole(BeamLineElement):
         self.setDQmode(0)
         
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+        BeamLineElement.__init__(self, _Name, \
+                                 _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Length, float):
             raise badBeamLineElement("DefocusQuadrupole:",\
@@ -2696,6 +2777,8 @@ class DefocusQuadrupole(BeamLineElement):
         self._kDQ = _kDQ
 
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
@@ -2727,7 +2810,9 @@ class DefocusQuadrupole(BeamLineElement):
             D = mth.sqrt(1. + 2.*_R[5]/b0 + _R[5]**2)
         else:
             E   = E0 + _R[5]*p0
-            p   = mth.sqrt(E**2 - protonMASS**2)
+            particleMASS = PhysCnst.PhysicalConstants().getparticleMASS(   \
+                                                   iRefPrtcl.getSpecies() )
+            p   = mth.sqrt(E**2 - particleMASS**2)
             if p > 0:
                 Scl = p0 / p
         
@@ -2801,7 +2886,9 @@ class DefocusQuadrupole(BeamLineElement):
             print("         ----> p0:", p0)
 
         Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-        kDQ  = self.getStrength() / Brho
+        kDQ  = self.getStrength() / Brho * \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                                   iRefPrtcl.getSpecies() )
 
         if self.getDebug():
             print("     <---- kDQ:", kDQ)
@@ -2827,7 +2914,9 @@ class DefocusQuadrupole(BeamLineElement):
             print("         ----> p0:", p0)
 
         Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-        Strn = self.getkDQ() * Brho
+        Strn = self.getkDQ() * Brho  / \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                                   iRefPrtcl.getSpecies() )
 
         if self.getDebug():
             print("     <---- Strength:", Strn)
@@ -3158,7 +3247,8 @@ class SectorDipole(BeamLineElement):
         SectorDipole.instances.append(self)
 
         # BeamLineElement class initialization:
-        BeamLineElement.__init__(self, _Name, _rStrt, _vStrt, _drStrt, _dvStrt)
+        BeamLineElement.__init__(self, _Name, \
+                                 _rStrt, _vStrt, _drStrt, _dvStrt)
 
         if not isinstance(_Angle, float):
             raise badBeamLineElement( \
@@ -3349,7 +3439,7 @@ class SectorDipole(BeamLineElement):
                   iRefPrtcl.getPrIn()[0])
             print("         ----> p0:", p0)
         
-        Brho = (1/(speed_of_light*1.E-9))*p0/1000.
+        Brho = (1./(speed_of_light*1.E-9))*p0/1000.
         r    = Brho / self.getB()
         l    = r * self.getAngle()
 
@@ -3359,6 +3449,8 @@ class SectorDipole(BeamLineElement):
         self._Length = l
 
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
@@ -3376,16 +3468,20 @@ class SectorDipole(BeamLineElement):
             print(" Dipole(BeamLineElement).setTransferMatrix:")
             print("     ----> Reference particle 4-mmtm:", \
                   iRefPrtcl.getPrIn()[0])
+            print("     ----> NOdispersion:", \
+                  BeamLineElement.getNOdispersion())
             print("         ----> p0, E0:", p0, E0)
             print("     <---- b02, g02:", b02, g02)
         
         E    = E0 + p0*_R[5]
-        p    = mth.sqrt(E**2 - protonMASS**2)
+        particleMASS = PhysCnst.PhysicalConstants().getparticleMASS(   \
+                                               iRefPrtcl.getSpecies() )
+        p    = mth.sqrt(E**2 - particleMASS**2)
         
         if self.getDebug():
             print("     ----> Particle energy and mmtm:", E, p)
 
-        Brho = (1/(speed_of_light*1.E-9))*p/1000.
+        Brho = (1./(speed_of_light*1.E-9))*p/1000.
         r    = Brho / self.getB()
         c    = np.cos(self.getAngle())
         s    = np.sin(self.getAngle())
@@ -3537,6 +3633,8 @@ class Octupole(BeamLineElement):
         self._Length = _Length
 
     def setTransferMatrix(self):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         l = self._Length
 
         TrnsMtrx = np.array([
@@ -3633,7 +3731,6 @@ class Solenoid(BeamLineElement):
     def __init__(self, _Name=None, \
                  _rStrt=None, _vStrt=None, _drStrt=None, _dvStrt=None, \
                  _Length=None, _Strength=None, _ksol=None):
-
         if self.getDebug():
             print(" Solenoid.__init__:", \
                   " creating the Solenoid object: Length=", _Length, " m,"\
@@ -3727,6 +3824,8 @@ class Solenoid(BeamLineElement):
         self._ksol = _ksol
 
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
@@ -3736,6 +3835,7 @@ class Solenoid(BeamLineElement):
         p0        = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
                                     iRefPrtcl.getPrOut()[iPrev][:3]))
         E0        = iRefPrtcl.getPrOut()[iPrev][3]
+
         b02       = (p0/E0)**2
         g02       = 1./(1.-b02)
         
@@ -3752,14 +3852,16 @@ class Solenoid(BeamLineElement):
                 print("     ----> Trace space:", _R)
 
         E    = E0 + p0*_R[5]
-        p    = mth.sqrt(E**2 - protonMASS**2)
+        particleMASS = PhysCnst.PhysicalConstants().getparticleMASS(   \
+                                               iRefPrtcl.getSpecies() )
+        p    = mth.sqrt(E**2 - particleMASS**2)
         
         if self.getDebug():
             print("     ----> Particle energy and mmtm:", E, p)
 
         Brho = (1./(speed_of_light*1.E-9))*p/1000.
         l  = self.getLength()
-        k  = self.getStrength() / (2.*Brho)
+        k  = self.getksol() * p0 / p
         
         ckl  = mth.cos(k*l)
         skl  = mth.sin(k*l)
@@ -3803,8 +3905,8 @@ class Solenoid(BeamLineElement):
         if CoordSys == "RPLC":
             if self.getDebug():
                 print("     ----> RPLC:")
-                
-            iRefPrtcl = Prtcl.ReferenceParticle.getinstances("All")
+
+            iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             iAddr     = iRefPrtcl.getLocation().index(self.getName())
             sStrt = iRefPrtcl.gets()[iAddr-1]
             if self.getDebug():
@@ -3881,8 +3983,12 @@ class Solenoid(BeamLineElement):
             print("         ----> p0:", p0)
 
         Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-        ksol  = self.getStrength() / Brho
+        if self.getDebug():
+            print("         ----> Brho, B:", Brho, self.getStrength())
 
+        ksol  = self.getStrength() / (2. * Brho) * \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                                   iRefPrtcl.getSpecies() )
         if self.getDebug():
             print("     <---- ksol:", ksol)
             print(" <---- Done.")
@@ -3907,7 +4013,7 @@ class Solenoid(BeamLineElement):
             print("         ----> p0:", p0)
 
         Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-        Strn = self.getksol() * Brho
+        Strn = self.getksol() * 2. * Brho
 
         if self.getDebug():
             print("     <---- Strength:", Strn)
@@ -4232,6 +4338,8 @@ class GaborLens(BeamLineElement):
             print(" <---- Electron density:", self.getElectronDensity())
             
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
         if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
             raise ReferenceParticleNotSpecified()
@@ -4258,8 +4366,10 @@ class GaborLens(BeamLineElement):
                 print("     ----> Trace space:", _R)
 
         E = E0 + p0*_R[5]
-        p = mth.sqrt(E**2 - protonMASS**2)
-        g = E / protonMASS  
+        particleMASS = PhysCnst.PhysicalConstants().getparticleMASS(   \
+                                               iRefPrtcl.getSpecies() )
+        p = mth.sqrt(E**2 - particleMASS**2)
+        g = E / particleMASS  
         
         if self.getDebug():
             print("     ----> Particle energy and mmtm:", E, p)
@@ -4273,9 +4383,11 @@ class GaborLens(BeamLineElement):
             print("     ----> Joule2MeV:", Joule2MeV)
             print("     ----> m2InvMeV:", m2InvMeV)
 
-        k      = (electricCHARGE**2 * protonMASS * g) / \
+        k      = (electricCHARGE**2 * particleMASS * g) / \
                  (2.*epsilon0 * p**2) * \
-                 ne /m2InvMeV
+                 ne /m2InvMeV * \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                                   iRefPrtcl.getSpecies() )
         w      = mth.sqrt(k)
         if self.getDebug():
             print("     ----> k, w:", k, w)
@@ -4602,7 +4714,9 @@ class CylindricalRFCavity(BeamLineElement):
         _V0 = self.getLength()*self.getGradient()*self.getTransitTimeFactor()
         self.setV0(_V0)
 
-        _alpha = self.getV0()/iRefPrtcl.getMomentumIn(iPrev)/1000.
+        _alpha = self.getV0()/iRefPrtcl.getMomentumIn(iPrev)/1000. * \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                                   iRefPrtcl.getSpecies() )
         self.setalpha(_alpha)
 
         _wperp = self.getWaveNumber()*mth.sqrt( \
@@ -5977,15 +6091,17 @@ class Source(BeamLineElement):
                   x, y, K, cTheta, Phi)
             
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
+        particleMASS = PhysCnst.PhysicalConstants().getparticleMASS(   \
+                                            iRefPrtcl.getSpecies() )
         p0        = iRefPrtcl.getMomentumIn(0)
-        E0        = mth.sqrt( protonMASS**2 + p0**2)
+        E0        = mth.sqrt( particleMASS**2 + p0**2)
         b0        = p0/E0
         if self.getDebug():
             print("     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, \
-                  "(", E0-protonMASS, ")")
+                  "(", E0-particleMASS, ")")
 
-        E = protonMASS+K
-        p = mth.sqrt(E**2 - protonMASS**2)
+        E = particleMASS+K
+        p = mth.sqrt(E**2 - particleMASS**2)
         if self.getDebug():
             print("     ----> K, E, p:", K, E, p)
 
@@ -6609,6 +6725,8 @@ class QuadDoublet(BeamLineElement):
         self._iQ2 = iQ2
             
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         
         if self.getDebug():
             print(" QuadDoublet(BeamLineElement).setTransferMatrix:")
@@ -7004,6 +7122,8 @@ class QuadTriplet(BeamLineElement):
         self._iQ3 = iQ3
             
     def setTransferMatrix(self, _R):
+        if BeamLineElement.getNOdispersion():
+            _R = np.array([0., 0., 0., 0., 0., 0.])
         
         if self.getDebug():
             print(" QuadTriplet(BeamLineElement).setTransferMatrix:")
