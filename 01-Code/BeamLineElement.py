@@ -4293,6 +4293,8 @@ class GaborLens(BeamLineElement):
         self._Strength = _Strength
 
     def setElectronDensity(self):
+        if self.getDebug():
+            print(" GaborLens(BeamLineElement).setElectronDensity:")
         if isinstance(self.getStrength(), float):
             iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
             if not isinstance(iRefPrtcl, Prtcl.ReferenceParticle):
@@ -4309,6 +4311,9 @@ class GaborLens(BeamLineElement):
             Brho = (1./(speed_of_light*1.E-9))*p0/1000.
             B0 = self.getStrength()
             # Bug: Will Shields; remove * 2.*Brho <---- 06Mar24
+            if self.getDebug():
+                print("     ----> epsilon0SI, B0, protonMASSSI, g0:", \
+                      epsilon0SI, B0, protonMASSSI, g0)
             ne = epsilon0SI * B0**2 / (2.*protonMASSSI*g0)
 
             ne_trans = ne
@@ -4328,9 +4333,7 @@ class GaborLens(BeamLineElement):
                  (1. + 2.*mth.log(self.getRA()/self.getRp())) \
                                                  )
         if self.getDebug():
-            print(" GaborLens(BeamLineElement).setElectronDensity:")
-            print("     ----> ne_trans:", ne_trans)
-            print("     ----> ne_longi:", ne_longi)
+            print("     <---- ne_trans, ne_longi:", ne_trans, ne_longi)
 
         self._ElectronDensity = min(ne_trans, ne_longi)
         

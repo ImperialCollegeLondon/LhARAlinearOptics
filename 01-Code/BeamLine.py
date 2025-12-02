@@ -1102,7 +1102,9 @@ class BeamLine(object):
                 Name  += str(nGbrLns)
                 if iLine.Type == "Length, strength":
                     Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-                    B0 = GbrLnsks * Brho
+                    chrg = PhysCnsts.PhysicalConstants().getparticleCHARGE( \
+                                                       iRefPrtcl.getSpecies())
+                    B0 = GbrLnsks * Brho / chrg
                 else:
                     raise badParameter(" BeamLine.addbeam: Gabor lens", \
                                        " Type=", iLine.Type, \
