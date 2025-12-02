@@ -92,6 +92,7 @@ def main(argv):
     print("         ----> Read data file:")
     while not EndOfFile:
         EndOfFile = ibmIOr.readBeamDataRecord()
+    
         if not EndOfFile:
             iEvt += 1
             if (iEvt % Scl) == 0:
