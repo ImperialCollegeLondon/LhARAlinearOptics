@@ -264,6 +264,8 @@ class PhysicalConstants(object):
     def m2InvMeV(self):
         return 5067730717679.4
 
+    def kginMeV(self):
+        return 5.609588603E29
 
 #--------  Utilities:
 

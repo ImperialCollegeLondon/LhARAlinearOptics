@@ -4303,18 +4303,25 @@ class GaborLens(BeamLineElement):
             iPrev = len(iRefPrtcl.getPrOut()) - 1
             p0    = mth.sqrt(np.dot(iRefPrtcl.getPrOut()[iPrev][:3], \
                                     iRefPrtcl.getPrOut()[iPrev][:3]))
-            E0    = iRefPrtcl.getPrOut()[iPrev][3]
-            b02   = (p0/E0)**2
+
+            Brho = (1./(speed_of_light*1.E-9))*p0/1000.
+            Rgty = p0 / constants_instance.getparticleCHARGE(
+                                                iRefPrtcl.getSpecies())
+            if self.getDebug():
+                print("     ----> Brho, Rgty:", Brho, Rgty)
+
+            E0    = mth.sqrt(Rgty**2 + protonMASS**2)
+            b02   = (Rgty/E0)**2
             g02   = 1./(1.-b02)
             g0    = mth.sqrt(g02)
             
-            Brho = (1./(speed_of_light*1.E-9))*p0/1000.
             B0 = self.getStrength()
             # Bug: Will Shields; remove * 2.*Brho <---- 06Mar24
             if self.getDebug():
                 print("     ----> epsilon0SI, B0, protonMASSSI, g0:", \
                       epsilon0SI, B0, protonMASSSI, g0)
-            ne = epsilon0SI * B0**2 / (2.*protonMASSSI*g0)
+            ne = epsilon0SI * B0**2 * mth.sqrt(b02) / (2.*Rgty) * \
+                constants_instance.kginMeV()
 
             ne_trans = ne
             ne_longi = ne
@@ -4379,6 +4386,8 @@ class GaborLens(BeamLineElement):
 
         l      = self.getLength()
         ne     = self.getElectronDensity()
+        if self.getDebug():
+            print("     ----> l, ne:", l, ne)
 
         if self.getDebug():
             print("     ----> alpha, electricCHARGE, epsilon0:", \
@@ -7645,6 +7654,13 @@ class RPLCswitch(BeamLineElement):
         if self.OutsideBeamPipe(_R) or \
            self.ExpansionParameterFail(_R) or \
            abs(_R[4]) > 2.5:
+            if abs(_R[4]) < 2.5:
+                print(" RPLCswitch.Transport:       outside beam pipe:", \
+                                         self.OutsideBeamPipe(_R), "\n", \
+                      "                       expansion paramter fail:", \
+                                  self.ExpansionParameterFail(_R), "\n", \
+                      "                                 TraceSpace[4]:", \
+                                                                _R[4]    )
             _Rprime = None
         else:
             if self.get3Drotation():
