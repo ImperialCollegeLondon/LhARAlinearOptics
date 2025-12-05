@@ -3440,7 +3440,9 @@ class SectorDipole(BeamLineElement):
             print("         ----> p0:", p0)
         
         Brho = (1./(speed_of_light*1.E-9))*p0/1000.
-        r    = Brho / self.getB()
+        r    = Brho / self.getB() / \
+            PhysCnst.PhysicalConstants().getparticleCHARGE(   \
+                                               iRefPrtcl.getSpecies())
         l    = r * self.getAngle()
 
         if self.getDebug():

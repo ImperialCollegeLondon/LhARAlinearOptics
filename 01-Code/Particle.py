@@ -1157,9 +1157,10 @@ class Particle:
 
         else:
             iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
+            species   = iRefPrtcl.getSpecies()
             if cls.getDebug():
                 print("     ----> Reference particle species:", \
-                      iRefPrtcl.getSpecies())
+                      species)
         
         brecord = ParticleFILE.read(4)
         if brecord == b'':
