@@ -17,6 +17,8 @@ import numpy as np
 import math as mt
 
 import pionDECAY as pd
+
+import Particle   as Prtcl
 import Simulation as Simu
 import PhysicalConstants as physCNST
 
@@ -27,17 +29,19 @@ print("========  pionDECAY: tests start  ========")
 pionDECAYTest = 1
 print()
 print(" pionDECAYTest:", pionDECAYTest, \
-      " Create pion decay, print quantities.")
+      " Pion, print quantities.")
 try:
-    pd.pionDECAY.setDebug("String")
+    Prtcl.pion.setDebug("String")
 except:
     pass
-pd.pionDECAY.setDebug(True)
-Dcy=pd.pionDECAY()
-print("    __str__:", Dcy)
-print("    --repr__", repr(Dcy))
-pd.pionDECAY.setDebug(False)
-del Dcy
+Prtcl.ReferenceParticle("pion")
+Prtcl.pion.setDebug(True)
+pion=Prtcl.pion()
+print("    __str__:", pion)
+print("    --repr__", repr(pion))
+Prtcl.pion.setDebug(False)
+del pion
+exit()
 
 ##! Create instance, test dynamic methods:
 pionDECAYTest = 2

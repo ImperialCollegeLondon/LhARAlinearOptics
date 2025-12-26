@@ -2004,9 +2004,17 @@ class pion(Particle):
         # Only constants; print values that will be used:
         if self.getDebug():
             print("     ----> pion lifetime:", lifetime, "s")
-            print(" <---- remaining lifetime:", self.getRemainingLifetime())
+            print("   <---- remaining lifetime:", self.getRemainingLifetime())
+            print(' pion(Particle).__init__: done.')
 
         return
+
+    def __repr__(self):
+        return "pion()"
+
+    def __str__(self):
+        self.print()
+        return " pion __str__ done."
 
 
 class muon(Particle):
@@ -2033,7 +2041,7 @@ class muon(Particle):
         # Only constants; print values that will be used:
         if self.getDebug():
             print("     ----> muon lifetime:", lifetime, "s")
-            print(" <---- remaining lifetime:", self.getRemainingLifetime())
+            print("   <---- remaining lifetime:", self.getRemainingLifetime())
 
         return
 
