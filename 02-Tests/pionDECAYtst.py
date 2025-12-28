@@ -12,6 +12,7 @@ Test script for "pionDECAY" class
 
 """
 
+from pylorentz import Momentum4 as mmtm4
 import matplotlib.pyplot as plt
 import numpy as np
 import math as mt
@@ -82,6 +83,20 @@ Enumu     = np.array([])
 cosTheta  = np.array([])
 phi       = np.array([])
 s = 0.
+
+mupLX     = np.array([])
+mupLY     = np.array([])
+mupLZ     = np.array([])
+mupRX     = np.array([])
+mupRY     = np.array([])
+mupRZ     = np.array([])
+
+#.. set pion energy and momentum:
+Epi = 8000.
+Ppi = mt.sqrt(Epi**2 - iPC.mPion()**2)
+pionL = mmtm4(Epi, 0., 0., Ppi)
+print("     ----> pion 4 momentum:", pionL)
+printBOOSTchk = False
 for ipion in pion:
     t      = np.append(t,     ipion.getRemainingLifetime())
     Emu    = np.append(Emu,   ipion.getDECAY().getvmu()[0])
@@ -94,7 +109,37 @@ for ipion in pion:
     
     phi = np.append(phi,     mt.atan2(p_mu[1],p_mu[0]))
     cosTheta = np.append(cosTheta,     p_mu[2]/mag_mu)
-                    
+
+    muonR = mmtm4(ipion.getDECAY().getvmu()[0], \
+                  ipion.getDECAY().getvmu()[1], \
+                  ipion.getDECAY().getvmu()[2], \
+                  ipion.getDECAY().getvmu()[3])
+
+    muonL = muonR.boost_particle(pionL)
+    
+    if not printBOOSTchk:
+        print("         ----> muon 4 momentum in pion rest frame, mass:", \
+              muonR, muonR.m)
+        print("         ----> muon 4 momentum in      lab  frame, mass:", \
+              muonL, muonL.m)
+        pionL1 = mmtm4(Epi, 0., 0., -Ppi)
+        pionR  = pionL.boost_particle(pionL1)
+        print("         ----> pion 4 momentum in pion rest frame, mass:", \
+              pionR, pionR.m)
+        muonR1 = muonL.boost_particle(pionL1)
+        print("         ----> muon 4 momentum in pion rest frame, mass:", \
+              muonR1, muonR1.m)
+        printBOOSTchk = True
+
+    mupLX = np.append(mupLX, muonL[1])
+    mupLY = np.append(mupLY, muonL[2])
+    mupLZ = np.append(mupLZ, muonL[3])
+    
+    mupRX = np.append(mupRX, muonR[1])
+    mupRY = np.append(mupRY, muonR[2])
+    mupRZ = np.append(mupRZ, muonR[3])
+
+    
 #-- Lifetime distribution:
 n, bins, patches = plt.hist(t, bins=100, color='y', log=True)
 plt.xlabel('Time (s)')
@@ -135,6 +180,35 @@ plt.xlabel('Cos(theta)')
 plt.ylabel('Frequency')
 plt.title('Muon cos(theta) distribution')
 plt.savefig('99-Scratch/pionPLOT5.pdf')
+plt.close()
+
+#-- Muon distributions:
+h, xedges, yedges, image = plt.hist2d(mupLX, mupLY, bins=50)
+plt.xlabel('pmuX')
+plt.ylabel('pmuY')
+plt.title('muon transverse momentum laboratory')
+plt.savefig('99-Scratch/pionPLOT6.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(mupLZ, bins=50, color='y')
+plt.xlabel('pmuZ')
+plt.ylabel('Frequency')
+plt.title('Muon longitudinal momentum distribution laboratory')
+plt.savefig('99-Scratch/pionPLOT7.pdf')
+plt.close()
+
+h, xedges, yedges, image = plt.hist2d(mupRX, mupRY, bins=50)
+plt.xlabel('pmuX')
+plt.ylabel('pmuY')
+plt.title('muon transverse momentum pion rest frame')
+plt.savefig('99-Scratch/pionPLOT8.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(mupRZ, bins=50, color='y')
+plt.xlabel('pmuZ')
+plt.ylabel('Frequency')
+plt.title('Muon longitudinal momentum distribution pion rest frame')
+plt.savefig('99-Scratch/pionPLOT9.pdf')
 plt.close()
 
 ##! Complete:
