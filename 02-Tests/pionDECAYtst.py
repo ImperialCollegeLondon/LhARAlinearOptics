@@ -24,6 +24,7 @@ import PhysicalConstants as physCNST
 
 ##! Start:
 print("========  pionDECAY: tests start  ========")
+Prtcl.ReferenceParticle("pion")
 
 ##! Create instance, test built-in methods:
 pionDECAYTest = 1
@@ -34,14 +35,9 @@ try:
     Prtcl.pion.setDebug("String")
 except:
     pass
-Prtcl.ReferenceParticle("pion")
-Prtcl.pion.setDebug(True)
 pion=Prtcl.pion()
 print("    __str__:", pion)
 print("    --repr__", repr(pion))
-Prtcl.pion.setDebug(False)
-del pion
-exit()
 
 ##! Create instance, test dynamic methods:
 pionDECAYTest = 2
@@ -49,24 +45,31 @@ print()
 print("pionDECAYTest:", pionDECAYTest, \
       " Create pion decay, print quantities.")
 Dcy=pd.pionDECAY()
-print("     _Lifetime:", Dcy.getLifetime())
 print("         _v_mu:", Dcy.getvmu())
 print("       _v_numu:", Dcy.getvnumu())
 iPC = physCNST.PhysicalConstants()
 SumE = Dcy.getvmu()[0] + Dcy.getvnumu()[0]
 DifE = SumE - iPC.mPion()
 print("    Sum energy:", SumE, "; difference to muon mass:", DifE)
+pion.setDECAY(Dcy)
+print("     ---> Print decay for this pion:")
+print(pion.getDECAY())
+
+del pion
 del Dcy
 
 ##! Soak test, generate many decays:
 pionDECAYTest = 3
 print()
 print("pionDECAYTest:", pionDECAYTest, " Create many decays.")
-Dcy = []
+pion = []
 for i in range(100000):
-    Dcy.append(pd.pionDECAY())
+    pn = Prtcl.pion()
+    pn.setDECAY(pd.pionDECAY())
+    pion.append(pn)
 for i in range(5):
-    print(Dcy[i])
+    print(pion[i].getDECAY())
+
 
 ##! Plot result of soak test:
 pionDECAYTest = 4
@@ -79,13 +82,13 @@ Enumu     = np.array([])
 cosTheta  = np.array([])
 phi       = np.array([])
 s = 0.
-for piDcy in Dcy:
-    t      = np.append(t,     piDcy.getLifetime())
-    Emu    = np.append(Emu,   piDcy.getvmu()[0])
-    Enumu  = np.append(Enumu, piDcy.getvnumu()[0])
+for ipion in pion:
+    t      = np.append(t,     ipion.getRemainingLifetime())
+    Emu    = np.append(Emu,   ipion.getDECAY().getvmu()[0])
+    Enumu  = np.append(Enumu, ipion.getDECAY().getvnumu()[0])
 
-    p_mu   = piDcy.getvmu()[1:]
-    p_numu = piDcy.getvnumu()[1:]
+    p_mu   = ipion.getDECAY().getvmu()[1:]
+    p_numu = ipion.getDECAY().getvnumu()[1:]
 
     mag_mu    = np.linalg.norm(p_mu)
     

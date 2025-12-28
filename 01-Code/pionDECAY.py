@@ -16,7 +16,6 @@ Class pionDECAY:
       
   Instance attributes:
   --------------------
-  _Lifetime : Time to decay (s).  This is for "this particular pion"
   _v_numu   : Muon-neutrino 4-vector (E, array(px, py, pz)); MeV
   _v_mu     : Muon 4-vector (E, array(px, py, pz)); MeV
   _costheta : Cosine of angle between the pion and the decay muon in the
@@ -77,20 +76,14 @@ iPC = PC.PhysicalConstants()
 
 class pionDECAY:
 
-    __Debug = True
+    __Debug = False
     
 #--------  "Built-in methods":
-    def __init__(self, **kwargs):
-
-        Tmax = kwargs.get('Tmax', float('inf'))
-        ppi = kwargs.get('ppi', 8.00)
+    def __init__(self):
 
         if self.getDebug():
-            print(" pionDecay.__init__ starts: Tmax, ppi:", \
-                  Tmax, ppi)
+            print(" pionDecay.__init__ starts:")
         
-        self.setLifetime(self.GenerateLifetime(Tmax=Tmax))
-
         v_mu, v_numu, costheta, phi = self.decaypion()
 
         if self.getDebug():
@@ -112,20 +105,19 @@ class pionDECAY:
         return "pionDECAY()"
 
     def __str__(self):
-        return " pionDECAY: Lifetime=%g, \r\n \
-               v_mu=(%g, [%g, %g, %g]), \r\n \
-              v_numu=(%g, [%g, %g, %g]),      \
-               " % (self.getLifetime(),                    \
-                   self.getvmu()[0], self.getvmu()[1],     \
-                   self.getvmu()[2], self.getvmu()[3],     \
-                   self.getvnumu()[0], self.getvnumu()[1],   \
-                   self.getvnumu()[2], self.getvnumu()[3])
+        return " pionDECAY: v_mu=(%g, [%g, %g, %g]), \r\n \
+         v_numu=(%g, [%g, %g, %g])" %                       \
+                   (self.getvmu()[0], self.getvmu()[1],     \
+                    self.getvmu()[2], self.getvmu()[3],     \
+                    self.getvnumu()[0], self.getvnumu()[1], \
+                    self.getvnumu()[2], self.getvnumu()[3])
 
     
 #--------  "Dynamic methods"; individual lifetime, energies, and angles
 
     #..  Lifetime
-    def GenerateLifetime(self, **kwargs):
+    @staticmethod
+    def GenerateLifetime(**kwargs):
         Tmax = kwargs.get('Tmax', float('inf'))
         Gmx = 1. - mth.exp( -Tmax / iPC.tauPion() )
         ran = Simu.getRandom() * Gmx
@@ -214,16 +206,6 @@ class pionDECAY:
         if cls.getDebug():
             print(" pionDECAY.setDebug:", cls.getDebug())
 
-    def setLifetime(self, _Lifetime):
-        if not isinstance(_Lifetime, float):
-            raise badPARAMETER(" pionDECAY.setLifetime:" + \
-                               str(_Lifetime) + \
-                               " not float, exit.")
-        self._Lifetime = _Lifetime
-
-        if self.getDebug():
-            print(" pionDECAY.setLifetime:", self.getLifetime())
-
     def setvmu(self, _vmu):
         if not isinstance(_vmu, np.ndarray):
             raise badPARAMETER(" pionDECAY.setvmu:" + \
@@ -270,9 +252,6 @@ class pionDECAY:
     @classmethod
     def getDebug(cls):
         return cls.__Debug
-
-    def getLifetime(self):
-        return self._Lifetime
 
     def getvmu(self):
         return deepcopy(self._vmu)

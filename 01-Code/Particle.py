@@ -158,7 +158,7 @@ import io
 import sys
 
 import BeamIO            as bmIO
-#import Particle          as Prtcl
+import pionDECAY         as pionDCY
 import BeamLine          as BL
 import BeamLineElement   as BLE
 import PhysicalConstants as PhysCnstnts
@@ -264,7 +264,11 @@ class Particle:
     def setDebug(cls, Debug=False):
         if cls.__Debug:
             print(" Particle.setDebug: ", Debug)
-        cls.__Debug = Debug
+
+        if isinstance(Debug, bool):
+            cls.__Debug = Debug
+        else:
+            raise badArgument()
 
     @classmethod
     def resetParticleInstances(cls):
@@ -282,6 +286,7 @@ class Particle:
         self._PhsSpc            = []
         self._LabPhsSpc         = []
         self._RemainingLifetime = mth.inf
+        self._Decay             = None
 
     def setRemainingLifetime(self, _RemainingLifetime):
         self._RemainingLifetime = _RemainingLifetime
@@ -359,6 +364,13 @@ class Particle:
             Success = self.setTraceSpace(TraceSpace)
         return Success
 
+    def setDECAY(self, _Decay):
+
+        if isinstance(_Decay, pionDCY.pionDECAY):
+            self._Decay = _Decay
+        else:
+            raise badDECAY()
+
     
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
@@ -371,9 +383,6 @@ class Particle:
     def getinstances(cls):
         return cls.instances
 
-    def getRemainingLifetime(self):
-        return self._RemainingLifetime
-    
     def getSpecies(self):
         return self._Species
             
@@ -395,7 +404,13 @@ class Particle:
     def getLabPhaseSpace(self):
         return deepcopy(self._LabPhsSpc)
 
-            
+    def getRemainingLifetime(self):
+        return self._RemainingLifetime
+    
+    def getDECAY(self):
+        return self._Decay
+
+    
 #--------  Processing methods:
     @staticmethod
     def createParticle():
@@ -1958,6 +1973,9 @@ class secondReferenceParticle(Exception):
 class fail2setReferenceParticle(Exception):
     pass
 
+class badDECAY(Exception):
+    pass
+
 
 class proton(Particle):
     __instance     = []
@@ -1994,15 +2012,17 @@ class pion(Particle):
         #.. Particle class initialisation:
         Particle.__init__(self, "pion")
 
-        iPhysCnstnts = PhysCnstnts.PhysicalConstants()
-        lifetime     = iPhysCnstnts.tauPion()
+        lifetime     = iPhysclCnstnts.tauPion()
         
-        RemainingLifetime = -lifetime * mth.log(1. - rnd.random())
-        #np.random.exponential(lifetime)
+        RemainingLifetime = pionDCY.pionDECAY.GenerateLifetime( \
+                                                      Tmax=float('inf'))
         self.setRemainingLifetime(RemainingLifetime)
         
         # Only constants; print values that will be used:
         if self.getDebug():
+            x = 1
+            y = 0
+            z = x/y
             print("     ----> pion lifetime:", lifetime, "s")
             print("   <---- remaining lifetime:", self.getRemainingLifetime())
             print(' pion(Particle).__init__: done.')
@@ -2015,7 +2035,6 @@ class pion(Particle):
     def __str__(self):
         self.print()
         return " pion __str__ done."
-
 
 class muon(Particle):
     __instance     = []
