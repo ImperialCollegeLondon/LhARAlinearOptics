@@ -7,7 +7,7 @@
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
 1,Source,Source,Uniform disc,SourceMode,4,,Uniform disc
 1,Source,Source,Uniform disc,MeanEnergy,6000,MeV,
-1,Source,Source,Uniform disc,SigmaEnergy,1,MeV,
+1,Source,Source,Uniform disc,SigmaEnergy,600,MeV,
 1,Source,Source,Uniform disc,Radius,0.001,m,
 2,Decay,Drift,,Length,1,m,1
 2,Decay,Drift,,Length,1,m,2

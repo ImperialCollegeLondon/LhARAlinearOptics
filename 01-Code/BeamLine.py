@@ -1366,16 +1366,17 @@ class BeamLine(object):
                     break
 
                 elif cls.checkDecay(iBLE, iRefPrtcl, PrtclInst, iLoc, TrcSpc):
+                    PrtclInst.decay(iLoc)
                     break
                 
-                else:
+                else:        #.. is this code ever executed? -- KL 28Dec25
                     if iBLE.ExpansionParameterFail(TrcSpc):
                         if cls.getDebug():
                             print("              ---->", \
                                 " Particle fails expansion parameter test")
                         TrcSpc = None
                         break
-                    else:
+                    else:    #.. is this code ever executed? -- KL 28Dec25
                         zEnd    = -999999.
                         sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
                         Success = PrtclInst.recordParticle(iBLE.getName(), \

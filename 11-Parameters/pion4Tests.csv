@@ -8,4 +8,5 @@
 1,Source,Source,Gaussian,SigmaY,0.000004,m,"Gaussian width, y"
 1,Source,Source,Gaussian,MeanEnergy,8000,MeV,Mean of guassian kinetic energy
 1,Source,Source,Gaussian,SigmaEnergy,800,MeV,Sigma of guassian kinetic energy
-1,Source,Source,Gaussian,MinCTheta,0.998,,Minimum theta for flat cos theta
+1,Source,Source,Gaussian,MinCTheta,0.9999,,Minimum theta for flat cos theta
+2,Drift,Drift,,Length,1000,m,Long drift

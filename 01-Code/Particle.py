@@ -145,6 +145,7 @@ Created on Mon 03Jul23: Version history:
 @author: kennethlong
 """
 
+from pylorentz import Momentum4 as mmtm4
 from copy import deepcopy
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as ticker
@@ -161,7 +162,7 @@ import BeamIO            as bmIO
 import pionDECAY         as pionDCY
 import BeamLine          as BL
 import BeamLineElement   as BLE
-import PhysicalConstants as PhysCnstnts
+#import PhysicalConstants as PhysCnstnts
 
 #-------- Physical Constants Instances and Methods ----------------
 from PhysicalConstants import PhysicalConstants
@@ -434,6 +435,10 @@ class Particle:
             print(" <---- Done.")
 
         return iPrtcl
+
+    def decay(self):
+        print(" Particle.decay: decay for particle species:", \
+              self.getSpecies(), "not coded.")
     
     @classmethod
     def fillPhaseSpaceAll(cls):
@@ -2036,6 +2041,53 @@ class pion(Particle):
         self.print()
         return " pion __str__ done."
 
+    def decay(self, iLoc):
+        iAddr = iLoc - 2
+        self.fillPhaseSpace()
+        
+        self.setDebug(True)
+
+        if self.getDebug():
+            print(" pion(Particle).decay: decay this particle:", \
+                  "at location:", iLoc, "address", iAddr)
+
+        piP  = self.getLabPhaseSpace()[iAddr][1]
+        piP2 = np.dot(piP, piP)
+        piE = mth.sqrt(piP2 + iPhysclCnstnts.mPion()**2)
+        pionL = mmtm4(piE, piP[0], piP[1], piP[2])
+                
+        if self.getDebug():
+            print("     ---->   piP:", piP)
+            print("     ---->  piP2:", piP2)
+            print("     ---->   piE:", piE)
+            print("     ----> pionL:", pionL)
+
+        if self.getDebug():
+            pionDCY.pionDECAY.setDebug(True)
+        self.setDECAY(pionDCY.pionDECAY())
+        if self.getDebug():
+            pionDCY.pionDECAY.setDebug(False)
+
+        muonR = mmtm4(self.getDECAY().getvmu()[0], \
+                      self.getDECAY().getvmu()[1], \
+                      self.getDECAY().getvmu()[2], \
+                      self.getDECAY().getvmu()[3])
+        neutR = mmtm4(self.getDECAY().getvnumu()[0], \
+                      self.getDECAY().getvnumu()[1], \
+                      self.getDECAY().getvnumu()[2], \
+                      self.getDECAY().getvnumu()[3])
+
+        muonL = muonR.boost_particle(pionL)
+        neutL = neutR.boost_particle(pionL)
+            
+        if self.getDebug():
+            print("         ----> muon     4 momentum in lab frame, mass:", \
+              muonL, muonL.m)
+            print("         ----> neutrino 4 momentum in lab frame, mass:", \
+              neutL, neutL.m)
+        exit()
+        
+        
 class muon(Particle):
     __instance     = []
 
