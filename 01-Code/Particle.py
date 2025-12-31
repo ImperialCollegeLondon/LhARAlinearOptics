@@ -2067,8 +2067,6 @@ class pion(Particle):
         iAddr = iLoc - 2
         self.fillPhaseSpace()
         
-        self.setDebug(True)
-
         if self.getDebug():
             print(" pion(Particle).decay: decay this particle:", \
                   "at location:", iLoc, "address", iAddr)
@@ -2108,11 +2106,8 @@ class pion(Particle):
             print("         ----> neutrino 4 momentum in lab frame, mass:", \
               neutL, neutL.m)
 
-        Particle.setDebug(True)
         Particle.addDECAYparticle2stack("muon",     muonL, iLoc, self)
         Particle.addDECAYparticle2stack("neutrino", neutL, iLoc, self)
-        
-        exit()
         
         
 class muon(Particle):
