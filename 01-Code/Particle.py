@@ -174,6 +174,8 @@ class Particle:
     instances  = []
     __Debug    = False
 
+    decayPRODUCTstack = []
+
     stable_species   = {"proton", "neutrino", "12c6"}
     unstable_species = {"pion", "muon"}
             
@@ -439,7 +441,27 @@ class Particle:
     def decay(self):
         print(" Particle.decay: decay for particle species:", \
               self.getSpecies(), "not coded.")
-    
+
+    @classmethod
+    def addDECAYparticle2stack(cls, Species, mmtm, iLoc, iPrtcl):
+        cls.decayPRODUCTstack.append([ Species, mmtm, iLoc, iPrtcl])
+
+        
+        if cls.getDebug():
+            print(" Particle.addDECAYparticle2stack:     \n", \
+                  "     ---->    Species:", \
+                               cls.getDECAYproductSTACK()[-1][0], "\n", \
+                  "     ---->       mmtm:", \
+                               cls.getDECAYproductSTACK()[-1][1], "\n", \
+                  "     ---->       iLoc:", \
+                               cls.getDECAYproductSTACK()[-1][2], "\n", \
+                  "     ----> id(iPrtcl):", \
+                               id(cls.getDECAYproductSTACK()[-1][3]))
+
+    @classmethod
+    def getDECAYproductSTACK(cls):
+        return cls.decayPRODUCTstack
+
     @classmethod
     def fillPhaseSpaceAll(cls):
         Success = False
@@ -2085,6 +2107,11 @@ class pion(Particle):
               muonL, muonL.m)
             print("         ----> neutrino 4 momentum in lab frame, mass:", \
               neutL, neutL.m)
+
+        Particle.setDebug(True)
+        Particle.addDECAYparticle2stack("muon",     muonL, iLoc, self)
+        Particle.addDECAYparticle2stack("neutrino", neutL, iLoc, self)
+        
         exit()
         
         
