@@ -675,7 +675,6 @@ class Particle:
 
         return PhsSpc
 
-
     @classmethod
     def RPLCPhaseSpace2TraceSpace(cls, PhsSpc):
         if cls.getDebug():
@@ -1697,7 +1696,7 @@ class ReferenceParticle(Particle):
 
         
 #--------  Processing methods:
-    def setReferenceParticleAtSource(self):
+    def setReferenceParticleAtSource(self, nRefPrtcl=0):
         particleMASS = iPhysclCnstnts.getparticleMASS(self.getSpecies())
         
         nRcrds  = len(self.getsIn())
@@ -1723,7 +1722,7 @@ class ReferenceParticle(Particle):
         if not Success:
             raise fail2setReferenceParticle("RrOut")
 
-        p0       = BL.BeamLine.getElement()[0].getp0()[0]
+        p0       = BL.BeamLine.getElement()[0].getp0()[nRefPrtcl]
         Ref4mmtm = np.array([0., 0., p0,
                              mth.sqrt(p0**2 + particleMASS**2)])
         
