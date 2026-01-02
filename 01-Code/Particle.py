@@ -443,8 +443,8 @@ class Particle:
               self.getSpecies(), "not coded.")
 
     @classmethod
-    def addDECAYparticle2stack(cls, Species, mmtm, iLoc, iPrtcl):
-        cls.decayPRODUCTstack.append([ Species, mmtm, iLoc, iPrtcl])
+    def addDECAYparticle2stack(cls, Species, posn, mmtm, iLoc, iPrtcl):
+        cls.decayPRODUCTstack.append([ Species, posn, mmtm, iLoc, iPrtcl])
 
         
         if cls.getDebug():
@@ -552,6 +552,39 @@ class Particle:
 
         return PhsSpc
 
+    def RPLCTraceSpace2LabPhaseSpace(self, TrcSpc, nLoc):
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" Particle.RPLCTraceSpace2LabPhaseSpace: start: \n", \
+                      "     ----> TrcSpc, nLoc:", TrcSpc, nLoc)
+
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
+        
+        PhsSpc  = self.RPLCTraceSpace2PhaseSpace(TrcSpc)
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> RPLCPhsSpc:", PhsSpc)
+
+        RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
+        if self.getDebug():
+            print("         ----> Rotation matrix:", \
+                  RotMtrx)
+            
+        drLab   = np.matmul(RotMtrx, PhsSpc[0])
+        if PhsSpc[1][2] != None:
+            pLab    = np.matmul(RotMtrx, PhsSpc[1])
+        else:
+            pLab    = np.array([None, None, None])
+
+        rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
+
+        LabPhsSpc = [rLab, pLab]
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> Lab PhsSpc:", LabPhsSpc)
+
+        return LabPhsSpc
+            
     @classmethod
     def RPLCTraceSpace2PhaseSpace(cls, TrcSpc):
         if cls.getDebug():
@@ -583,8 +616,19 @@ class Particle:
         
         p = mth.sqrt(E**2 - particleMASS**2)
         
-        #rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ]) #.. Here!
-        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], 0. ]) #.. Here!
+        rRPLC = np.array([ TrcSpc[0], TrcSpc[2], 0. ])
+        """
+          Use above line (i.e. set z_RPLC = 0.) rather than:
+             rRPLC = np.array([ TrcSpc[0], TrcSpc[2], TrcSpc[4]*b0 ])
+          because have moved along steps in s, i.e. to end of each element.
+          When moving to lab frame are also moving from system of units with
+          s as independent variable to system with t as independent variable.
+          Therefore the z position when reference particle is at s changes to
+          a change in the time at which the reference particle is at s.
+
+          Need to record time in lab frame when make transformation from RPLC
+          to Lab.
+        """
 
         px = TrcSpc[1]*p0
         py = TrcSpc[3]*p0
@@ -2063,15 +2107,32 @@ class pion(Particle):
         self.print()
         return " pion __str__ done."
 
-    def decay(self, iLoc):
+    def decay(self, iLoc, TrcSpc):
         iAddr = iLoc - 2
-        self.fillPhaseSpace()
-        
         if self.getDebug():
             print(" pion(Particle).decay: decay this particle:", \
                   "at location:", iLoc, "address", iAddr)
+            with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                print("     ----> Pion trace space   :", \
+                      TrcSpc)
 
-        piP  = self.getLabPhaseSpace()[iAddr][1]
+        PhsSpc = self.RPLCTraceSpace2PhaseSpace(TrcSpc)
+        if self.getDebug():
+            with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                print("     ----> Pion RPLC phase space   :", \
+                      PhsSpc)
+
+        LabPhsSpc = self.RPLCTraceSpace2LabPhaseSpace(TrcSpc, iLoc)
+        if self.getDebug():
+            with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                print("     ----> Pion lab phase space   :", \
+                      LabPhsSpc)
+
+        
+        piP  = LabPhsSpc[1]
         piP2 = np.dot(piP, piP)
         piE = mth.sqrt(piP2 + iPhysclCnstnts.mPion()**2)
         pionL = mmtm4(piE, piP[0], piP[1], piP[2])
@@ -2106,8 +2167,10 @@ class pion(Particle):
             print("         ----> neutrino 4 momentum in lab frame, mass:", \
               neutL, neutL.m)
 
-        Particle.addDECAYparticle2stack("muon",     muonL, iLoc, self)
-        Particle.addDECAYparticle2stack("neutrino", neutL, iLoc, self)
+        Particle.addDECAYparticle2stack("muon",     \
+                                        LabPhsSpc[0], muonL, iLoc, self)
+        Particle.addDECAYparticle2stack("neutrino", \
+                                        LabPhsSpc[0], neutL, iLoc, self)
         
         
 class muon(Particle):
@@ -2125,8 +2188,7 @@ class muon(Particle):
         #.. Particle class initialisation:
         Particle.__init__(self, "muon")
         
-        iPhysCnstnts = PhysCnstnts.PhysicalConstants()
-        lifetime     = iPhysCnstnts.tauMuon()
+        lifetime     = iPhysclCnstnts.tauMuon()
         
         RemainingLifetime = np.random.exponential(lifetime)
         self.setRemainingLifetime(RemainingLifetime)

@@ -231,14 +231,27 @@ class BeamLine(object):
                 print("        <---- Beam line done.")
 #    <---- Done beam line  --------  --------  --------  --------
 
-#    ----> Reference particle:  --------  --------  --------  --------
+#    ----> Complete reference particles:  --------  --------  --------
+            cls.setDebug(True)
             if cls.getDebug():
-                print("        ----> Reference particle: ")
+                print("        ----> Complete reference particle: ")
+                print("            ----> Numbed of reference particles:", \
+                      len(Prtcl.ReferenceParticle.getinstances("All")))
+
+            for iRefPrtcl in Prtcl.ReferenceParticle.getinstances("All"):
+                if iRefPrtcl == Prtcl.ReferenceParticle.getinstances():
+                    if cls.getDebug():
+                        print("         ----> Existing reference particle:")
+                        print(Prtcl.ReferenceParticle.getinstances())
+                else:
+                    print("     ----> Set reference particle for species:", \
+                          iRefPrtcl.getSpecies())
             
             if cls.getDebug():
                 print("            ----> Reference particle set, success:")
                 print("        <---- Reference particle done. ")
-#    <---- Done reference particle -----  --------  --------  --------
+            exit()
+#    <---- Completed reference particles  --------  --------  --------
 
         else:
             if cls.getDebug():
@@ -280,6 +293,7 @@ class BeamLine(object):
         cls.__BeamLineSpecificationCSVfile = None
         cls._BeamLineParamPandas           = None
         cls._SrcTrcSpc                     = []
+        cls._currentReferenceParticle      = None
 
     @classmethod
     def setDebug(cls, Debug=False):
@@ -292,6 +306,26 @@ class BeamLine(object):
         if not isinstance(_currentRefPrtcl, Prtcl.ReferenceParticle):
             raise badParameter()
         cls._currentReferenceParticle = _currentRefPrtcl
+        
+    @classmethod
+    def findReferenceParticle(cls, _Species):
+        if cls.getDebug():
+            print(" BeamLine.findReferenceParticle;", _Species)
+            
+        RefPrtcl = None
+        print(Prtcl.ReferenceParticle.getinstances("All"))
+        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances("All"):
+            if cls.getDebug():
+                print("     ----> Try:", id(iRefPrtcl), \
+                      iRefPrtcl.getSpecies())
+                
+            if iRefPrtcl.getSpecies() == _Species:
+                if cls.getDebug():
+                    print(" <---- Found! return:", id(iRefPrtcl))
+                return iRefPrtcl
+
+        if cls.getDebug():
+            print(" <---- Not found! return:", RefPrtcl)
         
     @classmethod
     def setSrcTrcSpc(cls, SrcTrcSpc=np.array([])):
@@ -456,8 +490,7 @@ class BeamLine(object):
                         (pndsFacility["Type"]=="Reference particle") & \
                         (pndsFacility["Parameter"]=="Species 1") ]
 
-        for id in range(1, len(K0list)):
-            print(" id", id)
+        for id in range(0, len(K0list)):
             K0.append(float(pndsFacility[ \
                         (pndsFacility["Type"]=="Reference particle") & \
                         (pndsFacility["Parameter"]=="Kinetic energy 1") ]. \
@@ -1252,7 +1285,8 @@ class BeamLine(object):
 
     @classmethod
     def trackBeam(cls, NEvts=0, ParticleFILE=None, \
-                  iParticle=None, LocStrt=None, CleanAfterWrite=True):
+                  iParticle=None, LocStrt=None, CleanAfterWrite=True, \
+                  trackDECAYproducts=False):
         if cls.getDebug():
             print(" BeamLine.trackBeam start")
             print("     ----> NEvts:", NEvts)
@@ -1335,59 +1369,9 @@ class BeamLine(object):
                         print("         ----> trace space at source     :", \
                               SrcTrcSpc)
 
-            #.. Track through beam line:
-            TrcSpc_i = SrcTrcSpc
-            TrcSpc   = SrcTrcSpc
-            if cls.getDebug():
-                print("     ----> Transport through beam line")
-            iLoc = -1
-            nLocStrt = -1
-            if LocStrt != None: nLocStrt = LocStrt
-            for iBLE in BLE.BeamLineElement.getinstances():
-                iLoc += 1
-                if iLoc <= nLocStrt or \
-                   isinstance(iBLE, BLE.Source) or \
-                   isinstance(iBLE, BLE.Facility):
-                    continue
-                if cls.getDebug():
-                    print("         ---->", iBLE.getName())
-
-                TrcSpc     = iBLE.Transport(TrcSpc_i)
-                if cls.getDebug():
-                    with np.printoptions(\
-                                linewidth=500,precision=7,suppress=True):
-                        print("             ----> Updated trace space   :", \
-                              TrcSpc)
-                        
-                if not isinstance(TrcSpc, np.ndarray):
-                    if cls.getDebug():
-                        print("              ---->", \
-                              " partice outside acceptance(1)")
-                    break
-
-                elif cls.checkDecay(iBLE, iRefPrtcl, PrtclInst, iLoc, TrcSpc):
-                    PrtclInst.decay(iLoc)
-                    break
-                
-                else:        #.. is this code ever executed? -- KL 28Dec25
-                    if iBLE.ExpansionParameterFail(TrcSpc):
-                        if cls.getDebug():
-                            print("              ---->", \
-                                " Particle fails expansion parameter test")
-                        TrcSpc = None
-                        break
-                    else:    #.. is this code ever executed? -- KL 28Dec25
-                        zEnd    = -999999.
-                        sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
-                        Success = PrtclInst.recordParticle(iBLE.getName(), \
-                                                           zEnd, \
-                                                           sEnd, \
-                                                           TrcSpc)
-                TrcSpc_i = TrcSpc
-
-            if cls.getDebug():
-                print("         ----> Reached end of beam line.")
-
+            #.. Track particle through beam line:
+            cls.trackPARTICLE(SrcTrcSpc, LocStrt, iRefPrtcl, PrtclInst)
+            
             #.. Write event:
             if isinstance(ParticleFILE, io.BufferedWriter):
                 if cls.getDebug():
@@ -1398,12 +1382,108 @@ class BeamLine(object):
                 #del PrtclInst
             
             if cls.getDebug():
-                print("     <---- Finished handling beam line.")
-                
+                print("     <---- Finished handling beam.")
+
+            #.. Optionally track decay products through beam line:
+            trackDECAYproducts = True
+            if len(Prtcl.Particle.getDECAYproductSTACK()) >0:
+                cls.setDebug(True)
+            if trackDECAYproducts:
+                if cls.getDebug():
+                    print("     ----> Track decay products: \n", \
+                          "         ---->", \
+                          Prtcl.Particle.getDECAYproductSTACK())
+                    
+                for iDCYprdct in \
+                              Prtcl.Particle.getDECAYproductSTACK().copy():
+                    Species = iDCYprdct[0]
+                    if Species == "neutrino":
+                        pass
+                    newREFprtcl = cls.findReferenceParticle(Species)
+                    cls.setcurrentReferenceParticle(newREFprtcl)
+                                            
+                    prdctLocStrt = iDCYprdct[3]
+                    
+                    iPRDCT       = Prtcl.Particle.createPartcle()
+
+                    #SrcTrcSpc = 
+                    
+                    cls.trackPARTICLE(SrcTrcSpc,  \
+                                      prdLocStrt, \
+                                      newREFprtcl,
+                                      iPRDCT)
+            
+                    Prtcl.Particle.getDECAYproductSTACK().remove(iDCYprdct)
+
+                    print(Prtcl.Particle.getDECAYproductSTACK())
+                if len(Prtcl.Particle.getDECAYproductSTACK()) >0:
+                    cls.setDebug(False)
+                    exit()
+                pass
+            
         if (cls.getDebug() or NEvts > 1) and \
         Smltn.Simulation.getProgressPrint():
-            print("     <---- End of this simulation, ", NEvts, \
+            print(" <---- End of this simulation, ", NEvts, \
                   " events generated")
+
+    @staticmethod
+    def trackPARTICLE(SrcTrcSpc, LocStrt, iRefPrtcl, PrtclInst):
+        #.. Track particle through beam line:
+        if BeamLine.getDebug():
+            print(" BeamLine.trackPARTICLE:", \
+                  "Transport particle through beam line")
+                
+        TrcSpc_i = SrcTrcSpc
+        TrcSpc   = SrcTrcSpc
+            
+        iLoc = -1
+        nLocStrt = -1
+        if LocStrt != None: nLocStrt = LocStrt
+        for iBLE in BLE.BeamLineElement.getinstances():
+            iLoc += 1
+            if iLoc <= nLocStrt or \
+               isinstance(iBLE, BLE.Source) or \
+               isinstance(iBLE, BLE.Facility):
+                continue
+            if BeamLine.getDebug():
+                print("     ---->", iBLE.getName())
+
+            TrcSpc     = iBLE.Transport(TrcSpc_i)
+            if BeamLine.getDebug():
+                with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                    print("         ----> Updated trace space   :", \
+                          TrcSpc)
+                        
+            if not isinstance(TrcSpc, np.ndarray):
+                if cls.getDebug():
+                    print("         <----", \
+                          " partice outside acceptance(1)")
+                break
+
+            elif BeamLine.checkDecay(iBLE, iRefPrtcl, PrtclInst, iLoc, \
+                                 TrcSpc):
+                PrtclInst.decay(iLoc, TrcSpc)
+                break
+                
+            else:
+                if iBLE.ExpansionParameterFail(TrcSpc):
+                    if BeamLine.getDebug():
+                        print("     <----", \
+                              " Particle fails expansion parameter test")
+                    TrcSpc = None
+                    break
+                else:
+                    zEnd    = -999999.
+                    sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
+                    Success = PrtclInst.recordParticle(iBLE.getName(), \
+                                                       zEnd, \
+                                                       sEnd, \
+                                                       TrcSpc)
+            TrcSpc_i = TrcSpc
+
+        if BeamLine.getDebug():
+            print(" <---- Reached end of beam line.")
 
     @classmethod
     def checkDecay(cls, iBLE, iRefPrtcl, PrtclInst, iLoc, TrcSpc):
@@ -1411,14 +1491,12 @@ class BeamLine(object):
 
         if cls.getDebug():
             print(" BeamLine.checkDecay: handle unstable particle:")
-            print("             ----> Time left to live:", \
+            print("     ----> Time left to live:", \
                   PrtclInst.getRemainingLifetime())
         
         if PrtclInst.getRemainingLifetime() != mth.inf:
             if cls.getDebug():
-                print("     ----> Time left to live:", \
-                      PrtclInst.getRemainingLifetime())
-                print("     ----> Length of element:", \
+                print("         ----> Length of element:", \
                       iBLE.getLength())
                         
             m = \
@@ -1427,12 +1505,12 @@ class BeamLine(object):
                          TrcSpc[5] * iRefPrtcl.getMomentumOut(iLoc-1)
             p = mth.sqrt(E**2 - m**2)
             if cls.getDebug():
-                print(" iLoc, E, p, mass:", iLoc, E, p, m)
+                print("         ----> iLoc, E, p, mass:", iLoc, E, p, m)
                         
             scl = m / p / speed_of_light
             dt  = iBLE.getLength() * scl
             if cls.getDebug():
-                print("     ----> Proper time increment:", dt)
+                print("     <---- Proper time increment:", dt)
                     
             if dt > PrtclInst.getRemainingLifetime():
                 if cls.getDebug():
@@ -1443,7 +1521,7 @@ class BeamLine(object):
                             PrtclInst.getRemainingLifetime() - dt \
                                                )
                 if cls.getDebug():
-                    print("         <---- Particle survived!")
+                    print(" <---- Particle survived!")
 
         return decayed
                                     
