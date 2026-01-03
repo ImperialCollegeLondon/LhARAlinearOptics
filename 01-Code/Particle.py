@@ -32,6 +32,8 @@ Class Particle:
                            List ot two ndarrays.
    _LabPhsSpc[]: array   : Lab 6D phase space: [(x, y, z), (px, py, pz)]
                            List ot two ndarrays.
+   -ct[]       : array   : ct coordinate at which lab phase space is
+                           recorded.
 
 ***   _SourceTraceSpace: numpy array of 6-dimensional trace space
     
@@ -288,6 +290,7 @@ class Particle:
         self._TrcSpc            = []
         self._PhsSpc            = []
         self._LabPhsSpc         = []
+        self._ct                = []
         self._RemainingLifetime = mth.inf
         self._Decay             = None
 
@@ -340,9 +343,10 @@ class Particle:
 
         return Success
 
-    def setLabPhaseSpace(self, PhaseSpace):
+    def setLabPhaseSpace(self, PhaseSpace, ct=None):
         Success = False
         self._LabPhsSpc.append(PhaseSpace)
+        self._ct.append(ct)
         Success = True
 
         return Success
@@ -406,6 +410,9 @@ class Particle:
     
     def getLabPhaseSpace(self):
         return deepcopy(self._LabPhsSpc)
+
+    def getct(self):
+        return self._ct
 
     def getRemainingLifetime(self):
         return self._RemainingLifetime
