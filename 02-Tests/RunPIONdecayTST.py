@@ -23,8 +23,9 @@ print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
                 '11-Parameters/decayCHAINpion.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(10000, filename, datafiledir, 'pionDECAYtst.dat')
-if Debug: print(BL.BeamLine.getinstances())
+Smltn = Simu.Simulation(100, filename, datafiledir, 'pionDECAYtst.dat')
+if Debug:
+    print(BL.BeamLine.getinstances())
 print()
 print(" <---- Simulation initialised.")
 

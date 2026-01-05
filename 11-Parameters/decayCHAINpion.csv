@@ -2,8 +2,10 @@
 0,Facility,Global,Name,Name,Decay chain,,
 0,Facility,Global,Reference particle,Kinetic energy,6000,MeV,
 0,Facility,Global,Reference particle,Kinetic energy 1,5000,MeV,
+0,Facility,Global,Reference particle,Kinetic energy 1,3000,MeV,
 0,Facility,Global,Reference particle,Species,pion,,
 0,Facility,Global,Reference particle,Species 1,muon,,
+0,Facility,Global,Reference particle,Species 1,neutrino,,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
 1,Source,Source,Uniform disc,SourceMode,4,,Uniform disc
 1,Source,Source,Uniform disc,MeanEnergy,6000,MeV,

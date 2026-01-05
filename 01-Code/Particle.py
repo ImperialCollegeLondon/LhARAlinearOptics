@@ -32,7 +32,7 @@ Class Particle:
                            List ot two ndarrays.
    _LabPhsSpc[]: array   : Lab 6D phase space: [(x, y, z), (px, py, pz)]
                            List ot two ndarrays.
-   -ct[]       : array   : ct coordinate at which lab phase space is
+   _ct[]       : array   : ct coordinate at which lab phase space is
                            recorded.
 
 ***   _SourceTraceSpace: numpy array of 6-dimensional trace space
@@ -345,6 +345,11 @@ class Particle:
 
     def setLabPhaseSpace(self, PhaseSpace, ct=None):
         Success = False
+        if ct == None:
+            print(" Particle.setLabPhaseSpace: ct =", ct)
+            x = 1.
+            y = 0.
+            z = x/y
         self._LabPhsSpc.append(PhaseSpace)
         self._ct.append(ct)
         Success = True
@@ -450,8 +455,9 @@ class Particle:
               self.getSpecies(), "not coded.")
 
     @classmethod
-    def addDECAYparticle2stack(cls, Species, posn, mmtm, iLoc, iPrtcl):
-        cls.decayPRODUCTstack.append([ Species, posn, mmtm, iLoc, iPrtcl])
+    def addDECAYparticle2stack(cls, Species, posn, mmtm, ct, iLoc, iPrtcl):
+        cls.decayPRODUCTstack.append( \
+                            [ Species, posn, mmtm, ct, iLoc, iPrtcl] )
 
         
         if cls.getDebug():
@@ -460,10 +466,12 @@ class Particle:
                                cls.getDECAYproductSTACK()[-1][0], "\n", \
                   "     ---->       mmtm:", \
                                cls.getDECAYproductSTACK()[-1][1], "\n", \
-                  "     ---->       iLoc:", \
+                  "     ---->         ct:", \
                                cls.getDECAYproductSTACK()[-1][2], "\n", \
+                  "     ---->       iLoc:", \
+                               cls.getDECAYproductSTACK()[-1][3], "\n", \
                   "     ----> id(iPrtcl):", \
-                               id(cls.getDECAYproductSTACK()[-1][3]))
+                               id(cls.getDECAYproductSTACK()[-1][4]))
 
     @classmethod
     def getDECAYproductSTACK(cls):
@@ -510,6 +518,7 @@ class Particle:
             if self.getDebug():
                 print("         ----> Convert at location:", \
                       iLoc)
+            TrcSpc  = self.getTraceSpace()[nLoc]
             PhsSpc  = self.calcRPLCPhaseSpace(nLoc)
             Success = self.setRPLCPhaseSpace(PhsSpc)
 
@@ -527,7 +536,8 @@ class Particle:
             rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
 
             LabPhsSpc = [rLab, pLab]
-            Success   = self.setLabPhaseSpace(LabPhsSpc)
+            ct        = iRefPrtcl.gets()[nLoc]/iRefPrtcl.getb0(nLoc) - TrcSpc[4]
+            Success   = self.setLabPhaseSpace(LabPhsSpc, ct)
 
             nLoc  += 1
 
@@ -586,11 +596,41 @@ class Particle:
         rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
 
         LabPhsSpc = [rLab, pLab]
+        ct        = iRefPrtcl.gets()[nLoc]/iRefPrtcl.getb0(nLoc) - TrcSpc[4]
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> Lab PhsSpc:", LabPhsSpc)
+                print("     ---->         ct:", ct)
 
-        return LabPhsSpc
+        return LabPhsSpc, ct
+            
+    def LabPhaseSpace2RPLCTraceSpace(self, LabPhsSpc, ct, nLoc):
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print(" Particle.LabPhaseSpace2RPLCTraceSpace: start: \n", \
+                      "     ----> LabPhsSpc, nLoc:", LabPhsSpc, nLoc)
+
+        iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
+
+        rRPLC     = LabPhsSpc[0] - iRefPrtcl.getRrOut()[nLoc][0:3]
+        
+        InvRotMtrx = np.linalg.inv(iRefPrtcl.getRot2LabOut()[nLoc])
+        if self.getDebug():
+            print("         ----> Inverse rotation matrix:", \
+                  InvRotMtrx)
+            
+        drRPLC  = np.matmul(InvRotMtrx, rRPLC)
+        if LabPhsSpc[1][2] != None:
+            pRPLC = np.matmul(InvRotMtrx, LabPhsSpc[1])
+        else:
+            pRPLC = np.array([None, None, None])
+
+        TrcSpc  = self.RPLCPhaseSpace2TraceSpace(LabPhsSpc, ct, nLoc)
+        if self.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ----> RPLCTrcSpc:", TrcSpc)
+
+        return TrcSpc
             
     @classmethod
     def RPLCTraceSpace2PhaseSpace(cls, TrcSpc):
@@ -683,37 +723,38 @@ class Particle:
         return PhsSpc
 
     @classmethod
-    def RPLCPhaseSpace2TraceSpace(cls, PhsSpc):
+    def RPLCPhaseSpace2TraceSpace(cls, PhsSpc, ct, nLoc):
         if cls.getDebug():
             print(" Particle.RPLCPhaseSpace2TraceSpace: start.")
             with np.printoptions(linewidth=500,precision=7,suppress=True):
                 print("     ----> PhsSpx:", PhsSpc)
-            
-        species      = Prtcl.ReferenceParticle.getinstances("All").getSpecies()
+
+        iRefPrtcl    = BL.BeamLine.getcurrentReferenceParticle()
+        species      = iRefPrtcl.getSpecies()
         particleMASS = iPhysclCnstnts.getparticleMASS(species)
 
-        p0        = BL.BeamLine.getElement()[0].getp0()
+        p0        = iRefPrtcl.getp0(nLoc)
         E0        = mth.sqrt( particleMASS**2 + p0**2)
         b0        = p0/E0
         if cls.getDebug():
             print("     ----> p0, E0, b0, ( K0 ):", p0, E0, b0, \
                   "(", E0-particleMASS, ")")
 
-        E = mth.sqrt(particleMASS**2 + np.dot(PhsSpc[3:],PhsSpc[3:]))
+        E = mth.sqrt(particleMASS**2 + np.dot(PhsSpc[1],PhsSpc[1]))
         if cls.getDebug():
             print("     ----> E:", E)
         
-        x      = PhsSpc[0]
-        y      = PhsSpc[1]
+        x      = PhsSpc[0][0]
+        y      = PhsSpc[0][1]
         
-        xPrime = PhsSpc[3] / p0
-        yPrime = PhsSpc[4] / p0
+        xPrime = PhsSpc[1][0] / p0
+        yPrime = PhsSpc[1][1] / p0
 
         if cls.getDebug():
             print("     ----> xPrime, yPrime:", 
                   xPrime, yPrime)
 
-        z      = PhsSpc[2] / b0
+        z      = iRefPrtcl.gets()[nLoc] / b0 - ct
         delta  = (E - E0) / p0
         
         if cls.getDebug():
@@ -1587,6 +1628,11 @@ class ReferenceParticle(Particle):
     def getRot2LabOut(self):
         return self._Rot2LabOut
 
+    def getp0(self, iLoc):
+        p0  = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
+                              self.getPrOut()[iLoc][:3]))
+        return p0
+    
     def getb0(self, iLoc):
         p0  = mth.sqrt(np.dot(self.getPrOut()[iLoc][:3], \
                               self.getPrOut()[iLoc][:3]))
@@ -2130,12 +2176,12 @@ class pion(Particle):
                 print("     ----> Pion RPLC phase space   :", \
                       PhsSpc)
 
-        LabPhsSpc = self.RPLCTraceSpace2LabPhaseSpace(TrcSpc, iLoc)
+        LabPhsSpc, ct = self.RPLCTraceSpace2LabPhaseSpace(TrcSpc, iLoc)
         if self.getDebug():
             with np.printoptions(\
                             linewidth=500,precision=7,suppress=True):
-                print("     ----> Pion lab phase space   :", \
-                      LabPhsSpc)
+                print("     ----> Pion lab phase space, ct:", \
+                      LabPhsSpc, ct)
 
         
         piP  = LabPhsSpc[1]
@@ -2148,6 +2194,7 @@ class pion(Particle):
             print("     ---->  piP2:", piP2)
             print("     ---->   piE:", piE)
             print("     ----> pionL:", pionL)
+            print("     ---->    ct:", ct)
 
         if self.getDebug():
             pionDCY.pionDECAY.setDebug(True)
@@ -2174,9 +2221,9 @@ class pion(Particle):
               neutL, neutL.m)
 
         Particle.addDECAYparticle2stack("muon",     \
-                                        LabPhsSpc[0], muonL, iLoc, self)
+                                        LabPhsSpc[0], muonL, ct, iLoc, self)
         Particle.addDECAYparticle2stack("neutrino", \
-                                        LabPhsSpc[0], neutL, iLoc, self)
+                                        LabPhsSpc[0], neutL, ct, iLoc, self)
         
         
 class muon(Particle):
@@ -2224,7 +2271,8 @@ class neutrino(Particle):
         Particle.__init__(self, "neutrino")
         
         # Only constants; print values that will be used:
-        print("     ----> Type::", type(self))
+        if self.getDebug():
+            print("     ----> Type::", type(self))
         
         return
 

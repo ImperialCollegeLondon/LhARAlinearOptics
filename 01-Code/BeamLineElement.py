@@ -582,13 +582,14 @@ class BeamLineElement:
                          _R[5]**2)
         eps   = ( _R[1]**2 + _R[3]**2  ) / (2.*D**2)
         if self.getDebug():
-            print("     ----> Epsilon:", eps)
+            print("     ----> p0, E0, b0, D:", p0, E0, b0, D)
+            print("     <---- Epsilon:", eps)
             
         if eps > 1.0:
             Fail = True
 
         if self.getDebug():
-            print(" <----> Return, Fail:", Fail)
+            print(" <---- Return, Fail:", Fail)
 
         return Fail
 
