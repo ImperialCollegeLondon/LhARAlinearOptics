@@ -802,6 +802,18 @@ class Particle:
             print("     ----> Coordinate system:", CoordSys)
             print("     ----> Projection:", Projection)
 
+        if self.getDebug():
+            print("     ----> Species:", self.getSpecies())
+            print("           Ref prt:", \
+                  BL.BeamLine.getcurrentReferenceParticle().getSpecies())
+        if self.getSpecies() != \
+           BL.BeamLine.getcurrentReferenceParticle().getSpecies():
+            BL.BeamLine.setcurrentReferenceParticle( \
+                        BL.BeamLine.findReferenceParticle(self.getSpecies()))
+            if self.getDebug():
+                print("     <---- Ref prt set to:", \
+                  BL.BeamLine.getcurrentReferenceParticle().getSpecies())
+
         sorz = []
         xory = []
         #..  Plotting as a function of s if RPLC or z if laboratory:

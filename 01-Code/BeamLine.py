@@ -237,41 +237,8 @@ class BeamLine(object):
                 print("            ----> Number of reference particles:", \
                       len(Prtcl.ReferenceParticle.getinstances("All")))
 
-            nRefPrtcl = 0
-            for iRefPrtcl in Prtcl.ReferenceParticle.getinstances("All"):
-                if iRefPrtcl == Prtcl.ReferenceParticle.getinstances():
-                    if cls.getDebug():
-                        print( \
-                        "                ----> Existing reference particle:",\
-                         Prtcl.ReferenceParticle.getinstances().getSpecies())
-                else:
-                    nRefPrtcl += 1
-                    if cls.getDebug():
-                        print( \
-                  "            ----> Set reference particle for species:", \
-                          iRefPrtcl.getSpecies())
-                        print( \
-                       "                ----> Reference particle offset:", \
-                          nRefPrtcl)
-                        print("                ----> Treat: Source")
-
-                    Success = iRefPrtcl.setReferenceParticleAtSource( \
-                                                            nRefPrtcl)
-
-                    if cls.getDebug():
-                        print("                ----> Treat beam line")
-                    for iBLE in BLE.BeamLineElement.getinstances():
-                        if isinstance(iBLE, BLE.Facility) or \
-                           isinstance(iBLE, BLE.Source):
-                            continue
-                        
-                        iRefPrtcl.setReferenceParticle(iBLE)
-                                    
-                    if cls.getDebug():
-                        print( \
-                  "            <---- Reference particle for species:", \
-                          iRefPrtcl.getSpecies(), "done.")
-                        
+            cls.completeREFERENCEparticles()
+            
             if cls.getDebug():
                 print("        <---- Reference particle completion done. ")
 
@@ -307,8 +274,53 @@ class BeamLine(object):
         print("     ----> Beam line is self consistent = ", \
               self.checkConsistency())
         return " <---- Beam line parameter dump complete."
-                
+
+    @classmethod
+    def completeREFERENCEparticles(cls):
+        if cls.getDebug():
+            print(" BeamLine.completeREFERENCEparticles:")
+            print("     ----> Number of reference particles:", \
+                  len(Prtcl.ReferenceParticle.getinstances("All")))
+        
+        nRefPrtcl = 0
+        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances("All"):
+            if iRefPrtcl == Prtcl.ReferenceParticle.getinstances():
+                if cls.getDebug():
+                    print( \
+                    "         <---- Existing reference particle:",\
+                    Prtcl.ReferenceParticle.getinstances().getSpecies())
+            else:
+                nRefPrtcl += 1
+                if cls.getDebug():
+                    print( \
+                  "         ----> Set reference particle for species:", \
+                          iRefPrtcl.getSpecies())
+                    print( \
+                       "             ----> Reference particle offset:", \
+                          nRefPrtcl)
+                    print("             ----> Treat: Source")
+
+                Success = iRefPrtcl.setReferenceParticleAtSource( \
+                                                            nRefPrtcl)
+
+                if cls.getDebug():
+                    print("             ----> Treat beam line")
+                for iBLE in BLE.BeamLineElement.getinstances():
+                    if isinstance(iBLE, BLE.Facility) or \
+                       isinstance(iBLE, BLE.Source):
+                        continue
+                        
+                    iRefPrtcl.setReferenceParticle(iBLE)
+                                    
+                if cls.getDebug():
+                    print( \
+                  "         <---- Reference particle for species:", \
+                           iRefPrtcl.getSpecies(), "done.")
+                        
+        if cls.getDebug():
+            print(" <---- Reference particle completion done. ")
     
+                
 #--------  "Set methods"
 #.. Method believed to be self documenting(!)
     @classmethod
@@ -1828,7 +1840,8 @@ class BeamLine(object):
                 sys.exit(1)
             cls.addBeamLineElement(instBLE)
 
-                    
+        cls.completeREFERENCEparticles()
+
         if cls.getDebug():
             print(" <---- BeamLine.writeBeamLine done.")
 
