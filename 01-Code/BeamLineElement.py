@@ -1299,16 +1299,16 @@ class Facility(BeamLineElement):
         record   = strct.pack(">i", len(derivedCLASS))
         dataFILE.write(record)
         if self.getDebug():
-            print("         ----> Length of derived class record:", \
+            print("     ----> Length of derived class record:", \
                   strct.unpack(">i", record))
         record   = bversion
         dataFILE.write(record)
         if self.getDebug():
             print("         ----> Derived class:", bversion.decode('utf-8'))
-
-        """
-          Needs fix, hacked [0] to make it run, KL, 05Sep25.
-        """
+            
+        #.. Write reference particle 0 and VCMV:
+        if self.getDebug():
+            print("     ----> Reference particle 0 and VCMV:")
         record = strct.pack(">2d", self.getp0()[0], self.getVCMVr())
         dataFILE.write(record)
         if self.getDebug():
@@ -1319,15 +1319,58 @@ class Facility(BeamLineElement):
         record   = strct.pack(">i", len(species))
         dataFILE.write(record)
         if self.getDebug():
-            print("         ----> Length of species record:", \
+            print("         ----> Length of species 0 record:", \
                   strct.unpack(">i", record))
         record   = bversion
         dataFILE.write(record)
         if self.getDebug():
             print("         ----> Species:", bversion.decode('utf-8'))
         
-        BeamLineElement.writeElement(self, dataFILE)
+        #.. Write reference particles for decay products:
+        if self.getDebug():
+            print("     ----> Reference particle(s) 1:",
+                  len(self.getspecies0())-1)
+
+        record     = strct.pack(">i", len(self.getspecies0())-1 )
+        dataFILE.write(record)
+        if self.getDebug():
+            print( \
+            "         ----> Number of decay-produce reference particles:", \
+                  strct.unpack(">i", record))
         
+        for idREFprtcl in range(1,len(self.getspecies0())):
+            if idREFprtcl ==0: continue
+            
+            if self.getDebug():
+                print("         ----> idREFprtcl, species, p0:", \
+                      idREFprtcl, \
+                      self.getspecies0()[idREFprtcl], \
+                      self.getp0()[idREFprtcl])
+
+            record = strct.pack(">1d", self.getp0()[idREFprtcl])
+            dataFILE.write(record)
+            if self.getDebug():
+                print("             ----> idREFprtcl, p0:", idREFprtcl,\
+                      strct.unpack(">1d",record))
+                
+            species = self.getspecies0()[idREFprtcl]
+            bversion = bytes(species, 'utf-8')
+            record   = strct.pack(">i", len(species))
+            dataFILE.write(record)
+            if self.getDebug():
+                print("             ----> Length of species record:", \
+                      strct.unpack(">i", record))
+            record   = bversion
+            dataFILE.write(record)
+            if self.getDebug():
+                print("             ----> Species:", bversion.decode('utf-8'))
+
+        if self.getDebug():
+            print("     <---- Done with Facility specific stuff;", \
+                  "Facility(BeamLineElement).writeElement starts.")
+            
+        BeamLineElement.writeElement(self, dataFILE)
+
         if self.getDebug():
             print(" <---- Facility(BeamLineElement).writeElement done.")
 
@@ -1338,16 +1381,21 @@ class Facility(BeamLineElement):
 
         dataFILE = dataFILEinst.getdataFILE()
 
+        p0list       = []
+        species0list = []
+        
         EoF      = False
         species0 = "proton"
 
         brecord = dataFILE.read((2*8))
         if brecord == b'':
-            return True, None, None
+            return True, None, None, None
         
         record  = strct.unpack(">2d", brecord)
         p0      = float(record[0])
         VCMVr   = float(record[1])
+        
+        p0list.append(p0)
 
         if cls.getDebug():
             print("     ----> Data file version:", \
@@ -1355,28 +1403,74 @@ class Facility(BeamLineElement):
         if dataFILEinst.getdataFILEversion() < 7:
             if cls.getDebug():
                 print("     ----> p0, VCMVr, species0:", \
-                      p0, VCMVr, species0)
-            return EoF, p0, VCMVr, species0
+                      p0list, VCMVr, species0list)
+            return EoF, p0list, VCMVr, species0list
         
         brecord = dataFILE.read(4)
         if brecord == b'':
             if cls.getDebug():
                 print(" <---- end of file, return.")
-                return True, p0, VCMVr, species0
+            return True, p0list, VCMVr, species0list
 
         record = strct.unpack(">i", brecord)
         nChr   = record[0]
         if cls.getDebug():
             print("     ----> Number of characters:", nChr)
         
-        brecord = dataFILE.read(nChr)
+        brecord  = dataFILE.read(nChr)
         species0 = brecord.decode('utf-8')
+
+        species0list.append(species0)
+
+        if dataFILEinst.getdataFILEversion() < 8:
+            if cls.getDebug():
+                print(" <---- p0, VCMVr:", p0list, VCMVr, species0list)
+
+            return EoF, p0list, VCMVr, species0list
+
+        #.. Reference particles for decay products from version 8:
+        brecord = dataFILE.read(4)
+        if brecord == b'':
+            if cls.getDebug():
+                print(" <---- end of file, return.")
+            return True, p0list, VCMVr, species0list
+        record = strct.unpack(">i", brecord)
+        nDCYprdctREFprtcls = record[0]
+        if cls.getDebug():
+            print("     ----> Number of decay produce reference particles:", \
+                  nDCYprdctREFprtcls)
+
+        for iRefPrtcl in range(nDCYprdctREFprtcls):
+            brecord = dataFILE.read((1*8))
+            if brecord == b'':
+                return True, p0list, VCMVr, species0list
+            record  = strct.unpack(">1d", brecord)
+            p0      = float(record[0])
+            if cls.getDebug():
+                print("     ----> p0:", p0)
+
+            p0list.append(p0)    
+
+            brecord = dataFILE.read(4)
+            if brecord == b'':
+                if cls.getDebug():
+                    print(" <---- end of file, return.")
+                    return True, p0list, VCMVr, species0list
+            record = strct.unpack(">i", brecord)
+            nChr   = record[0]
+            if cls.getDebug():
+                print("     ----> Number of characters:", nChr)
+            brecord = dataFILE.read(nChr)
+            species = brecord.decode('utf-8')
+            if cls.getDebug():
+                print("     ----> Species:", species)
+
+            species0list.append(species)
             
         if cls.getDebug():
-            print(" <---- p0, VCMVr:", p0, VCMVr, species0)
+            print(" <---- p0list, species0list:", p0list, species0list)
 
-        return EoF, p0, VCMVr, species0
-        
+        return EoF, p0list, VCMVr, species0list
         
 """
 Derived class Drift:

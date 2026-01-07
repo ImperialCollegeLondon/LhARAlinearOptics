@@ -492,10 +492,30 @@ class Particle:
             if cls.getDebug():
                 print("     ----> Particle:", nPrtcl)
             
-            #if not isinstance(iPrtcl, ReferenceParticle):
+            #.. Check got the right reference particle:
+            if Particle.getDebug():
+                print( \
+                "         ----> Check got the right reference particle:")
+                print("             ----> Ref particle species:", \
+                    BL.BeamLine.getcurrentReferenceParticle().getSpecies())
+                print("             ---->     Particle species:", \
+                    iPrtcl.getSpecies())
+
+            if BL.BeamLine.getcurrentReferenceParticle().getSpecies() != \
+               iPrtcl.getSpecies():
+                iRefPrtcl = BL.BeamLine.findReferenceParticle( \
+                                                    iPrtcl.getSpecies())
+                BL.BeamLine.setcurrentReferenceParticle(iRefPrtcl)
+                
+                if Particle.getDebug():
+                    print( \
+                        "         <---- Reference particle reset to:", \
+                    BL.BeamLine.getcurrentReferenceParticle().getSpecies())
+
             if Particle.getDebug():
                 print("         ----> Fill phase space for particle:", \
                       nPrtcl)
+                
             Success = iPrtcl.fillPhaseSpace()
 
         if cls.getDebug():
@@ -536,7 +556,8 @@ class Particle:
             rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
 
             LabPhsSpc = [rLab, pLab]
-            ct        = iRefPrtcl.gets()[nLoc]/iRefPrtcl.getb0(nLoc) - TrcSpc[4]
+            ct        = iRefPrtcl.gets()[nLoc]/iRefPrtcl.getb0(nLoc) - \
+                TrcSpc[4]
             Success   = self.setLabPhaseSpace(LabPhsSpc, ct)
 
             nLoc  += 1
@@ -546,10 +567,12 @@ class Particle:
         
         if self.getDebug():
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Particle.fillPhaseSpace: RPLC phase space:", \
+                print("     ----> Particle.fillPhaseSpace:", \
+                      "RPLC phase space:", \
                       PhsSpc)
             with np.printoptions(linewidth=500,precision=7,suppress=True):
-                print("     ----> Particle.fillPhaseSpace:  Lab phase space:", \
+                print("     ----> Particle.fillPhaseSpace:", \
+                      "Lab phase space:", \
                       LabPhsSpc)
             print(" <----  Particle.fillPhaseSpace, compete.", \
                   "Success:", Success)
@@ -649,6 +672,11 @@ class Particle:
         b0  = p0/E0
         E   = E0 + TrcSpc[5]*p0
 
+        if cls.getDebug():
+            with np.printoptions(linewidth=500,precision=7,suppress=True):
+                print("     ---->     b0:", b0, \
+                      "           TrcSpc:", TrcSpc)
+                
         D   = mth.sqrt(1. + \
                        2.*TrcSpc[5]/b0 +
                        TrcSpc[5]**2)
@@ -2160,10 +2188,9 @@ class pion(Particle):
         return " pion __str__ done."
 
     def decay(self, iLoc, TrcSpc):
-        iAddr = iLoc - 2
         if self.getDebug():
             print(" pion(Particle).decay: decay this particle:", \
-                  "at location:", iLoc, "address", iAddr)
+                  "at location:", iLoc)
             with np.printoptions(\
                             linewidth=500,precision=7,suppress=True):
                 print("     ----> Pion trace space   :", \
@@ -2225,7 +2252,7 @@ class pion(Particle):
         Particle.addDECAYparticle2stack("neutrino", \
                                         LabPhsSpc[0], neutL, ct, iLoc, self)
         
-        
+    
 class muon(Particle):
     __instance     = []
 
@@ -2253,6 +2280,17 @@ class muon(Particle):
 
         return
 
+    def decay(self, iLoc, TrcSpc):
+        if self.getDebug():
+            print(" muon(Particle).decay: decay this particle:", \
+                  "at location:", iLoc)
+            with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                print("     ----> Muon trace space   :", \
+                      TrcSpc)
+        print(" muon(Particle).decay: decay this particle:", \
+              " Not yet coded!")
+    
 
 class neutrino(Particle):
     __instance     = []

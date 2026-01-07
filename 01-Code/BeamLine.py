@@ -344,11 +344,11 @@ class BeamLine(object):
                 
             if iRefPrtcl.getSpecies() == _Species:
                 if cls.getDebug():
-                    print(" <---- Found! return:", id(iRefPrtcl))
-                return iRefPrtcl
+                    print(" <---- Return:", RefPrtcl)
+                break
 
-        if cls.getDebug():
-            print(" <---- Not found! return:", RefPrtcl)
+        return iRefPrtcl
+        
         
     @classmethod
     def setSrcTrcSpc(cls, SrcTrcSpc=np.array([])):
@@ -1453,14 +1453,15 @@ class BeamLine(object):
                         if CleanAfterWrite:
                             Prtcl.Particle.cleanParticles()
                         #del PrtclInst
-            
+
                     if cls.getDebug():
                         print("     ----> After remove", \
                               Prtcl.Particle.getDECAYproductSTACK())
                         print(" End of product treatment")
-
+                        
                 iRefPrtcl = cls.findReferenceParticle(parentSPECIES)
                 cls.setcurrentReferenceParticle(iRefPrtcl)
+
             
         if (cls.getDebug() or NEvts > 1) and \
         Smltn.Simulation.getProgressPrint():
@@ -1507,7 +1508,7 @@ class BeamLine(object):
 
             elif BeamLine.checkDecay(iBLE, iRefPrtcl, PrtclInst, iLoc, \
                                  TrcSpc):
-                PrtclInst.decay(iLoc, TrcSpc)
+                PrtclInst.decay(iLoc-1, TrcSpc_i)
                 break
                 
             else:
@@ -1699,6 +1700,7 @@ class BeamLine(object):
                     BLE.Facility.readElement(beamlineFILEinst)
                 if EoF:
                     return EoF
+
             elif derivedCLASS == "Source":
                 EoF, Mode, Params = BLE.Source.readElement(beamlineFILEinst)
                 if EoF:

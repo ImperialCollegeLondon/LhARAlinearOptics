@@ -166,7 +166,7 @@ class BeamIO:
                     print("         ----> File opened for write.")
                 
                 self.writeFIRSTword()
-                self.writeVersion("BeamIO v7")
+                self.writeVersion("BeamIO v8")
                 self.writeREPOversion()
                 
             else:
@@ -591,7 +591,7 @@ class BeamIO:
                        ]
         
         if self.getDebug():
-            print(" <----> repoVERSION:", repoVERSION)
+            print(" <---- repoVERSION:", repoVERSION)
 
         return repoVERSION
 
