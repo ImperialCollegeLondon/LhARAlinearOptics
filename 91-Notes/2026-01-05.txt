@@ -69,17 +69,17 @@ Tests:
  - OctupoleTst.py                     - Fails
 
 Scripts:
- - 2BDSIM.py
- - plotBeam.py
- - plotextrapolatedBeam.py
- - runBeamSim.py
- - readBeamSim.py
- - visualiseBeam.py
+ - 2BDSIM.py                          - OK
+ - plotBeam.py                        - OK
+ - plotextrapolatedBeam.py            - OK
+ - runBeamSim.py                      - OK
+ - readBeamSim.py                     - OK
+ - visualiseBeam.py                   - OK
 
 UserDirectory:
- - EnvelopeAnalysis.py
- - UserAnalysis.py
- - visualiseBeam.py
+ - EnvelopeAnalysis.py                - OK
+ - UserAnalysis.py                    - OK
+ - visualiseBeam.py                   - OK
 
 
 --------  --------  --------  --------  --------  --------  --------  --------
