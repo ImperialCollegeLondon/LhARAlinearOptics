@@ -1111,7 +1111,7 @@ class Facility(BeamLineElement):
             " Facility: bad specification for vacuum chamber mother volume!"
                                          )
 
-            if _species0in == None:
+            if _species0in == None or _species0in == []:
                 wrngs.warn("Facility(BeamLineElement): no species given," + \
                            " use default, proton")
                 _species0 = ["proton"]
@@ -1123,11 +1123,15 @@ class Facility(BeamLineElement):
                 raise badBeamLineElement( \
                         " Facility: bad species0:" + str(_species0in) \
                                          )
+
+            if self.getDebug():
+                print("         ---->       _p0:", _p0, "\n", \
+                      "              _species0:", _species0)
+
             if len(_p0) != len(_species0):
                 raise badBeamLineElement( \
             " Facility: length of p0 and species0 not the same!" \
                                          )
-                
             self.setp0(_p0)
             self.setVCMVr(_VCMVr)
             self.setspecies0(_species0)
@@ -1144,7 +1148,6 @@ class Facility(BeamLineElement):
                   " attempt to create facility.", \
                   " Abort!")
             raise secondFacility(" Second call not allowed.")
-                
             
     def __repr__(self):
         return "Facility()"

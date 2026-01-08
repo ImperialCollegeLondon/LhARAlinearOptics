@@ -1,0 +1,156 @@
+--------  --------  --------  --------  --------  --------  --------  08JAN26
+Have managed to make an update to include pion decay.  Need now to check all
+tests and scripts.  Muon decay not yet implemented.  Need to do that in a next
+iteration.
+
+So, job for now is to do tests etc., generate jobs list, and perhaps share with
+Paul if he is interested to do it.
+
+Tests:
+ - ApertureTst.py                     - OK
+ - BeamIOTst-wrt.py                   - OK
+ - BeamIOTst-rd.py                    - OK; had to add V8 check and fix a
+                                            glitch in defaultinh species in
+					    V2
+ - BeamIOTst-rd-BDSIM.py              - OK
+ - BeamLineElementTst.py              - OK
+ - BeamLineTst.py                     - OK
+ - BeamTst.py                         - OK
+ - CylindricalRFCavityTst.py          - OK
+ - CylindricalRFCavityTst-12C6.py     - OK
+ - DRACOfacilityTst.py                - OK
+ - decayCHAIN.py                      - OK; has to fix parameter file for
+                                            species format.
+ - DefocusQuadTst.py                  - OK
+ - DefocusQuad-12C6-Tst.py            - OK
+ - DipoleTst.py                       - OK
+ - Dipole-12C6-Tst.py                 - OK; had to fix charge in setLength
+ - DriftTst.py                        - OK
+ - Drift-12C6-Tst.py                  - OK
+ - ExpSourceTst.py                    - OK
+ - ExpSourceTst_rms_KE.py             - OK
+ - FacilityTst.py                     - OK
+ - FocusQuadTst.py                    - OK
+ - FocusQuad-12C6-Tst.py              - OK
+ - GaborLensTst.py                    - OK
+ - GaborLens-12C6-Tst.py              - OK
+ - LIONfacilityTst.py                 - OK
+ - LaTexTst.py                        - OK
+ - LhARAFacility-from-datafile-Tst.py - OK
+ - LhARAFacilityTst.py                - OK
+ - LhARALinearOpticsTst.py            - OK
+ - LhARAMagnetTable.py                - OK
+ - ParticleTst.py                     - OK
+ - PhysicalConstantsTst.py            - OK
+ - pionDECAYtst.py                    - 
+ - QuadDoubletTst.py                  - OK
+ - QuadTripletTst.py                  - OK
+ - RPLCswitchTst.py                   - OK
+ - ReferenceParticleTst.py            - OK
+ - RunDRACOsimulation.py              - OK
+ - RunLIONsimulation.py               - OK
+ - RunLhARAsimulation.py              - OK
+ - ReadDRACOsimu.py                   - OK
+ - ReadLIONsimu.py                    - OK
+ - ReadLhARAsimu.py                   - OK
+ - RunPIONdecaytst.py                 - OK
+ - RunSimulationTst.py                - OK
+ - SimulationTst.py                   - OK
+ - SolenoidTst.py                     -	OK
+ - Solenoid-12C6-Tst.py               - OK
+ - SourceTst.py                       - OK
+ - TestWrite.py                       - OK -- Pension off?
+ - TestRead.py                        - OK -- Pension off?
+ - extrapolatedBeamTst.py             - OK
+ - plotQuadTriplet.py                 - OK
+ - plotTrajectory.py                  - OK
+ - visualiseTst.py                    - OK
+
+ - OctupoleTst.py                     - Fails
+
+Scripts:
+ - 2BDSIM.py
+ - plotBeam.py
+ - plotextrapolatedBeam.py
+ - runBeamSim.py
+ - readBeamSim.py
+ - visualiseBeam.py
+
+UserDirectory:
+ - EnvelopeAnalysis.py
+ - UserAnalysis.py
+ - visualiseBeam.py
+
+
+--------  --------  --------  --------  --------  --------  --------  --------
+Tests:
+ - ApertureTst.py                     - 
+ - BeamIOTst-wrt.py                   - 
+ - BeamIOTst-rd.py                    - 
+ - BeamIOTst-rd-BDSIM.py              - 
+ - BeamLineElementTst.py              - 
+ - BeamLineTst.py                     - 
+ - BeamTst.py                         - 
+ - CylindricalRFCavityTst.py          - 
+ - CylindricalRFCavityTst-12C6.py     - 
+ - DRACOfacilityTst.py                - 
+ - decayCHAIN.py                      - 
+ - DefocusQuadTst.py                  - 
+ - DefocusQuad-12C6-Tst.py            - 
+ - DipoleTst.py                       - 
+ - Dipole-12C6-Tst.py                 - 
+ - DriftTst.py                        - 
+ - Drift-12C6-Tst.py                  - 
+ - ExpSourceTst.py                    - 
+ - ExpSourceTst_rms_KE.py             - 
+ - FacilityTst.py                     - 
+ - FocusQuadTst.py                    - 
+ - FocusQuad-12C6-Tst.py              - 
+ - GaborLensTst.py                    - 
+ - GaborLens-12C6-Tst.py              - 
+ - LIONfacilityTst.py                 - 
+ - LaTexTst.py                        - 
+ - LhARAFacility-from-datafile-Tst.py - 
+ - LhARAFacilityTst.py                - 
+ - LhARALinearOpticsTst.py            - 
+ - LhARAMagnetTable.py                - 
+ - ParticleTst.py                     - 
+ - PhysicalConstantsTst.py            - 
+ - pionDECAYtst.py                    - 
+ - QuadDoubletTst.py                  - 
+ - QuadTripletTst.py                  - 
+ - RPLCswitchTst.py                   - 
+ - ReferenceParticleTst.py            - 
+ - RunDRACOsimulation.py              - 
+ - RunLIONsimulation.py               - 
+ - RunLhARAsimulation.py              - 
+ - ReadDRACOsimu.py                   - 
+ - ReadLIONsimu.py                    - 
+ - ReadLhARAsimu.py                   - 
+ - RunSimulationTst.py                - 
+ - RunPIONdecaytst.py                 - 
+ - SimulationTst.py                   - 
+ - SolenoidTst.py                     - 
+ - Solenoid-12C6-Tst.py               - 
+ - SourceTst.py                       - 
+ - TestWrite.py                       - 
+ - TestRead.py                        - 
+ - extrapolatedBeamTst.py             - 
+ - plotQuadTriplet.py                 -
+ - plotTrajectory.py                  - 
+ - visualiseTst.py                    - 
+
+ - OctupoleTst.py                     - 
+
+Scripts:
+ - 2BDSIM.py                          - 
+ - plotBeam.py                        - 
+ - plotextrapolatedBeam.py            - 
+ - runBeamSim.py                      - 
+ - readBeamSim.py                     - 
+ - visualiseBeam.py                   - 
+
+UserDirectory:
+ - EnvelopeAnalysis.py                - 
+ - UserAnalysis.py                    - 
+ - visualiseBeam.py                   - 
