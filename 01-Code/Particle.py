@@ -382,8 +382,8 @@ class Particle:
             self._Decay = _Decay
         else:
             raise badDECAY()
+        
 
-    
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 
@@ -425,7 +425,7 @@ class Particle:
     def getDECAY(self):
         return self._Decay
 
-    
+
 #--------  Processing methods:
     @staticmethod
     def createParticle():
@@ -797,6 +797,7 @@ class Particle:
         return TrcSpc
 
     def visualise(self, CoordSys, Projection, axs):
+        self.setDebug(True)
         if self.getDebug():
             print(" Particle.visualise: start")
             print("     ----> Coordinate system:", CoordSys)
@@ -816,6 +817,21 @@ class Particle:
 
         sorz = []
         xory = []
+
+        locSTRT = 0
+        if self.getLocation()[0] != \
+           BL.BeamLine.getcurrentReferenceParticle().getLocation()[0]:
+            
+            for iLoc in range(len( \
+                BL.BeamLine.getcurrentReferenceParticle().getLocation())):
+                if self.getLocation()[0] == \
+                BL.BeamLine.getcurrentReferenceParticle().getLocation()[iLoc]:
+                    locSTRT = iLoc
+                    break
+                
+        if self.getDebug():
+            print("     ----> Starting location:", locSTRT)
+            
         #..  Plotting as a function of s if RPLC or z if laboratory:
         if CoordSys == "RPLC":
             iCrd = 0
@@ -823,9 +839,10 @@ class Particle:
             if Projection == "ys":
                 iCrd = 2
                 axl  = "y"
-            sorz = BL.BeamLine.getcurrentReferenceParticle().getsOut()
+            sorz = \
+                BL.BeamLine.getcurrentReferenceParticle().getsOut()[locSTRT:]
             for TrcSpc in self.getTraceSpace():
-                xory.append(TrcSpc[iCrd])
+                xory.append(TrcSpc[iCrd])            
 
         elif CoordSys == "Lab":
             iCrd = 0
@@ -843,12 +860,26 @@ class Particle:
             print("     ----> len, sorz:", len(sorz), sorz)
             print("     ----> len, xory:", len(xory), xory)
             print("     ----> len ref. prtcl.:", \
-                  len(ReferenceParticle.getinstances("All").getsOut()))
+                  len(BL.BeamLine.getcurrentReferenceParticle().getsOut()))
 
-        if len(BL.BeamLine.getcurrentReferenceParticle().getsOut()) > len(xory):
-            axs.plot(sorz[0:len(xory)], xory, color='salmon', linewidth='0.5')
+            print(self.getSpecies())
+            if self.getSpecies() == "pion":
+                Particle.trcspclast = self.getTraceSpace()[-1]
+                Particle.sorzlast   = sorz[len(self.getTraceSpace())]
+                print(Particle.trcspclast)
+            if self.getSpecies() == "muon":
+                print(Particle.sorzlast)
+                print(sorz[0])
+                print(len(sorz), len(xory))
+                print(Particle.trcspclast)
+                print(self.getTraceSpace()[0])
+                
+        if len(sorz) > len(xory):
+            axs.plot(sorz[0:len(xory)], xory, color='salmon', \
+                     linewidth='0.5')
         else:
-            axs.plot(sorz, xory, color='darkgray', linewidth='0.5', zorder=2)
+            axs.plot(sorz, xory, color='darkgray', linewidth='0.5', \
+                     zorder=2)
 
         if CoordSys == "RPLC":
             axs.set_xlabel('s (m)')
@@ -2264,7 +2295,7 @@ class pion(Particle):
         Particle.addDECAYparticle2stack("neutrino", \
                                         LabPhsSpc[0], neutL, ct, iLoc, self)
         
-    
+        
 class muon(Particle):
     __instance     = []
 

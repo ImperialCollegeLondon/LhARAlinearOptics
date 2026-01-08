@@ -1449,6 +1449,29 @@ class BeamLine(object):
                     SrcTrcSpc = iPRDCT.LabPhaseSpace2RPLCTraceSpace( \
                                                 LabPhsSpc, ct, prdctLocStrt)
 
+                    #.. Record particle at decay location:
+                    zEnd = -999999.
+                    sEnd = iRefPrtcl.gets()[prdctLocStrt]
+                    if cls.getDebug():
+                        print("     ----> Start tracking decay particle:")
+                        print("         ----> BLE:", \
+                              iRefPrtcl.getLocation()[prdctLocStrt])
+                        print("         ----> zEnd, sEnd:", zEnd, sEnd)
+                        with np.printoptions(linewidth=500,precision=7, \
+                                             suppress=True):
+                            print("         ----> TrcSpc:", SrcTrcSpc)
+                    Success = iPRDCT.recordParticle( \
+                                    iRefPrtcl.getLocation()[prdctLocStrt], \
+                                                       zEnd, \
+                                                       sEnd, \
+                                                       SrcTrcSpc)
+                    if cls.getDebug():
+                        with np.printoptions(linewidth=500,precision=7, \
+                                             suppress=True):
+                            print("     ----> TrcSpc record:", \
+                                  iPRDCT.getTraceSpace()[0])
+                    
+                    #.. :
                     cls.trackPARTICLE(SrcTrcSpc,  \
                                       prdctLocStrt, \
                                       newREFprtcl,
