@@ -533,6 +533,17 @@ class Particle:
 
         iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
 
+        locSTRT = 0
+        if self.getLocation()[0] != \
+           BL.BeamLine.getcurrentReferenceParticle().getLocation()[0]:
+            
+            for iLoc in range(len( \
+                BL.BeamLine.getcurrentReferenceParticle().getLocation())):
+                if self.getLocation()[0] == \
+                BL.BeamLine.getcurrentReferenceParticle().getLocation()[iLoc]:
+                    locSTRT = iLoc
+                    break
+                
         nLoc = 0
         for iLoc in self.getLocation():
             if self.getDebug():
@@ -542,7 +553,7 @@ class Particle:
             PhsSpc  = self.calcRPLCPhaseSpace(nLoc)
             Success = self.setRPLCPhaseSpace(PhsSpc)
 
-            RotMtrx = iRefPrtcl.getRot2LabOut()[nLoc]
+            RotMtrx = iRefPrtcl.getRot2LabOut()[locSTRT+nLoc]
             if self.getDebug():
                 print("         ----> Rotation matrix:", \
                       RotMtrx)
@@ -553,11 +564,12 @@ class Particle:
             else:
                 pLab    = np.array([None, None, None])
 
-            rLab    = iRefPrtcl.getRrOut()[nLoc][0:3] + drLab
+            rLab    = iRefPrtcl.getRrOut()[locSTRT+nLoc][0:3] + drLab
 
             LabPhsSpc = [rLab, pLab]
-            ct        = iRefPrtcl.gets()[nLoc]/iRefPrtcl.getb0(nLoc) - \
-                TrcSpc[4]
+            ct        = iRefPrtcl.gets()[locSTRT+nLoc] / \
+                             iRefPrtcl.getb0(locSTRT+nLoc) - \
+                                   TrcSpc[4]   
             Success   = self.setLabPhaseSpace(LabPhsSpc, ct)
 
             nLoc  += 1
@@ -797,7 +809,6 @@ class Particle:
         return TrcSpc
 
     def visualise(self, CoordSys, Projection, axs):
-        self.setDebug(True)
         if self.getDebug():
             print(" Particle.visualise: start")
             print("     ----> Coordinate system:", CoordSys)
@@ -841,8 +852,10 @@ class Particle:
                 axl  = "y"
             sorz = \
                 BL.BeamLine.getcurrentReferenceParticle().getsOut()[locSTRT:]
+            locEND = locSTRT
             for TrcSpc in self.getTraceSpace():
-                xory.append(TrcSpc[iCrd])            
+                xory.append(TrcSpc[iCrd])
+                locEND += 1
 
         elif CoordSys == "Lab":
             iCrd = 0
@@ -852,9 +865,11 @@ class Particle:
                 axl  = "y"
 
             iAddr = -1
+            locEND = locSTRT
             for RrOut in self.getLabPhaseSpace():
                 xory.append(RrOut[0][iCrd])
                 sorz.append(RrOut[0][2])
+                locEND += 1
 
         if self.getDebug():
             print("     ----> len, sorz:", len(sorz), sorz)
@@ -865,7 +880,7 @@ class Particle:
             print(self.getSpecies())
             if self.getSpecies() == "pion":
                 Particle.trcspclast = self.getTraceSpace()[-1]
-                Particle.sorzlast   = sorz[len(self.getTraceSpace())]
+                Particle.sorzlast   = sorz[len(self.getTraceSpace())-1]
                 print(Particle.trcspclast)
             if self.getSpecies() == "muon":
                 print(Particle.sorzlast)
@@ -873,8 +888,8 @@ class Particle:
                 print(len(sorz), len(xory))
                 print(Particle.trcspclast)
                 print(self.getTraceSpace()[0])
-                
-        if len(sorz) > len(xory):
+
+        if locEND != len(BL.BeamLine.getcurrentReferenceParticle().getsOut()):
             axs.plot(sorz[0:len(xory)], xory, color='salmon', \
                      linewidth='0.5')
         else:

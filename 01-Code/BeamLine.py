@@ -1451,17 +1451,17 @@ class BeamLine(object):
 
                     #.. Record particle at decay location:
                     zEnd = -999999.
-                    sEnd = iRefPrtcl.gets()[prdctLocStrt]
+                    sEnd = iRefPrtcl.gets()[prdctLocStrt-1]
                     if cls.getDebug():
                         print("     ----> Start tracking decay particle:")
                         print("         ----> BLE:", \
-                              iRefPrtcl.getLocation()[prdctLocStrt])
+                              iRefPrtcl.getLocation()[prdctLocStrt-1])
                         print("         ----> zEnd, sEnd:", zEnd, sEnd)
                         with np.printoptions(linewidth=500,precision=7, \
                                              suppress=True):
                             print("         ----> TrcSpc:", SrcTrcSpc)
                     Success = iPRDCT.recordParticle( \
-                                    iRefPrtcl.getLocation()[prdctLocStrt], \
+                                    iRefPrtcl.getLocation()[prdctLocStrt-1], \
                                                        zEnd, \
                                                        sEnd, \
                                                        SrcTrcSpc)
