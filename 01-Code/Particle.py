@@ -162,6 +162,7 @@ import sys
 
 import BeamIO            as bmIO
 import pionDECAY         as pionDCY
+import muonDECAY         as muonDCY
 import BeamLine          as BL
 import BeamLineElement   as BLE
 #import PhysicalConstants as PhysCnstnts
@@ -378,7 +379,8 @@ class Particle:
 
     def setDECAY(self, _Decay):
 
-        if isinstance(_Decay, pionDCY.pionDECAY):
+        if isinstance(_Decay, pionDCY.pionDECAY) or \
+           isinstance(_Decay, muonDCY.muonDECAY):
             self._Decay = _Decay
         else:
             raise badDECAY()
