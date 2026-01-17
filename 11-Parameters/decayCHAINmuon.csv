@@ -1,16 +1,14 @@
 ﻿Stage,Section,Element,Type,Parameter,Value,Unit,Comment
 0,Facility,Global,Name,Name,Decay chain,,
-0,Facility,Global,Reference particle,Kinetic energy,6000,MeV,
-0,Facility,Global,Reference particle,Kinetic energy 1,5000,MeV,
-0,Facility,Global,Reference particle,Kinetic energy 1,2000,MeV,
-0,Facility,Global,Reference particle,Species,pion,,
-0,Facility,Global,Reference particle,Species 1,muon,,
+0,Facility,Global,Reference particle,Kinetic energy,400,MeV,
+0,Facility,Global,Reference particle,Kinetic energy 1,200,MeV,
+0,Facility,Global,Reference particle,Species,muon,,
 0,Facility,Global,Reference particle,Species 1,electron,,
 0,Facility,Global,Reference particle,Species 1,neutrino,,
 0,Facility,Global,Vacuum chamber,Mother volume radius,0.5,m,
 1,Source,Source,Uniform disc,SourceMode,4,,Uniform disc
-1,Source,Source,Uniform disc,MeanEnergy,6000,MeV,
-1,Source,Source,Uniform disc,SigmaEnergy,600,MeV,
+1,Source,Source,Uniform disc,MeanEnergy,400,MeV,
+1,Source,Source,Uniform disc,SigmaEnergy,20,MeV,
 1,Source,Source,Uniform disc,Radius,0.001,m,
 2,Decay,Drift,,Length,1,m,1
 2,Decay,Drift,,Length,1,m,2

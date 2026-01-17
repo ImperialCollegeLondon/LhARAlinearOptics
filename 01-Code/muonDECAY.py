@@ -92,6 +92,9 @@ class muonDECAY:
 #--------  "Built-in methods":
     def __init__(self, **kwargs):
 
+        if self.getDebug():
+            print(" muonDECAY.muonDECAY: instanciation:")
+            
         Tmax = kwargs.get('Tmax', float('inf'))
 
         self._Lifetime = self.GenerateLifetime(Tmax=Tmax)
@@ -105,34 +108,52 @@ class muonDECAY:
         self._costheta = costheta
         self._cosphi   = cosphi
 
+        if self.getDebug():
+            print(self)
+
         return
 
     def __repr__(self):
         return "muonDECAY()"
 
     def __str__(self):
-        return "muonDECAY: Lifetime=%g, \r\n \
+        sumE = self.getve()[0] + self.getvnue()[0] + self.getvnumu()[0] 
+        sumP = self.getve()[1:] + self.getvnue()[1:] + self.getvnumu()[1:] 
+
+        return " muonDECAY: Lifetime=%g, \r\n \
                            v_e=(%g, [%g, %g, %g]), \r\n \
                          v_nue=(%g, [%g, %g, %g]), \r\n \
-                        v_numu=(%g, [%g, %g, %g]),      \
+                        v_numu=(%g, [%g, %g, %g]), \r\n \
+             sumE=%g, sumP=[%g, %g, %g]                 \
                " % (self._Lifetime,                                  \
                      self._v_e[0], self._v_e[1], self._v_e[2], \
                                                     self._v_e[3], \
                      self._v_nue[0], self._v_nue[1], self._v_nue[2], \
                                                    self._v_nue[3],      \
                      self._v_numu[0], self._v_numu[1], \
-                                     self._v_numu[2], self._v_numu[3])
+                                     self._v_numu[2], self._v_numu[3], \
+                                     sumE, sumP[0], sumP[1], sumP[2])
 
     
 #--------  "Dynamic methods"; individual lifetime, energies, and angles
     def GenerateLifetime(self, **kwargs):
+        if self.getDebug():
+            print("     ----> muonD£ECAY.GenerateLifetimme: starts")
         Tmax = kwargs.get('Tmax', float('inf'))
         Gmx = 1. - mth.exp( -Tmax / iPC.tauMuon() )
+        
         ran = Simu.getRandom() * Gmx
         lt = -mth.log(1.-ran) * iPC.tauMuon()
+        
+        if self.getDebug():
+            print("     <---- Tmax, lt:", Tmax, lt)
+            
         return lt
 
     def GenerateScldE(self):
+        if self.getDebug():
+            print("         ----> muonDECAY.GenerateScldE: start:")
+            
 #----  See P. 3, my "Notes and calcs"
         f_nue = 0.5
         f_e   = 0.
@@ -165,6 +186,9 @@ class muonDECAY:
             else:
                 f_e = Rt
 
+            if self.getDebug():
+                print("             ----> f_e:", f_e)
+
 #.. fractional electron-neutrino energy:
             Alpha   = (1. - f_e)**2 * (1. + 2.*f_e)
             Gnue    = Simu.getRandom()
@@ -192,6 +216,7 @@ class muonDECAY:
                 raise Exception(Err)
             else:
                 f_nue = Rt
+                
             if (1.-f_e) > f_nue:
                 print(" (1.-f_e) > f_nue:", \
                       f_e, (1.-f_e), f_nue, (f_e + f_nue))
@@ -199,20 +224,20 @@ class muonDECAY:
                 print(" (f_e+f_nue) < 1.:", \
                       f_e, (1.-f_e), f_nue, (f_e + f_nue))
                         
-            """ Start old code
-            gam = 1.
-            x   = 1.
-            while gam > x*(1.-x):
-                x   = Simu.getRandom()
-                gam = Simu.getRandom()
-            f_nue = x
-            End old code """
+            if self.getDebug():
+                print("             ----> f_nue:", f_nue)
 
         f_numu = 2. - f_e - f_nue
+        if self.getDebug():
+            print("             ----> f_numu:", f_numu)
+            print("         <---- f_e, f_nue, f_numu:", f_e, f_nue, f_numu)
         
         return f_e, f_nue, f_numu
     
     def get3vectors(self, f_e, f_nue, f_numu):
+        if self.getDebug():
+            print("         ----> muonDECAY.get3vectors: start:")
+            
 #----  See P. 3, my "Notes and calcs"
 #.. electron neutrino
         costheta = 1. - 2.*( 1./f_e + 1/f_nue - 1/(f_e*f_nue) )
@@ -226,14 +251,29 @@ class muonDECAY:
         theta = mth.acos(costheta) * 180./mth.pi
         phi   = mth.acos(cosphi)   * 180./mth.pi
 
+        if self.getDebug():
+            print("             ----> cosphi, sinphi, diff, theta, phi:", \
+                  cosphi, sinphi, diff, theta, phi)
+
 #.. Three vectors:
         p_e    = np.array([             0., 0., f_e            ])
         p_nue  = np.array([ f_nue*sintheta, 0., f_nue*costheta ])
         p_numu = np.array([  f_numu*sinphi, 0., f_numu*cosphi  ])
         
+        if self.getDebug():
+            print("         <---- Return with:")
+            print("                  p_e:", p_e)
+            print("                p_nue:", p_nue)
+            print("               p_numu:", p_numu)
+            print("             costheta:", costheta)
+            print("               cosphi:", cosphi)
+            
         return p_e, p_nue, p_numu, costheta, cosphi
 
     def ranCoor(self, p_e, p_nue, p_numu):
+        if self.getDebug():
+            print("         ----> muonDECAY.ranCoor: start:")
+            
 #.. Rotation angles
         alpha  = Simu.getRandom() * 2.*mth.pi
         calpha = mth.cos(alpha)
@@ -263,6 +303,9 @@ class muonDECAY:
              [sgamma   ,  cgamma,      0.      ], \
              [0.       , 0.,      1.      ] \
                                    ])
+        if self.getDebug():
+            print("             ----> alpha, cbeta, gamma:", \
+                  alpha, cbeta, gamma)
 
         Rr = np.dot(Ra, Rb)
         Rr = np.dot(Rr, Rc)
@@ -272,9 +315,18 @@ class muonDECAY:
         p_nue1  = np.dot(Rr, p_nue)
         p_numu1 = np.dot(Rr, p_numu)
 
+        if self.getDebug():
+            print("         <---- Returnn with:")
+            print("                   p_e1:", p_e1)
+            print("                 p_nue1:", p_nue1)
+            print("                p_numu1:", p_numu1)
+            
         return p_e1, p_nue1, p_numu1
 
     def decaymuon(self):
+        if self.getDebug():
+            print("     ----> muonDECAY.decayMUON starts:")
+            
 #.. Get scaled muon eneries:        
         f_e, f_nue, f_numu = self.GenerateScldE()
         
@@ -301,10 +353,24 @@ class muonDECAY:
         v_nue  = np.array([f_nue,  p_nue[0], p_nue[1], p_nue[2]])
         v_numu = np.array([f_numu, p_numu[0], p_numu[1], p_numu[2]])
 
+        if self.getDebug():
+            print("     <----    f_e:", f_e)
+            print("     <----  f_nue:", f_nue)
+            print("     <---- f_numu:", f_numu)
+            
         return v_e, v_nue, v_numu, costheta, cosphi
 
-#--------  "Get methods" only; version, reference, and constants
+#--------  "Set methods":
+    @classmethod
+    def setDebug(cls, Debug):
+        cls.__Debug = Debug
+    
+#--------  "Get methods":
 #.. Methods believed to be self documenting(!)
+    @classmethod
+    def getDebug(cls):
+        return cls.__Debug
+        
     def getLifetime(self):
         return self._Lifetime
 
@@ -322,4 +388,5 @@ class muonDECAY:
 
     def getcosphi(self):
         return deepcopy(self._cosphi)
+
     

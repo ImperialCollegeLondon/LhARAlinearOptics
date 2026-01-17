@@ -179,7 +179,7 @@ class Particle:
 
     decayPRODUCTstack = []
 
-    stable_species   = {"proton", "neutrino", "12c6"}
+    stable_species   = {"proton", "neutrino", "12c6", "electron"}
     unstable_species = {"pion", "muon"}
             
 #--------  "Built-in methods":
@@ -442,6 +442,7 @@ class Particle:
         elif species == "pion":       iPrtcl = pion()
         elif species == "muon":       iPrtcl = muon()
         elif species == "neutrino":   iPrtcl = neutrino()
+        elif species == "electron":   iPrtcl = electron()
         else:
             iPrtcl = Particle( \
                 BL.BeamLine.getcurrentReferenceParticle().getSpecies() \
@@ -479,6 +480,10 @@ class Particle:
     def getDECAYproductSTACK(cls):
         return cls.decayPRODUCTstack
 
+    @classmethod
+    def resetDECAYproductSTACK(cls):
+        cls.decayPRODUCTstack = []
+    
     @classmethod
     def fillPhaseSpaceAll(cls):
         Success = False
@@ -1650,6 +1655,8 @@ class ReferenceParticle(Particle):
             muon.__init__(self)
         elif species == "neutrino":
             neutrino.__init__(self)
+        elif species == "electron":
+            electron.__init__(self)
         elif species.lower() == "12c6":
             twelveC6.__init__(self)
         else:
@@ -2348,10 +2355,82 @@ class muon(Particle):
                             linewidth=500,precision=7,suppress=True):
                 print("     ----> Muon trace space   :", \
                       TrcSpc)
-        print(" muon(Particle).decay: decay this particle:", \
-              " Not yet coded!")
-    
 
+        if self.getDebug():
+            print( \
+                "     ----> Transform muon trace space to RPLC phase space:")
+        PhsSpc = self.RPLCTraceSpace2PhaseSpace(TrcSpc)
+        if self.getDebug():
+            with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                print("     <---- Muon RPLC phase space   :", \
+                      PhsSpc)
+
+        if self.getDebug():
+            print( \
+          "     ----> Transform muon RPLC phase space to lab phase space:")
+        LabPhsSpc, ct = self.RPLCTraceSpace2LabPhaseSpace(TrcSpc, iLoc)
+        if self.getDebug():
+            with np.printoptions(\
+                            linewidth=500,precision=7,suppress=True):
+                print("     ----> Muon lab phase space, ct:", \
+                      LabPhsSpc, ct)
+
+        muP  = LabPhsSpc[1]
+        muP2 = np.dot(muP, muP)
+        muE = mth.sqrt(muP2 + iPhysclCnstnts.mMuon()**2)
+        muonL = mmtm4(muE, muP[0], muP[1], muP[2])
+                
+        if self.getDebug():
+            print("     ---->   muP:", muP)
+            print("     ---->  muP2:", muP2)
+            print("     ---->   muE:", muE)
+            print("     ----> muonL:", muonL)
+            print("     ---->    ct:", ct)
+            print("     ----> call muonDCY.muonDECAY()")
+
+        self.setDECAY(muonDCY.muonDECAY())
+        if self.getDebug():
+            print("     <----      ve:", self.getDECAY().getve())
+            print("     <----    vnue:", self.getDECAY().getvnue())
+            print("     <----   vnumu:", self.getDECAY().getvnumu())
+
+        elecR = mmtm4(self.getDECAY().getve()[0], \
+                      self.getDECAY().getve()[1], \
+                      self.getDECAY().getve()[2], \
+                      self.getDECAY().getve()[3])
+        numuR = mmtm4(self.getDECAY().getvnumu()[0], \
+                      self.getDECAY().getvnumu()[1], \
+                      self.getDECAY().getvnumu()[2], \
+                      self.getDECAY().getvnumu()[3])
+        nueR  = mmtm4(self.getDECAY().getvnue()[0], \
+                      self.getDECAY().getvnue()[1], \
+                      self.getDECAY().getvnue()[2], \
+                      self.getDECAY().getvnue()[3])
+        if self.getDebug():
+            print("     ----> electron and neutrino masses:", \
+                  elecR.m, numuR.m, nueR.m)
+
+        elecL = elecR.boost_particle(muonL)
+        numuL = numuR.boost_particle(muonL)
+        nueL  = nueR.boost_particle(muonL)
+            
+        if self.getDebug():
+            print("         ----> electron 4 momentum in lab frame, mass:", \
+              elecL, elecL.m)
+            print("         ----> numu     4 momentum in lab frame, mass:", \
+              numuL, numuL.m)
+            print("         ----> nue      4 momentum in lab frame, mass:", \
+              nueL, nueL.m)
+
+        Particle.addDECAYparticle2stack("electron",     \
+                                        LabPhsSpc[0], elecL, ct, iLoc, self)
+        Particle.addDECAYparticle2stack("neutrino", \
+                                        LabPhsSpc[0], numuL, ct, iLoc, self)
+        Particle.addDECAYparticle2stack("neutrino", \
+                                        LabPhsSpc[0], nueL,  ct, iLoc, self)
+
+        
 class neutrino(Particle):
     __instance     = []
     __Debug      = False
@@ -2367,6 +2446,29 @@ class neutrino(Particle):
         
         #.. Particle class initialisation:
         Particle.__init__(self, "neutrino")
+        
+        # Only constants; print values that will be used:
+        if self.getDebug():
+            print("     ----> Type::", type(self))
+        
+        return
+
+
+class electron(Particle):
+    __instance     = []
+    __Debug      = False
+
+#--------  "Built-in methods":
+    def __init__(self):
+        
+        if self.getDebug():
+            print(' electron(Particle).__init__:', \
+                  'creating the electron object')
+
+        electron.__instance.append(self)
+        
+        #.. Particle class initialisation:
+        Particle.__init__(self, "electron")
         
         # Only constants; print values that will be used:
         if self.getDebug():

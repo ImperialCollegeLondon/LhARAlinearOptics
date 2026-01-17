@@ -1429,9 +1429,18 @@ class BeamLine(object):
                           "number of products:", 
                           Prtcl.Particle.getDECAYproductSTACK())
 
-                for iDCYprdct in \
-                              Prtcl.Particle.getDECAYproductSTACK().copy():
+                dcyPRDCTcnt = -1
+                while dcyPRDCTcnt+1 != \
+                      len(Prtcl.Particle.getDECAYproductSTACK()):
+                    
+                    dcyPRDCTcnt += 1
+                    
+                    iDCYprdct = \
+                        Prtcl.Particle.getDECAYproductSTACK()[dcyPRDCTcnt]
+
+                
                     Species = iDCYprdct[0]
+                        
                     doneDCY = True
                     newREFprtcl = cls.findReferenceParticle(Species)
                     cls.setcurrentReferenceParticle(newREFprtcl)
@@ -1476,8 +1485,8 @@ class BeamLine(object):
                                       prdctLocStrt, \
                                       newREFprtcl,
                                       iPRDCT)
-            
-                    Prtcl.Particle.getDECAYproductSTACK().remove(iDCYprdct)
+
+                    #Prtcl.Particle.getDECAYproductSTACK().remove(iDCYprdct)
 
                     #.. Write event:
                     if isinstance(ParticleFILE, io.BufferedWriter):
@@ -1493,15 +1502,17 @@ class BeamLine(object):
                         print("     ----> After remove", \
                               Prtcl.Particle.getDECAYproductSTACK())
                         print(" End of product treatment")
-                        
+
+                Prtcl.Particle.resetDECAYproductSTACK()
                 iRefPrtcl = cls.findReferenceParticle(parentSPECIES)
                 cls.setcurrentReferenceParticle(iRefPrtcl)
 
-            
         if (cls.getDebug() or NEvts > 1) and \
         Smltn.Simulation.getProgressPrint():
             print(" <---- End of this simulation, ", NEvts, \
                   " events generated")
+
+
             
     @staticmethod
     def trackPARTICLE(SrcTrcSpc, LocStrt, iRefPrtcl, PrtclInst):

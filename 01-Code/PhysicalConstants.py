@@ -60,7 +60,7 @@ import math
 class PhysicalConstants(object):
     __instance = None
     __Debug    = False
-    _Species   = ["proton", "pion", "muon", "neutrino", "12c6"]
+    _Species   = ["proton", "pion", "muon", "neutrino", "12c6", "electron"]
 
 #--------  "Built-in methods":
     def __new__(cls):
@@ -95,7 +95,9 @@ class PhysicalConstants(object):
         print("      ----> muon mass (MeV/c2):", self.mMuon())
         print("      ----> muon lifetime (s):", self.tauMuon())
         print("      ----> neutrino mass (MeV/c2):", self.mNeutrino())
+        print("      ----> electron mass (MeV/c2):", self.mElectron())
         print("      ----> neutrino lifetime (s):", self.tauNeutrino())
+        print("      ----> electron lifetime (s):", self.tauElectron())
         print("      ----> 12C6 mass (MeV/c2):", self.m12c6())
         print("      ----> 12C6 lifetime (s):", self.tau12c6())
         print("      ----> Permitivity of free space (N/A**2):", self.mu0())
@@ -155,6 +157,8 @@ class PhysicalConstants(object):
                 particleCHARGE = 1.
             elif _Species.lower() == "neutrino":
                 particleCHARGE = 0.
+            elif _Species.lower() == "electron":
+                particleCHARGE = 1.
             elif _Species.lower() == "12c6":
                 particleCHARGE = 6.
         else:
@@ -178,6 +182,8 @@ class PhysicalConstants(object):
                 particleMASS = self.mNeutrino()
             elif _Species.lower() == "12c6":
                 particleMASS = self.m12c6()
+            elif _Species.lower() == "electron":
+                particleMASS = self.me()
         else:
             raise badParameter("PhysicalConstants.getParticleMASS: " \
                                "Species " + _Species + " not allowed!")
@@ -197,6 +203,8 @@ class PhysicalConstants(object):
                 particleLifeTime = self.tauMuon()
             elif _Species.lower() == "neutrino":
                 particleLifeTime = self.tauNeutrino()
+            elif _Species.lower() == "electron":
+                particleLifeTime = self.tauElectron()
             elif _Species.lower() == "12c6":
                 particleLifeTime = self.tau12c6()
         else:
@@ -241,6 +249,9 @@ class PhysicalConstants(object):
         return math.inf
 
     def tauNeutrino(self):
+        return math.inf
+
+    def tauElectron(self):
         return math.inf
 
     def mu0(self):
