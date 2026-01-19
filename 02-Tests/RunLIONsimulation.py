@@ -22,7 +22,7 @@ filename    = os.path.join(HOMEPATH, \
 #                         '11-Parameters/LIONBeamLine-Params-Gauss.csv')
 #                         '11-Parameters/LIONBeamLine-Params-Flat.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(100000, filename, datafiledir, 'LIONsimu.dat')
+Smltn = Simu.Simulation(10000, filename, datafiledir, 'LIONsimu.dat')
 print()
 print(" <---- Simulation initialised.")
 print(BL.BeamLine.getinstances())

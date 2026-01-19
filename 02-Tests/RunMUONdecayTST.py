@@ -23,7 +23,7 @@ print("HOMEPATH", HOMEPATH)
 filename    = os.path.join(HOMEPATH, \
                 '11-Parameters/decayCHAINmuon.csv')
 datafiledir = os.path.join(HOMEPATH, '99-Scratch')
-Smltn = Simu.Simulation(100000, filename, datafiledir, 'muonDECAYtst.dat')
+Smltn = Simu.Simulation(10000, filename, datafiledir, 'muonDECAYtst.dat')
 if Debug:
     print(BL.BeamLine.getinstances())
 print()

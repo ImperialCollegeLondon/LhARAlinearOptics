@@ -95,7 +95,7 @@ class PhysicalConstants(object):
         print("      ----> muon mass (MeV/c2):", self.mMuon())
         print("      ----> muon lifetime (s):", self.tauMuon())
         print("      ----> neutrino mass (MeV/c2):", self.mNeutrino())
-        print("      ----> electron mass (MeV/c2):", self.mElectron())
+        print("      ----> electron mass (MeV/c2):", self.me())
         print("      ----> neutrino lifetime (s):", self.tauNeutrino())
         print("      ----> electron lifetime (s):", self.tauElectron())
         print("      ----> 12C6 mass (MeV/c2):", self.m12c6())
