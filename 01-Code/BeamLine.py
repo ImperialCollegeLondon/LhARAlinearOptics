@@ -345,6 +345,7 @@ class BeamLine(object):
         
     @classmethod
     def findReferenceParticle(cls, _Species):
+        iRefPrtcl = None
         if cls.getDebug():
             print(" BeamLine.findReferenceParticle;", _Species)
             
@@ -1432,12 +1433,15 @@ class BeamLine(object):
                 dcyPRDCTcnt = -1
                 while dcyPRDCTcnt+1 != \
                       len(Prtcl.Particle.getDECAYproductSTACK()):
-                    
+
                     dcyPRDCTcnt += 1
                     
                     iDCYprdct = \
                         Prtcl.Particle.getDECAYproductSTACK()[dcyPRDCTcnt]
 
+
+                    if cls.getDebug():
+                        print("     ----> Decay product:", iDCYprdct)
                 
                     Species = iDCYprdct[0]
                         

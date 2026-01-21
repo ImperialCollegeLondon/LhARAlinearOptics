@@ -226,6 +226,7 @@ class Particle:
         print("     ---->    Species:", self.getSpecies())
         print("     ---->     Charge:", \
                    iPhysclCnstnts.getparticleCHARGE(self.getSpecies()))
+        print("     ---->     Color:", self.getColor())
         print("     ----> Number of phase-space records:", \
               len(self.getLocation()))
         if len(self.getLocation()) > 0:
@@ -397,6 +398,9 @@ class Particle:
     def getinstances(cls):
         return cls.instances
 
+    def getColor(self):
+        return 'darkgray'
+            
     def getSpecies(self):
         return self._Species
             
@@ -884,23 +888,37 @@ class Particle:
             print("     ----> len ref. prtcl.:", \
                   len(BL.BeamLine.getcurrentReferenceParticle().getsOut()))
 
-            print(self.getSpecies())
+            print("     ----> Species:", self.getSpecies())
             if self.getSpecies() == "pion":
                 Particle.trcspclast = self.getTraceSpace()[-1]
                 Particle.sorzlast   = sorz[len(self.getTraceSpace())-1]
                 print(Particle.trcspclast)
             if self.getSpecies() == "muon":
+                Particle.trcspclast = self.getTraceSpace()[-1]
+                Particle.sorzlast   = sorz[len(self.getTraceSpace())-1]
                 print(Particle.sorzlast)
                 print(sorz[0])
                 print(len(sorz), len(xory))
                 print(Particle.trcspclast)
                 print(self.getTraceSpace()[0])
 
-        if locEND != len(BL.BeamLine.getcurrentReferenceParticle().getsOut()):
+        if locEND != \
+            len(BL.BeamLine.getcurrentReferenceParticle().getsOut()):
             axs.plot(sorz[0:len(xory)], xory, color='salmon', \
                      linewidth='0.5')
         else:
-            axs.plot(sorz, xory, color='darkgray', linewidth='0.5', \
+            color = 'darkgray'
+
+            refSPECIES0 = ReferenceParticle.getinstances("All")[0].getSpecies()
+            if self.getDebug():
+                print("     ----> set color: species, ref prtcl species:", \
+                      self.getSpecies(), refSPECIES0)
+            if self.getSpecies() != refSPECIES0:
+                color = self.getColor()
+            if self.getDebug():
+                print("     <---- color:", color, type(self))
+                
+            axs.plot(sorz, xory, color=color, linewidth='0.5', \
                      zorder=2)
 
         if CoordSys == "RPLC":
@@ -1380,13 +1398,16 @@ class Particle:
             species = brecord.decode('utf-8')
             if cls.getDebug():
                 print("     ----> Species:", species)
+            iRefPrtcl = BL.BeamLine.findReferenceParticle(species)
+            BL.BeamLine.setcurrentReferenceParticle(iRefPrtcl)
 
         else:
             iRefPrtcl = BL.BeamLine.getcurrentReferenceParticle()
-            species   = iRefPrtcl.getSpecies()
-            if cls.getDebug():
-                print("     ----> Reference particle species:", \
-                      species)
+            
+        species   = iRefPrtcl.getSpecies()
+        if cls.getDebug():
+            print("     ----> Reference particle species:", \
+                  species)
         
         brecord = ParticleFILE.read(4)
         if brecord == b'':
@@ -1399,7 +1420,10 @@ class Particle:
         if cls.getDebug():
             print("     ----> Number of locations to read:", nLoc)
         if nLoc > 0:
-            iPrtcl = Particle(species)
+            """
+                iPrtcl = Particle(species)
+            """
+            iPrtcl = Particle.createParticle()
 
         if cls.getDebug():
             print("     ----> Species:", species)
@@ -2238,9 +2262,6 @@ class pion(Particle):
         
         # Only constants; print values that will be used:
         if self.getDebug():
-            x = 1
-            y = 0
-            z = x/y
             print("     ----> pion lifetime:", lifetime, "s")
             print("   <---- remaining lifetime:", self.getRemainingLifetime())
             print(' pion(Particle).__init__: done.')
@@ -2253,6 +2274,9 @@ class pion(Particle):
     def __str__(self):
         self.print()
         return " pion __str__ done."
+
+    def getColor(self):
+        return('crimson')
 
     def decay(self, iLoc, TrcSpc):
         if self.getDebug():
@@ -2346,6 +2370,9 @@ class muon(Particle):
             print("   <---- remaining lifetime:", self.getRemainingLifetime())
 
         return
+
+    def getColor(self):
+        return('royalblue')
 
     def decay(self, iLoc, TrcSpc):
         if self.getDebug():
@@ -2453,6 +2480,9 @@ class neutrino(Particle):
         
         return
 
+    def getColor(self):
+        return 'cyan'
+        
 
 class electron(Particle):
     __instance     = []
@@ -2476,7 +2506,9 @@ class electron(Particle):
         
         return
 
-
+    def getColor(self):
+        return 'green'
+        
 class twelveC6(Particle):
     __instance     = []
     __Debug      = False
