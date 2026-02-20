@@ -1694,7 +1694,7 @@ class BeamLine(object):
             print(" <---- BeamLine.writeBeamLine done.")
         
     @classmethod
-    def readBeamLine(cls, beamlineFILEinst=None):
+    def readBeamLine(cls, beamlineFILEinst=None, version=None):
         if cls.getDebug():
             print(" BeamLine.readBeamLine starts.")
 
@@ -1806,6 +1806,10 @@ class BeamLine(object):
                 BLE.BeamLineElement.readElement(beamlineFILEinst)
             
             if derivedCLASS == "Facility":
+                if version != None:
+                    print(version)
+                    if version < 7:
+                        if species0 == []: species0 = ["proton"]
                 instBLE = BLE.Facility(Loc, r, v, dr, dv, \
                                        p0, VCMVr, species0)
                 if cls.getDebug():

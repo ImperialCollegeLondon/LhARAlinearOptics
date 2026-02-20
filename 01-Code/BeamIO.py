@@ -383,6 +383,7 @@ class BeamIO:
             if self.getDebug():
                 print("     ----> Id number:", nId)
                 
+            self.setDebug(True)
             Version = "Version 1"
             self.setdataFILEversion(1)
             if nId == 9999:
@@ -402,7 +403,7 @@ class BeamIO:
                     print(" BeamIO.readBeamDataRecord:", \
                           "reading data file version", Version)
                     
-                BL.BeamLine.readBeamLine(self)
+                BL.BeamLine.readBeamLine(self, self.getdataFILEversion())
 
             else:
                 if self.getDebug():
@@ -413,6 +414,7 @@ class BeamIO:
             if self.getDebug():
                 print("     <---- Data file format version:", \
                       self.getdataFILEversion())
+            self.setDebug(False)
         else:
             EoF = Prtcl.Particle.readParticle(self.getdataFILE(), \
                                               self.getdataFILEversion())

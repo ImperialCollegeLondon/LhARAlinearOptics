@@ -909,15 +909,19 @@ class BeamLineElement:
 #--------  Utilities:
     @classmethod
     def cleaninstances(cls):
+        cls.setDebug(True)
+        if cls.getDebug():
+            print(' BeamLineElement.cleaninstance: clean instances.')
         for inst in cls.instances:
             if cls.getDebug():
-                print(" Kill:", inst.getName())
+                print("     ----> Kill:", inst.getName())
             if isinstance(inst, Facility):
                 Facility.instance = None
             del inst
         cls.instances = []
         if cls.getDebug():
-            print(' BeamLineElement.cleaninstance: instances removed.')
+            print(' <---- BeamLineElement.cleaninstance: instances removed.')
+        cls.setDebug(False)
 
     @classmethod
     def removeInstance(cls, inst):
@@ -5657,6 +5661,7 @@ class Source(BeamLineElement):
     #.. clean all source instances:
     @classmethod
     def cleaninstances(cls):
+        cls.setDebug(True)
         if cls.getDebug():
             print(" Source(BeamLineElement).cleaninstance:")
         for inst in cls.getinstances():
@@ -5671,12 +5676,13 @@ class Source(BeamLineElement):
         cls.instances = []
         if cls.getDebug():
             print(' <---- Instances removed.')
+        cls.setDebug(False)
 
     @classmethod
     #.. Check through data frame and report legacy lines:
     def scanLEGACY(cls, pndsDF):
         if cls.getDebug():
-            print(" BeamLineElement.Source.scanLEGACY starts.", \
+            print(" Source(BeamLineElement).scanLEGACY starts.", \
                   "Source data frame:")
             print(pndsDF)
             
@@ -5690,7 +5696,8 @@ class Source(BeamLineElement):
         #.. Minimum kinetic energy:
         if bool(cleanedPNDS[cleanedPNDS["Parameter"] == \
                            "Emin"].any().any()):
-            print(" BeamLine.parseSource: Depricated parameter Emin,", \
+            print(" Source(BeamLineElement).scanLEGACY:", \
+                  "Depricated parameter Emin,", \
                   "use Kmin.")
 
             cleanedPNDS.loc[ \

@@ -940,6 +940,12 @@ class Particle:
 
         ReferenceParticle.cleaninstances()
         
+        proton.cleaninstances()
+        pion.cleaninstances()
+        muon.cleaninstances()
+        neutrino.cleaninstances()
+        twelveC6.cleaninstances()
+        
         DoneOK = True
 
         return DoneOK
@@ -2220,7 +2226,7 @@ class badDECAY(Exception):
 
 
 class proton(Particle):
-    __instance     = []
+    __instances     = []
 
 #--------  "Built-in methods":
     def __init__(self):
@@ -2228,8 +2234,8 @@ class proton(Particle):
             print(' proton(Particle).__init__:', \
                   'creating the proton object')
 
-        proton.__instance.append(self)
-        
+        proton.__instances.append(self)
+
         #.. Particle class initialisation:
         Particle.__init__(self, "proton")
         
@@ -2239,9 +2245,15 @@ class proton(Particle):
 
         return
 
+    @classmethod
+    def cleaninstances(cls):
+        for iPRTN in cls.__instances:
+            del iPRTN
+        cls.__instances = []
+
 
 class pion(Particle):
-    __instance     = []
+    __instances     = []
 
 #--------  "Built-in methods":
     def __init__(self):
@@ -2249,7 +2261,7 @@ class pion(Particle):
             print(' pion(Particle).__init__:', \
                   'creating the pion object')
 
-        pion.__instance.append(self)
+        pion.__instances.append(self)
         
         #.. Particle class initialisation:
         Particle.__init__(self, "pion")
@@ -2343,9 +2355,15 @@ class pion(Particle):
         Particle.addDECAYparticle2stack("neutrino", \
                                         LabPhsSpc[0], neutL, ct, iLoc, self)
         
-        
+    @classmethod
+    def cleaninstances(cls):
+        for iPRTN in cls.__instances:
+            del iPRTN
+        cls.__instances = []
+
+            
 class muon(Particle):
-    __instance     = []
+    __instances     = []
 
 #--------  "Built-in methods":
     def __init__(self):
@@ -2354,7 +2372,7 @@ class muon(Particle):
             print(' muon(Particle).__init__:', \
                   'creating the muon object')
 
-        muon.__instance.append(self)
+        muon.__instances.append(self)
         
         #.. Particle class initialisation:
         Particle.__init__(self, "muon")
@@ -2457,9 +2475,15 @@ class muon(Particle):
         Particle.addDECAYparticle2stack("neutrino", \
                                         LabPhsSpc[0], nueL,  ct, iLoc, self)
 
-        
+    @classmethod
+    def cleaninstances(cls):
+        for iPRTN in cls.__instances:
+            del iPRTN
+        cls.__instances = []
+
+            
 class neutrino(Particle):
-    __instance     = []
+    __instances     = []
     __Debug      = False
 
 #--------  "Built-in methods":
@@ -2469,7 +2493,7 @@ class neutrino(Particle):
             print(' neutrino(Particle).__init__:', \
                   'creating the neutrino object')
 
-        neutrino.__instance.append(self)
+        neutrino.__instances.append(self)
         
         #.. Particle class initialisation:
         Particle.__init__(self, "neutrino")
@@ -2483,9 +2507,15 @@ class neutrino(Particle):
     def getColor(self):
         return 'cyan'
         
+    @classmethod
+    def cleaninstances(cls):
+        for iPRTN in cls.__instances:
+            del iPRTN
+        cls.__instances = []
+            
 
 class electron(Particle):
-    __instance     = []
+    __instances     = []
     __Debug      = False
 
 #--------  "Built-in methods":
@@ -2495,7 +2525,7 @@ class electron(Particle):
             print(' electron(Particle).__init__:', \
                   'creating the electron object')
 
-        electron.__instance.append(self)
+        electron.__instances.append(self)
         
         #.. Particle class initialisation:
         Particle.__init__(self, "electron")
@@ -2509,8 +2539,15 @@ class electron(Particle):
     def getColor(self):
         return 'green'
         
+    @classmethod
+    def cleaninstances(cls):
+        for iPRTN in cls.__instances:
+            del iPRTN
+        cls.__instances = []
+
+            
 class twelveC6(Particle):
-    __instance     = []
+    __instances     = []
     __Debug      = False
 
 #--------  "Built-in methods":
@@ -2520,7 +2557,7 @@ class twelveC6(Particle):
             print(' twelveC6(Particle).__init__:', \
                   'creating the twelveC6 object')
 
-        twelveC6.__instance.append(self)
+        twelveC6.__instances.append(self)
         
         #.. Particle class initialisation:
         Particle.__init__(self, "12C6")
@@ -2530,3 +2567,8 @@ class twelveC6(Particle):
         
         return
     
+    @classmethod
+    def cleaninstances(cls):
+        for iPRTN in cls.__instances:
+            del iPRTN
+        cls.__instances = []
