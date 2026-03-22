@@ -775,6 +775,7 @@ class BeamLine(object):
 
     @classmethod
     def addBeamline(cls):
+        cls.setDebug(True)
         if cls.getDebug():
             print("            BeamLine.addBeamline starts:")
             
@@ -891,6 +892,8 @@ class BeamLine(object):
                 vStrt = iLst.getvEnd()
                 drStrt = np.array([0.,0.,0.])
                 dvStrt = np.array([0.,0.,0.])
+                if cls.getDebug():
+                    print("         ----> New element:")
             
             if cls.getDebug():
                 print("                ---->  rStrt:", rStrt)
@@ -1260,6 +1263,7 @@ class BeamLine(object):
                 print("               Momentum:", \
                       refPrtcl.getPrIn()[0])
                 print("     <---- Done.")
+        cls.setDebug(True)
 
     @classmethod
     def addBeamLineElement(cls, iBLE=False):
