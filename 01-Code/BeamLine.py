@@ -775,7 +775,6 @@ class BeamLine(object):
 
     @classmethod
     def addBeamline(cls):
-        cls.setDebug(True)
         if cls.getDebug():
             print("            BeamLine.addBeamline starts:")
             
@@ -1263,7 +1262,6 @@ class BeamLine(object):
                 print("               Momentum:", \
                       refPrtcl.getPrIn()[0])
                 print("     <---- Done.")
-        cls.setDebug(True)
 
     @classmethod
     def addBeamLineElement(cls, iBLE=False):
