@@ -1572,7 +1572,7 @@ class BeamLine(object):
                     break
                 else:
                     zEnd    = -999999.
-                    sEnd    = iBLE.getrStrt()[2] + iBLE.getLength()
+                    sEnd    = PrtclInst.gets()[iLoc-2] + iBLE.getLength()
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
                                                        sEnd, \
