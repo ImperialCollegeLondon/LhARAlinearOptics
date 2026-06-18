@@ -177,7 +177,7 @@ class BeamIO:
 
         else:
             if self.getBDSIMfile():
-                dataFILE = open(pathFILE, "r")
+                dataFILE = open(pathFILE, "r", encoding="utf-8-sig")
             else:
                 dataFILE = open(pathFILE, "rb")
             if self.getDebug():
@@ -325,6 +325,9 @@ class BeamIO:
             
             record = record.lstrip()
             record = record.rstrip('\n')
+            if self.getDebug():
+                print("     ----> record:", record, \
+                                            record.split(' '))
             TrcSpc = np.asarray(record.split(' '), dtype=float)
             if self.getDebug():
                 print("     ----> BDSIM file: number of fields:", len(TrcSpc))
