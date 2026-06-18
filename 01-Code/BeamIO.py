@@ -355,7 +355,7 @@ class BeamIO:
                 TrcSpc1[1] = TrcSpc[1]
                 TrcSpc1[2] = TrcSpc[2]
                 TrcSpc1[3] = TrcSpc[3]
-                TrcSpc1[4] = TrcSpc[3]
+                TrcSpc1[4] = TrcSpc[4]
                 TrcSpc1[5] = (1000.*TrcSpc[5] - E0) / p0
                 if self.getDebug():
                     print("     <---- TrcSpc1:", TrcSpc1)
