@@ -109,6 +109,7 @@ constants_instance = PhysCnst.PhysicalConstants()
 
 protonMASS         = constants_instance.mp()
 pionMASS           = constants_instance.mPion()
+speedOFlight       = constants_instance.SoL()
 
 class BeamIO:
     instances = []
@@ -358,8 +359,22 @@ class BeamIO:
                 TrcSpc1[1] = TrcSpc[1]
                 TrcSpc1[2] = TrcSpc[2]
                 TrcSpc1[3] = TrcSpc[3]
-                TrcSpc1[4] = TrcSpc[4]
                 TrcSpc1[5] = (1000.*TrcSpc[5] - E0) / p0
+
+                delE = TrcSpc1[5] * p0
+                E    = E0 + delE
+                p2   = E**2 - protonMASS**2
+                p    = mth.sqrt(p2)
+                TrcSpc1[4] = -TrcSpc[4] * speedOFlight / 1.E9
+                """(p/E - p0/E0) * TrcSpc[4] * E0/p0 * \
+                    speedOFlight / 1.E9
+                """
+                if self.getDebug():
+                    print("     ----> E0, p0:", \
+                          E0, p0)
+                    print("     ----> delE, E, p2, p:", \
+                                      delE, E, p2, p)
+                
                 if self.getDebug():
                     print("     <---- TrcSpc1:", TrcSpc1)
             
@@ -386,7 +401,6 @@ class BeamIO:
             if self.getDebug():
                 print("     ----> Id number:", nId)
                 
-            self.setDebug(True)
             Version = "Version 1"
             self.setdataFILEversion(1)
             if nId == 9999:
@@ -417,7 +431,6 @@ class BeamIO:
             if self.getDebug():
                 print("     <---- Data file format version:", \
                       self.getdataFILEversion())
-            self.setDebug(False)
         else:
             EoF = Prtcl.Particle.readParticle(self.getdataFILE(), \
                                               self.getdataFILEversion())
