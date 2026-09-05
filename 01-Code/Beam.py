@@ -171,9 +171,14 @@ class Beam:
                        _beamlineSpecificationCSVfile=None):
 
         if self.getDebug():
-            print(' Beam.__init__: ', \
-                  'creating the Beam object')
-            
+            print(' Beam.__init__: \n', \
+                  'creating the Beam object; input:', \
+                  '     ----> InputDataFile, nEvtMax,', \
+                  'outputCSVfile, startlocation,', \
+                  'beamlineSpecificationCSVfile:', \
+                  _InputDataFile, _nEvtMax, _outputCSVfile, _startlocation, \
+                  _beamlineSpecificationCSVfile)
+                  
         Beam.instances.append(self)
 
         self.setAll2None()
@@ -182,9 +187,11 @@ class Beam:
 
         #.. Load parameter file
         #.. Check and open input data file
-        if _InputDataFile == None:
+        if _InputDataFile                == None and \
+           _beamlineSpecificationCSVfile == None:
             raise Exception( \
-                        " Beam.__init__: no input data file given.")
+                " Beam.__init__: no input data file given ... and ...", \
+                 "no csv file.")
 
         if _nEvtMax == None:
             pass
@@ -213,19 +220,22 @@ class Beam:
 
 #--------  Open input data file, read first record, initialise sums:  -----
 
-        if isinstance(_InputDataFile, bmIO.BeamIO):
-            _ibmIOr = _InputDataFile
-        else:
-            _ibmIOr = bmIO.BeamIO(None, _InputDataFile)
-        self.setBeamIOread(_ibmIOr)
-        ParticleFILE = self.getBeamIOread().getdataFILE()
-        self.setInputDataFile(ParticleFILE)
+        if _InputDataFile != None:
+            if isinstance(_InputDataFile, bmIO.BeamIO):
+                _ibmIOr = _InputDataFile
+            else:
+                _ibmIOr = bmIO.BeamIO(None, _InputDataFile)
+                
+            self.setBeamIOread(_ibmIOr)
+            ParticleFILE = self.getBeamIOread().getdataFILE()
+            self.setInputDataFile(ParticleFILE)
 
-        EndOfFile = False
-        if BL.BeamLine.getinstances() == None:
-            EndOfFile = self.getBeamIOread().readBeamDataRecord()
+            EndOfFile = False
+            if BL.BeamLine.getinstances() == None:
+                EndOfFile = self.getBeamIOread().readBeamDataRecord()
 
         iBm = BL.BeamLine.getinstances()
+        
         if iBm == None:
             self.setbeamlineSpecificationCSVfile( \
                                         _beamlineSpecificationCSVfile)
@@ -746,7 +756,7 @@ class Beam:
         nEvtMax = self.getnEvtMax()
         if nEvtMax == None:
             nEvtMax = 1000
-        iEvtStopClean = max(0, nEvtMax-1000000)
+        iEvtStopClean = max(0, nEvtMax-1000)
         while not EndOfFile:
             EndOfFile = self.getBeamIOread().readBeamDataRecord()
             if not EndOfFile:
@@ -908,7 +918,7 @@ class Beam:
         font = {'family': 'serif', \
                 'color':  'darkred', \
                 }
-        plt.rcParams["figure.figsize"] = (10., 7.5)
+        plt.rcParams["figure.figsize"] = (10., 10.0)
 
         iLocMin = self.getstartlocation()
         nLocs = len(BLE.BeamLineElement.getinstances()) - iLocMin
@@ -987,54 +997,61 @@ class Beam:
                           s[iAddr], sx[iAddr], sy[iAddr])
 
         with PdfPages(plotFILE) as pdf:
-            fig, axs = plt.subplots(nrows=5, ncols=1, \
+            fig, axs = plt.subplots(nrows=6, ncols=1, \
                                     layout="constrained")
             # add an artist, in this case a nice label in the middle...
             Ttl = "Test"
             fig.suptitle(Ttl, fontdict=font)
 
-            ivisRPLCy = vis.visualise("RPLC", "ys")
+            ivisRPLCx = vis.visualise("RPLC", "xs")
             axs[0].set_xlim(-0.5, \
                 BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
             axs[0].set_ylim(-0.05, 0.05)
-            ivisRPLCy.Particles(axs[0], 1000)
-            ivisRPLCy.BeamLine(axs[0])
+            ivisRPLCx.Particles(axs[0], 1000)
+            ivisRPLCx.BeamLine(axs[0])
         
-            gs     = axs[2].get_gridspec()
-            axs[2].remove()
-            gs     = axs[1].get_gridspec()
-            axs[1].remove()
-            
-            axs[1] = fig.add_subplot(gs[1:3])
-
-            gs     = axs[4].get_gridspec()
-            axs[4].remove()
-            gs     = axs[3].get_gridspec()
-            axs[3].remove()
-            axs[2] = fig.add_subplot(gs[3:])
-
+            ivisRPLCy = vis.visualise("RPLC", "ys")
             axs[1].set_xlim(-0.5, \
                 BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
-            axs[1].plot(s[0:len(sx)], sx, \
-                color='b', marker='o', markersize=4, label='s_x')
-            axs[1].plot(s[0:len(sy)], sy, color='r', marker='s', markersize=4, \
-                        linestyle='dashed', label='s_y')
-            axs[1].legend()
-            axs[1].set_xlabel('s (m)')
-            axs[1].set_ylabel('s_{xy} (m)')
+            axs[1].set_ylim(-0.05, 0.05)
+            ivisRPLCy.Particles(axs[1], 1000)
+            ivisRPLCy.BeamLine(axs[1])
+        
+            gs     = axs[3].get_gridspec()
+            axs[3].remove()
+            gs     = axs[2].get_gridspec()
+            axs[2].remove()
+            
+            axs[2] = fig.add_subplot(gs[2:4])
+
+            gs     = axs[5].get_gridspec()
+            axs[5].remove()
+            gs     = axs[3].get_gridspec()
+            axs[4].remove()
+            axs[4] = fig.add_subplot(gs[4:])
 
             axs[2].set_xlim(-0.5, \
                 BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
-            axs[2].plot(s[0:len(ex)], ex, \
+            axs[2].plot(s[0:len(sx)], sx, \
+                color='b', marker='o', markersize=4, label='s_x')
+            axs[2].plot(s[0:len(sy)], sy, color='r', marker='s', markersize=4, \
+                        linestyle='dashed', label='s_y')
+            axs[2].legend()
+            axs[2].set_xlabel('s (m)')
+            axs[2].set_ylabel('s_{xy} (m)')
+
+            axs[4].set_xlim(-0.5, \
+                BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
+            axs[4].plot(s[0:len(ex)], ex, \
                           color='b', marker='o', markersize=4, label='e_x')
-            axs[2].plot(s[0:len(ey)], ey, \
+            axs[4].plot(s[0:len(ey)], ey, \
                           color='r', marker='s', markersize=4, 
                           linestyle='dashed', label='e_y')
-            axs[2].legend(loc='upper left')
-            axs[2].set_xlabel('s (m)')
-            axs[2].set_ylabel('e_{xy} (m)')
+            axs[4].legend(loc='upper left')
+            axs[4].set_xlabel('s (m)')
+            axs[4].set_ylabel('e_{xy} (m)')
 
-            ax2 = axs[2].twinx()
+            ax2 = axs[4].twinx()
             ax2.plot(s[0:len(exy)], exy, \
                        color='g', marker='d', markersize=4, \
                        linestyle='dotted', label='e_(xy)')
@@ -1046,82 +1063,89 @@ class Beam:
 
             # Twiss parameters and dispersion
             
-            fig, axs = plt.subplots(nrows=7, ncols=1, \
+            fig, axs = plt.subplots(nrows=8, ncols=1, \
                                     layout="constrained")
             # add an artist, in this case a nice label in the middle...
             Ttl = "Test"
             fig.suptitle(Ttl, fontdict=font)
 
-            ivisRPLCy = vis.visualise("RPLC", "ys")
+            ivisRPLCx = vis.visualise("RPLC", "xs")
             axs[0].set_xlim(-0.5, \
                 BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
             axs[0].set_ylim(-0.05, 0.05)
-            ivisRPLCy.Particles(axs[0], 1000)
-            ivisRPLCy.BeamLine(axs[0])
+            ivisRPLCx.Particles(axs[0], 1000)
+            ivisRPLCx.BeamLine(axs[0])
         
-            gs     = axs[2].get_gridspec()
-            axs[2].remove()
-            gs     = axs[1].get_gridspec()
-            axs[1].remove()
-            
-            axs[1] = fig.add_subplot(gs[1:3])
-
-            gs     = axs[4].get_gridspec()
-            axs[4].remove()
-            gs     = axs[3].get_gridspec()
-            axs[3].remove()
-            
-            axs[2] = fig.add_subplot(gs[3:5])
-    
-            gs     = axs[6].get_gridspec()
-            axs[6].remove()
-            gs     = axs[5].get_gridspec()
-            axs[5].remove()
-            
-            axs[3] = fig.add_subplot(gs[5:])
-    
+            ivisRPLCy = vis.visualise("RPLC", "ys")
             axs[1].set_xlim(-0.5, \
                 BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
-            axs[1].plot(s[0:len(bx)], bx, \
+            axs[1].set_ylim(-0.05, 0.05)
+            ivisRPLCy.Particles(axs[1], 1000)
+            ivisRPLCy.BeamLine(axs[1])
+        
+            gs     = axs[3].get_gridspec()
+            axs[3].remove()
+            gs     = axs[2].get_gridspec()
+            axs[2].remove()
+            
+            axs[2] = fig.add_subplot(gs[2:4])
+
+            gs     = axs[5].get_gridspec()
+            axs[5].remove()
+            gs     = axs[4].get_gridspec()
+            axs[4].remove()
+            
+            axs[3] = fig.add_subplot(gs[4:6])
+    
+            gs     = axs[7].get_gridspec()
+            axs[7].remove()
+            gs     = axs[6].get_gridspec()
+            axs[6].remove()
+            
+            axs[4] = fig.add_subplot(gs[6:])
+    
+            axs[2].set_xlim(-0.5, \
+                BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
+            axs[2].plot(s[0:len(bx)], bx, \
                           color='b', marker='o', markersize=4, \
                           label='b_x')
-            axs[1].plot(s[0:len(by)], by, \
+            axs[2].plot(s[0:len(by)], by, \
                           color='r', marker='s', markersize=4, \
                           linestyle='dashed', label='b_y')
-            axs[1].legend(loc='upper center')
-            axs[1].set_xlabel('s (m)')
-            axs[1].set_ylabel('b_{xy} (m)')
+            axs[2].legend(loc='upper center')
+            axs[2].set_xlabel('s (m)')
+            axs[2].set_ylabel('b_{xy} (m)')
 
-            ax1 = axs[1].twinx()
+            ax1 = axs[2].twinx()
             ax1.plot(s[0:len(exy)], exy, \
                      color='g', marker='d', markersize=4, \
                      linestyle='dotted', label='e_(xy)')
             ax1.legend()
             ax1.set_ylabel('e_(xy) (m)')
 
-            axs[2].set_xlim(-0.5, \
-                BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
-            axs[2].plot(s[0:len(ax)], ax, \
-                          color='b', marker='o', markersize=4, \
-                          label='a_x')
-            axs[2].plot(s[0:len(ay)], ay, \
-                        color='r', marker='s', markersize=4, 
-                        linestyle='dashed', label='a_y')
-            axs[2].legend()
-            axs[2].set_xlabel('s (m)')
-            axs[2].set_ylabel('a_{xy}')
-
             axs[3].set_xlim(-0.5, \
                 BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
-            axs[3].plot(s[0:len(gx)], gx, \
+            axs[3].plot(s[0:len(ax)], ax, \
                           color='b', marker='o', markersize=4, \
-                          label='g_x')
-            axs[3].plot(s[0:len(gy)], gy, \
-                        color='r', marker='s', markersize=4, \
-                        linestyle="dashed", label='g_y')
+                          label='a_x')
+            axs[3].plot(s[0:len(ay)], ay, \
+                        color='r', marker='s', markersize=4, 
+                        linestyle='dashed', label='a_y')
             axs[3].legend()
             axs[3].set_xlabel('s (m)')
-            axs[3].set_ylabel('g_{xy}')
+            axs[3].set_ylabel('a_{xy}')
+
+            axs[4].set_xlim(-0.5, \
+                BL.BeamLine.getcurrentReferenceParticle().gets()[-1]+0.5)
+            axs[4].plot(s[0:len(gx)], gx, \
+                          color='b', marker='o', markersize=4, \
+                          label='g_x')
+            axs[4].plot(s[0:len(gy)], gy, \
+                        color='r', marker='s', markersize=4, \
+                        linestyle="dashed", label='g_y')
+            axs[4].legend()
+            axs[4].set_xlabel('s (m)')
+            axs[4].set_ylabel('g_{xy}')
 
             pdf.savefig()
             plt.close()
@@ -1422,7 +1446,7 @@ class extrapolateBeam(Beam):
 
     def extrapolateBeam(self):
         if self.getDebug():
-            print(" extrapolateBeam.extrapolateBeam: transport", \
+            print(" Beam.extrapolateBeam: transport", \
                   "beam envelope")
             print("     ----> BeamLine: id(BL):", \
                   id(BL.BeamLine.getinstances()))
@@ -1435,16 +1459,39 @@ class extrapolateBeam(Beam):
 
         ParticleFILE = self.getInputDataFile()
 
+        Generate  = False
+        GotCvMtrx = False
+            
+        #.. if ParticleFILE is None, assume will generate starting
+        #   covariance matrix
+        if self.getDebug():
+            print("     ----> Choice of initial covariance matrix:")
+            print("         ----> len(self.getCovMtrx():", \
+                  len(self.getCovMtrx()))
+            print("         ----> ParticleFILE.closed:", ParticleFILE.closed)
+            
+        if len(self.getCovMtrx()) == 1:
+            if self.getDebug():
+                print("     ----> Got covariance matrix.")
+            GotCvMtrx = True
+        
+        elif ParticleFILE == None:
+            if self.getDebug():
+                print("     ----> No particle file closed, so generate", \
+                      "initial covariance matrix as specified in csv file.")
+            Generate = True
+            
         #.. if ParticleFILE is closed, assume dont need to make initial
         #   covariance matrix
-        if ParticleFILE.closed:
+        elif ParticleFILE.closed:
             if self.getDebug():
                 print("     ----> Particle file closed, so continue from", \
                       " stored source covariance matrix.")
-            pass
-        else:
+            GotCvMtrx = True
+
+        if not GotCvMtrx:
             if self.getDebug():
-                print("     ----:>event loop")
+                print("     ----> Event loop")
 
             nEvtMax = self.getnEvtMax()
             if nEvtMax == None:
@@ -1452,12 +1499,13 @@ class extrapolateBeam(Beam):
             iEvtStopClean = max(0, nEvtMax-1000)
             Cleaned       = None
             while not EndOfFile:
-                try:
-                    EndOfFile = Prtcl.Particle.readParticle(ParticleFILE)
-                except:
+                if not Generate:
                     EndOfFile = self.getBeamIOread().readBeamDataRecord()
-                    
+
                 if not EndOfFile:
+                    iPrtcl = Prtcl.Particle.getinstances()[-1]
+                    rEvt = BL.BeamLine.trackBeam(1, None, iPrtcl)
+
                     iEvt += 1
                     if (iEvt % Scl) == 0:
                         if self.getDebug():
@@ -1480,7 +1528,6 @@ class extrapolateBeam(Beam):
                     if self.getnEvtMax() != None and iEvt >= \
                        self.getnEvtMax():
                         break
-            
             if self.getDebug():
                 print("     <----", iEvt, "events read")
 

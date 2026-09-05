@@ -1713,8 +1713,11 @@ class ReferenceParticle(Particle):
         return cls.__speciesLIST
 
     @classmethod
-    def getinstance(cls, species):
-        id = cls.__speciesLIST.index(species)
+    def getinstance(cls, species=None):
+        if species == None:
+            id = 0
+        else:
+            id = cls.__speciesLIST.index(species)
         return cls.__instances[id]
 
     @classmethod

@@ -38,20 +38,14 @@ def startAnalysis(argv):
                       default=1000, type=int)
     
     prsr.add_argument("-d", "--debug", help="debug flag (boolean)", \
-                      default=False, type=bool)
+                      action='store_true')
+
     prsr.add_argument("-z", "--bdsimfile", \
                 help="boolean flag; if true input file is in BDSIM format", \
-                      default=False, type=bool)
+                      action='store_true')
     
     print(" UserAnal.startAnalysis:")
     Success = False
-
-    """
-    print("args:", args)
-
-    opts, args = getopt.getopt(argv,"hdiz:o:b:n:",\
-                            ["ifile=","BDSIMfile","ofile=","bfile=", "nEvts="])
-    """
 
     beamspecfile = None
     inputfile    = None
@@ -66,6 +60,8 @@ def startAnalysis(argv):
     outputfile = prsr.parse_args().outputfile
     beamspecfile = prsr.parse_args().beamspecfile
     nEvts = prsr.parse_args().nEvents
+
+    print(" !! Debug:", Debug)
 
     if (inputfile == None and beamspecfile == None) or \
        (inputfile != None and beamspecfile != None and not bdsimfile):
@@ -96,6 +92,7 @@ def startAnalysis(argv):
 #--------  Do the i/o file handling
 def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
     print(" UserAnal.handleFILES start:")
+
     Success = False
 
     HOMEPATH    = os.getenv('HOMEPATH')
@@ -115,11 +112,10 @@ def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
             sys.exit(1)
 
         ibmIOr = bmIO.BeamIO(None, inputfile, False, bdsimFILE)
-        print("         ---->              Input file:", inputfile)
+        print("         ----> Input file:", inputfile)
         if bdsimFILE:
             print("             ----> BDSIM file:", bdsimFILE)
             
-
         if not bdsimFILE:
             EndOfFile = ibmIOr.readBeamDataRecord()
             if EndOfFile: 
@@ -131,7 +127,7 @@ def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
     ibmIOw = None
     if outputfile != None and not os.path.isabs(outputfile): 
         outputfile = os.path.join(HOMEPATH, outputfile)
-        print("         ---->             Output file:", outputfile)
+        print("         ----> Output file:", outputfile)
     if outputfile != None and not \
        os.path.isdir(os.path.dirname(outputfile)):
         print("         ----> Directory for output file", \
@@ -155,7 +151,7 @@ def handleFILES(beamspecfile, inputfile, outputfile, bdsimFILE=False):
         ofileSPLIT = [None, None]
         if outputfile != None:
             ofileSPLIT = os.path.split(outputfile)
-        print(" ofileSPLIT:", ofileSPLIT)
+        print("         ----> ofileSPLIT:", ofileSPLIT)
         iSm    = Simu.Simulation(1, None, ofileSPLIT[0], ofileSPLIT[1])
 
         ibmIOw = iSm.getiBmIOw()

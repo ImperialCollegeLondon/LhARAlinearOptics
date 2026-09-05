@@ -909,7 +909,6 @@ class BeamLineElement:
 #--------  Utilities:
     @classmethod
     def cleaninstances(cls):
-        cls.setDebug(True)
         if cls.getDebug():
             print(' BeamLineElement.cleaninstance: clean instances.')
         for inst in cls.instances:
@@ -921,7 +920,6 @@ class BeamLineElement:
         cls.instances = []
         if cls.getDebug():
             print(' <---- BeamLineElement.cleaninstance: instances removed.')
-        cls.setDebug(False)
 
     @classmethod
     def removeInstance(cls, inst):
@@ -1241,10 +1239,7 @@ class Facility(BeamLineElement):
 
         print(" TimeBomb!  This routine was modified to deal with", \
               "list of reference particles; need to check it!")
-        x = 1.
-        y = 0.
-        z = x/y
-
+        
         Stage   = 0
         Section = "Facility"
         Element = "Global"
@@ -1260,10 +1255,10 @@ class Facility(BeamLineElement):
         Param   = "Kinetic energy"
         Unit    = "MeV"
         idRfPrtcl = 0
-        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances():
+        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances("All"):
             p0      = self.getp0()[idRfPrtcl]
             particleMASS = PhysCnst.PhysicalConstants().getparticleMASS( \
-                                        self.getspecies0() )
+                                        self.getspecies0()[idRfPrtcl] )
             E       = mth.sqrt( particleMASS**2 + p0**2)
             K       = E - particleMASS
             Value   = K
@@ -1277,10 +1272,10 @@ class Facility(BeamLineElement):
         Param   = "Species"
         Unit    = ""
         idRfPrtcl = 0
-        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances():
-            Value = self.getSpecies()[idRfPrtcl]
+        for iRefPrtcl in Prtcl.ReferenceParticle.getinstances("All"):
+            Value = self.getspecies0()[idRfPrtcl]
 
-            Value   = K
+            Value   = self.getspecies0()[idRfPrtcl]
             Lines.append([Stage, Section, Element, Type, \
                           Param, Value, Unit, Comment])
             
@@ -5381,6 +5376,7 @@ Derived class Source:
            Flat (Mode=2)
 
            Read from file (Mode=3)
+             [0] = User should set to BeamIO instance of file to be read
 
            Uniform disc (Mode=4):
              [0] - Kinetic energy - MeV
@@ -5466,7 +5462,7 @@ class Source(BeamLineElement):
                     "MeV", "MeV", \
                     "degrees", "degrees", " "], \
                    ["m", "m", "MeV", "MeV", ""], \
-                   [], [], \
+                   [" "], [], \
                    ["MeV", "MeV", "m"] ]
     
     ParamText  = [ ["Wavelength", "Power", "Strehl ratio", "r0", \
@@ -5475,8 +5471,9 @@ class Source(BeamLineElement):
                     "SigmaThetaS0", "SlopeThetaS", "rpmax"], \
                    ["SigmaX", "SigmaY", "MinCTheta", \
                     "MeanEnergy", "SigmaEnergy"],    \
-                   [], [], \
-                   ["MeanEnergy", "SigmaEnergy", "MaxRadius"] ]
+                   [], \
+                   ["imput file (BeamIO instance)"], \
+                   ["MeanEnergy", "SigmaEnergy", "Radius"] ]
     
     ParamList  = [ [float, float, float, float, float, float, \
                     float, float, float, float, float], \
@@ -5632,7 +5629,7 @@ class Source(BeamLineElement):
     
 #--------  Processing methods:
     def getParticleFromSource(self):
-        if self.__Debug:
+        if self.getDebug():
             print(" BeamLineElement(Source).getParticleFromSource: start")
 
         #.. Generate initial particle:
@@ -5650,7 +5647,7 @@ class Source(BeamLineElement):
             if self.__Debug:
                 raise FailToCreateTraceSpaceAtSource()
                 
-        if self.__Debug:
+        if self.getDebug():
             print(" <---- BeamLineElement(Source).getParticleFromSource,", \
                   " done.", \
                   '  --------  --------  --------  --------  --------')
@@ -5661,7 +5658,6 @@ class Source(BeamLineElement):
     #.. clean all source instances:
     @classmethod
     def cleaninstances(cls):
-        cls.setDebug(True)
         if cls.getDebug():
             print(" Source(BeamLineElement).cleaninstance:")
         for inst in cls.getinstances():
@@ -5676,7 +5672,6 @@ class Source(BeamLineElement):
         cls.instances = []
         if cls.getDebug():
             print(' <---- Instances removed.')
-        cls.setDebug(False)
 
     @classmethod
     #.. Check through data frame and report legacy lines:
@@ -5928,7 +5923,7 @@ class Source(BeamLineElement):
         yp       = None
 
         #-------- Laser driven:
-        if self._Mode == 0:
+        if self.getMode() == 0:
             #.. Proton kinetic energy:
             if self.getDebug():
                 print("     ----> Calling getLaserDrivenProtonEnergy:")
@@ -5976,23 +5971,29 @@ class Source(BeamLineElement):
                     
             if xp == yp:
                 wrnngs.warn(" BeamLineElement.Source.getParticle:", \
-                            " eqaual xp adn yp")
+                            " eqaual xp and yp")
             
             cosTheta, Phi = None, None # Backward compatibility!
 
-        elif self._Mode == 1:
+        elif self.getMode() == 1:
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
             cosTheta, Phi = self.getFlatThetaPhi()
             KE            = rnd.gauss(self.getParameters()[3], \
                                       self.getParameters()[4])
-        elif self._Mode == 2:
+        elif self.getMode() == 2:
             X             = rnd.gauss(0., self.getParameters()[0])
             Y             = rnd.gauss(0., self.getParameters()[1])
             cosTheta, Phi = self.getFlatThetaPhi()
             KE            = rnd.uniform(self.getParameters()[3], \
                                         self.getParameters()[4])
-        elif self._Mode == 4:
+        elif self.getMode() == 3:
+            self.getParameters()[0].readBeamDataRecord()
+            x = 1.
+            y = 0.
+            z = x/y
+            exit()
+        elif self.getMode() == 4:
             KE            = rnd.gauss(self.getParameters()[0], \
                                       self.getParameters()[1])
             rd            = self.getParameters()[2] * mth.sqrt(rnd.random())
@@ -6001,6 +6002,8 @@ class Source(BeamLineElement):
             Y             = rd * mth.sin(phi)
             xp            = 0.
             yp            = 0.
+        else:
+            raise badSOURCEmode(self.getMode())
 
         if self.getDebug():
             print("     ----> X, Y, KE, cosTheta, Phi, xp, yp:", \
@@ -6336,8 +6339,12 @@ class Source(BeamLineElement):
             print("     ----> len(_Param):", len(_Param))
             print("         ----> cf     :", len(cls.ParamList[_Mode]))
 
-        if len(_Param) == len(cls.ParamList[_Mode]):
-            iMtch = 0
+        iMtch = 0
+        if _Mode == 3 and len(_Param) == 0:
+            if cls.getDebug():
+                print("     ----> Mode, len(param):", _Mode, \
+                      len(_Param))
+        elif len(_Param) == len(cls.ParamList[_Mode]):
             for i in range(len(_Param)):
                 if cls.getDebug():
                     print("         ----> i, ParamList, _Param:", \
@@ -7831,4 +7838,7 @@ class cantFINDfile(Exception):
     pass
 
 class need2convertdvStrt(Exception):
+    pass
+
+class badSOURCEmode(Exception):
     pass

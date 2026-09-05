@@ -154,7 +154,7 @@ class Simulation(object):
             # Create Facility instance:
             cls.setFacility(BL.BeamLine(filename))
             p0BLfile = BLE.Facility.getinstances().getp0()[0]
-            print("             ---->", \
+            print(" Simulation instanciation:", \
                   "Reference particle momentum from beam line file:", \
                   p0BLfile)
             if p0iBmIOr != p0BLfile and _inputFILE != None and \
@@ -166,7 +166,8 @@ class Simulation(object):
                   " is not the same as that read from input file, abort.", \
                   "****" )
                 raise referenceMOMENTUMmismatch()
-            print("         <---- Beam line set up.")
+            if cls.getDebug():
+                print(" <---- Beam line set up.")
 
             # Open file for write:
             if _dataFileDir != None or _dataFileName != None:

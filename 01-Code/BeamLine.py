@@ -1138,7 +1138,6 @@ class BeamLine(object):
                                        " invalid.")
                 if cls.getDebug():
                     print("             ----> Add", Name)
-                print(" Here: Name, B0:", Name, B0)
                 iBLE = BLE.Solenoid(Name, \
                                 rStrt, vStrt, drStrt, dvStrt, SlndL, B0)
                 cls.addBeamLineElement(iBLE)
@@ -1518,8 +1517,6 @@ class BeamLine(object):
             print(" <---- End of this simulation, ", NEvts, \
                   " events generated")
 
-
-            
     @staticmethod
     def trackPARTICLE(SrcTrcSpc, LocStrt, iRefPrtcl, PrtclInst):
         #.. Track particle through beam line:
@@ -1572,11 +1569,12 @@ class BeamLine(object):
                     break
                 else:
                     zEnd    = -999999.
-                    sEnd    = PrtclInst.gets()[iLoc-2] + iBLE.getLength()
+                    sEnd    = PrtclInst.gets()[-1] + iBLE.getLength()
                     Success = PrtclInst.recordParticle(iBLE.getName(), \
                                                        zEnd, \
                                                        sEnd, \
                                                        TrcSpc)
+                    
             TrcSpc_i = TrcSpc
 
         if BeamLine.getDebug():
@@ -1809,7 +1807,6 @@ class BeamLine(object):
             
             if derivedCLASS == "Facility":
                 if version != None:
-                    print(version)
                     if version < 7:
                         if species0 == []: species0 = ["proton"]
                 instBLE = BLE.Facility(Loc, r, v, dr, dv, \

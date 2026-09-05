@@ -281,9 +281,6 @@ class BeamIO:
     def getReadFirstRecord(self):
         return self._Rd1stRcrd
     
-    def getReadFirstRecord(self):
-        return self._Rd1stRcrd
-
     def getrepoVERSION(self):
         return self._repoVERSION
 
@@ -308,6 +305,7 @@ class BeamIO:
             print("     ----> Read first record:", \
                   self.getReadFirstRecord())
 
+        
         if not isinstance(self.getdataFILE(), io.BufferedReader) and \
            not isinstance(self.getdataFILE(), io.TextIOWrapper):
             raise noFILE( \
@@ -323,7 +321,7 @@ class BeamIO:
             if record == '':
                 EoF = True
                 return EoF
-            
+
             record = record.lstrip()
             record = record.rstrip('\n')
             if self.getDebug():
